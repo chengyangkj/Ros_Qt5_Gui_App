@@ -47,3 +47,22 @@ catkin_make
 ```cpp
 rosrun cyrobot_monitor cyrobot_monitor
 ```
+### LICENCE
+### 开源协议
+**GNU GPL（GNU General Public License，GNU通用公共许可证）**
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408135643929.png)
+
+- As long as the software contains products or code that follow this Agreement, the software must also comply with the GPL License Agreement, i.e. it must be open source free, not charged from a closed source, and not commercial software.
+- 只要软件中包含了遵循本协议的产品或代码，该软件就必须也遵循 GPL 许可协议，也就是必须开源免费，不能闭源收费，不能作为商用软件。
+
+*Key features of GPL open source protocol*
+*GPL 开源协议的主要特点*
+- Copy Freedom allows software to be copied to anyone's computer without limiting the number of copies.
+- 复制自由 	允许把软件复制到任何人的电脑中，并且不限制复制的数量。
+- Freedom of communication Allows software to be disseminated in various forms.
+- 传播自由 	允许软件以各种形式进行传播。
+- Fee-based communication allows the software to be sold in a variety of media, but buyers must be made aware in advance that the software is free to be obtained;
+- 收费传播 	允许在各种媒介上出售该软件，但必须提前让买家知道这个软件是可以免费获得的；因此，一般来讲，开源软件都是通过为用户提供有偿服务的形式来盈利的。
+- Fee-based communication allows the software to be sold in a variety of media, but buyers must be made aware in advance that the software is free to be obtained;
+Freedom of modification allows developers to add or remove the functionality of the software, but the software must still be licensed on a GPL license agreement after modification.
+- 修改自由 	允许开发人员增加或删除软件的功能，但软件修改后必须依然基于GPL许可协议授权。
