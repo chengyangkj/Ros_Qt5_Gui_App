@@ -49,7 +49,7 @@ catkin_make
 rosrun cyrobot_monitor cyrobot_monitor
 ```
 ***
-### LICENCE
+### LIENSE
 ### 开源协议
 **GNU GPL（GNU General Public License，GNU通用公共许可证）**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408135643929.png)
