@@ -20,7 +20,7 @@ public:
     QRviz(QVBoxLayout *layout,QString node_name);
     void run();
     void createDisplay(QString display_name,QString topic_name);
-    void Display_Grid(bool enable,QColor color=QColor(125,125,125));
+    void Display_Grid(bool enable,QString Reference_frame,int Plan_Cell_count,QColor color=QColor(125,125,125));
     void Display_Map(bool enable,QString topic,double Alpha,QString Color_Scheme);
 
 private:

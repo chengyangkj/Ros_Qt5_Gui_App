@@ -27,18 +27,13 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
     manager_->initialize();
     manager_->removeAllDisplays();
 
-//    rviz::Display* grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
-//    ROS_ASSERT( grid_ != NULL );
-//    // Configure the GridDisplay the way we like it.
-//    grid_->subProp( "Line Style" )->setValue("Billboards");
-//    grid_->subProp( "Color" )->setValue(QColor(125,125,125));
-//    manager_->startUpdate();
+
 
 
 
 }
 //显示grid
-void QRviz::Display_Grid(bool enable,QColor color)
+void QRviz::Display_Grid(bool enable,QString Reference_frame,int Plan_Cell_count,QColor color)
 {
     if(grid_==NULL)
     {
@@ -47,10 +42,19 @@ void QRviz::Display_Grid(bool enable,QColor color)
         // Configure the GridDisplay the way we like it.
         grid_->subProp( "Line Style" )->setValue("Billboards");
         grid_->subProp( "Color" )->setValue(color);
+        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
+        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
 
     }
     else{
+        delete grid_;
+        grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
+        ROS_ASSERT( grid_ != NULL );
+        // Configure the GridDisplay the way we like it.
+        grid_->subProp( "Line Style" )->setValue("Billboards");
         grid_->subProp( "Color" )->setValue(color);
+        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
+        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
     }
     grid_->setEnabled(enable);
     manager_->startUpdate();
@@ -65,9 +69,19 @@ void QRviz::Display_Map(bool enable,QString topic,double Alpha,QString Color_Sch
     }
     if(map_==NULL)
     {
-        qDebug()<<"map ok";
         map_=manager_->createDisplay("rviz/Map","QMap",true);
 
+        ROS_ASSERT(map_);
+        map_->subProp("Topic")->setValue(topic);
+        map_->subProp("Alpha")->setValue(Alpha);
+        map_->subProp("Color Scheme")->setValue(Color_Scheme);
+    }
+    else{
+         ROS_ASSERT(map_);
+         qDebug()<<"asdasdasd:"<<topic<<Alpha;
+
+        delete map_;
+        map_=manager_->createDisplay("rviz/Map","QMap",true);
         ROS_ASSERT(map_);
         map_->subProp("Topic")->setValue(topic);
         map_->subProp("Alpha")->setValue(Alpha);

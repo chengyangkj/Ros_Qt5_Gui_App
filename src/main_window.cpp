@@ -158,7 +158,9 @@ void MainWindow::initUis()
 void MainWindow::initRviz()
 {
 map_rviz=new QRviz(ui.verticalLayout_build_map,"qrviz");
-map_rviz->Display_Grid(true,QColor(160,160,160));
+QComboBox *Global_op=(QComboBox *) ui.treeWidget_rviz->itemWidget(ui.treeWidget_rviz->topLevelItem(0)->child(0),1);
+QString Reference_text=Global_op->currentText();
+map_rviz->Display_Grid(true,Reference_text,10,QColor(160,160,160));
 //qrviz=new QRviz_widget(ui.widget);
 //qrviz->showFullScreen();
 //qrviz->show();
@@ -256,16 +258,26 @@ void MainWindow::slot_treewidget_item_check_change(int is_check)
         QLineEdit *Color_text=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
         QString co=Color_text->text();
         QStringList colorList=co.split(";");
-        if(colorList.size()==3)
+        QColor cell_color=QColor(colorList[0].toInt(),colorList[1].toInt(),colorList[2].toInt());
+
+        QComboBox *Reference_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
+        QString Reference_text=Reference_box->currentText();
+        if(Reference_box->currentText()=="<Fixed Frame>")
         {
-            map_rviz->Display_Grid(true,QColor(colorList[0].toInt(),colorList[1].toInt(),colorList[2].toInt()));
+            QComboBox *Global_op=(QComboBox *) ui.treeWidget_rviz->itemWidget(ui.treeWidget_rviz->topLevelItem(0)->child(0),1);
+            Reference_text=Global_op->currentText();
         }
+        QSpinBox *plan_cell_count=(QSpinBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
+        map_rviz->Display_Grid(enable,Reference_text,plan_cell_count->text().toInt(),cell_color);
+
     }
     else if(dis_name=="Map")
     {
+
         QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
         QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
         QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
+        qDebug()<<topic_box->currentText()<<alpha->text()<<scheme->currentText();
         map_rviz->Display_Map(enable,topic_box->currentText(),alpha->text().toDouble(),scheme->currentText());
     }
 }
@@ -289,10 +301,17 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
         QLineEdit *Color_text=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
         QString co=Color_text->text();
         QStringList colorList=co.split(";");
-        if(colorList.size()==3)
+        QColor cell_color=QColor(colorList[0].toInt(),colorList[1].toInt(),colorList[2].toInt());
+
+        QComboBox *Reference_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
+        QString Reference_text=Reference_box->currentText();
+        if(Reference_box->currentText()=="<Fixed Frame>")
         {
-            map_rviz->Display_Grid(enable,QColor(colorList[0].toInt(),colorList[1].toInt(),colorList[2].toInt()));
+            QComboBox *Global_op=(QComboBox *) ui.treeWidget_rviz->itemWidget(ui.treeWidget_rviz->topLevelItem(0)->child(0),1);
+            Reference_text=Global_op->currentText();
         }
+        QSpinBox *plan_cell_count=(QSpinBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
+        map_rviz->Display_Grid(enable,Reference_text,plan_cell_count->text().toInt(),cell_color);
 
     }
     else if(Dis_Name=="Global Options")
@@ -304,6 +323,7 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
         QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
         QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
         QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
+        qDebug()<<topic_box->currentText()<<alpha->text()<<scheme->currentText();
         map_rviz->Display_Map(enable,topic_box->currentText(),alpha->text().toDouble(),scheme->currentText());
     }
 
