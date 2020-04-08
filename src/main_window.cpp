@@ -52,6 +52,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
         on_button_connect_clicked(true);
     }
 
+
+
     initRviz();
     //链接connect
     connections();
@@ -116,6 +118,7 @@ void MainWindow::initUis()
     ui.treeWidget_rviz->addTopLevelItem(Grid);
     Grid->setExpanded(true);
     QCheckBox* gridcheck=new QCheckBox;
+    gridcheck->setChecked(true);
     ui.treeWidget_rviz->setItemWidget(Grid,1,gridcheck);
 
     QTreeWidgetItem *Grid_Status=new QTreeWidgetItem(QStringList()<<"Statue:");
@@ -134,8 +137,9 @@ void MainWindow::initUis()
     ui.treeWidget_rviz->setItemWidget(Reference_Frame,1,Reference_Frame_Value);
 
     QTreeWidgetItem* Plan_Cell_Count=new QTreeWidgetItem(QStringList()<<"Plan Cell Count");
-    QSpinBox* Plan_Cell_Count_Value=new QSpinBox();
     Grid->addChild(Plan_Cell_Count);
+    QSpinBox* Plan_Cell_Count_Value=new QSpinBox();
+
     Plan_Cell_Count_Value->setMaximumWidth(150);
     Plan_Cell_Count_Value->setRange(1,100);
     Plan_Cell_Count_Value->setValue(10);
@@ -153,10 +157,11 @@ void MainWindow::initUis()
 }
 void MainWindow::initRviz()
 {
-
-qrviz=new QRviz_widget(ui.widget_rviz);
-qrviz->showFullScreen();
-qrviz->show();
+map_rviz=new QRviz(ui.verticalLayout_build_map,"qrviz");
+map_rviz->Display_Grid(true,QColor(160,160,160));
+//qrviz=new QRviz_widget(ui.widget);
+//qrviz->showFullScreen();
+//qrviz->show();
 
 }
 void MainWindow::connections()
@@ -242,13 +247,67 @@ void MainWindow::slot_treewidget_item_check_change(int is_check)
 {
     QCheckBox* sen = (QCheckBox*)sender();
     qDebug()<<"check:"<<is_check<<"parent:"<<tree_rviz_keys[sen]->text(0)<<"地址："<<tree_rviz_keys[sen];
+    QTreeWidgetItem *parentItem=tree_rviz_keys[sen];
+    QString dis_name=tree_rviz_keys[sen]->text(0);
+    bool enable=is_check>1?true:false;
+    if(dis_name=="Grid")
+    {
+
+        QLineEdit *Color_text=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
+        QString co=Color_text->text();
+        QStringList colorList=co.split(";");
+        if(colorList.size()==3)
+        {
+            map_rviz->Display_Grid(true,QColor(colorList[0].toInt(),colorList[1].toInt(),colorList[2].toInt()));
+        }
+    }
+    else if(dis_name=="Map")
+    {
+        QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
+        QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
+        QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
+        map_rviz->Display_Map(enable,topic_box->currentText(),alpha->text().toDouble(),scheme->currentText());
+    }
 }
-//treewidget 的值槽函数
+//treewidget 的值改变槽函数
 void MainWindow::slot_treewidget_item_value_change(QString value)
 {
+
     QWidget* sen = (QWidget*)sender();
-    qDebug()<<sen->metaObject()->className()<<"parent:"<<tree_rviz_keys[(QWidget*)sen]->text(0);
-//    qDebug()<<value;
+    qDebug()<<sen->metaObject()->className()<<"parent:"<<tree_rviz_keys[sen]->text(0);
+    qDebug()<<value;
+    QTreeWidgetItem *parentItem=tree_rviz_keys[sen];
+    QString Dis_Name=tree_rviz_keys[sen]->text(0);
+    //是否启用该图层
+    QCheckBox *che_box=(QCheckBox *) ui.treeWidget_rviz->itemWidget(parentItem,1);
+    bool enable=che_box->isChecked();
+//    qDebug()<<"sdad"<<enable;
+    //判断每种显示的类型
+    if(Dis_Name=="Grid")
+    {
+
+        QLineEdit *Color_text=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
+        QString co=Color_text->text();
+        QStringList colorList=co.split(";");
+        if(colorList.size()==3)
+        {
+            map_rviz->Display_Grid(enable,QColor(colorList[0].toInt(),colorList[1].toInt(),colorList[2].toInt()));
+        }
+
+    }
+    else if(Dis_Name=="Global Options")
+    {
+
+    }
+    else if(Dis_Name=="Map")
+    {
+        QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
+        QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
+        QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
+        map_rviz->Display_Map(enable,topic_box->currentText(),alpha->text().toDouble(),scheme->currentText());
+    }
+
+
 }
 //rviz添加topic的槽函数
 void MainWindow::slot_add_topic_btn()
@@ -276,13 +335,42 @@ void MainWindow::slot_add_topic_btn()
 void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
 {
     ui.treeWidget_rviz->addTopLevelItem(choose);
+    //添加是否启用的checkbox
     QCheckBox *check=new QCheckBox();
     ui.treeWidget_rviz->setItemWidget(choose,1,check);
-
-
     //记录父子关系
     tree_rviz_keys[check]=choose;
+    //绑定checkbox的槽函数
     connect(check,SIGNAL(stateChanged(int)),this,SLOT(slot_treewidget_item_check_change(int)));
+    //添加状态的对应关系到map
+    tree_rviz_stues[choose->text(0)]=choose->child(0);
+
+    if(choose->text(0)=="Map")
+    {
+        QComboBox *Map_Topic=new QComboBox();
+        Map_Topic->addItem("map");
+        Map_Topic->setEditable(true);
+        Map_Topic->setMaximumWidth(150);
+        tree_rviz_keys[Map_Topic]=choose;
+        ui.treeWidget_rviz->setItemWidget(choose->child(1),1,Map_Topic);
+        //绑定值改变了的事件
+        connect(Map_Topic,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+        QLineEdit *map_alpha=new QLineEdit;
+        map_alpha->setMaximumWidth(150);
+        map_alpha->setText("0.7");
+        tree_rviz_keys[map_alpha]=choose;
+        //绑定值改变了的事件
+        connect(map_alpha,SIGNAL(textChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+        ui.treeWidget_rviz->setItemWidget(choose->child(2),1,map_alpha);
+
+        QComboBox *Map_Scheme=new QComboBox;
+        Map_Scheme->setMaximumWidth(150);
+        Map_Scheme->addItems(QStringList()<<"map"<<"costmap"<<"raw");
+        tree_rviz_keys[Map_Scheme]=choose;
+        //绑定值改变了的事件
+        connect(Map_Scheme,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+        ui.treeWidget_rviz->setItemWidget(choose->child(3),1,Map_Scheme);
+    }
 }
 //左工具栏索引改变
 void MainWindow::slot_tab_manage_currentChanged(int index)

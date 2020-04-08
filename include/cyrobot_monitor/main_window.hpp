@@ -17,8 +17,7 @@
 #include "qnode.hpp"
 #include "addtopics.h"
 #include "settings.h"
-#include "qrviz.h"
-#include "qrviz_widget.h"
+#include "qrviz.hpp"
 //仪表盘头文件
 #include "CCtrlDashBoard.h"
 #include "QProcess"
@@ -106,11 +105,16 @@ private:
     QProcess *close_remote_cmd=NULL;
     QProcess *base_cmd=NULL;
     QRviz *map_rviz=NULL;
-    QRviz_widget *qrviz=NULL;
     QStandardItemModel* treeView_rviz_model=NULL;
     AddTopics *addtopic_form=NULL;
+    //存放rviz treewidget当前显示的控件及控件的父亲的地址
     QMap <QWidget*,QTreeWidgetItem *> tree_rviz_keys;
+    //存放状态栏的对应关系 display名 状态item
+    QMap <QString,QTreeWidgetItem *> tree_rviz_stues;
+    //存放display的当前值 item名，参数名称和值
+    QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
     Settings *set;
+
 };
 }// namespace cyrobot_monitor
 

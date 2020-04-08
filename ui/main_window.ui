@@ -448,11 +448,7 @@ QProgressBar {
               <height>1081</height>
              </rect>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_build_map">
-             <item>
-              <widget class="QWidget" name="widget_rviz" native="true"/>
-             </item>
-            </layout>
+            <layout class="QVBoxLayout" name="verticalLayout_build_map"/>
            </widget>
           </widget>
           <widget class="QWidget" name="tab_7">

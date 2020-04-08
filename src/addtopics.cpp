@@ -80,6 +80,19 @@ void AddTopics::initUi()
      Map=new QTreeWidgetItem(QStringList()<<"Map");
     Map->setIcon(0,QIcon("://images/classes/Map.png"));
     parent->addChild(Map);
+    QTreeWidgetItem* Map_status=new QTreeWidgetItem(QStringList()<<"Status");
+    Map_status->setIcon(0,QIcon("://images/ok.png"));
+    Map->addChild(Map_status);
+    Map_status->setHidden(true);
+    QTreeWidgetItem* Map_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
+    Map->addChild(Map_Topic);
+    Map_Topic->setHidden(true);
+    QTreeWidgetItem* Map_Alpha=new QTreeWidgetItem(QStringList()<<"Alpha");
+    Map->addChild(Map_Alpha);
+    Map_Alpha->setHidden(true);
+    QTreeWidgetItem* Map_Color_Scheme=new QTreeWidgetItem(QStringList()<<"Color Scheme");
+    Map->addChild(Map_Color_Scheme);
+    Map_Color_Scheme->setHidden(true);
 
      Marker=new QTreeWidgetItem(QStringList()<<"Marker");
     Marker->setIcon(0,QIcon("://images/classes/Marker.png"));
