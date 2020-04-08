@@ -99,7 +99,7 @@ void MainWindow::initUis()
     QTreeWidgetItem* bcolor=new QTreeWidgetItem(QStringList()<<"Background Color");
     Global->addChild(bcolor);
     //添加lineedit控件
-    QLineEdit *colorval=new QLineEdit("255;255;255");
+    QLineEdit *colorval=new QLineEdit("48;48;48");
     colorval->setMaximumWidth(150);
     ui.treeWidget_rviz->setItemWidget(bcolor,1,colorval);
 
@@ -107,6 +107,7 @@ void MainWindow::initUis()
     framerateval->setStyleSheet("border:none");
     framerateval->setMaximumWidth(150);
     framerateval->setRange(10,50);
+    framerateval->setValue(30);
     QTreeWidgetItem* framerate=new QTreeWidgetItem(QStringList()<<"Frame Rate");
     Global->addChild(framerate);
     ui.treeWidget_rviz->setItemWidget(framerate,1,framerateval);
@@ -161,9 +162,8 @@ map_rviz=new QRviz(ui.verticalLayout_build_map,"qrviz");
 QComboBox *Global_op=(QComboBox *) ui.treeWidget_rviz->itemWidget(ui.treeWidget_rviz->topLevelItem(0)->child(0),1);
 QString Reference_text=Global_op->currentText();
 map_rviz->Display_Grid(true,Reference_text,10,QColor(160,160,160));
-//qrviz=new QRviz_widget(ui.widget);
-//qrviz->showFullScreen();
-//qrviz->show();
+
+
 
 }
 void MainWindow::connections()
@@ -290,14 +290,14 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
     qDebug()<<value;
     QTreeWidgetItem *parentItem=tree_rviz_keys[sen];
     QString Dis_Name=tree_rviz_keys[sen]->text(0);
-    //是否启用该图层
-    QCheckBox *che_box=(QCheckBox *) ui.treeWidget_rviz->itemWidget(parentItem,1);
-    bool enable=che_box->isChecked();
+
 //    qDebug()<<"sdad"<<enable;
     //判断每种显示的类型
     if(Dis_Name=="Grid")
     {
-
+        //是否启用该图层
+        QCheckBox *che_box=(QCheckBox *) ui.treeWidget_rviz->itemWidget(parentItem,1);
+        bool enable=che_box->isChecked();
         QLineEdit *Color_text=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
         QString co=Color_text->text();
         QStringList colorList=co.split(";");
@@ -316,10 +316,19 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
     }
     else if(Dis_Name=="Global Options")
     {
-
+        QComboBox *Global_op=(QComboBox *) ui.treeWidget_rviz->itemWidget(ui.treeWidget_rviz->topLevelItem(0)->child(0),1);
+        QString Reference_text=Global_op->currentText();
+        QLineEdit *back_color=(QLineEdit *) ui.treeWidget_rviz->itemWidget(ui.treeWidget_rviz->topLevelItem(0)->child(1),1);
+        QStringList coList=back_color->text().split(";");
+        QColor colorBack=QColor(coList[0].toInt(),coList[1].toInt(),coList[2].toInt());
+        QSpinBox *FrameRaBox=(QSpinBox *) ui.treeWidget_rviz->itemWidget(ui.treeWidget_rviz->topLevelItem(0)->child(2),1);
+        map_rviz->SetGlobalOptions(Reference_text,colorBack,FrameRaBox->value());
     }
     else if(Dis_Name=="Map")
     {
+        //是否启用该图层
+        QCheckBox *che_box=(QCheckBox *) ui.treeWidget_rviz->itemWidget(parentItem,1);
+        bool enable=che_box->isChecked();
         QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
         QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
         QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);

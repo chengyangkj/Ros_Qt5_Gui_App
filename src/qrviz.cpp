@@ -87,9 +87,18 @@ void QRviz::Display_Map(bool enable,QString topic,double Alpha,QString Color_Sch
         map_->subProp("Alpha")->setValue(Alpha);
         map_->subProp("Color Scheme")->setValue(Color_Scheme);
     }
+
     map_->setEnabled(enable);
     manager_->startUpdate();
 }
+//设置全局显示
+ void QRviz::SetGlobalOptions(QString frame_name,QColor backColor,int frame_rate)
+ {
+     manager_->setFixedFrame(frame_name);
+     manager_->setProperty("Background Color",backColor);
+     manager_->setProperty("Frame Rate",frame_rate);
+     manager_->startUpdate();
+ }
 void QRviz::createDisplay(QString display_name,QString topic_name)
 {
 

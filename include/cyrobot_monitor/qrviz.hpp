@@ -20,8 +20,12 @@ public:
     QRviz(QVBoxLayout *layout,QString node_name);
     void run();
     void createDisplay(QString display_name,QString topic_name);
+    //显示Grid
     void Display_Grid(bool enable,QString Reference_frame,int Plan_Cell_count,QColor color=QColor(125,125,125));
+    //显示map
     void Display_Map(bool enable,QString topic,double Alpha,QString Color_Scheme);
+    //设置全局显示属性
+    void SetGlobalOptions(QString frame_name,QColor backColor,int frame_rate);
 
 private:
     rviz::RenderPanel *render_panel_;
