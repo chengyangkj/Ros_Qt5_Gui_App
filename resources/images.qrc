@@ -97,5 +97,7 @@
         <file>images/classes/src/GridCells.xcf</file>
         <file>images/classes/src/Axes.xcf</file>
         <file>images/classes/src/Arrow.xcf</file>
+        <file>images/Slam.png</file>
+        <file>images/Navigate.png</file>
     </qresource>
 </RCC>

@@ -17,6 +17,15 @@ void AddTopics::initUi()
     ui->treeWidget->addTopLevelItem(parent);
     parent->setExpanded(true);
 
+
+    Navigate=new QTreeWidgetItem(QStringList()<<"Navigate");
+    Navigate->setIcon(0,QIcon("://images/Navigate.png"));
+    parent->addChild(Navigate);
+
+    Build_Map=new QTreeWidgetItem(QStringList()<<"Build Map");
+    Build_Map->setIcon(0,QIcon("://images/Slam.png"));
+    parent->addChild(Build_Map);
+
     Axes=new QTreeWidgetItem(QStringList()<<"Axes");
     Axes->setIcon(0,QIcon("://images/classes/Axes.png"));
 

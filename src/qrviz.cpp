@@ -79,11 +79,11 @@ void QRviz::Display_Map(bool enable,QString topic,double Alpha,QString Color_Sch
     if(map_==NULL)
     {
         map_=manager_->createDisplay("rviz/Map","QMap",true);
-
         ROS_ASSERT(map_);
         map_->subProp("Topic")->setValue(topic);
         map_->subProp("Alpha")->setValue(Alpha);
         map_->subProp("Color Scheme")->setValue(Color_Scheme);
+
     }
     else{
          ROS_ASSERT(map_);

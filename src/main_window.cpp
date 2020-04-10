@@ -150,7 +150,6 @@ void MainWindow::initUis()
     Grid_Color_Value->setText("160;160;160");
     ui.treeWidget_rviz->setItemWidget(Grid_Color,1,Grid_Color_Value);
 
-
 }
 void MainWindow::initRviz()
 {
@@ -213,7 +212,7 @@ void MainWindow::connections()
              QWidget* controls=ui.treeWidget_rviz->itemWidget(tmp,1);
 //             qDebug()<<controls;
              //将当前控件对象和父级对象加入到map中
-             tree_rviz_keys[controls]=top;
+             widget_to_parentItem_map[controls]=top;
              //判断这些widget的类型 并分类型进行绑定槽函数
              if(QString(controls->metaObject()->className())=="QComboBox")
              {
@@ -238,7 +237,7 @@ void MainWindow::connections()
         QTreeWidgetItem *top=ui.treeWidget_rviz->topLevelItem(i);
         QWidget *check=ui.treeWidget_rviz->itemWidget(top,1);
         //记录父子关系
-        tree_rviz_keys[check]=top;
+        widget_to_parentItem_map[check]=top;
         connect(check,SIGNAL(stateChanged(int)),this,SLOT(slot_treewidget_item_check_change(int)));
 
 
@@ -261,9 +260,9 @@ void MainWindow::slot_set_2D_Goal()
 void MainWindow::slot_treewidget_item_check_change(int is_check)
 {
     QCheckBox* sen = (QCheckBox*)sender();
-    qDebug()<<"check:"<<is_check<<"parent:"<<tree_rviz_keys[sen]->text(0)<<"地址："<<tree_rviz_keys[sen];
-    QTreeWidgetItem *parentItem=tree_rviz_keys[sen];
-    QString dis_name=tree_rviz_keys[sen]->text(0);
+    qDebug()<<"check:"<<is_check<<"parent:"<<widget_to_parentItem_map[sen]->text(0)<<"地址："<<widget_to_parentItem_map[sen];
+    QTreeWidgetItem *parentItem=widget_to_parentItem_map[sen];
+    QString dis_name=widget_to_parentItem_map[sen]->text(0);
     bool enable=is_check>1?true:false;
     if(dis_name=="Grid")
     {
@@ -304,10 +303,10 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
 {
 
     QWidget* sen = (QWidget*)sender();
-    qDebug()<<sen->metaObject()->className()<<"parent:"<<tree_rviz_keys[sen]->text(0);
+    qDebug()<<sen->metaObject()->className()<<"parent:"<<widget_to_parentItem_map[sen]->text(0);
     qDebug()<<value;
-    QTreeWidgetItem *parentItem=tree_rviz_keys[sen];
-    QString Dis_Name=tree_rviz_keys[sen]->text(0);
+    QTreeWidgetItem *parentItem=widget_to_parentItem_map[sen];
+    QString Dis_Name=widget_to_parentItem_map[sen]->text(0);
 
 //    qDebug()<<"sdad"<<enable;
     //判断每种显示的类型
@@ -394,7 +393,7 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
     QCheckBox *check=new QCheckBox();
     ui.treeWidget_rviz->setItemWidget(choose,1,check);
     //记录父子关系
-    tree_rviz_keys[check]=choose;
+    widget_to_parentItem_map[check]=choose;
     //绑定checkbox的槽函数
     connect(check,SIGNAL(stateChanged(int)),this,SLOT(slot_treewidget_item_check_change(int)));
     //添加状态的对应关系到map
@@ -406,14 +405,14 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         Map_Topic->addItem("map");
         Map_Topic->setEditable(true);
         Map_Topic->setMaximumWidth(150);
-        tree_rviz_keys[Map_Topic]=choose;
+        widget_to_parentItem_map[Map_Topic]=choose;
         ui.treeWidget_rviz->setItemWidget(choose->child(1),1,Map_Topic);
         //绑定值改变了的事件
         connect(Map_Topic,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
         QLineEdit *map_alpha=new QLineEdit;
         map_alpha->setMaximumWidth(150);
         map_alpha->setText("0.7");
-        tree_rviz_keys[map_alpha]=choose;
+        widget_to_parentItem_map[map_alpha]=choose;
         //绑定值改变了的事件
         connect(map_alpha,SIGNAL(textChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
         ui.treeWidget_rviz->setItemWidget(choose->child(2),1,map_alpha);
@@ -421,7 +420,7 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         QComboBox *Map_Scheme=new QComboBox;
         Map_Scheme->setMaximumWidth(150);
         Map_Scheme->addItems(QStringList()<<"map"<<"costmap"<<"raw");
-        tree_rviz_keys[Map_Scheme]=choose;
+        widget_to_parentItem_map[Map_Scheme]=choose;
         //绑定值改变了的事件
         connect(Map_Scheme,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
         ui.treeWidget_rviz->setItemWidget(choose->child(3),1,Map_Scheme);
@@ -433,11 +432,141 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         Laser_Topic->setMaximumWidth(150);
         Laser_Topic->addItem("scan");
         Laser_Topic->setEditable(true);
-        tree_rviz_keys[Laser_Topic]=choose;
+        widget_to_parentItem_map[Laser_Topic]=choose;
         ui.treeWidget_rviz->setItemWidget(choose->child(1),1,Laser_Topic);
         //绑定值改变了的事件
         connect(Laser_Topic,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
 
+    }
+    else if(choose->text(0)=="Navigate")
+    {
+        //Global Map
+        QTreeWidgetItem *Global_map=new QTreeWidgetItem(QStringList()<<"Global Map");
+        Global_map->setIcon(0,QIcon("://images/classes/Group.png"));
+        choose->addChild(Global_map);
+        QTreeWidgetItem *Costmap=new QTreeWidgetItem(QStringList()<<"Costmap");
+        Costmap->setIcon(0,QIcon("://images/classes/Map.png"));
+        QTreeWidgetItem *Costmap_topic=new QTreeWidgetItem(QStringList()<<"Topic");
+        Costmap->addChild(Costmap_topic);
+        QComboBox *Costmap_Topic_Vel=new QComboBox();
+        Costmap_Topic_Vel->setEditable(true);
+        Costmap_Topic_Vel->setMaximumWidth(150);
+        Costmap_Topic_Vel->addItem("/move_base/local_costmap/costmap");
+        ui.treeWidget_rviz->setItemWidget(Costmap_topic,1,Costmap_Topic_Vel);
+        Global_map->addChild(Costmap);
+        //绑定子父关系
+        widget_to_parentItem_map[Costmap_Topic_Vel]=Global_map;
+        //绑定值改变了的事件
+        connect(Costmap_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+
+        QTreeWidgetItem* CostMap_Planner=new QTreeWidgetItem(QStringList()<<"Planner");
+        CostMap_Planner->setIcon(0,QIcon("://images/classes/Path.png"));
+       Global_map->addChild(CostMap_Planner);
+
+       QTreeWidgetItem* CostMap_Planner_topic=new QTreeWidgetItem(QStringList()<<"Topic");
+        QComboBox* Costmap_Planner_Topic_Vel=new QComboBox();
+        Costmap_Planner_Topic_Vel->setMaximumWidth(150);
+        Costmap_Planner_Topic_Vel->addItem("/move_base/DWAPlannerROS/local_plan");
+        Costmap_Planner_Topic_Vel->setEditable(true);
+        CostMap_Planner->addChild(CostMap_Planner_topic);
+        ui.treeWidget_rviz->setItemWidget(CostMap_Planner_topic,1,Costmap_Planner_Topic_Vel);
+        //绑定子父关系
+        widget_to_parentItem_map[Costmap_Planner_Topic_Vel]=Global_map;
+        //绑定值改变了的事件
+        connect(Costmap_Planner_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+
+
+
+        //Local Map
+        QTreeWidgetItem *Local_map=new QTreeWidgetItem(QStringList()<<"Local Map");
+        Local_map->setIcon(0,QIcon("://images/classes/Group.png"));
+        choose->addChild(Local_map);
+
+        QTreeWidgetItem *Local_Costmap=new QTreeWidgetItem(QStringList()<<"Costmap");
+        Local_Costmap->setIcon(0,QIcon("://images/classes/Map.png"));
+        Local_map->addChild(Local_Costmap);
+
+        QTreeWidgetItem *local_costmap_topic=new QTreeWidgetItem(QStringList()<<"Topic");
+        Local_Costmap->addChild(local_costmap_topic);
+        QComboBox *local_costmap_topic_vel=new QComboBox();
+        local_costmap_topic_vel->setEditable(true);
+        local_costmap_topic_vel->setMaximumWidth(150);
+        local_costmap_topic_vel->addItem("/move_base/local_costmap/costmap");
+        ui.treeWidget_rviz->setItemWidget(local_costmap_topic,1,local_costmap_topic_vel);
+
+        //绑定子父关系
+        widget_to_parentItem_map[local_costmap_topic_vel]=Local_map;
+        //绑定值改变了的事件
+        connect(local_costmap_topic_vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+
+        QTreeWidgetItem* LocalMap_Planner=new QTreeWidgetItem(QStringList()<<"Planner");
+        LocalMap_Planner->setIcon(0,QIcon("://images/classes/Path.png"));
+       Local_map->addChild(LocalMap_Planner);
+
+       QTreeWidgetItem* Local_Planner_topic=new QTreeWidgetItem(QStringList()<<"Topic");
+
+        QComboBox* Local_Planner_Topic_Vel=new QComboBox();
+        Local_Planner_Topic_Vel->setMaximumWidth(150);
+        Local_Planner_Topic_Vel->addItem("/move_base/DWAPlannerROS/local_plan");
+        Local_Planner_Topic_Vel->setEditable(true);
+        LocalMap_Planner->addChild(Local_Planner_topic);
+        ui.treeWidget_rviz->setItemWidget(Local_Planner_topic,1, Local_Planner_Topic_Vel);
+        //绑定子父关系
+        widget_to_parentItem_map[Local_Planner_Topic_Vel]=Local_map;
+        //绑定值改变了的事件
+        connect(Local_Planner_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+        //CostCloud
+        QTreeWidgetItem* CostCloud=new QTreeWidgetItem(QStringList()<<"Cost Cloud");
+        CostCloud->setIcon(0,QIcon("://images/classes/PointCloud2.png"));
+        Local_map->addChild(CostCloud);
+        QTreeWidgetItem *CostCloud_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
+        QComboBox* CostCloud_Topic_Vel=new QComboBox();
+        CostCloud_Topic_Vel->setMaximumWidth(150);
+        CostCloud_Topic_Vel->setEditable(true);
+        CostCloud_Topic_Vel->addItem("/move_base/DWAPlannerROS/cost_cloud");
+        CostCloud->addChild(CostCloud_Topic);
+        ui.treeWidget_rviz->setItemWidget(CostCloud_Topic,1,CostCloud_Topic_Vel);
+        //绑定子父关系
+        widget_to_parentItem_map[CostCloud_Topic_Vel]=CostCloud;
+        //绑定值改变了的事件
+        connect(CostCloud_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+        //Trajectory Cloud
+        QTreeWidgetItem* TrajectoryCloud=new QTreeWidgetItem(QStringList()<<"Trajectory Cloud");
+        TrajectoryCloud->setIcon(0,QIcon("://images/classes/PointCloud2.png"));
+        Local_map->addChild(TrajectoryCloud);
+        QTreeWidgetItem *TrajectoryCloud_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
+        QComboBox* TrajectoryCloud_Topic_Vel=new QComboBox();
+        TrajectoryCloud_Topic_Vel->setMaximumWidth(150);
+        TrajectoryCloud_Topic_Vel->setEditable(true);
+        TrajectoryCloud_Topic_Vel->addItem("/move_base/DWAPlannerROS/trajectory_cloud");
+        TrajectoryCloud->addChild(TrajectoryCloud_Topic);
+        ui.treeWidget_rviz->setItemWidget(TrajectoryCloud_Topic,1,TrajectoryCloud_Topic_Vel);
+        //绑定子父关系
+        widget_to_parentItem_map[TrajectoryCloud_Topic_Vel]=TrajectoryCloud;
+        //绑定值改变了的事件
+        connect(TrajectoryCloud_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+
+
+        //Amcl Particle Swarm
+        QTreeWidgetItem* Amcl=new QTreeWidgetItem(QStringList()<<"Amcl Particle Swarm");
+        Amcl->setIcon(0,QIcon("://images/classes/PoseArray.png"));
+        choose->addChild(Amcl);
+        QTreeWidgetItem* Amcl_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
+        Amcl->addChild(Amcl_Topic);
+        QComboBox*  Amcl_Topic_Val=new QComboBox();
+        Amcl_Topic_Val->setMaximumWidth(150);
+        Amcl_Topic_Val->setEditable(true);
+        Amcl_Topic_Val->addItem("/particlecloud");
+        ui.treeWidget_rviz->setItemWidget(Amcl_Topic,1,Amcl_Topic_Val);
+        //绑定子父关系
+        widget_to_parentItem_map[Amcl_Topic_Val]=Amcl;
+        //绑定值改变了的事件
+        connect(Amcl_Topic_Val,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+
+
+
+        ui.treeWidget_rviz->addTopLevelItem(choose);
+        choose->setExpanded(true);
     }
 }
 //左工具栏索引改变

@@ -31,6 +31,8 @@ private:
     Ui::AddTopics *ui;
     void initUi();
     QCheckBox *checkbox;
+    QTreeWidgetItem *Navigate=NULL;
+    QTreeWidgetItem *Build_Map=NULL;
     QTreeWidgetItem *Axes=NULL;
     QTreeWidgetItem *Camera=NULL;
     QTreeWidgetItem *DepthCloud=NULL;
