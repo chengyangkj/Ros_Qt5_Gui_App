@@ -46,15 +46,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 	ui.view_logging->setModel(qnode.loggingModel());
 
     /*********************
-    ** Auto Start
+    ** 自动连接master
     **********************/
     if ( ui.checkbox_remember_settings->isChecked() ) {
         on_button_connect_clicked(true);
     }
-
-
-
-    initRviz();
     //链接connect
     connections();
 
@@ -191,6 +187,11 @@ void MainWindow::connections()
    connect(ui.pushButton_m,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));
    connect(ui.pushButton_back,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));
    connect(ui.pushButton_backr,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));
+   //设置2D Pose
+   connect(ui.set_pos_btn,SIGNAL(clicked()),this,SLOT(slot_set_2D_Pos()));
+   //设置2D goal
+   connect(ui.set_goal_btn,SIGNAL(clicked()),this,SLOT(slot_set_2D_Goal()));
+
    //左工具栏tab索引改变
    connect(ui.tab_manager,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_manage_currentChanged(int)));
    //右工具栏索引改变
@@ -244,6 +245,18 @@ void MainWindow::connections()
     }
     //connect(ui.treeWidget_rviz,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(slot_treewidget_item_value_change(QTreeWidgetItem*,int)));
 }
+//设置导航当前位置按钮的槽函数
+void MainWindow::slot_set_2D_Pos()
+{
+ map_rviz->Set_Pos();
+// ui.label_map_msg->setText("请在地图中选择机器人的初始位置");
+}
+//设置导航目标位置按钮的槽函数
+void MainWindow::slot_set_2D_Goal()
+{
+  map_rviz->Set_Goal();
+//  ui.label_map_msg->setText("请在地图中选择机器人导航的目标位置");
+}
 //treewidget的checkbox是否选中槽函数
 void MainWindow::slot_treewidget_item_check_change(int is_check)
 {
@@ -277,8 +290,13 @@ void MainWindow::slot_treewidget_item_check_change(int is_check)
         QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
         QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
         QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
-        qDebug()<<topic_box->currentText()<<alpha->text()<<scheme->currentText();
+//        qDebug()<<topic_box->currentText()<<alpha->text()<<scheme->currentText();
         map_rviz->Display_Map(enable,topic_box->currentText(),alpha->text().toDouble(),scheme->currentText());
+    }
+    else if(dis_name=="LaserScan")
+    {
+        QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
+        map_rviz->Display_LaserScan(enable,topic_box->currentText());
     }
 }
 //treewidget 的值改变槽函数
@@ -334,6 +352,14 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
         QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
         qDebug()<<topic_box->currentText()<<alpha->text()<<scheme->currentText();
         map_rviz->Display_Map(enable,topic_box->currentText(),alpha->text().toDouble(),scheme->currentText());
+    }
+    else if(Dis_Name=="LaserScan")
+    {
+        //是否启用该图层
+        QCheckBox *che_box=(QCheckBox *) ui.treeWidget_rviz->itemWidget(parentItem,1);
+        bool enable=che_box->isChecked();
+        QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
+        map_rviz->Display_LaserScan(enable,topic_box->currentText());
     }
 
 
@@ -399,6 +425,19 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         //绑定值改变了的事件
         connect(Map_Scheme,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
         ui.treeWidget_rviz->setItemWidget(choose->child(3),1,Map_Scheme);
+    }
+    else if(choose->text(0)=="LaserScan")
+    {
+
+        QComboBox *Laser_Topic=new QComboBox;
+        Laser_Topic->setMaximumWidth(150);
+        Laser_Topic->addItem("scan");
+        Laser_Topic->setEditable(true);
+        tree_rviz_keys[Laser_Topic]=choose;
+        ui.treeWidget_rviz->setItemWidget(choose->child(1),1,Laser_Topic);
+        //绑定值改变了的事件
+        connect(Laser_Topic,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+
     }
 }
 //左工具栏索引改变
@@ -581,6 +620,7 @@ void MainWindow::showNoMasterMessage() {
  */
 
 void MainWindow::on_button_connect_clicked(bool check ) {
+    //如果使用环境变量
 	if ( ui.checkbox_use_environment->isChecked() ) {
 		if ( !qnode.init() ) {
             //showNoMasterMessage();
@@ -589,12 +629,16 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
 		} else {
+            //初始化rviz
+            initRviz();
 			ui.button_connect->setEnabled(false);
               ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
               ui.label_statue_text->setStyleSheet("color:green;");
              ui.label_statue_text->setText("在线");
 		}
-	} else {
+    }
+    //如果不使用环境变量
+    else {
 		if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
 				   ui.line_edit_host->text().toStdString()) ) {
             QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
@@ -603,6 +647,8 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.label_statue_text->setText("离线");
             //showNoMasterMessage();
 		} else {
+            //初始化rviz
+            initRviz();
 			ui.button_connect->setEnabled(false);
 			ui.line_edit_master->setReadOnly(true);
 			ui.line_edit_host->setReadOnly(true);

@@ -76,6 +76,14 @@ void AddTopics::initUi()
      LaserScan=new QTreeWidgetItem(QStringList()<<"LaserScan");
     LaserScan->setIcon(0,QIcon("://images/classes/LaserScan.png"));
     parent->addChild(LaserScan);
+    QTreeWidgetItem* Laser_status=new QTreeWidgetItem(QStringList()<<"Status");
+    Laser_status->setIcon(0,QIcon("://images/ok.png"));
+    LaserScan->addChild(Laser_status);
+    Laser_status->setHidden(true);
+    QTreeWidgetItem* Laser_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
+    LaserScan->addChild(Laser_Topic);
+    Laser_Topic->setHidden(true);
+
 
      Map=new QTreeWidgetItem(QStringList()<<"Map");
     Map->setIcon(0,QIcon("://images/classes/Map.png"));

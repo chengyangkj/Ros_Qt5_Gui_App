@@ -35,7 +35,7 @@
 #include <rviz/visualization_manager.h>
 #include <rviz/render_panel.h>
 #include <rviz/display.h>
-#include<rviz/tool_manager.h>
+#include<rviz/tool.h>
 #include <rviz_visual_tools/rviz_visual_tools.h>
 /*****************************************************************************
 ** Namespace
@@ -91,6 +91,8 @@ public slots:
     void slot_choose_topic(QTreeWidgetItem *choose);
     void slot_treewidget_item_value_change(QString);
     void slot_treewidget_item_check_change(int);
+    void slot_set_2D_Goal();
+    void slot_set_2D_Pos();
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
