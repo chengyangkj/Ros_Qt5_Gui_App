@@ -20,8 +20,15 @@ Use qt5 to implement the ros robot human-machine interface
 ##### 4.1 Subscribe to map topics
 ##### 4.1 订阅map话题
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408122253344.gif)
-##### 4.2 To be perfected
-##### 4.2 待完善
+##### 4.2 Laser Display
+##### 4.2 激光雷达图层显示
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408194648822.gif)
+##### 4.3 Set the initial point of navigation
+##### 4.3 设置导航初始点
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201723417.gif)
+##### 4.4 Set up navigation target points
+##### 4.4 设置导航目标点
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201804722.gif)
 ### 二，安装教程
 ### 二，Installation tutorial
 #### 1，首先安装ros对qt pkg的支持
