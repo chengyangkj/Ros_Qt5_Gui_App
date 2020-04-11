@@ -285,7 +285,6 @@ void MainWindow::slot_treewidget_item_check_change(int is_check)
     }
     else if(dis_name=="Map")
     {
-
         QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
         QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
         QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
@@ -296,6 +295,15 @@ void MainWindow::slot_treewidget_item_check_change(int is_check)
     {
         QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
         map_rviz->Display_LaserScan(enable,topic_box->currentText());
+    }
+    else if(dis_name=="Navigate")
+    {
+        QComboBox* Global_map=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(0)->child(0)->child(0),1);
+        QComboBox* Global_plan=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(0)->child(1)->child(0),1);
+        QComboBox* Local_map=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1)->child(0)->child(0),1);
+        QComboBox* Local_plan=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1)->child(1)->child(0),1);
+
+        map_rviz->Display_Navigate(enable,Global_map->currentText(),Global_plan->currentText(),Local_map->currentText(),Local_plan->currentText());
     }
 }
 //treewidget 的值改变槽函数
@@ -451,11 +459,11 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         QComboBox *Costmap_Topic_Vel=new QComboBox();
         Costmap_Topic_Vel->setEditable(true);
         Costmap_Topic_Vel->setMaximumWidth(150);
-        Costmap_Topic_Vel->addItem("/move_base/local_costmap/costmap");
+        Costmap_Topic_Vel->addItem("/move_base/global_costmap/costmap");
         ui.treeWidget_rviz->setItemWidget(Costmap_topic,1,Costmap_Topic_Vel);
         Global_map->addChild(Costmap);
         //绑定子父关系
-        widget_to_parentItem_map[Costmap_Topic_Vel]=Global_map;
+        widget_to_parentItem_map[Costmap_Topic_Vel]=choose;
         //绑定值改变了的事件
         connect(Costmap_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
 
@@ -466,12 +474,12 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
        QTreeWidgetItem* CostMap_Planner_topic=new QTreeWidgetItem(QStringList()<<"Topic");
         QComboBox* Costmap_Planner_Topic_Vel=new QComboBox();
         Costmap_Planner_Topic_Vel->setMaximumWidth(150);
-        Costmap_Planner_Topic_Vel->addItem("/move_base/DWAPlannerROS/local_plan");
+        Costmap_Planner_Topic_Vel->addItem("/move_base/DWAPlannerROS/global_plan");
         Costmap_Planner_Topic_Vel->setEditable(true);
         CostMap_Planner->addChild(CostMap_Planner_topic);
         ui.treeWidget_rviz->setItemWidget(CostMap_Planner_topic,1,Costmap_Planner_Topic_Vel);
         //绑定子父关系
-        widget_to_parentItem_map[Costmap_Planner_Topic_Vel]=Global_map;
+        widget_to_parentItem_map[Costmap_Planner_Topic_Vel]=choose;
         //绑定值改变了的事件
         connect(Costmap_Planner_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
 
@@ -495,7 +503,7 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         ui.treeWidget_rviz->setItemWidget(local_costmap_topic,1,local_costmap_topic_vel);
 
         //绑定子父关系
-        widget_to_parentItem_map[local_costmap_topic_vel]=Local_map;
+        widget_to_parentItem_map[local_costmap_topic_vel]=choose;
         //绑定值改变了的事件
         connect(local_costmap_topic_vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
 
@@ -512,7 +520,7 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         LocalMap_Planner->addChild(Local_Planner_topic);
         ui.treeWidget_rviz->setItemWidget(Local_Planner_topic,1, Local_Planner_Topic_Vel);
         //绑定子父关系
-        widget_to_parentItem_map[Local_Planner_Topic_Vel]=Local_map;
+        widget_to_parentItem_map[Local_Planner_Topic_Vel]=choose;
         //绑定值改变了的事件
         connect(Local_Planner_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
         //CostCloud
@@ -547,27 +555,35 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose)
         connect(TrajectoryCloud_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
 
 
-        //Amcl Particle Swarm
-        QTreeWidgetItem* Amcl=new QTreeWidgetItem(QStringList()<<"Amcl Particle Swarm");
-        Amcl->setIcon(0,QIcon("://images/classes/PoseArray.png"));
-        choose->addChild(Amcl);
-        QTreeWidgetItem* Amcl_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
-        Amcl->addChild(Amcl_Topic);
-        QComboBox*  Amcl_Topic_Val=new QComboBox();
-        Amcl_Topic_Val->setMaximumWidth(150);
-        Amcl_Topic_Val->setEditable(true);
-        Amcl_Topic_Val->addItem("/particlecloud");
-        ui.treeWidget_rviz->setItemWidget(Amcl_Topic,1,Amcl_Topic_Val);
-        //绑定子父关系
-        widget_to_parentItem_map[Amcl_Topic_Val]=Amcl;
-        //绑定值改变了的事件
-        connect(Amcl_Topic_Val,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
+//        //Amcl Particle Swarm
+//        QTreeWidgetItem* Amcl=new QTreeWidgetItem(QStringList()<<"Amcl Particle Swarm");
+//        Amcl->setIcon(0,QIcon("://images/classes/PoseArray.png"));
+//        choose->addChild(Amcl);
+//        QTreeWidgetItem* Amcl_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
+//        Amcl->addChild(Amcl_Topic);
+//        QComboBox*  Amcl_Topic_Val=new QComboBox();
+//        Amcl_Topic_Val->setMaximumWidth(150);
+//        Amcl_Topic_Val->setEditable(true);
+//        Amcl_Topic_Val->addItem("/particlecloud");
+//        ui.treeWidget_rviz->setItemWidget(Amcl_Topic,1,Amcl_Topic_Val);
+//        //绑定子父关系
+//        widget_to_parentItem_map[Amcl_Topic_Val]=Amcl;
+//        //绑定值改变了的事件
+//        connect(Amcl_Topic_Val,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
 
 
 
         ui.treeWidget_rviz->addTopLevelItem(choose);
         choose->setExpanded(true);
     }
+    else if(choose->text(0)=="TF")
+    {
+        ui.treeWidget_rviz->addTopLevelItem(choose);
+    }
+
+
+    //默认选中
+    check->setChecked(true);
 }
 //左工具栏索引改变
 void MainWindow::slot_tab_manage_currentChanged(int index)

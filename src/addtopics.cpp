@@ -232,6 +232,14 @@ AddTopics::~AddTopics()
 
 void AddTopics::on_pushButton_ok_clicked()
 {
+
+//    //如果选择的是Navigate
+//    if(choose->text(0)=="Navigate")
+//    {
+//      emit(Topic_choose(TF));
+//      emit(Topic_choose(Map));
+
+//    }
     emit(Topic_choose(choose));
     this->close();
 }

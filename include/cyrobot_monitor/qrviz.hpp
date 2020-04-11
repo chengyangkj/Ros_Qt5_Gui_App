@@ -29,14 +29,27 @@ public:
     void SetGlobalOptions(QString frame_name,QColor backColor,int frame_rate);
     //显示激光雷达点云
     void Display_LaserScan(bool enable,QString topic);
+    //显示导航相关控件
+    void Display_Navigate(bool enable,QString Global_topic,QString Global_planner,QString Local_topic,QString Local_planner);
+    //显示tf坐标变换
+    void Display_TF(bool enable);
     void Set_Pos();
     void Set_Goal();
+    //发布goal话题的坐标
+    void Send_Goal_topic();
 private:
     rviz::RenderPanel *render_panel_;
     rviz::VisualizationManager *manager_;
     rviz::Display* grid_=NULL ;
+    //显示tf坐标变换
+    rviz::Display* TF_=NULL ;
     rviz::Display* map_=NULL ;
     rviz::Display* laser_=NULL ;
+    rviz::Display *Navigate_localmap=NULL;
+    rviz::Display *Navigate_localplanner=NULL;
+    rviz::Display *Navigate_globalmap=NULL;
+    rviz::Display *Navigate_globalplanner=NULL;
+    rviz::Display *Navigate_amcl=NULL;
     rviz::Tool *current_tool;
     rviz::ToolManager *tool_manager_;
     QVBoxLayout *layout;

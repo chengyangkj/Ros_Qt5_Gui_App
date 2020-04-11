@@ -151,9 +151,46 @@ void QRviz::Display_LaserScan(bool enable,QString topic)
  {
      //添加工具
      current_tool= tool_manager_->addTool("rviz/SetGoal");
+     //设置goal的话题
+     rviz::Property* pro= current_tool->getPropertyContainer();
+     pro->subProp("Topic")->setValue("/move_base_simple/goal");
+     //设置当前frame
+     manager_->setFixedFrame("map");
      //设置当前使用的工具为SetGoal（实现在地图上标点）
      tool_manager_->setCurrentTool( current_tool );
+
      manager_->startUpdate();
+
+ }
+ //显示tf坐标变换
+ void QRviz::Display_TF(bool enable)
+ {
+     if(TF_){delete TF_;TF_=NULL;}
+     TF_=manager_->createDisplay("rviz/TF","QTF",enable);
+ }
+ //显示导航相关
+ void QRviz::Display_Navigate(bool enable,QString Global_topic,QString Global_planner,QString Local_topic,QString Local_planner)
+ {
+    if(Navigate_localmap) {delete Navigate_localmap; Navigate_localmap=NULL;}
+    if(Navigate_localplanner) {delete Navigate_localplanner; Navigate_localplanner=NULL;}
+    if(Navigate_globalmap) {delete Navigate_globalmap; Navigate_globalmap=NULL;}
+    if(Navigate_globalplanner) {delete Navigate_globalplanner; Navigate_globalplanner=NULL;}
+    //local map
+    Navigate_localmap=manager_->createDisplay("rviz/Map","Qlocalmap",enable);
+    Navigate_localmap->subProp("Topic")->setValue(Local_topic);
+    Navigate_localmap->subProp("Color Scheme")->setValue("costmap");
+    Navigate_localplanner=manager_->createDisplay("rviz/Path","QlocalPath",enable);
+    Navigate_localplanner->subProp("Topic")->setValue(Local_planner);
+    Navigate_localplanner->subProp("Color")->setValue(QColor(0,12,255));
+    //global map
+    Navigate_globalmap=manager_->createDisplay("rviz/Map","QGlobalmap",enable);
+    Navigate_globalmap->subProp("Topic")->setValue(Global_topic);
+    Navigate_globalmap->subProp("Color Scheme")->setValue("costmap");
+    Navigate_globalplanner=manager_->createDisplay("rviz/Path","QGlobalpath",enable);
+    Navigate_globalplanner->subProp("Topic")->setValue(Global_planner);
+    Navigate_globalplanner->subProp("Color")->setValue(QColor(255,0,0));
+    //更新画面显示
+    manager_->startUpdate();
 
  }
  void QRviz::addTool( rviz::Tool* )
