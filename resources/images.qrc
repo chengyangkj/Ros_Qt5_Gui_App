@@ -99,5 +99,7 @@
         <file>images/classes/src/Arrow.xcf</file>
         <file>images/Slam.png</file>
         <file>images/Navigate.png</file>
+        <file>images/set_return.png</file>
+        <file>images/return.png</file>
     </qresource>
 </RCC>

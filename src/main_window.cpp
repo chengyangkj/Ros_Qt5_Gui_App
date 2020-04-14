@@ -171,9 +171,10 @@ void MainWindow::connections()
     connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_y(double)));
     //电源的信号
     connect(&qnode,SIGNAL(power(float)),this,SLOT(slot_power(float)));
+    //机器人位置信号
+    connect(&qnode,SIGNAL(position(QString,double,double,double,double)),this,SLOT(slot_position_change(QString,double,double,double,double)));
     //绑定快捷按钮相关函数
-    connect(ui.laser_btn,SIGNAL(clicked()),this,SLOT(quick_cmds()));
-    connect(ui.basecontrol_btn,SIGNAL(clicked()),this,SLOT(quick_cmds()));
+
    //绑定slider的函数
    connect(ui.horizontalSlider_raw,SIGNAL(valueChanged(int)),this,SLOT(on_Slider_raw_valueChanged(int)));
    connect(ui.horizontalSlider_linear,SIGNAL(valueChanged(int)),this,SLOT(on_Slider_linear_valueChanged(int)));
@@ -190,7 +191,10 @@ void MainWindow::connections()
    connect(ui.set_pos_btn,SIGNAL(clicked()),this,SLOT(slot_set_2D_Pos()));
    //设置2D goal
    connect(ui.set_goal_btn,SIGNAL(clicked()),this,SLOT(slot_set_2D_Goal()));
-
+   //设置返航点
+   connect(ui.set_return_btn,SIGNAL(clicked()),this,SLOT(slot_set_return_point()));
+   //返航
+   connect(ui.return_btn,SIGNAL(clicked()),this,SLOT(slot_return_point()));
    //左工具栏tab索引改变
    connect(ui.tab_manager,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_manage_currentChanged(int)));
    //右工具栏索引改变
@@ -243,6 +247,55 @@ void MainWindow::connections()
 
     }
     //connect(ui.treeWidget_rviz,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(slot_treewidget_item_value_change(QTreeWidgetItem*,int)));
+}
+//刷新当前坐标
+void MainWindow::slot_position_change(QString frame,double x,double y,double z,double w)
+{
+    //更新ui显示
+    ui.label_frame->setText(frame);
+    ui.label_x->setText(QString::number(x));
+    ui.label_y->setText(QString::number(y));
+    ui.label_z->setText(QString::number(z));
+    ui.label_w->setText(QString::number(w));
+}
+//刷新返航地点
+void MainWindow::slot_set_return_point()
+{
+    //更新ui返航点显示
+    ui.label_return_x->setText(ui.label_x->text());
+    ui.label_return_y->setText(ui.label_y->text());
+    ui.label_return_z->setText(ui.label_z->text());
+    ui.label_return_w->setText(ui.label_w->text());
+    //写入setting
+    QSettings settings("return-position", "cyrobot_monitor");
+    settings.setValue("x",ui.label_x->text());
+    settings.setValue("y",ui.label_y->text());
+    settings.setValue("z",ui.label_z->text());
+    settings.setValue("w",ui.label_w->text());
+    //发出声音提醒
+    if(media_player!=NULL)
+    {
+        delete media_player;
+        media_player=NULL;
+    }
+    media_player=new QSoundEffect;
+    media_player->setSource(QUrl::fromLocalFile("://media/refresh_return.wav"));
+    media_player->play();
+
+}
+//返航
+void MainWindow::slot_return_point()
+{
+    qnode.set_goal(ui.label_frame->text(),ui.label_return_x->text().toDouble(),ui.label_return_y->text().toDouble(),ui.label_return_z->text().toDouble(),ui.label_return_w->text().toDouble());
+    //声音提醒
+    if(media_player!=NULL)
+    {
+        delete media_player;
+        media_player=NULL;
+    }
+    media_player=new QSoundEffect;
+    media_player->setSource(QUrl::fromLocalFile("://media/start_return.wav"));
+    media_player->play();
 }
 //设置导航当前位置按钮的槽函数
 void MainWindow::slot_set_2D_Pos()
@@ -590,7 +643,7 @@ void MainWindow::slot_tab_manage_currentChanged(int index)
 {
     switch (index) {
     case 0:
-        ui.tabWidget->setCurrentIndex(0);
+
         break;
     case 1:
 
@@ -607,7 +660,7 @@ void MainWindow::slot_tab_Widget_currentChanged(int index)
 {
     switch (index) {
     case 0:
-        ui.tab_manager->setCurrentIndex(0);
+
         break;
     case 1:
         ui.tab_manager->setCurrentIndex(1);
@@ -900,6 +953,12 @@ void MainWindow::ReadSettings() {
     	ui.line_edit_host->setEnabled(false);
     	//ui.line_edit_topic->setEnabled(false);
     }
+
+    QSettings return_pos("return-position","cyrobot_monitor");
+    ui.label_return_x->setText(return_pos.value("x",QString("0")).toString());
+    ui.label_return_y->setText(return_pos.value("y",QString("0")).toString());
+    ui.label_return_z->setText(return_pos.value("z",QString("0")).toString());
+    ui.label_return_w->setText(return_pos.value("w",QString("0")).toString());
 }
 
 void MainWindow::WriteSettings() {

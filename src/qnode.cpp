@@ -51,20 +51,15 @@ bool QNode::init() {
 
      cmdVel_sub =n.subscribe<nav_msgs::Odometry>("raw_odom",1000,&QNode::speedCallback,this);
      power_sub=n.subscribe("power",1000,&QNode::powerCallback,this);
+     pos_sub=n.subscribe("amcl_pose",1000,&QNode::poseCallback,this);
+     //导航目标点发送话题
+     goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
      //速度控制话题
-     cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+     cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
 	start();
 	return true;
 }
-void QNode::powerCallback(const std_msgs::Float32 &message_holder)
-{
 
-    emit power(message_holder.data);
-}
-void QNode::myCallback(const std_msgs::Float64 &message_holder)
-{
-    qDebug()<<message_holder.data<<endl;
-}
 //初始化的函数*********************************
 bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	std::map<std::string,std::string> remappings;
@@ -81,12 +76,46 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
     //创建速度话题的订阅者
     cmdVel_sub =n.subscribe<nav_msgs::Odometry>("raw_odom",200,&QNode::speedCallback,this);
     power_sub=n.subscribe("power",1000,&QNode::powerCallback,this);
+    //机器人位置话题
+    pos_sub=n.subscribe("amcl_pose",1000,&QNode::poseCallback,this);
+    //导航目标点发送话题
+    goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
     //速度控制话题
-    cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
 	start();
 	return true;
 }
+//机器人位置话题的回调函数
+void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
+{
+    emit position(pos.header.frame_id.data(), pos.pose.pose.position.x,pos.pose.pose.position.y,pos.pose.pose.orientation.z,pos.pose.pose.orientation.w);
+//    qDebug()<<<<" "<<pos.pose.pose.position.y;
+}
+void QNode::powerCallback(const std_msgs::Float32 &message_holder)
+{
 
+    emit power(message_holder.data);
+}
+void QNode::myCallback(const std_msgs::Float64 &message_holder)
+{
+    qDebug()<<message_holder.data<<endl;
+}
+//发布导航目标点信息
+void QNode::set_goal(QString frame,double x,double y,double z,double w)
+{
+    geometry_msgs::PoseStamped goal;
+    //设置frame
+    goal.header.frame_id=frame.toStdString();
+    //设置时刻
+    goal.header.stamp=ros::Time::now();
+    goal.pose.position.x=x;
+    goal.pose.position.y=y;
+    goal.pose.position.z=0;
+    goal.pose.orientation.z=z;
+    goal.pose.orientation.w=w;
+    goal_pub.publish(goal);
+    ros::spinOnce();
+}
 //速度回调函数
 void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {

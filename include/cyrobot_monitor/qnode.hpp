@@ -25,6 +25,8 @@
 #include <QThread>
 #include <QStringListModel>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Float64.h>
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/Twist.h>
@@ -47,6 +49,7 @@ public:
 	bool init();
 	bool init(const std::string &master_url, const std::string &host_url);
     void move_base(char k,float speed_linear,float speed_trun);
+    void set_goal(QString frame,double x,double y,double z,double w);
 	void run();
 
 	/*********************
@@ -71,15 +74,19 @@ Q_SIGNALS:
     void speed_y(double y);
     void power(float p);
     void Master_shutdown();
+    void position(QString frame,double x,double y,double z,double w);
 private:
 	int init_argc;
 	char** init_argv;
 	ros::Publisher chatter_publisher;
     ros::Subscriber cmdVel_sub;
     ros::Subscriber chatter_subscriber;
+    ros::Subscriber pos_sub;
     ros::Subscriber power_sub;
+    ros::Publisher goal_pub;
     ros::Publisher cmd_pub;
     QStringListModel logging_model;
+    void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void powerCallback(const std_msgs::Float32& message_holder);
     void myCallback(const std_msgs::Float64& message_holder);

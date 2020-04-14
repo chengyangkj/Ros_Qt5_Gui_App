@@ -23,6 +23,7 @@
 #include "QProcess"
 #include <QStandardItemModel>
 #include <QTreeWidgetItem>
+#include <QSoundEffect>
 #include <QComboBox>
 #include <QSpinBox>
 #include <QVariant>
@@ -93,6 +94,12 @@ public slots:
     void slot_treewidget_item_check_change(int);
     void slot_set_2D_Goal();
     void slot_set_2D_Pos();
+    //设置返航点
+    void slot_set_return_point();
+    //返航
+    void slot_return_point();
+    //机器人位置
+    void slot_position_change(QString,double,double,double,double);
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
@@ -116,6 +123,7 @@ private:
     //存放display的当前值 item名，参数名称和值
     QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
     Settings *set;
+    QSoundEffect *media_player=NULL;
 
 };
 }// namespace cyrobot_monitor
