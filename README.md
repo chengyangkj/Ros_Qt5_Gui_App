@@ -34,6 +34,9 @@ Note that this software is for learning purposes only and should not be used in 
 ##### 4.4 Set up navigation target points
 ##### 4.4 设置导航目标点
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201804722.gif)
+##### 4.5 Fixed-point return
+##### 4.5 定点返航
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200413204212739.gif)
 ### 二，安装教程
 ### 二，Installation tutorial
 #### 1，首先安装ros对qt pkg的支持
