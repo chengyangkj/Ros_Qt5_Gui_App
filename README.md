@@ -1,8 +1,8 @@
 ## ROS Qt Deskotp GUI Apps
 Use qt5 to implement the ros robot human-machine interface
+
 使用qt5实现ros机器人人机界面
-=注意，此软件仅供学习使用，请勿在未经更改的情况下直接用于其他途径，否则将追究相关责任。=
-Note that this software is for learning purposes only and should not be used directly in other ways without change, otherwise the matter will be held accountable.
+
 ### 一，Features
 ### 一，功能介绍
 #### 1，Speed dashboard
