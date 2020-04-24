@@ -11,7 +11,6 @@
 #include <rviz/display.h>
 #include <rviz/tool.h>
 #include<rviz/tool_manager.h>
-#include <rviz_visual_tools/rviz_visual_tools.h>
 #include <QThread>
 #include <QDebug>
 class QRviz:public QThread
