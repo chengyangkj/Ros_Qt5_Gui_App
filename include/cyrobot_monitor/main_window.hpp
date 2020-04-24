@@ -37,11 +37,9 @@
 #include <rviz/render_panel.h>
 #include <rviz/display.h>
 #include<rviz/tool.h>
-#include <rviz_visual_tools/rviz_visual_tools.h>
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
-namespace rvt = rviz_visual_tools;
 namespace cyrobot_monitor {
 
 /*****************************************************************************
