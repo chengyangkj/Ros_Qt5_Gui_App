@@ -7,6 +7,10 @@ Note that this software is for learning purposes only and should not be used in 
 
 注意，此软件仅供学习使用，请勿用于其他途径。
 
+Continuously updating.....
+
+持续更新中.....
+
 ### 一，Features
 ### 一，功能介绍
 #### 1，Speed dashboard
