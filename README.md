@@ -55,9 +55,6 @@ sudo apt-get install ros-melodic-qt-create
 sudo apt-get install ros-melodic-qt-build
 ```
 ```cpp
-sudo apt-get install qtcreator
-```
-```cpp
 sudo apt-get install qtmultimedia5-dev
 ```
 #### 2，Compile
