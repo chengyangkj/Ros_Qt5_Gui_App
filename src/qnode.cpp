@@ -46,7 +46,7 @@ bool QNode::init() {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-	ros::NodeHandle n;
+    ros::NodeHandle n;
 	// Add your ros communications here.
 
      cmdVel_sub =n.subscribe<nav_msgs::Odometry>("raw_odom",1000,&QNode::speedCallback,this);
@@ -70,9 +70,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-	ros::NodeHandle n;
-
-
+    ros::NodeHandle n;
     //创建速度话题的订阅者
     cmdVel_sub =n.subscribe<nav_msgs::Odometry>("raw_odom",200,&QNode::speedCallback,this);
     power_sub=n.subscribe("power",1000,&QNode::powerCallback,this);
@@ -82,9 +80,11 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
     goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
     //速度控制话题
     cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+
 	start();
 	return true;
 }
+
 //机器人位置话题的回调函数
 void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
 {
@@ -186,6 +186,146 @@ void QNode::run() {
     cmd_pub.publish(twist);
     ros::spinOnce();
 
+ }
+ //订阅图片话题，并在label上显示
+ void QNode::Sub_Image(QString topic,int frame_id,QLabel *label)
+ {
+      ros::NodeHandle n;
+      image_transport::ImageTransport it_(n);
+     switch (frame_id) {
+         case 0:
+            video_label0=label;
+            image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
+         break;
+         case 1:
+             video_label1=label;
+             image_sub1=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback1,this);
+          break;
+         case 2:
+             video_label2=label;
+             image_sub2=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback2,this);
+          break;
+         case 3:
+             video_label3=label;
+             image_sub3=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback3,this);
+          break;
+     }
+     ros::spinOnce();
+
+
+
+ }
+ //图像话题的回调函数
+ void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
+ {
+     cv_bridge::CvImagePtr cv_ptr;
+
+     try
+       {
+         //深拷贝转换为opencv类型
+         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         QImage im=Mat2QImage(cv_ptr->image);
+         video_label0->setPixmap(QPixmap::fromImage(im).scaled(video_label0->width(),video_label0->height()));
+       }
+       catch (cv_bridge::Exception& e)
+       {
+
+         ROS_ERROR("video frame0 exception: %s", e.what());
+         return;
+       }
+ }
+ //图像话题的回调函数
+ void QNode::imageCallback1(const sensor_msgs::ImageConstPtr& msg)
+ {
+     cv_bridge::CvImagePtr cv_ptr;
+     try
+       {
+         //深拷贝转换为opencv类型
+         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         QImage im=Mat2QImage(cv_ptr->image);
+         video_label1->setPixmap(QPixmap::fromImage(im).scaled(video_label1->width(),video_label1->height()));
+       }
+       catch (cv_bridge::Exception& e)
+       {
+         ROS_ERROR("video frame0 exception: %s", e.what());
+         return;
+       }
+ }
+ //图像话题的回调函数
+ void QNode::imageCallback2(const sensor_msgs::ImageConstPtr& msg)
+ {
+     cv_bridge::CvImagePtr cv_ptr;
+     try
+       {
+         //深拷贝转换为opencv类型
+         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         QImage im=Mat2QImage(cv_ptr->image);
+         video_label2->setPixmap(QPixmap::fromImage(im).scaled(video_label2->width(),video_label2->height()));
+       }
+       catch (cv_bridge::Exception& e)
+       {
+         ROS_ERROR("video frame0 exception: %s", e.what());
+         return;
+       }
+ }
+ //图像话题的回调函数
+ void QNode::imageCallback3(const sensor_msgs::ImageConstPtr& msg)
+ {
+     cv_bridge::CvImagePtr cv_ptr;
+     try
+       {
+         //深拷贝转换为opencv类型
+         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         QImage im=Mat2QImage(cv_ptr->image);
+         video_label3->setPixmap(QPixmap::fromImage(im).scaled(video_label3->width(),video_label3->height()));
+       }
+       catch (cv_bridge::Exception& e)
+       {
+         ROS_ERROR("video frame0 exception: %s", e.what());
+         return;
+       }
+ }
+ QImage QNode::Mat2QImage(cv::Mat const& src)
+ {
+   QImage dest(src.cols, src.rows, QImage::Format_ARGB32);
+
+   const float scale = 255.0;
+
+   if (src.depth() == CV_8U) {
+     if (src.channels() == 1) {
+       for (int i = 0; i < src.rows; ++i) {
+         for (int j = 0; j < src.cols; ++j) {
+           int level = src.at<quint8>(i, j);
+           dest.setPixel(j, i, qRgb(level, level, level));
+         }
+       }
+     } else if (src.channels() == 3) {
+       for (int i = 0; i < src.rows; ++i) {
+         for (int j = 0; j < src.cols; ++j) {
+           cv::Vec3b bgr = src.at<cv::Vec3b>(i, j);
+           dest.setPixel(j, i, qRgb(bgr[2], bgr[1], bgr[0]));
+         }
+       }
+     }
+   } else if (src.depth() == CV_32F) {
+     if (src.channels() == 1) {
+       for (int i = 0; i < src.rows; ++i) {
+         for (int j = 0; j < src.cols; ++j) {
+           int level = scale * src.at<float>(i, j);
+           dest.setPixel(j, i, qRgb(level, level, level));
+         }
+       }
+     } else if (src.channels() == 3) {
+       for (int i = 0; i < src.rows; ++i) {
+         for (int j = 0; j < src.cols; ++j) {
+           cv::Vec3f bgr = scale * src.at<cv::Vec3f>(i, j);
+           dest.setPixel(j, i, qRgb(bgr[2], bgr[1], bgr[0]));
+         }
+       }
+     }
+   }
+
+   return dest;
  }
 void QNode::log( const LogLevel &level, const std::string &msg) {
 	logging_model.insertRows(logging_model.rowCount(),1);

@@ -10,8 +10,8 @@
 #include <rviz/render_panel.h>
 #include <rviz/display.h>
 #include <rviz/tool.h>
+#include "rviz/image/ros_image_texture.h"
 #include<rviz/tool_manager.h>
-#include <rviz_visual_tools/rviz_visual_tools.h>
 #include <QThread>
 #include <QDebug>
 class QRviz:public QThread
@@ -38,6 +38,7 @@ public:
     //发布goal话题的坐标
     void Send_Goal_topic();
 private:
+    //rviz显示容器
     rviz::RenderPanel *render_panel_;
     rviz::VisualizationManager *manager_;
     rviz::Display* grid_=NULL ;
@@ -50,7 +51,10 @@ private:
     rviz::Display *Navigate_globalmap=NULL;
     rviz::Display *Navigate_globalplanner=NULL;
     rviz::Display *Navigate_amcl=NULL;
+
+    //rviz工具
     rviz::Tool *current_tool;
+    //rviz工具控制器
     rviz::ToolManager *tool_manager_;
     QVBoxLayout *layout;
     QString nodename;

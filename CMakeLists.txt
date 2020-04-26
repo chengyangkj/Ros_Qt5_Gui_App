@@ -11,7 +11,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 ##############################################################################
 
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
-find_package(catkin REQUIRED COMPONENTS rviz roscpp)
+find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
+    cv_bridge
+    std_msgs
+    image_transport
+    )
 
 find_package(Qt5 REQUIRED Core Widgets Multimedia)
 set(QT_LIBRARIES Qt5::Widgets Qt5::Multimedia)

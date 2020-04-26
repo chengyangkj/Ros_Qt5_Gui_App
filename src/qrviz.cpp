@@ -17,27 +17,11 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
     manager_=new rviz::VisualizationManager(render_panel_);
     //获取当前rviz控制对象的 tool控制对象
     tool_manager_=manager_->getToolManager();
-
-//    //绑定槽函数
-//    connect( tool_manager_, SIGNAL( toolAdded( rviz::Tool* )), this, SLOT( addTool( rviz::Tool* )));
    //初始化camera 这行代码实现放大 缩小 平移等操作
     render_panel_->initialize(manager_->getSceneManager(),manager_);
-
-
-
-//       //工具管理
-//       rviz::ToolManager* tool_man;
-//       connect( tool_man, SIGNAL( toolAdded( Tool* )), this, SLOT( addTool( Tool* )));
-//       connect( tool_man, SIGNAL( toolRemoved( Tool* )), this, SLOT( removeTool( Tool* )));
-//       connect( tool_man, SIGNAL( toolRefreshed( Tool* )), this, SLOT( refreshTool( Tool* )));
-//       connect( tool_man, SIGNAL( toolChanged( Tool* )), this, SLOT( indicateToolIsCurrent( Tool* )));
     manager_->initialize();
     tool_manager_->initialize();
     manager_->removeAllDisplays();
-
-
-
-
 
 }
 
@@ -127,6 +111,7 @@ void QRviz::Display_LaserScan(bool enable,QString topic)
      manager_->setProperty("Frame Rate",frame_rate);
      manager_->startUpdate();
  }
+
 // "rviz/MoveCamera";
 // "rviz/Interact";
 // "rviz/Select";

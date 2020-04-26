@@ -23,6 +23,7 @@
 #endif
 #include <string>
 #include <QThread>
+#include <QLabel>
 #include <QStringListModel>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -30,7 +31,12 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/Twist.h>
+#include <image_transport/image_transport.h>   //image_transport
+#include <cv_bridge/cv_bridge.h>              //cv_bridge
+#include <sensor_msgs/image_encodings.h>    //图像编码格式
 #include <map>
+#include <QLabel>
+#include <QImage>
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
@@ -50,13 +56,14 @@ public:
 	bool init(const std::string &master_url, const std::string &host_url);
     void move_base(char k,float speed_linear,float speed_trun);
     void set_goal(QString frame,double x,double y,double z,double w);
+    void Sub_Image(QString topic,int frame_id,QLabel *label);
 	void run();
 
 	/*********************
 	** Logging
 	**********************/
 	enum LogLevel {
-	         Debug,
+             Debug,
 	         Info,
 	         Warn,
 	         Error,
@@ -86,9 +93,24 @@ private:
     ros::Publisher goal_pub;
     ros::Publisher cmd_pub;
     QStringListModel logging_model;
+    //图像订阅
+    image_transport::Subscriber image_sub0;
+    image_transport::Subscriber image_sub1;
+    image_transport::Subscriber image_sub2;
+    image_transport::Subscriber image_sub3;
+    //图像显示label
+    QLabel* video_label0;
+    QLabel* video_label1;
+    QLabel* video_label2;
+    QLabel* video_label3;
+    QImage Mat2QImage(cv::Mat const& src);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void powerCallback(const std_msgs::Float32& message_holder);
+    void imageCallback0(const sensor_msgs::ImageConstPtr& msg);
+    void imageCallback1(const sensor_msgs::ImageConstPtr& msg);
+    void imageCallback2(const sensor_msgs::ImageConstPtr& msg);
+    void imageCallback3(const sensor_msgs::ImageConstPtr& msg);
     void myCallback(const std_msgs::Float64& message_holder);
 };
 

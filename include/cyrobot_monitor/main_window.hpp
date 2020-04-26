@@ -27,6 +27,8 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include <QVariant>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <map>
 //rviz
 #include <rviz/visualization_manager.h>
@@ -37,11 +39,9 @@
 #include <rviz/render_panel.h>
 #include <rviz/display.h>
 #include<rviz/tool.h>
-#include <rviz_visual_tools/rviz_visual_tools.h>
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
-namespace rvt = rviz_visual_tools;
 namespace cyrobot_monitor {
 
 /*****************************************************************************
@@ -64,7 +64,7 @@ public:
 	void showNoMasterMessage();
     void initRviz();
     void initUis();
-
+    void initVideos();
 
 public slots:
 	/******************************************
@@ -77,7 +77,7 @@ public slots:
     void slot_speed_y(double y);
     void slot_power(float p);
     void slot_rosShutdown();
-    void quick_cmds();
+    void quick_cmds_check_change(int);
     void cmd_output();
     /******************************************
     ** Manual connections
@@ -94,12 +94,16 @@ public slots:
     void slot_treewidget_item_check_change(int);
     void slot_set_2D_Goal();
     void slot_set_2D_Pos();
+    //设置界面
+    void slot_setting_frame();
     //设置返航点
     void slot_set_return_point();
     //返航
     void slot_return_point();
     //机器人位置
     void slot_position_change(QString,double,double,double,double);
+    void quick_cmd_add();
+    void quick_cmd_remove();
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
@@ -107,6 +111,7 @@ private slots:
 private:
 	Ui::MainWindowDesign ui;
     void connections();
+    void add_quick_cmd(QString name,QString shell);
     QNode qnode;
     CCtrlDashBoard *m_DashBoard_x;
     CCtrlDashBoard *m_DashBoard_y;
@@ -122,7 +127,7 @@ private:
     QMap <QString,QTreeWidgetItem *> tree_rviz_stues;
     //存放display的当前值 item名，参数名称和值
     QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
-    Settings *set;
+    Settings *set=NULL;
     QSoundEffect *media_player=NULL;
 
 };
