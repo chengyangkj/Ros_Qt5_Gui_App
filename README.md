@@ -1,6 +1,15 @@
 ## ROS Qt Deskotp GUI Apps
 Use qt5 to implement the ros robot human-machine interface
+
 使用qt5实现ros机器人人机界面
+
+Note that this software is for learning purposes only and should not be used in any other way.
+
+注意，此软件仅供学习使用，请勿用于其他途径。
+
+Continuously updating.....
+
+持续更新中.....
 
 ### 一，Features
 ### 一，功能介绍
@@ -29,6 +38,11 @@ Use qt5 to implement the ros robot human-machine interface
 ##### 4.4 Set up navigation target points
 ##### 4.4 设置导航目标点
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201804722.gif)
+##### 4.5 Fixed-point return
+##### 4.5 定点返航
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200413204212739.gif)
+##### 4.6 To be perfected....
+##### 4.6 待完善....
 ### 二，安装教程
 ### 二，Installation tutorial
 #### 1，首先安装ros对qt pkg的支持
@@ -39,9 +53,6 @@ sudo apt-get install ros-melodic-qt-create
 
 ```cpp
 sudo apt-get install ros-melodic-qt-build
-```
-```cpp
-sudo apt-get install qtcreator
 ```
 ```cpp
 sudo apt-get install qtmultimedia5-dev
