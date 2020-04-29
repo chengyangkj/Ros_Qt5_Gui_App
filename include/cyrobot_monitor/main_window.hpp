@@ -79,6 +79,7 @@ public slots:
     void slot_rosShutdown();
     void quick_cmds_check_change(int);
     void cmd_output();
+    void cmd_error_output();
     /******************************************
     ** Manual connections
     *******************************************/
@@ -115,7 +116,7 @@ private:
     QNode qnode;
     CCtrlDashBoard *m_DashBoard_x;
     CCtrlDashBoard *m_DashBoard_y;
-    QProcess *laser_cmd=NULL;
+    QProcess *quick_cmd=NULL;
     QProcess *close_remote_cmd=NULL;
     QProcess *base_cmd=NULL;
     QRviz *map_rviz=NULL;

@@ -841,83 +841,35 @@ void MainWindow::quick_cmds_check_change(int state)
     bool is_checked=state>1?true:false;
     if(is_checked)
     {
-        laser_cmd=new QProcess();
-        laser_cmd->start("bash");
-         qDebug()<<laser_cmd->processId();
-        laser_cmd->waitForStarted();
-         qDebug()<<laser_cmd->processId();
-        laser_cmd->write(bash.toLocal8Bit()+'\n');
-        qDebug()<<laser_cmd->processId();
+        quick_cmd=new QProcess;
+        quick_cmd->start("bash");
+        qDebug()<<bash;
+        quick_cmd->write(bash.toLocal8Bit()+'\n');
+        connect(quick_cmd,SIGNAL(readyReadStandardOutput()),this,SLOT(cmd_output()));
+         connect(quick_cmd,SIGNAL(readyReadStandardError()),this,SLOT(cmd_error_output()));
     }
     else{
 
 
     }
-//   if(btn->objectName()=="laser_btn")
-//   {
-//       if(laser_cmd==NULL)
-//       {
-//           laser_cmd = new QProcess(this);
-//           laser_cmd->start("bash");
 
-//           //等待启动完成
-//           laser_cmd->waitForStarted();
-//           laser_cmd->write(ui.laer_cmd_text->toPlainText().toLocal8Bit() + '\n');
-//           connect(laser_cmd,SIGNAL(readyReadStandardOutput()),this,SLOT(cmd_output()));
-//           btn->setText("关闭激光雷达");
-//       }
-//       else{
-//         laser_cmd->write("exit\n");
-//         laser_cmd->write("exit\n");
-//         laser_cmd->close();
-//         laser_cmd->waitForFinished();
-//         btn->setText("开启激光雷达");
-//         delete laser_cmd;->child(j)[1]
-//         laser_cmd=NULL;
-//       }
-
-//   }
-//   else if(btn->objectName()=="basecontrol_btn")
-//   {
-//       if(base_cmd==NULL)
-//       {
-//           base_cmd=new QProcess();
-//           base_cmd->start("bash");
-//           base_cmd->waitForStarted();
-//           base_cmd->wr->child(j)[1]ite(ui.base_cmd_text->toPlainText().toLocal8Bit()+'\n');
-//          // base_cmd->execute("gnome-terminal");
-
-//           btn->setText("关闭底盘控制");
-//       }
-//       else{
-//           //base_cmd->write("exit\n");
-
-//           base_cmd->close();
-//           base_cmd->waitForFinished();
-//           btn->setText("开启底盘控制");
-//           delete base_cmd;
-//           base_cmd=NULL;
-//       }
-//   }
 }
 //执行一些命令的回显
 void MainWindow::cmd_output()
 {
-    if(laser_cmd!=NULL)
-    {
-        ui.cmd_output->append(laser_cmd->readAllStandardOutput().data());
-    }
+
+    ui.cmd_output->append(quick_cmd->readAllStandardOutput());
+}
+//执行一些命令的错误回显
+void MainWindow::cmd_error_output()
+{
+    ui.cmd_output->append("<font color=\"#FF0000\">"+quick_cmd->readAllStandardError()+"</font> ");
 }
 
 //析构函数
 MainWindow::~MainWindow() {
 
-    if(laser_cmd!=NULL)
-    {
-        laser_cmd->close();
-        laser_cmd->waitForFinished();
-        delete laser_cmd;
-    }
+
     if( base_cmd)
     {
         delete base_cmd;
