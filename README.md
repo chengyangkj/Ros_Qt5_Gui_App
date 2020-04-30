@@ -3,9 +3,6 @@ Use qt5 to implement the ros robot human-machine interface
 
 使用qt5实现ros机器人人机界面
 
-Note that this software is for learning purposes only and should not be used in any other way.
-
-注意，此软件仅供学习使用，请勿用于其他途径。
 
 Continuously updating.....
 
