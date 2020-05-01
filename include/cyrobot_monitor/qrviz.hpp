@@ -37,20 +37,23 @@ public:
     void Set_Goal();
     //发布goal话题的坐标
     void Send_Goal_topic();
+    //显示robotmodel
+    void Display_RobotModel(bool enable);
 private:
     //rviz显示容器
     rviz::RenderPanel *render_panel_;
     rviz::VisualizationManager *manager_;
     rviz::Display* grid_=NULL ;
+
     //显示tf坐标变换
     rviz::Display* TF_=NULL ;
     rviz::Display* map_=NULL ;
     rviz::Display* laser_=NULL ;
-    rviz::Display *Navigate_localmap=NULL;
-    rviz::Display *Navigate_localplanner=NULL;
-    rviz::Display *Navigate_globalmap=NULL;
-    rviz::Display *Navigate_globalplanner=NULL;
-    rviz::Display *Navigate_amcl=NULL;
+    rviz::Display* Navigate_localmap=NULL;
+    rviz::Display* Navigate_localplanner=NULL;
+    rviz::Display* Navigate_globalmap=NULL;
+    rviz::Display* Navigate_globalplanner=NULL;
+    rviz::Display* Navigate_amcl=NULL;
 
     //rviz工具
     rviz::Tool *current_tool;

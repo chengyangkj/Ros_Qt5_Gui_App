@@ -24,7 +24,20 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
     manager_->removeAllDisplays();
 
 }
+  rviz::Display* RobotModel_=NULL;
+//显示robotModel
+  void QRviz::Display_RobotModel(bool enable)
+  {
 
+      if(RobotModel_==NULL)
+      {
+          RobotModel_=manager_->createDisplay("rviz/RobotModel","Qrviz RobotModel",enable);
+      }
+      else{
+          delete RobotModel_;
+          RobotModel_=manager_->createDisplay("rviz/RobotModel","Qrviz RobotModel",enable);
+      }
+  }
 //显示grid
 void QRviz::Display_Grid(bool enable,QString Reference_frame,int Plan_Cell_count,QColor color)
 {

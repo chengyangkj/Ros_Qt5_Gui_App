@@ -411,6 +411,10 @@ void MainWindow::slot_treewidget_item_check_change(int is_check)
 
         map_rviz->Display_Navigate(enable,Global_map->currentText(),Global_plan->currentText(),Local_map->currentText(),Local_plan->currentText());
     }
+    else if(dis_name=="RobotModel")
+    {
+        map_rviz->Display_RobotModel(enable);
+    }
 }
 //treewidget 的值改变槽函数
 void MainWindow::slot_treewidget_item_value_change(QString value)
