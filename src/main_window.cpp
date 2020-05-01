@@ -916,6 +916,8 @@ void MainWindow::on_button_connect_clicked(bool check ) {
               ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
               ui.label_statue_text->setStyleSheet("color:green;");
              ui.label_statue_text->setText("在线");
+             //初始化视频订阅的显示
+             initVideos();
 		}
     }
     //如果不使用环境变量
@@ -937,10 +939,11 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
             ui.label_statue_text->setStyleSheet("color:green;");
            ui.label_statue_text->setText("在线");
+           //初始化视频订阅的显示
+           initVideos();
 		}
 	}
-    //初始化视频订阅的显示
-    initVideos();
+
 }
 //当ros与master的连接断开时
 void MainWindow::slot_rosShutdown()
