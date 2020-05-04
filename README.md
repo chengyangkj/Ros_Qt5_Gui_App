@@ -3,6 +3,10 @@ Use qt5 to implement the ros robot human-machine interface
 
 使用qt5实现ros机器人人机界面
 
+Attention! This code is for learning purposes only and cannot be used for any other purpose without the author's permission.
+
+注意！未经作者的许可，此代码仅用于学习，不能用于其他用途。
+
 Continuously updating.....
 
 持续更新中.....
