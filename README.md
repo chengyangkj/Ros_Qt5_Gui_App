@@ -15,13 +15,17 @@ Continuously updating.....
 ### 一，功能介绍
 #### 1，Speed dashboard
 #### 1,速度仪表盘
-
+- Before use, you must set the odom topic in the menu-settings-and-topic settings:
+- 使用前须在菜单->设置->话题设置中设置odom话题：
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200507124144542.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405102549333.gif)
 #### 2，Robot speed control
 #### 2, 机器人速度控制
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405104454149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
 #### 3，Power display
 #### 3, 电量显示
+- Before use, you must set the power topic(Std_msg/Float32) in the menu-settings-and-topic settings
+- 使用前须在菜单->设置->话题设置中设置电量话题(Std_msg/Float32)
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405153102508.png)
 #### 4，rviz module 
 #### 4, rviz模块
@@ -40,6 +44,8 @@ Continuously updating.....
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201804722.gif)
 ##### 4.5 Fixed-point return
 ##### 4.5 定点返航
+- Before use, you must set the amcl topic in the menu-settings-and-topic settings
+- 使用前须在菜单->设置->话题设置中设置amcl话题
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200413204212739.gif)
 ##### 4.6 Subscribe to image topics
 ##### 4.6 订阅图像话题

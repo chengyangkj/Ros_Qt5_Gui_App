@@ -935,6 +935,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
 		} else {
+
             //初始化rviz
             initRviz();
 			ui.button_connect->setEnabled(false);
@@ -955,6 +956,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.label_statue_text->setText("离线");
             //showNoMasterMessage();
 		} else {
+
             //初始化rviz
             initRviz();
 			ui.button_connect->setEnabled(false);

@@ -37,6 +37,7 @@
 #include <map>
 #include <QLabel>
 #include <QImage>
+#include <QSettings>
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
@@ -57,9 +58,7 @@ public:
     void move_base(char k,float speed_linear,float speed_trun);
     void set_goal(QString frame,double x,double y,double z,double w);
     void Sub_Image(QString topic,int frame_id,QString format);
-    void sub_odom(QString topic);
-    void sub_amcl_pos(QString topic);
-    void sub_power(QString topic);
+
 	void run();
 
 	/*********************
@@ -107,6 +106,11 @@ private:
     QString video1_format;
     QString video2_format;
     QString video3_format;
+    QString odom_topic;
+    QString power_topic;
+    QString pose_topic;
+    QString power_max;
+    QString power_min;
     QImage Mat2QImage(cv::Mat const& src);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);

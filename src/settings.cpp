@@ -32,8 +32,9 @@ Settings::Settings(QWidget *parent) :
         ui->video3_format->setText(format[3]);
     }
     QSettings main_setting("topic_setting","cyrobot_monitor");
-    ui->lineEdit_odm->setText(main_setting.value("topic_odom","row_odom").toString());
+    ui->lineEdit_odm->setText(main_setting.value("topic_odom","raw_odom").toString());
     ui->lineEdit_power->setText(main_setting.value("topic_power","power").toString());
+    ui->lineEdit_power->setText(main_setting.value("topic_amcl","amcl_pose").toString());
     ui->lineEdit_power_min->setText(main_setting.value("power_min","10").toString());
     ui->lineEdit_power_max->setText(main_setting.value("power_max","12").toString());
 //    ui->lineEdit_odom->setText(main_setting.value("odom_topic","amcl_pose").toString());

@@ -30,7 +30,16 @@ namespace cyrobot_monitor {
 QNode::QNode(int argc, char** argv ) :
 	init_argc(argc),
 	init_argv(argv)
-	{}
+    {
+//    读取topic的设置
+    QSettings topic_setting("topic_setting","cyrobot_monitor");
+    odom_topic= topic_setting.value("topic_odom","raw_odom").toString();
+    power_topic=topic_setting.value("topic_power","power").toString();
+    pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
+    power_min=topic_setting.value("power_min","10").toString();
+    power_max=topic_setting.value("power_max","12").toString();
+
+    }
 
 QNode::~QNode() {
     if(ros::isStarted()) {
@@ -49,9 +58,11 @@ bool QNode::init() {
     ros::NodeHandle n;
 	// Add your ros communications here.
 
-     cmdVel_sub =n.subscribe<nav_msgs::Odometry>("raw_odom",1000,&QNode::speedCallback,this);
-     power_sub=n.subscribe("power",1000,&QNode::powerCallback,this);
-     pos_sub=n.subscribe("amcl_pose",1000,&QNode::poseCallback,this);
+    //创建速度话题的订阅者
+    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
+    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
+    //机器人位置话题
+    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
      //导航目标点发送话题
      goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
      //速度控制话题
@@ -72,10 +83,10 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
     ros::NodeHandle n;
     //创建速度话题的订阅者
-    cmdVel_sub =n.subscribe<nav_msgs::Odometry>("raw_odom",200,&QNode::speedCallback,this);
-    power_sub=n.subscribe("power",1000,&QNode::powerCallback,this);
+    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
+    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
     //机器人位置话题
-    pos_sub=n.subscribe("amcl_pose",1000,&QNode::poseCallback,this);
+    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
     //导航目标点发送话题
     goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
     //速度控制话题
@@ -212,6 +223,7 @@ void QNode::run() {
      }
      ros::spinOnce();
  }
+
  //图像话题的回调函数
  void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
  {
