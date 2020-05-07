@@ -62,7 +62,7 @@ void MainWindow::initVideos()
    QSettings video_topic_setting("video_topic","cyrobot_monitor");
    QStringList names=video_topic_setting.value("names").toStringList();
    QStringList topics=video_topic_setting.value("topics").toStringList();
-
+   QStringList format=video_topic_setting.value("format").toStringList();
    if(names.size()==4)
    {
        ui.label_v_name0->setText(names[0]);
@@ -70,20 +70,41 @@ void MainWindow::initVideos()
        ui.label_v_name2->setText(names[2]);
        ui.label_v_name3->setText(names[3]);
    }
-   if(topics.size()==4)
+   if(topics.size()==4&&format.size()==4)
    {
        if(topics[0]!="")
-        qnode.Sub_Image(topics[0],0,ui.label_video0);
+        qnode.Sub_Image(topics[0],0,format[0]);
        if(topics[1]!="")
-        qnode.Sub_Image(topics[1],0,ui.label_video1);
+        qnode.Sub_Image(topics[1],1,format[1]);
        if(topics[2]!="")
-        qnode.Sub_Image(topics[2],0,ui.label_video2);
+        qnode.Sub_Image(topics[2],2,format[2]);
        if(topics[3]!="")
-        qnode.Sub_Image(topics[3],0,ui.label_video3);
+        qnode.Sub_Image(topics[3],3,format[3]);
 
    }
 
+   //链接槽函数
+   connect(&qnode,SIGNAL(Show_image(int,QImage)),this,SLOT(slot_show_image(int,QImage)));
 
+
+}
+void MainWindow::slot_show_image(int frame_id, QImage image)
+{
+    switch (frame_id)
+    {
+    case 0:
+        ui.label_video0->setPixmap(QPixmap::fromImage(image).scaled(ui.label_video0->width(),ui.label_video0->height()));
+        break;
+    case 1:
+        ui.label_video1->setPixmap(QPixmap::fromImage(image).scaled(ui.label_video1->width(),ui.label_video1->height()));
+        break;
+    case 2:
+        ui.label_video2->setPixmap(QPixmap::fromImage(image).scaled(ui.label_video2->width(),ui.label_video2->height()));
+        break;
+    case 3:
+        ui.label_video3->setPixmap(QPixmap::fromImage(image).scaled(ui.label_video3->width(),ui.label_video3->height()));
+        break;
+    }
 }
 //初始化UI
 void MainWindow::initUis()

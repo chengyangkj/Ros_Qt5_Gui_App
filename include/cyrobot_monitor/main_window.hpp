@@ -105,6 +105,9 @@ public slots:
     void slot_position_change(QString,double,double,double,double);
     void quick_cmd_add();
     void quick_cmd_remove();
+    //显示图像
+    //显示图像
+    void slot_show_image(int,QImage);
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 

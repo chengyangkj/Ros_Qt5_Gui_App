@@ -19,7 +19,7 @@
      <item>
       <widget class="QToolBox" name="toolBox">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page">
         <property name="geometry">
@@ -150,9 +150,9 @@
         <attribute name="label">
          <string>Video</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_11">
+        <layout class="QVBoxLayout" name="verticalLayout_9">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_10">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_4">
              <item>
@@ -210,9 +210,33 @@
                  </item>
                 </layout>
                </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_23">
+                 <item>
+                  <widget class="QLabel" name="label_6">
+                   <property name="text">
+                    <string>Format:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="video0_format_3"/>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame">
+             <property name="frameShape">
+              <enum>QFrame::HLine</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -230,7 +254,7 @@
               </widget>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_4">
+              <layout class="QVBoxLayout" name="verticalLayout_7">
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <item>
@@ -271,9 +295,33 @@
                  </item>
                 </layout>
                </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_19">
+                 <item>
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Format:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="video1_format"/>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_2">
+             <property name="frameShape">
+              <enum>QFrame::HLine</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -332,9 +380,33 @@
                  </item>
                 </layout>
                </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_20">
+                 <item>
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>Format:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="video2_format"/>
+                 </item>
+                </layout>
+               </item>
               </layout>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QFrame" name="frame_3">
+             <property name="frameShape">
+              <enum>QFrame::HLine</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_15">
@@ -352,7 +424,7 @@
               </widget>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_7">
+              <layout class="QVBoxLayout" name="verticalLayout_4">
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_16">
                  <item>
@@ -390,6 +462,20 @@
                  </item>
                  <item>
                   <widget class="QLineEdit" name="video0_topic_set_4"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_21">
+                 <item>
+                  <widget class="QLabel" name="label_4">
+                   <property name="text">
+                    <string>Format:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="video3_format"/>
                  </item>
                 </layout>
                </item>

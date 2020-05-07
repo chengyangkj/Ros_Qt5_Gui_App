@@ -9,6 +9,7 @@ Settings::Settings(QWidget *parent) :
     QSettings video_topic_setting("video_topic","cyrobot_monitor");
     QStringList names=video_topic_setting.value("names").toStringList();
     QStringList topics=video_topic_setting.value("topics").toStringList();
+    QStringList format=video_topic_setting.value("format").toStringList();
     if(names.size()==4)
     {
         ui->video0_name_set->setText(names[0]);
@@ -23,7 +24,19 @@ Settings::Settings(QWidget *parent) :
         ui->video0_topic_set_3->setText(topics[2]);
         ui->video0_topic_set_4->setText(topics[3]);
     }
-
+    if(format.size()==4)
+    {
+        ui->video0_format_3->setText(format[0]);
+        ui->video1_format->setText(format[1]);
+        ui->video2_format->setText(format[2]);
+        ui->video3_format->setText(format[3]);
+    }
+    QSettings main_setting("topic_setting","cyrobot_monitor");
+    ui->lineEdit_odm->setText(main_setting.value("topic_odom","row_odom").toString());
+    ui->lineEdit_power->setText(main_setting.value("topic_power","power").toString());
+    ui->lineEdit_power_min->setText(main_setting.value("power_min","10").toString());
+    ui->lineEdit_power_max->setText(main_setting.value("power_max","12").toString());
+//    ui->lineEdit_odom->setText(main_setting.value("odom_topic","amcl_pose").toString());
     connect(ui->pushButton,SIGNAL(clicked()),this,SLOT(slot_ok_btn_click()));
     connect(ui->pushButton_2,SIGNAL(clicked()),this,SLOT(slot_cancel_btn_click()));
 }
@@ -34,11 +47,12 @@ void Settings::slot_ok_btn_click()
     main_setting.setValue("topic_power",ui->lineEdit_power->text());
     main_setting.setValue("power_min",ui->lineEdit_power_min->text());
     main_setting.setValue("power_max",ui->lineEdit_power_max->text());
-
+//    main_setting.setValue("odom_topic",ui->lineEdit_odom->text());
 
     QSettings video_topic_setting("video_topic","cyrobot_monitor");
     QStringList name_data;
     QStringList topic_data;
+    QStringList format_data;
     name_data.append(ui->video0_name_set->text());
     name_data.append(ui->video0_name_set_2->text());
     name_data.append(ui->video0_name_set_3->text());
@@ -47,8 +61,14 @@ void Settings::slot_ok_btn_click()
     topic_data.append(ui->video0_topic_set_2->text());
     topic_data.append(ui->video0_topic_set_3->text());
     topic_data.append(ui->video0_topic_set_4->text());
+
+    format_data.append(ui->video0_format_3->text());
+    format_data.append(ui->video1_format->text());
+    format_data.append(ui->video2_format->text());
+    format_data.append(ui->video3_format->text());
     video_topic_setting.setValue("names",name_data);
     video_topic_setting.setValue("topics",topic_data);
+    video_topic_setting.setValue("format",format_data);
     QMessageBox::critical(NULL, "保存成功！", "保存成功，部分功能需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     this->close();
 }

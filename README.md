@@ -43,8 +43,14 @@ Continuously updating.....
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200413204212739.gif)
 ##### 4.6 Subscribe to image topics
 ##### 4.6 订阅图像话题
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200426203752918.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200426203815951.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+- Provides four image display forms that can display four images at the same time
+- 提供四个图像显示窗体，可以同时显示四个图像
+![加粗样式](https://img-blog.csdnimg.cn/20200507093831130.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+- Before use, you need to set the topic and image encoding of the image in the menu->settings->-video (the encoding must be correctly set, otherwise the image will not be displayed correctly). When setting the error, the prompt for coding the wrong is output in info, and the correct encoding is set according to the prompt)
+- 使用前需要先在菜单->设置->video 中设置图像的话题和图像编码（编码一定要设置正确，否则会不能正确显示图像。设置错误时在info中会输出编码错误的提示，根据提示设置正确的编码即可）
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200507093731575.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+
 ##### 4.7 Quick instructions
 ##### 4.7 快捷指令
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200429204153916.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)

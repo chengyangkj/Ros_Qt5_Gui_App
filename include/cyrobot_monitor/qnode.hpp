@@ -56,7 +56,10 @@ public:
 	bool init(const std::string &master_url, const std::string &host_url);
     void move_base(char k,float speed_linear,float speed_trun);
     void set_goal(QString frame,double x,double y,double z,double w);
-    void Sub_Image(QString topic,int frame_id,QLabel *label);
+    void Sub_Image(QString topic,int frame_id,QString format);
+    void sub_odom(QString topic);
+    void sub_amcl_pos(QString topic);
+    void sub_power(QString topic);
 	void run();
 
 	/*********************
@@ -81,6 +84,7 @@ Q_SIGNALS:
     void speed_y(double y);
     void power(float p);
     void Master_shutdown();
+    void Show_image(int,QImage);
     void position(QString frame,double x,double y,double z,double w);
 private:
 	int init_argc;
@@ -98,11 +102,11 @@ private:
     image_transport::Subscriber image_sub1;
     image_transport::Subscriber image_sub2;
     image_transport::Subscriber image_sub3;
-    //图像显示label
-    QLabel* video_label0;
-    QLabel* video_label1;
-    QLabel* video_label2;
-    QLabel* video_label3;
+    //图像format
+    QString video0_format;
+    QString video1_format;
+    QString video2_format;
+    QString video3_format;
     QImage Mat2QImage(cv::Mat const& src);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);

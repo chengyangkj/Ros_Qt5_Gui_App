@@ -188,32 +188,29 @@ void QNode::run() {
 
  }
  //订阅图片话题，并在label上显示
- void QNode::Sub_Image(QString topic,int frame_id,QLabel *label)
+ void QNode::Sub_Image(QString topic,int frame_id,QString format)
  {
       ros::NodeHandle n;
       image_transport::ImageTransport it_(n);
      switch (frame_id) {
          case 0:
-            video_label0=label;
+            video0_format=format;
             image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
          break;
          case 1:
-             video_label1=label;
+             video1_format=format;
              image_sub1=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback1,this);
           break;
          case 2:
-             video_label2=label;
+             video2_format=format;
              image_sub2=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback2,this);
           break;
          case 3:
-             video_label3=label;
+             video3_format=format;
              image_sub3=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback3,this);
           break;
      }
      ros::spinOnce();
-
-
-
  }
  //图像话题的回调函数
  void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
@@ -223,14 +220,14 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         cv_ptr = cv_bridge::toCvCopy(msg, video0_format.toStdString());
          QImage im=Mat2QImage(cv_ptr->image);
-         video_label0->setPixmap(QPixmap::fromImage(im).scaled(video_label0->width(),video_label0->height()));
+         emit Show_image(0,im);
        }
        catch (cv_bridge::Exception& e)
        {
 
-         ROS_ERROR("video frame0 exception: %s", e.what());
+         log(Error,("video frame0 exception: "+QString(e.what())).toStdString());
          return;
        }
  }
@@ -241,13 +238,13 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         cv_ptr = cv_bridge::toCvCopy(msg,video1_format.toStdString());
          QImage im=Mat2QImage(cv_ptr->image);
-         video_label1->setPixmap(QPixmap::fromImage(im).scaled(video_label1->width(),video_label1->height()));
+         emit Show_image(1,im);
        }
        catch (cv_bridge::Exception& e)
        {
-         ROS_ERROR("video frame0 exception: %s", e.what());
+         log(Error,("video frame1 exception: "+QString(e.what())).toStdString());
          return;
        }
  }
@@ -258,13 +255,13 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         cv_ptr = cv_bridge::toCvCopy(msg, video2_format.toStdString());
          QImage im=Mat2QImage(cv_ptr->image);
-         video_label2->setPixmap(QPixmap::fromImage(im).scaled(video_label2->width(),video_label2->height()));
+         emit Show_image(2,im);
        }
        catch (cv_bridge::Exception& e)
        {
-         ROS_ERROR("video frame0 exception: %s", e.what());
+         log(Error,("video frame2 exception: "+QString(e.what())).toStdString());
          return;
        }
  }
@@ -275,13 +272,13 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+         cv_ptr = cv_bridge::toCvCopy(msg, video3_format.toStdString());
          QImage im=Mat2QImage(cv_ptr->image);
-         video_label3->setPixmap(QPixmap::fromImage(im).scaled(video_label3->width(),video_label3->height()));
+         emit Show_image(3,im);
        }
        catch (cv_bridge::Exception& e)
        {
-         ROS_ERROR("video frame0 exception: %s", e.what());
+         log(Error,("video frame3 exception: "+QString(e.what())).toStdString());
          return;
        }
  }
