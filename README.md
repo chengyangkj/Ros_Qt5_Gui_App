@@ -27,6 +27,7 @@ Continuously updating.....
 #### 3, 电量显示
 - Before use, you must set the power topic(Std_msg/Float32) in the menu-settings-and-topic settings
 - 使用前须在菜单->设置->话题设置中设置电量话题(Std_msg/Float32)
+
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405153102508.png)
 #### 4，rviz module 
 #### 4, rviz模块
