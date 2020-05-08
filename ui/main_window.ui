@@ -711,7 +711,7 @@ QProgressBar {
            <cursorShape>ArrowCursor</cursorShape>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -940,25 +940,6 @@ QProgressBar {
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="1">
-                    <widget class="QPushButton" name="pushButton_i">
-                     <property name="mouseTracking">
-                      <bool>false</bool>
-                     </property>
-                     <property name="tabletTracking">
-                      <bool>false</bool>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_i:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>i</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>I</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="1" column="2">
                     <widget class="QPushButton" name="pushButton_l">
                      <property name="styleSheet">
@@ -1051,6 +1032,19 @@ QProgressBar {
                     <widget class="QLabel" name="label_linear">
                      <property name="text">
                       <string>50</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
+                    <widget class="QPushButton" name="pushButton_i">
+                     <property name="styleSheet">
+                      <string notr="true">QPushButton#pushButton_u:pressed{background-color:rgb(239, 41, 41)}</string>
+                     </property>
+                     <property name="text">
+                      <string>i</string>
+                     </property>
+                     <property name="shortcut">
+                      <string>I</string>
                      </property>
                     </widget>
                    </item>
