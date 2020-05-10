@@ -1,23 +1,23 @@
 ## ROS Qt Deskotp GUI Apps
-Use qt5 to implement the ros robot human-machine interface
+- Use qt5 to implement the ros robot human-machine interface
 
-使用qt5实现ros机器人人机界面
+- 使用qt5实现ros机器人人机界面
 
-Attention! This code is for learning purposes only and cannot be used for any other purpose without the author's permission.
+- Attention! This code is for learning purposes only and cannot be used for any other purpose without the author's permission.
 
-注意！未经作者的许可，此代码仅用于学习，不能用于其他用途。
+- 注意！未经作者的许可，此代码仅用于学习，不能用于其他用途。
 
-Continuously updating.....
+- Continuously updating.....
 
-持续更新中.....
+- 持续更新中.....
 
-Welcome to submit bugs in issues
+- Welcome to submit bugs in issues
 
-欢迎在issues提交bug
+- 欢迎在issues提交bug
 
-Kinetic version branch
+- Kinetic version branch
 
-kinetic 版本分支
+- kinetic 版本分支
 
 [kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")
 ### 一，Features
