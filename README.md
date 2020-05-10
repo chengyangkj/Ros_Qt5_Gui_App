@@ -11,6 +11,12 @@ Continuously updating.....
 
 持续更新中.....
 
+Welcome to submit bugs in issues
+欢迎在issues提交bug
+
+Kinetic version branch
+kinetic 版本分支
+[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/edit/kinetic-devel "kinetic-devel")
 ### 一，Features
 ### 一，功能介绍
 #### 1，Speed dashboard
