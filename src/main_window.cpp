@@ -62,7 +62,6 @@ void MainWindow::initVideos()
    QSettings video_topic_setting("video_topic","cyrobot_monitor");
    QStringList names=video_topic_setting.value("names").toStringList();
    QStringList topics=video_topic_setting.value("topics").toStringList();
-   QStringList format=video_topic_setting.value("format").toStringList();
    if(names.size()==4)
    {
        ui.label_v_name0->setText(names[0]);
@@ -70,16 +69,16 @@ void MainWindow::initVideos()
        ui.label_v_name2->setText(names[2]);
        ui.label_v_name3->setText(names[3]);
    }
-   if(topics.size()==4&&format.size()==4)
+   if(topics.size()==4)
    {
        if(topics[0]!="")
-        qnode.Sub_Image(topics[0],0,format[0]);
+        qnode.Sub_Image(topics[0],0);
        if(topics[1]!="")
-        qnode.Sub_Image(topics[1],1,format[1]);
+        qnode.Sub_Image(topics[1],1);
        if(topics[2]!="")
-        qnode.Sub_Image(topics[2],2,format[2]);
+        qnode.Sub_Image(topics[2],2);
        if(topics[3]!="")
-        qnode.Sub_Image(topics[3],3,format[3]);
+        qnode.Sub_Image(topics[3],3);
 
    }
 

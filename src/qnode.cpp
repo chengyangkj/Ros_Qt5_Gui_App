@@ -199,25 +199,21 @@ void QNode::run() {
 
  }
  //订阅图片话题，并在label上显示
- void QNode::Sub_Image(QString topic,int frame_id,QString format)
+ void QNode::Sub_Image(QString topic,int frame_id)
  {
       ros::NodeHandle n;
       image_transport::ImageTransport it_(n);
      switch (frame_id) {
          case 0:
-            video0_format=format;
             image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
          break;
          case 1:
-             video1_format=format;
              image_sub1=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback1,this);
           break;
          case 2:
-             video2_format=format;
              image_sub2=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback2,this);
           break;
          case 3:
-             video3_format=format;
              image_sub3=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback3,this);
           break;
      }
@@ -232,7 +228,7 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, video0_format.toStdString());
+         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
          QImage im=Mat2QImage(cv_ptr->image);
          emit Show_image(0,im);
        }
@@ -267,7 +263,7 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, video2_format.toStdString());
+         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
          QImage im=Mat2QImage(cv_ptr->image);
          emit Show_image(2,im);
        }
@@ -284,7 +280,7 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, video3_format.toStdString());
+         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
          QImage im=Mat2QImage(cv_ptr->image);
          emit Show_image(3,im);
        }
