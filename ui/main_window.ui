@@ -219,8 +219,8 @@ QProgressBar {
              <widget class="QGroupBox" name="groupBox_2">
               <property name="minimumSize">
                <size>
-                <width>782</width>
-                <height>791</height>
+                <width>200</width>
+                <height>200</height>
                </size>
               </property>
               <property name="title">
@@ -315,8 +315,8 @@ QProgressBar {
                        </property>
                        <property name="maximumSize">
                         <size>
-                         <width>300</width>
-                         <height>300</height>
+                         <width>16777215</width>
+                         <height>16777215</height>
                         </size>
                        </property>
                       </widget>
@@ -401,15 +401,15 @@ QProgressBar {
                        <widget class="QGroupBox" name="groupBox_4">
                         <property name="maximumSize">
                          <size>
-                          <width>300</width>
+                          <width>16777215</width>
                           <height>16777215</height>
                          </size>
                         </property>
                         <property name="title">
                          <string>Info</string>
                         </property>
-                        <layout class="QVBoxLayout" name="verticalLayout_11">
-                         <item>
+                        <layout class="QGridLayout" name="gridLayout_8">
+                         <item row="0" column="0">
                           <widget class="QListView" name="view_logging">
                            <property name="minimumSize">
                             <size>
@@ -419,8 +419,8 @@ QProgressBar {
                            </property>
                            <property name="maximumSize">
                             <size>
-                             <width>256</width>
-                             <height>387</height>
+                             <width>123123</width>
+                             <height>12312312</height>
                             </size>
                            </property>
                           </widget>
@@ -433,77 +433,11 @@ QProgressBar {
                         <property name="title">
                          <string>Video</string>
                         </property>
-                        <layout class="QHBoxLayout" name="horizontalLayout_15">
-                         <item>
+                        <layout class="QGridLayout" name="gridLayout_7">
+                         <item row="0" column="0">
                           <layout class="QGridLayout" name="gridLayout_3">
-                           <item row="0" column="0">
-                            <widget class="QLabel" name="label_video0">
-                             <property name="minimumSize">
-                              <size>
-                               <width>200</width>
-                               <height>200</height>
-                              </size>
-                             </property>
-                             <property name="maximumSize">
-                              <size>
-                               <width>200</width>
-                               <height>200</height>
-                              </size>
-                             </property>
-                             <property name="styleSheet">
-                              <string notr="true">border:1px solid rgb(0, 0, 0)</string>
-                             </property>
-                             <property name="text">
-                              <string>No Video</string>
-                             </property>
-                            </widget>
-                           </item>
                            <item row="0" column="1">
                             <widget class="QLabel" name="label_video1">
-                             <property name="minimumSize">
-                              <size>
-                               <width>150</width>
-                               <height>150</height>
-                              </size>
-                             </property>
-                             <property name="maximumSize">
-                              <size>
-                               <width>200</width>
-                               <height>200</height>
-                              </size>
-                             </property>
-                             <property name="styleSheet">
-                              <string notr="true">border:1px solid rgb(0, 0, 0)</string>
-                             </property>
-                             <property name="text">
-                              <string>No Video</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="0" column="2">
-                            <widget class="QLabel" name="label_video2">
-                             <property name="minimumSize">
-                              <size>
-                               <width>150</width>
-                               <height>150</height>
-                              </size>
-                             </property>
-                             <property name="maximumSize">
-                              <size>
-                               <width>200</width>
-                               <height>200</height>
-                              </size>
-                             </property>
-                             <property name="styleSheet">
-                              <string notr="true">border:1px solid rgb(0, 0, 0)</string>
-                             </property>
-                             <property name="text">
-                              <string>No Video</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="0" column="3">
-                            <widget class="QLabel" name="label_video3">
                              <property name="minimumSize">
                               <size>
                                <width>200</width>
@@ -550,23 +484,25 @@ QProgressBar {
                              </property>
                             </widget>
                            </item>
-                           <item row="1" column="2">
-                            <widget class="QLabel" name="label_v_name2">
-                             <property name="text">
-                              <string>Video2</string>
-                             </property>
-                            </widget>
-                           </item>
-                           <item row="1" column="3">
-                            <widget class="QLabel" name="label_v_name3">
-                             <property name="maximumSize">
+                           <item row="0" column="0">
+                            <widget class="QLabel" name="label_video0">
+                             <property name="minimumSize">
                               <size>
-                               <width>16777215</width>
-                               <height>15</height>
+                               <width>200</width>
+                               <height>200</height>
                               </size>
                              </property>
+                             <property name="maximumSize">
+                              <size>
+                               <width>200</width>
+                               <height>200</height>
+                              </size>
+                             </property>
+                             <property name="styleSheet">
+                              <string notr="true">border:1px solid rgb(0, 0, 0)</string>
+                             </property>
                              <property name="text">
-                              <string>Video3</string>
+                              <string>No Video</string>
                              </property>
                             </widget>
                            </item>
@@ -688,8 +624,78 @@ QProgressBar {
           </widget>
           <widget class="QWidget" name="tab_7">
            <attribute name="title">
-            <string>导航</string>
+            <string>其他</string>
            </attribute>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_video2">
+                <property name="minimumSize">
+                 <size>
+                  <width>150</width>
+                  <height>150</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border:1px solid rgb(0, 0, 0)</string>
+                </property>
+                <property name="text">
+                 <string>No Video</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_video3">
+                <property name="minimumSize">
+                 <size>
+                  <width>200</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>200</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">border:1px solid rgb(0, 0, 0)</string>
+                </property>
+                <property name="text">
+                 <string>No Video</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_v_name2">
+                <property name="text">
+                 <string>Video2</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="label_v_name3">
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>15</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Video3</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
