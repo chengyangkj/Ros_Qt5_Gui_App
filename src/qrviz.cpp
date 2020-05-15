@@ -24,7 +24,8 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
     manager_->removeAllDisplays();
 
 }
-  rviz::Display* RobotModel_=NULL;
+
+    rviz::Display* RobotModel_=NULL;
 //显示robotModel
   void QRviz::Display_RobotModel(bool enable)
   {
@@ -159,6 +160,26 @@ void QRviz::Display_LaserScan(bool enable,QString topic)
 
      manager_->startUpdate();
 
+ }
+ void QRviz::Set_MoveCamera()
+ {
+     //获取设置Pos的工具
+     //添加工具
+
+     current_tool= tool_manager_->addTool("rviz/MoveCamera");
+     //设置当前使用的工具为SetInitialPose（实现在地图上标点）
+     tool_manager_->setCurrentTool( current_tool );
+     manager_->startUpdate();
+ }
+ void QRviz::Set_Select()
+ {
+     //获取设置Pos的工具
+     //添加工具
+
+     current_tool= tool_manager_->addTool("rviz/Select");
+     //设置当前使用的工具为SetInitialPose（实现在地图上标点）
+     tool_manager_->setCurrentTool( current_tool );
+     manager_->startUpdate();
  }
  //显示tf坐标变换
  void QRviz::Display_TF(bool enable)

@@ -208,7 +208,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <attribute name="title">
@@ -419,7 +419,7 @@ QProgressBar {
                            </property>
                            <property name="maximumSize">
                             <size>
-                             <width>123123</width>
+                             <width>12312312</width>
                              <height>12312312</height>
                             </size>
                            </property>
@@ -539,6 +539,28 @@ QProgressBar {
             <layout class="QVBoxLayout" name="verticalLayout_14">
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <widget class="QPushButton" name="move_camera_btn">
+                 <property name="text">
+                  <string>Move Camera</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/images.qrc">
+                   <normaloff>:/images/rotate_cam.svg</normaloff>:/images/rotate_cam.svg</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="set_select_btn">
+                 <property name="text">
+                  <string>Select</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../resources/images.qrc">
+                   <normaloff>:/images/classes/Select.png</normaloff>:/images/classes/Select.png</iconset>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <widget class="QPushButton" name="set_pos_btn">
                  <property name="maximumSize">

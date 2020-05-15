@@ -248,6 +248,10 @@ void MainWindow::connections()
    connect(ui.set_pos_btn,SIGNAL(clicked()),this,SLOT(slot_set_2D_Pos()));
    //设置2D goal
    connect(ui.set_goal_btn,SIGNAL(clicked()),this,SLOT(slot_set_2D_Goal()));
+   //设置MoveCamera
+   connect(ui.move_camera_btn,SIGNAL(clicked()),this,SLOT(slot_move_camera_btn()));
+   //设置Select
+   connect(ui.set_select_btn,SIGNAL(clicked()),this,SLOT(slot_set_select()));
    //设置返航点
    connect(ui.set_return_btn,SIGNAL(clicked()),this,SLOT(slot_set_return_point()));
    //返航
@@ -381,6 +385,15 @@ void MainWindow::slot_set_2D_Goal()
 {
   map_rviz->Set_Goal();
 //  ui.label_map_msg->setText("请在地图中选择机器人导航的目标位置");
+}
+void MainWindow::slot_move_camera_btn()
+{
+    map_rviz->Set_MoveCamera();
+    qDebug()<<"move camera";
+}
+void MainWindow::slot_set_select()
+{
+    map_rviz->Set_Select();
 }
 //treewidget的checkbox是否选中槽函数
 void MainWindow::slot_treewidget_item_check_change(int is_check)

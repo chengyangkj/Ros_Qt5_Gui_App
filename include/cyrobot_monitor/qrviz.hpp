@@ -14,6 +14,7 @@
 #include<rviz/tool_manager.h>
 #include <QThread>
 #include <QDebug>
+#include <QException>
 class QRviz:public QThread
 {
     Q_OBJECT
@@ -35,6 +36,8 @@ public:
     void Display_TF(bool enable);
     void Set_Pos();
     void Set_Goal();
+    void Set_MoveCamera();
+    void Set_Select();
     //发布goal话题的坐标
     void Send_Goal_topic();
     //显示robotmodel
@@ -54,6 +57,8 @@ private:
     rviz::Display* Navigate_globalmap=NULL;
     rviz::Display* Navigate_globalplanner=NULL;
     rviz::Display* Navigate_amcl=NULL;
+
+
 
     //rviz工具
     rviz::Tool *current_tool;

@@ -95,6 +95,8 @@ public slots:
     void slot_treewidget_item_check_change(int);
     void slot_set_2D_Goal();
     void slot_set_2D_Pos();
+    void slot_set_select();
+    void slot_move_camera_btn();
     //设置界面
     void slot_setting_frame();
     //设置返航点
