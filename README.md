@@ -75,9 +75,11 @@
 ##### 4.8 Display RobotModel
 ##### 4.8 显示机器人模型
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200501165154149.gif)
-
-##### 4.9 To be perfected....
-##### 4.9 待完善....
+##### 4.9 Available in six rviz tools
+##### 4.9 提供六种rviz工具
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515184545845.png)
+##### 4.10 To be perfected....
+##### 4.10 待完善....
 ### 二，安装教程
 ### 二，Installation tutorial
 #### 1，首先安装ros对qt pkg的支持
