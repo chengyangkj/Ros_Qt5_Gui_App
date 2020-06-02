@@ -15,8 +15,10 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
     layout->addWidget(render_panel_);
     //初始化rviz控制对象
     manager_=new rviz::VisualizationManager(render_panel_);
+    ROS_ASSERT(manager_!=NULL);
     //获取当前rviz控制对象的 tool控制对象
     tool_manager_=manager_->getToolManager();
+    ROS_ASSERT(tool_manager_!=NULL);
    //初始化camera 这行代码实现放大 缩小 平移等操作
     render_panel_->initialize(manager_->getSceneManager(),manager_);
     manager_->initialize();
