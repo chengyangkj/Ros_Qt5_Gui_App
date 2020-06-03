@@ -5,9 +5,7 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
 
     this->layout=layout;
     this->nodename=node_name;
-    int argc;
-    char **argv;
-    ros::init(argc,argv,"QRviz",ros::init_options::AnonymousName);
+
 
     //创建rviz容器
     render_panel_=new rviz::RenderPanel;

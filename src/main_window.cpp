@@ -109,6 +109,7 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 void MainWindow::initUis()
 {
 
+    ui.treeWidget_rviz->setEnabled(false);
     m_DashBoard_x =new CCtrlDashBoard(ui.widget_speed_x);
     m_DashBoard_x->setGeometry(ui.widget_speed_x->rect());
     m_DashBoard_x->setValue(0);
@@ -946,10 +947,13 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
+             ui.treeWidget_rviz->setEnabled(false);
+
 		} else {
 
             //初始化rviz
             initRviz();
+            ui.treeWidget_rviz->setEnabled(true);
 			ui.button_connect->setEnabled(false);
               ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
               ui.label_statue_text->setStyleSheet("color:green;");
@@ -966,11 +970,13 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
+                ui.treeWidget_rviz->setEnabled(false);
             //showNoMasterMessage();
 		} else {
 
             //初始化rviz
             initRviz();
+            ui.treeWidget_rviz->setEnabled(true);
 			ui.button_connect->setEnabled(false);
 			ui.line_edit_master->setReadOnly(true);
 			ui.line_edit_host->setReadOnly(true);
