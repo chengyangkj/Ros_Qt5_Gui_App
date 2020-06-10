@@ -14,12 +14,16 @@
 - Welcome to submit bugs in issues
 
 - 欢迎在issues提交bug
-
-- ~~Kinetic version branch(Branches are merged)~~
-
-- ~~kinetic 版本分支(分支已合并)~~
-
+***
+## 分支
+1.~~Kinetic version branch(Branches are merged)~~
+1.~~kinetic 版本分支(分支已合并)~~
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
+2. Qml版本分支
+-
+
+***
+
 ### 一，Features
 ### 一，功能介绍
 #### 1，Speed dashboard
