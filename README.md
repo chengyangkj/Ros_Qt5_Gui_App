@@ -16,13 +16,13 @@
 - 欢迎在issues提交bug
 ***
 ## 分支
-1.~~Kinetic version branch(Branches are merged)~~
-   ~~kinetic 版本分支(分支已合并)~~
+**1.~~Kinetic version branch(Branches are merged)~~**
+**~~kinetic 版本分支(分支已合并)~~**
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 
 
-2. Qml version branch
-   Qml版本分支
+**2. Qml version branch
+   Qml版本分支**
 - The interface is more beautiful, the function is simple, can be used as a robot on-board display
 - 界面更加美观，功能简单，可作为机器人机载端显示
 - [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_simple)
