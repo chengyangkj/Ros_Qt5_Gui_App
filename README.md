@@ -1,4 +1,4 @@
-## ROS Qt Deskotp GUI Apps
+## ROS Qt Deskotp GUI Apps(qml_simple branch )
 - Use qt5 to implement the ros robot human-machine interface
 
 - 使用qt5实现ros机器人人机界面
@@ -23,7 +23,7 @@
 
 2. Qml version branch
    Qml版本分支
-- [Ros_Qml_Gui_App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/Ros_Qml_GUI_App)
+- [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/Ros_Qml_GUI_App)
 
 ***
 
