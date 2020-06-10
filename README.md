@@ -1,7 +1,8 @@
-## ROS Qt Deskotp GUI Apps(qml_simple branch )
-- Use qt5 to implement the ros robot human-machine interface
+##分支开发中，功能暂未完成...........
+## ROS Qml Deskotp GUI Apps(qml_simple branch )
+- Ros robotic human-machine interface implemented using The Mix programming of Qml-Qwidget-cpp
 
-- 使用qt5实现ros机器人人机界面
+- 使用Qml+Qwidget+cpp混合编程实现的ros机器人人机界面
 
 - Attention! This code is for learning purposes only and cannot be used for any other purpose without the author's permission.
 
@@ -21,9 +22,9 @@
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 
 
-2. Qml version branch
-   Qml版本分支
-- [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/Ros_Qml_GUI_App)
+2. Qwidget version branch
+   Qwidget版本分支
+- [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App)
 
 ***
 
