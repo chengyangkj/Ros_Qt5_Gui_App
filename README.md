@@ -23,7 +23,9 @@
 
 2. Qml version branch
    Qml版本分支
-- [Ros_Qml_Gui_App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/Ros_Qml_GUI_App)
+- The interface is more beautiful, the function is simple, can be used as a robot on-board display
+- 界面更加美观，功能简单，可作为机器人机载端显示
+- [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_simple)
 
 ***
 
