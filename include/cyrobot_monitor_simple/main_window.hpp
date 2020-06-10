@@ -1,12 +1,12 @@
 /**
- * @file /include/cyrobot_monitor/main_window.hpp
+ * @file /include/cyrobot_monitor_simple/main_window.hpp
  *
- * @brief Qt based gui for cyrobot_monitor.
+ * @brief Qt based gui for cyrobot_monitor_simple.
  *
  * @date November 2010
  **/
-#ifndef cyrobot_monitor_MAIN_WINDOW_H
-#define cyrobot_monitor_MAIN_WINDOW_H
+#ifndef cyrobot_monitor_simple_MAIN_WINDOW_H
+#define cyrobot_monitor_simple_MAIN_WINDOW_H
 
 /*****************************************************************************
 ** Includes
@@ -42,7 +42,7 @@
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
-namespace cyrobot_monitor {
+namespace cyrobot_monitor_simple {
 
 /*****************************************************************************
 ** Interface [MainWindow]
@@ -137,6 +137,6 @@ private:
     QSoundEffect *media_player=NULL;
 
 };
-}// namespace cyrobot_monitor
+}// namespace cyrobot_monitor_simple
 
-#endif // cyrobot_monitor_MAIN_WINDOW_H
+#endif // cyrobot_monitor_simple_MAIN_WINDOW_H

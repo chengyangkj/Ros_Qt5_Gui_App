@@ -1,4 +1,4 @@
-#include "../include/cyrobot_monitor/addtopics.h"
+#include "../include/cyrobot_monitor_simple/addtopics.h"
 #include "ui_addtopics.h"
 #include <QDebug>
 AddTopics::AddTopics(QWidget *parent) :

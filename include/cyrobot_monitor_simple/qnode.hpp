@@ -1,5 +1,5 @@
 /**
- * @file /include/cyrobot_monitor/qnode.hpp
+ * @file /include/cyrobot_monitor_simple/qnode.hpp
  *
  * @brief Communications central!
  *
@@ -9,8 +9,8 @@
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cyrobot_monitor_QNODE_HPP_
-#define cyrobot_monitor_QNODE_HPP_
+#ifndef cyrobot_monitor_simple_QNODE_HPP_
+#define cyrobot_monitor_simple_QNODE_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -42,7 +42,7 @@
 ** Namespaces
 *****************************************************************************/
 
-namespace cyrobot_monitor {
+namespace cyrobot_monitor_simple {
 
 /*****************************************************************************
 ** Class
@@ -122,6 +122,6 @@ private:
     void myCallback(const std_msgs::Float64& message_holder);
 };
 
-}  // namespace cyrobot_monitor
+}  // namespace cyrobot_monitor_simple
 
-#endif /* cyrobot_monitor_QNODE_HPP_ */
+#endif /* cyrobot_monitor_simple_QNODE_HPP_ */

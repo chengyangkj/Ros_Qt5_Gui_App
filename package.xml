@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package>
-  <name>cyrobot_monitor</name>
+  <name>cyrobot_monitor_simple</name>
   <version>0.1.0</version>
   <description>
 
-     cyrobot_monitor
+     cyrobot_monitor_simple
 
   </description>
   <maintainer email="chengyangkj@gmail.com">chengyangkj</maintainer>

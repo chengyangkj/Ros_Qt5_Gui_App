@@ -1,4 +1,4 @@
-#include "../include/cyrobot_monitor/settings.h"
+#include "../include/cyrobot_monitor_simple/settings.h"
 #include "ui_settings.h"
 
 Settings::Settings(QWidget *parent) :
@@ -6,7 +6,7 @@ Settings::Settings(QWidget *parent) :
     ui(new Ui::Settings)
 {
     ui->setupUi(this);
-    QSettings video_topic_setting("video_topic","cyrobot_monitor");
+    QSettings video_topic_setting("video_topic","cyrobot_monitor_simple");
     QStringList names=video_topic_setting.value("names").toStringList();
     QStringList topics=video_topic_setting.value("topics").toStringList();
     if(names.size()==4)
@@ -24,7 +24,7 @@ Settings::Settings(QWidget *parent) :
         ui->video0_topic_set_4->setText(topics[3]);
     }
 
-    QSettings main_setting("topic_setting","cyrobot_monitor");
+    QSettings main_setting("topic_setting","cyrobot_monitor_simple");
     ui->lineEdit_odm->setText(main_setting.value("topic_odom","raw_odom").toString());
     ui->lineEdit_power->setText(main_setting.value("topic_power","power").toString());
     ui->lineEdit_power_min->setText(main_setting.value("power_min","10").toString());
@@ -35,14 +35,14 @@ Settings::Settings(QWidget *parent) :
 }
 void Settings::slot_ok_btn_click()
 {
-    QSettings main_setting("topic_setting","cyrobot_monitor");
+    QSettings main_setting("topic_setting","cyrobot_monitor_simple");
     main_setting.setValue("topic_odom",ui->lineEdit_odm->text());
     main_setting.setValue("topic_power",ui->lineEdit_power->text());
     main_setting.setValue("power_min",ui->lineEdit_power_min->text());
     main_setting.setValue("power_max",ui->lineEdit_power_max->text());
 //    main_setting.setValue("odom_topic",ui->lineEdit_odom->text());
 
-    QSettings video_topic_setting("video_topic","cyrobot_monitor");
+    QSettings video_topic_setting("video_topic","cyrobot_monitor_simple");
     QStringList name_data;
     QStringList topic_data;
     QStringList format_data;

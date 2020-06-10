@@ -1,4 +1,4 @@
-#include "../include/cyrobot_monitor/qrviz.hpp"
+#include "../include/cyrobot_monitor_simple/qrviz.hpp"
 
 QRviz::QRviz(QVBoxLayout *layout,QString node_name)
 {

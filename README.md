@@ -111,7 +111,7 @@ catkin_make
 #### 3，run
 #### 3,运行
 ```cpp
-rosrun cyrobot_monitor cyrobot_monitor
+rosrun cyrobot_monitor_simple cyrobot_monitor_simple
 ```
 ***
 ### LIENSE

@@ -12,14 +12,14 @@
 #include <QtGui>
 #include <QMessageBox>
 #include <iostream>
-#include "../include/cyrobot_monitor/main_window.hpp"
+#include "../include/cyrobot_monitor_simple/main_window.hpp"
 
 
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
 
-namespace cyrobot_monitor {
+namespace cyrobot_monitor_simple {
 
 using namespace Qt;
 
@@ -59,7 +59,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 void MainWindow::initVideos()
 {
 
-   QSettings video_topic_setting("video_topic","cyrobot_monitor");
+   QSettings video_topic_setting("video_topic","cyrobot_monitor_simple");
    QStringList names=video_topic_setting.value("names").toStringList();
    QStringList topics=video_topic_setting.value("topics").toStringList();
    if(names.size()==4)
@@ -346,7 +346,7 @@ void MainWindow::slot_set_return_point()
     ui.label_return_z->setText(ui.label_z->text());
     ui.label_return_w->setText(ui.label_w->text());
     //写入setting
-    QSettings settings("return-position", "cyrobot_monitor");
+    QSettings settings("return-position", "cyrobot_monitor_simple");
     settings.setValue("x",ui.label_x->text());
     settings.setValue("y",ui.label_y->text());
     settings.setValue("z",ui.label_z->text());
@@ -1068,7 +1068,7 @@ void MainWindow::on_actionAbout_triggered() {
 *****************************************************************************/
 
 void MainWindow::ReadSettings() {
-    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    QSettings settings("Qt-Ros Package", "cyrobot_monitor_simple");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
     QString master_url = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
@@ -1087,14 +1087,14 @@ void MainWindow::ReadSettings() {
     	//ui.line_edit_topic->setEnabled(false);
     }
 
-    QSettings return_pos("return-position","cyrobot_monitor");
+    QSettings return_pos("return-position","cyrobot_monitor_simple");
     ui.label_return_x->setText(return_pos.value("x",QString("0")).toString());
     ui.label_return_y->setText(return_pos.value("y",QString("0")).toString());
     ui.label_return_z->setText(return_pos.value("z",QString("0")).toString());
     ui.label_return_w->setText(return_pos.value("w",QString("0")).toString());
 
     //读取快捷指令的setting
-    QSettings quick_setting("quick_setting","cyrobot_monitor");
+    QSettings quick_setting("quick_setting","cyrobot_monitor_simple");
     QStringList ch_key=quick_setting.childKeys();
     for(auto c:ch_key)
     {
@@ -1104,7 +1104,7 @@ void MainWindow::ReadSettings() {
 }
 
 void MainWindow::WriteSettings() {
-    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    QSettings settings("Qt-Ros Package", "cyrobot_monitor_simple");
     settings.setValue("master_url",ui.line_edit_master->text());
     settings.setValue("host_url",ui.line_edit_host->text());
     //settings.setValue("topic_name",ui.line_edit_topic->text());
@@ -1114,7 +1114,7 @@ void MainWindow::WriteSettings() {
     settings.setValue("remember_settings",QVariant(ui.checkbox_remember_settings->isChecked()));
 
     //存下快捷指令的setting
-    QSettings quick_setting("quick_setting","cyrobot_monitor");
+    QSettings quick_setting("quick_setting","cyrobot_monitor_simple");
     quick_setting.clear();
     for(int i=0;i<ui.treeWidget_quick_cmd->topLevelItemCount();i++)
     {
@@ -1132,7 +1132,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 }
 
-}  // namespace cyrobot_monitor
+}  // namespace cyrobot_monitor_simple
 
 
 

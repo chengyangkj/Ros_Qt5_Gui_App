@@ -15,13 +15,13 @@
 #include <string>
 #include <std_msgs/String.h>
 #include <sstream>
-#include "../include/cyrobot_monitor/qnode.hpp"
+#include "../include/cyrobot_monitor_simple/qnode.hpp"
 #include <QDebug>
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
 
-namespace cyrobot_monitor {
+namespace cyrobot_monitor_simple {
 
 /*****************************************************************************
 ** Implementation
@@ -32,7 +32,7 @@ QNode::QNode(int argc, char** argv ) :
 	init_argv(argv)
     {
 //    读取topic的设置
-    QSettings topic_setting("topic_setting","cyrobot_monitor");
+    QSettings topic_setting("topic_setting","cyrobot_monitor_simple");
     odom_topic= topic_setting.value("topic_odom","raw_odom").toString();
     power_topic=topic_setting.value("topic_power","power").toString();
     pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
@@ -50,7 +50,7 @@ QNode::~QNode() {
 }
 
 bool QNode::init() {
-	ros::init(init_argc,init_argv,"cyrobot_monitor");
+	ros::init(init_argc,init_argv,"cyrobot_monitor_simple");
 	if ( ! ros::master::check() ) {
 		return false;
 	}
@@ -76,7 +76,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	std::map<std::string,std::string> remappings;
 	remappings["__master"] = master_url;
 	remappings["__hostname"] = host_url;
-	ros::init(remappings,"cyrobot_monitor");
+	ros::init(remappings,"cyrobot_monitor_simple");
 	if ( ! ros::master::check() ) {
 		return false;
 	}
@@ -367,4 +367,4 @@ void QNode::log( const LogLevel &level, const std::string &msg) {
 	Q_EMIT loggingUpdated(); // used to readjust the scrollbar
 }
 
-}  // namespace cyrobot_monitor
+}  // namespace cyrobot_monitor_simple
