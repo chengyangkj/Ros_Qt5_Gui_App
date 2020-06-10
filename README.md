@@ -17,10 +17,12 @@
 ***
 ## 分支
 1.~~Kinetic version branch(Branches are merged)~~
-1.~~kinetic 版本分支(分支已合并)~~
+   ~~kinetic 版本分支(分支已合并)~~
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
-2. Qml版本分支
--
+
+2. Qml version branch
+   Qml版本分支
+- [Ros_Qml_Gui_App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/Ros_Qml_GUI_App)
 
 ***
 
