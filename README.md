@@ -19,7 +19,7 @@
 
 - ~~kinetic 版本分支(分支已合并)~~
 
-~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
+- ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 ### 一，Features
 ### 一，功能介绍
 #### 1，Speed dashboard
