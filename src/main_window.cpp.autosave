@@ -34,7 +34,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(ui.actionAbout_Qt, SIGNAL(triggered(bool)), qApp, SLOT(aboutQt())); // qApp is a global variable for the application
     //取消边框
 
-    this->setWindowFlags(Qt::WindowCloseButtonHint);
+    this->setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
     //设置窗口全屏
     this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
 //    ReadSettings();
