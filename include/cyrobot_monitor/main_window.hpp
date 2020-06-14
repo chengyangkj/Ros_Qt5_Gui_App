@@ -65,7 +65,7 @@ public:
     void initRviz();
     void initUis();
     void initVideos();
-
+    void initTopicList();
 public slots:
 	/******************************************
 	** Auto-connections (connectSlotsByName())

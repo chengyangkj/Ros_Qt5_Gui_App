@@ -208,7 +208,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <attribute name="title">
@@ -648,72 +648,158 @@ QProgressBar {
            <attribute name="title">
             <string>其他</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_21">
+            <item>
              <layout class="QGridLayout" name="gridLayout_4">
               <item row="0" column="0">
-               <widget class="QLabel" name="label_video2">
-                <property name="minimumSize">
-                 <size>
-                  <width>150</width>
-                  <height>150</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>200</width>
-                  <height>200</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">border:1px solid rgb(0, 0, 0)</string>
-                </property>
-                <property name="text">
-                 <string>No Video</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_11">
+                <item>
+                 <widget class="QLabel" name="label_video2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>200</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border:1px solid rgb(0, 0, 0)</string>
+                  </property>
+                  <property name="text">
+                   <string>No Video</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_v_name2">
+                  <property name="maximumSize">
+                   <size>
+                    <width>90</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Video2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="0" column="2">
+               <layout class="QVBoxLayout" name="verticalLayout_20">
+                <item>
+                 <widget class="QLabel" name="label_29">
+                  <property name="maximumSize">
+                   <size>
+                    <width>90</width>
+                    <height>30</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>话题列表：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QListWidget" name="topic_listWidget"/>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
               <item row="0" column="1">
-               <widget class="QLabel" name="label_video3">
-                <property name="minimumSize">
-                 <size>
-                  <width>200</width>
-                  <height>200</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>200</width>
-                  <height>200</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">border:1px solid rgb(0, 0, 0)</string>
-                </property>
-                <property name="text">
-                 <string>No Video</string>
-                </property>
-               </widget>
+               <layout class="QVBoxLayout" name="verticalLayout_19">
+                <item>
+                 <widget class="QLabel" name="label_video3">
+                  <property name="minimumSize">
+                   <size>
+                    <width>200</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>200</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border:1px solid rgb(0, 0, 0)</string>
+                  </property>
+                  <property name="text">
+                   <string>No Video</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_v_name3">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Video3</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_v_name2">
-                <property name="text">
-                 <string>Video2</string>
+              <item row="0" column="3">
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
                 </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="label_v_name3">
-                <property name="maximumSize">
+                <property name="sizeHint" stdset="0">
                  <size>
-                  <width>16777215</width>
-                  <height>15</height>
+                  <width>40</width>
+                  <height>20</height>
                  </size>
                 </property>
-                <property name="text">
-                 <string>Video3</string>
-                </property>
-               </widget>
+               </spacer>
               </item>
              </layout>
             </item>
@@ -739,7 +825,7 @@ QProgressBar {
            <cursorShape>ArrowCursor</cursorShape>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">

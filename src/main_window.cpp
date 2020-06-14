@@ -960,6 +960,8 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.label_statue_text->setText("在线");
              //初始化视频订阅的显示
              initVideos();
+             //显示话题列表
+             initTopicList();
 		}
     }
     //如果不使用环境变量
@@ -986,9 +988,20 @@ void MainWindow::on_button_connect_clicked(bool check ) {
            ui.label_statue_text->setText("在线");
            //初始化视频订阅的显示
            initVideos();
+           //显示话题列表
+           initTopicList();
 		}
 	}
 
+}
+void MainWindow::initTopicList()
+{
+    ui.topic_listWidget->addItem(QString("%1   (%2)").arg("Name","Type"));
+    QMap<QString,QString> topic_list= qnode.get_topic_list();
+    for(QMap<QString,QString>::iterator iter=topic_list.begin();iter!=topic_list.end();iter++)
+    {
+       ui.topic_listWidget->addItem(QString("%1   (%2)").arg(iter.key(),iter.value()));
+    }
 }
 //当ros与master的连接断开时
 void MainWindow::slot_rosShutdown()

@@ -58,7 +58,7 @@ public:
     void move_base(char k,float speed_linear,float speed_trun);
     void set_goal(QString frame,double x,double y,double z,double w);
     void Sub_Image(QString topic,int frame_id);
-
+    QMap<QString,QString> get_topic_list();
 	void run();
 
 	/*********************

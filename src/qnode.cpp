@@ -95,7 +95,19 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	start();
 	return true;
 }
+QMap<QString,QString> QNode::get_topic_list()
+{
+    ros::master::V_TopicInfo topic_list;
+    ros::master::getTopics(topic_list);
+    QMap<QString,QString> res;
+    for(auto topic:topic_list)
+    {
 
+        res.insert(QString::fromStdString(topic.name),QString::fromStdString(topic.datatype));
+
+    }
+    return res;
+}
 //机器人位置话题的回调函数
 void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
 {
