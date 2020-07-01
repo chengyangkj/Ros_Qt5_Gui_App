@@ -27,33 +27,31 @@ using namespace Qt;
 *****************************************************************************/
 
 MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
-	: QMainWindow(parent)
+    : QMainWindow(parent)
 	, qnode(argc,argv)
 {
 	ui.setupUi(this); // Calling this incidentally connects all ui's triggers to on_...() callbacks in this class.
     QObject::connect(ui.actionAbout_Qt, SIGNAL(triggered(bool)), qApp, SLOT(aboutQt())); // qApp is a global variable for the application
     //取消边框
 
-    this->setWindowFlags(Qt::WindowCloseButtonHint);
+    this->setWindowFlags(Qt::Dialog|Qt::FramelessWindowHint);
     //设置窗口全屏
     this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
-//    ReadSettings();
+    ReadSettings();
 	setWindowIcon(QIcon(":/images/icon.png"));
-	ui.tab_manager->setCurrentIndex(0); // ensure the first tab is showing - qt-designer should have this already hardwired, but often loses it (settings?).
     QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
 
 	/*********************
 	** Logging
 	**********************/
-	ui.view_logging->setModel(qnode.loggingModel());
     QObject::connect(&qnode, SIGNAL(loggingUpdated()), this, SLOT(updateLoggingView()));
 
     /*********************
     ** Auto Start
     **********************/
-    if ( ui.checkbox_remember_settings->isChecked() ) {
-        on_button_connect_clicked(true);
-    }
+//    if ( ui.checkbox_remember_settings->isChecked() ) {
+//        on_button_connect_clicked(true);
+//    }
 }
 
 MainWindow::~MainWindow() {}
@@ -75,23 +73,23 @@ void MainWindow::showNoMasterMessage() {
  */
 
 void MainWindow::on_button_connect_clicked(bool check ) {
-	if ( ui.checkbox_use_environment->isChecked() ) {
-		if ( !qnode.init() ) {
-			showNoMasterMessage();
-		} else {
-			ui.button_connect->setEnabled(false);
-		}
-	} else {
-		if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
-				   ui.line_edit_host->text().toStdString()) ) {
-			showNoMasterMessage();
-		} else {
-			ui.button_connect->setEnabled(false);
-			ui.line_edit_master->setReadOnly(true);
-			ui.line_edit_host->setReadOnly(true);
-			ui.line_edit_topic->setReadOnly(true);
-		}
-	}
+//	if ( ui.checkbox_use_environment->isChecked() ) {
+//		if ( !qnode.init() ) {
+//			showNoMasterMessage();
+//		} else {
+//			ui.button_connect->setEnabled(false);
+//		}
+//	} else {
+//		if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
+//				   ui.line_edit_host->text().toStdString()) ) {
+//			showNoMasterMessage();
+//		} else {
+//			ui.button_connect->setEnabled(false);
+//			ui.line_edit_master->setReadOnly(true);
+//			ui.line_edit_host->setReadOnly(true);
+//			ui.line_edit_topic->setReadOnly(true);
+//		}
+//	}
 }
 
 
@@ -102,8 +100,8 @@ void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 	} else {
 		enabled = false;
 	}
-	ui.line_edit_master->setEnabled(enabled);
-	ui.line_edit_host->setEnabled(enabled);
+//	ui.line_edit_master->setEnabled(enabled);
+//	ui.line_edit_host->setEnabled(enabled);
 	//ui.line_edit_topic->setEnabled(enabled);
 }
 
@@ -117,7 +115,7 @@ void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
  * the user can always see the latest log message.
  */
 void MainWindow::updateLoggingView() {
-        ui.view_logging->scrollToBottom();
+//        ui.view_logging->scrollToBottom();
 }
 
 /*****************************************************************************
@@ -139,29 +137,29 @@ void MainWindow::ReadSettings() {
     QString master_url = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
     QString host_url = settings.value("host_url", QString("192.168.1.3")).toString();
     //QString topic_name = settings.value("topic_name", QString("/chatter")).toString();
-    ui.line_edit_master->setText(master_url);
-    ui.line_edit_host->setText(host_url);
-    //ui.line_edit_topic->setText(topic_name);
-    bool remember = settings.value("remember_settings", false).toBool();
-    ui.checkbox_remember_settings->setChecked(remember);
-    bool checked = settings.value("use_environment_variables", false).toBool();
-    ui.checkbox_use_environment->setChecked(checked);
-    if ( checked ) {
-    	ui.line_edit_master->setEnabled(false);
-    	ui.line_edit_host->setEnabled(false);
-    	//ui.line_edit_topic->setEnabled(false);
-    }
+//    ui.line_edit_master->setText(master_url);
+//    ui.line_edit_host->setText(host_url);
+//    //ui.line_edit_topic->setText(topic_name);
+//    bool remember = settings.value("remember_settings", false).toBool();
+//    ui.checkbox_remember_settings->setChecked(remember);
+//    bool checked = settings.value("use_environment_variables", false).toBool();
+//    ui.checkbox_use_environment->setChecked(checked);
+//    if ( checked ) {
+//    	ui.line_edit_master->setEnabled(false);
+//    	ui.line_edit_host->setEnabled(false);
+//    	//ui.line_edit_topic->setEnabled(false);
+//    }
 }
 
 void MainWindow::WriteSettings() {
-    QSettings settings("Qt-Ros Package", "cyrobot_monitor_simple");
-    settings.setValue("master_url",ui.line_edit_master->text());
-    settings.setValue("host_url",ui.line_edit_host->text());
-    //settings.setValue("topic_name",ui.line_edit_topic->text());
-    settings.setValue("use_environment_variables",QVariant(ui.checkbox_use_environment->isChecked()));
-    settings.setValue("geometry", saveGeometry());
-    settings.setValue("windowState", saveState());
-    settings.setValue("remember_settings",QVariant(ui.checkbox_remember_settings->isChecked()));
+//    QSettings settings("Qt-Ros Package", "cyrobot_monitor_simple");
+//    settings.setValue("master_url",ui.line_edit_master->text());
+//    settings.setValue("host_url",ui.line_edit_host->text());
+//    //settings.setValue("topic_name",ui.line_edit_topic->text());
+//    settings.setValue("use_environment_variables",QVariant(ui.checkbox_use_environment->isChecked()));
+//    settings.setValue("geometry", saveGeometry());
+//    settings.setValue("windowState", saveState());
+//    settings.setValue("remember_settings",QVariant(ui.checkbox_remember_settings->isChecked()));
 
 }
 

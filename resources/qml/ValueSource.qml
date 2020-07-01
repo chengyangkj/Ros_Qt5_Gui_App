@@ -76,7 +76,7 @@ Item {
             return "5";
         }
     }
-    property int turnSignal: gear == "P" && !start ? randomDirection() : -1
+    property int turnSignal: -1
     property real temperature: 0.6
     property bool start: true
     function randomDirection() {

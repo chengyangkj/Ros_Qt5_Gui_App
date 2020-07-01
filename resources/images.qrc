@@ -101,5 +101,7 @@
         <file>images/Navigate.png</file>
         <file>images/set_return.png</file>
         <file>images/return.png</file>
+        <file>images/temperature-icon.png</file>
+        <file>images/fuel-icon.png</file>
     </qresource>
 </RCC>

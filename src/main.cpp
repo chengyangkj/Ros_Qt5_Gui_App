@@ -1,33 +1,36 @@
 /**
- * @file /src/main.cpp
- *
- * @brief Qt based gui.
- *
- * @date November 2010
- **/
+* @file /src/main.cpp
+*
+* @brief Qt based gui.
+*
+* @date November 2010
+**/
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
 
 #include <QtGui>
 #include <QApplication>
-#include "../include/cyrobot_monitor_simple/main_window.hpp"
+//#include "../include/cyrobot_monitor_simple/main_window.hpp"
 #include <QQmlApplicationEngine>
+#include "include/cyrobot_monitor_simple/mainform.h"
 /*****************************************************************************
 ** Main
 *****************************************************************************/
 
 int main(int argc, char **argv) {
 
-    /*********************
-    ** Qt
-    **********************/
-    QApplication app(argc, argv);
-    cyrobot_monitor_simple::MainWindow w(argc,argv);
-    w.show();
+   /*********************
+   ** Qt
+   **********************/
+   QApplication app(argc, argv);
+//  cyrobot_monitor_simple::MainWindow w(argc,argv);
+//   w.show();
+   MainForm form;
+   form.show();
 
-    app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
-    int result = app.exec();
+   app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+   int result = app.exec();
 
-    return result;
+   return result;
 }

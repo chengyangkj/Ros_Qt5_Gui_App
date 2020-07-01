@@ -4,7 +4,7 @@ import QtQuick.Controls 2.0
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Extras 1.4
 //import CyRobot.Monitor.QNode 1.0
-ApplicationWindow  {
+Rectangle  {
     id: root
     visible: true
     width: 1024
@@ -17,9 +17,12 @@ ApplicationWindow  {
     //信号处理
     onSpeed_x_signal: {
         valueSource.kph=Math.abs(x*100)
-//        quit_btn.text="test"
     }
-
+    onSpeed_y_signal: {
+        valueSource.kph=Math.abs(y*100)
+        valueSource.turnSignal=y>0?Qt.LeftArrow:-1
+        valueSource.turnSignal=y<0?Qt.RightArrow:-1
+    }
     ValueSource {
         id: valueSource
     }
@@ -75,7 +78,7 @@ ApplicationWindow  {
                             }
                             style: IconGaugeStyle {
                                 id: fuelGaugeStyle
-                                icon: "qrc:/images/power.png"
+                                icon: "qrc:/images/fuel-icon.png"
                                 minWarningColor: Qt.rgba(0.5, 0, 0, 1)
                                 tickmarkLabel: Text {
                                     color: "white"
