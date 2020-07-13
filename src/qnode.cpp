@@ -52,6 +52,7 @@ QNode::~QNode() {
 bool QNode::init() {
 	ros::init(init_argc,init_argv,"cyrobot_monitor");
 	if ( ! ros::master::check() ) {
+
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.

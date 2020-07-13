@@ -48,9 +48,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     /*********************
     ** 自动连接master
     **********************/
-    if ( ui.checkbox_remember_settings->isChecked() ) {
-        on_button_connect_clicked(true);
-    }
+//    if ( ui.checkbox_remember_settings->isChecked() ) {
+//        on_button_connect_clicked(true);
+//    }
+
     //链接connect
     connections();
 
@@ -942,7 +943,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
     //如果使用环境变量
 	if ( ui.checkbox_use_environment->isChecked() ) {
 		if ( !qnode.init() ) {
-            //showNoMasterMessage();
+//            showNoMasterMessage();
             QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
              ui.label_statue_text->setStyleSheet("color:red;");
@@ -973,7 +974,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
                 ui.treeWidget_rviz->setEnabled(false);
-            //showNoMasterMessage();
+//            showNoMasterMessage();
 		} else {
 
             //初始化rviz
