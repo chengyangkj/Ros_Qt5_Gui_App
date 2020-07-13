@@ -208,7 +208,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <attribute name="title">
@@ -825,7 +825,7 @@ QProgressBar {
            <cursorShape>ArrowCursor</cursorShape>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">

@@ -48,9 +48,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     /*********************
     ** 自动连接master
     **********************/
-    if ( ui.checkbox_remember_settings->isChecked() ) {
-        on_button_connect_clicked(true);
-    }
+//    if ( ui.checkbox_remember_settings->isChecked() ) {
+//        on_button_connect_clicked(true);
+//    }
     //链接connect
     connections();
 
@@ -109,6 +109,8 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 void MainWindow::initUis()
 {
 
+    ui.tab_manager->setTabEnabled(1,false);
+    ui.tabWidget->setTabEnabled(1,false);
     ui.treeWidget_rviz->setEnabled(false);
     m_DashBoard_x =new CCtrlDashBoard(ui.widget_speed_x);
     m_DashBoard_x->setGeometry(ui.widget_speed_x->rect());
@@ -948,9 +950,11 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
              ui.treeWidget_rviz->setEnabled(false);
-
+            ui.tab_manager->setTabEnabled(1,false);
+            ui.tabWidget->setTabEnabled(1,false);
 		} else {
-
+            ui.tab_manager->setTabEnabled(1,true);
+            ui.tabWidget->setTabEnabled(1,true);
             //初始化rviz
             initRviz();
             ui.treeWidget_rviz->setEnabled(true);
@@ -973,9 +977,12 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
                 ui.treeWidget_rviz->setEnabled(false);
+                ui.tab_manager->setTabEnabled(1,false);
+                ui.tabWidget->setTabEnabled(1,false);
             //showNoMasterMessage();
 		} else {
-
+            ui.tab_manager->setTabEnabled(1,true);
+            ui.tabWidget->setTabEnabled(1,true);
             //初始化rviz
             initRviz();
             ui.treeWidget_rviz->setEnabled(true);
