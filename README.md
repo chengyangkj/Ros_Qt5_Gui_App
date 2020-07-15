@@ -1,4 +1,4 @@
-## ROS Qt Deskotp GUI Apps
+## ROS Qt Deskotp GUI App
 - Use qt5 to implement the ros robot human-machine interface
 
 
@@ -16,7 +16,7 @@
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 
 
-**2. Qml version branch
+**2. Qml version branch**
 - The interface is more beautiful, the function is simple, can be used as a robot on-board display
 - [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_simple)
 
@@ -81,7 +81,6 @@ sudo apt-get install qtmultimedia5-dev
 ```
 #### 2，Compile
 Put the package in the ros src package directory：
-将软件包放入ros src软件包目录下：
 ```cpp
 catkin_make
 ```
@@ -91,7 +90,7 @@ rosrun cyrobot_monitor cyrobot_monitor
 ```
 ***
 ### LIENSE
-**GNU GPL（GNU General Public License，GNU通用公共许可证）**
+**GNU GPL**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408135643929.png)
 
 - As long as the software contains products or code that follow this Agreement, the software must also comply with the GPL License Agreement, i.e. it must be open source free, not charged from a closed source, and not commercial software.
