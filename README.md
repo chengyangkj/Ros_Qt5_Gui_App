@@ -11,7 +11,7 @@
 - Welcome to submit bugs in issues
 
 ***
-## 分支
+## Branch
 **1.~~Kinetic version branch(Branches are merged)~~**
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 
@@ -32,7 +32,6 @@
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405104454149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
 #### 3，Power display
 - Before use, you must set the power topic(Std_msg/Float32) in the menu-settings-and-topic settings
-- 使用前须在菜单->设置->话题设置中设置电量话题(Std_msg/Float32)
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405153102508.png)
 #### 4，rviz module 
