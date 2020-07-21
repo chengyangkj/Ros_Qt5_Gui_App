@@ -80,6 +80,7 @@ public slots:
     void quick_cmds_check_change(int);
     void cmd_output();
     void cmd_error_output();
+    void refreashTopicList();
     /******************************************
     ** Manual connections
     *******************************************/

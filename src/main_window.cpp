@@ -111,6 +111,7 @@ void MainWindow::initUis()
 
     ui.tab_manager->setTabEnabled(1,false);
     ui.tabWidget->setTabEnabled(1,false);
+    ui.groupBox_3->setEnabled(false);
     ui.treeWidget_rviz->setEnabled(false);
     m_DashBoard_x =new CCtrlDashBoard(ui.widget_speed_x);
     m_DashBoard_x->setGeometry(ui.widget_speed_x->rect());
@@ -263,6 +264,8 @@ void MainWindow::connections()
    connect(ui.tab_manager,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_manage_currentChanged(int)));
    //右工具栏索引改变
     connect(ui.tabWidget,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_Widget_currentChanged(int)));
+    //刷新话题列表
+    connect(ui.refreash_topic_btn,SIGNAL(clicked()),this,SLOT(refreashTopicList()));
     //添加rviz话题的按钮
     connect(ui.pushButton_add_topic,SIGNAL(clicked()),this,SLOT(slot_add_topic_btn()));
     //treewidget的值改变的槽函数
@@ -952,9 +955,11 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.treeWidget_rviz->setEnabled(false);
             ui.tab_manager->setTabEnabled(1,false);
             ui.tabWidget->setTabEnabled(1,false);
+              ui.groupBox_3->setEnabled(false);
 		} else {
             ui.tab_manager->setTabEnabled(1,true);
             ui.tabWidget->setTabEnabled(1,true);
+            ui.groupBox_3->setEnabled(true);
             //初始化rviz
             initRviz();
             ui.treeWidget_rviz->setEnabled(true);
@@ -979,6 +984,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
                 ui.treeWidget_rviz->setEnabled(false);
                 ui.tab_manager->setTabEnabled(1,false);
                 ui.tabWidget->setTabEnabled(1,false);
+                  ui.groupBox_3->setEnabled(false);
             //showNoMasterMessage();
 		} else {
             ui.tab_manager->setTabEnabled(1,true);
@@ -990,6 +996,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
 			ui.line_edit_master->setReadOnly(true);
 			ui.line_edit_host->setReadOnly(true);
 			ui.line_edit_topic->setReadOnly(true);
+            ui.groupBox_3->setEnabled(true);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
             ui.label_statue_text->setStyleSheet("color:green;");
            ui.label_statue_text->setText("在线");
@@ -1003,12 +1010,17 @@ void MainWindow::on_button_connect_clicked(bool check ) {
 }
 void MainWindow::initTopicList()
 {
+    ui.topic_listWidget->clear();
     ui.topic_listWidget->addItem(QString("%1   (%2)").arg("Name","Type"));
     QMap<QString,QString> topic_list= qnode.get_topic_list();
     for(QMap<QString,QString>::iterator iter=topic_list.begin();iter!=topic_list.end();iter++)
     {
        ui.topic_listWidget->addItem(QString("%1   (%2)").arg(iter.key(),iter.value()));
     }
+}
+void MainWindow::refreashTopicList()
+{
+    initTopicList();
 }
 //当ros与master的连接断开时
 void MainWindow::slot_rosShutdown()
@@ -1146,8 +1158,7 @@ void MainWindow::WriteSettings() {
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    //关闭时释放内存
-    this->setAttribute(Qt::WA_DeleteOnClose);
+
 	WriteSettings();
 	QMainWindow::closeEvent(event);
 }
