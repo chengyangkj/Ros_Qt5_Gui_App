@@ -27,6 +27,10 @@
 - 界面更加美观，功能简单，可作为机器人机载端显示
 - [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_simple)
 
+**3. Windows version branch
+   Windows版本分支**
+- [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/widows_devel)
+
 ***
 
 ### 一，Features
