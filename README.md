@@ -29,7 +29,7 @@
 
 **3. Windows version branch
    Windows版本分支**
-- [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/widows_devel)
+- [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/windows_devel)
 
 ***
 
