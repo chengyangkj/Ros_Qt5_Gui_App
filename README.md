@@ -1,7 +1,7 @@
-## ROS Qt Deskotp GUI App
+## ROS Qt Deskotp GUI App（windows branch）
 - Use qt5 to implement the ros robot human-machine interface
 
-- 使用qt5实现ros机器人人机界面
+- 使用qt5实现ros机器人人机界面 windows版本分支
 
 - Attention! This code is for learning purposes only and cannot be used for any other purpose without the author's permission.
 
