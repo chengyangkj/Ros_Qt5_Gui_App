@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file /src/main_window.cpp
  *
  * @brief Implementation for the qt gui.
@@ -405,7 +405,7 @@ void MainWindow::slot_set_select()
 void MainWindow::slot_treewidget_item_check_change(int is_check)
 {
     QCheckBox* sen = (QCheckBox*)sender();
-    qDebug()<<"check:"<<is_check<<"parent:"<<widget_to_parentItem_map[sen]->text(0)<<"地址："<<widget_to_parentItem_map[sen];
+    //qDebug()<<"check:"<<is_check<<"parent:"<<widget_to_parentItem_map[sen]->text(0)<<"地址："<<widget_to_parentItem_map[sen];
     QTreeWidgetItem *parentItem=widget_to_parentItem_map[sen];
     QString dis_name=widget_to_parentItem_map[sen]->text(0);
     bool enable=is_check>1?true:false;

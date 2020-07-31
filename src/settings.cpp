@@ -57,7 +57,7 @@ void Settings::slot_ok_btn_click()
 
     video_topic_setting.setValue("names",name_data);
     video_topic_setting.setValue("topics",topic_data);
-    QMessageBox::critical(NULL, "保存成功！", "保存成功，部分功能需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    //QMessageBox::critical(NULL, "保存成功！", "保存成功，部分功能需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     this->close();
 }
 void Settings::slot_cancel_btn_click()
