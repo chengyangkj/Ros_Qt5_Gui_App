@@ -944,69 +944,36 @@ void MainWindow::showNoMasterMessage() {
  */
 
 void MainWindow::on_button_connect_clicked(bool check ) {
-    //如果使用环境变量
-	if ( ui.checkbox_use_environment->isChecked() ) {
-		if ( !qnode.init() ) {
-            //showNoMasterMessage();
-            QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
-            ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-             ui.label_statue_text->setStyleSheet("color:red;");
-            ui.label_statue_text->setText("离线");
-             ui.treeWidget_rviz->setEnabled(false);
+    if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
+               ui.line_edit_host->text().toStdString()) ) {
+        QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
+        ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
+         ui.label_statue_text->setStyleSheet("color:red;");
+        ui.label_statue_text->setText("离线");
+            ui.treeWidget_rviz->setEnabled(false);
             ui.tab_manager->setTabEnabled(1,false);
             ui.tabWidget->setTabEnabled(1,false);
               ui.groupBox_3->setEnabled(false);
-		} else {
-            ui.tab_manager->setTabEnabled(1,true);
-            ui.tabWidget->setTabEnabled(1,true);
-            ui.groupBox_3->setEnabled(true);
-            //初始化rviz
-            initRviz();
-            ui.treeWidget_rviz->setEnabled(true);
-			ui.button_connect->setEnabled(false);
-              ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
-              ui.label_statue_text->setStyleSheet("color:green;");
-             ui.label_statue_text->setText("在线");
-             //初始化视频订阅的显示
-             initVideos();
-             //显示话题列表
-             initTopicList();
-		}
+        //showNoMasterMessage();
+    } else {
+        ui.tab_manager->setTabEnabled(1,true);
+        ui.tabWidget->setTabEnabled(1,true);
+        //初始化rviz
+        initRviz();
+        ui.treeWidget_rviz->setEnabled(true);
+        ui.button_connect->setEnabled(false);
+        ui.line_edit_master->setReadOnly(true);
+        ui.line_edit_host->setReadOnly(true);
+        ui.line_edit_topic->setReadOnly(true);
+        ui.groupBox_3->setEnabled(true);
+        ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
+        ui.label_statue_text->setStyleSheet("color:green;");
+       ui.label_statue_text->setText("在线");
+       //初始化视频订阅的显示
+       initVideos();
+       //显示话题列表
+       initTopicList();
     }
-    //如果不使用环境变量
-    else {
-		if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
-				   ui.line_edit_host->text().toStdString()) ) {
-            QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
-            ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-             ui.label_statue_text->setStyleSheet("color:red;");
-            ui.label_statue_text->setText("离线");
-                ui.treeWidget_rviz->setEnabled(false);
-                ui.tab_manager->setTabEnabled(1,false);
-                ui.tabWidget->setTabEnabled(1,false);
-                  ui.groupBox_3->setEnabled(false);
-            //showNoMasterMessage();
-		} else {
-            ui.tab_manager->setTabEnabled(1,true);
-            ui.tabWidget->setTabEnabled(1,true);
-            //初始化rviz
-            initRviz();
-            ui.treeWidget_rviz->setEnabled(true);
-			ui.button_connect->setEnabled(false);
-			ui.line_edit_master->setReadOnly(true);
-			ui.line_edit_host->setReadOnly(true);
-			ui.line_edit_topic->setReadOnly(true);
-            ui.groupBox_3->setEnabled(true);
-            ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
-            ui.label_statue_text->setStyleSheet("color:green;");
-           ui.label_statue_text->setText("在线");
-           //初始化视频订阅的显示
-           initVideos();
-           //显示话题列表
-           initTopicList();
-		}
-	}
-
 }
 void MainWindow::initTopicList()
 {
@@ -1112,7 +1079,7 @@ void MainWindow::ReadSettings() {
     bool remember = settings.value("remember_settings", false).toBool();
     ui.checkbox_remember_settings->setChecked(remember);
     bool checked = settings.value("use_environment_variables", false).toBool();
-    ui.checkbox_use_environment->setChecked(checked);
+//    ui.checkbox_use_environment->setChecked(checked);
     if ( checked ) {
     	ui.line_edit_master->setEnabled(false);
     	ui.line_edit_host->setEnabled(false);
@@ -1140,7 +1107,7 @@ void MainWindow::WriteSettings() {
     settings.setValue("master_url",ui.line_edit_master->text());
     settings.setValue("host_url",ui.line_edit_host->text());
     //settings.setValue("topic_name",ui.line_edit_topic->text());
-    settings.setValue("use_environment_variables",QVariant(ui.checkbox_use_environment->isChecked()));
+//    settings.setValue("use_environment_variables",QVariant(ui.checkbox_use_environment->isChecked()));
     settings.setValue("geometry", saveGeometry());
     //settings.setValue("windowState", saveState());
     settings.setValue("remember_settings",QVariant(ui.checkbox_remember_settings->isChecked()));
