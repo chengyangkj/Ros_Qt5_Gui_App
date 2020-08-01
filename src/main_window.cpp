@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @file /src/main_window.cpp
  *
  * @brief Implementation for the qt gui.
