@@ -20,6 +20,6 @@
 ### The interface overview
 ### 界面大致介绍
 
-[image.png](https://postimg.cc/f3Vkyh70)
+![image.png](https://postimg.cc/f3Vkyh70)
 
-[image.png](https://postimg.cc/75Fb5WKs)
+![image.png](https://postimg.cc/75Fb5WKs)
