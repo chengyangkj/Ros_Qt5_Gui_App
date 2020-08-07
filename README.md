@@ -31,9 +31,7 @@
 **3. Lite branch
    精简版分支**
 - This version is the implementation of the 《ROS Human-Computer Interactive Software Development》 series of courses, the basic functions of master branch, the code is easy to understand
-
--此版本为《ROS人机交互软件开发》系列课程中实现的版本，实现了master分支的基本功能，代码易懂 
-
+- 此版本为《ROS人机交互软件开发》系列课程中实现的版本，实现了master分支的基本功能，代码易懂 
 - [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
 
 
