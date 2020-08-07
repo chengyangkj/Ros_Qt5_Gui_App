@@ -19,6 +19,6 @@
 ### The interface overview
 ### 界面大致介绍
 
-![image.png](https://postimg.cc/f3Vkyh70)
+![image.png](https://i.postimg.cc/zGh6HMVq/image.png)
 
-![image.png](https://postimg.cc/75Fb5WKs)
+![image.png](https://i.postimg.cc/5t0zRcLV/image.png)
