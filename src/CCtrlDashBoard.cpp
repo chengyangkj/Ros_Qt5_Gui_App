@@ -1,4 +1,4 @@
-#include "../include/cyrobot_monitor/CCtrlDashBoard.h"
+#include "../include/robot_hmi/CCtrlDashBoard.h"
 #include <QPainter>
 #include <QDebug>
 #include <qmath.h>

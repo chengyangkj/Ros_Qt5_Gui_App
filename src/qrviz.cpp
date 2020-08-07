@@ -1,227 +1,155 @@
-#include "../include/cyrobot_monitor/qrviz.hpp"
-
-QRviz::QRviz(QVBoxLayout *layout,QString node_name)
+#include "../include/robot_hmi/qrviz.hpp"
+#include <QDebug>
+#include <QException>
+qrviz::qrviz(QVBoxLayout* layout)
 {
 
-    this->layout=layout;
-    this->nodename=node_name;
-
-
-    //创建rviz容器
-    render_panel_=new rviz::RenderPanel;
-    //向layout添加widget
+    //创建rviz panel
+    render_panel_=new rviz::RenderPanel();
+    //向layout添加
     layout->addWidget(render_panel_);
-    //初始化rviz控制对象
+    //创建rviz控制对象
     manager_=new rviz::VisualizationManager(render_panel_);
-    ROS_ASSERT(manager_!=NULL);
-    //获取当前rviz控制对象的 tool控制对象
     tool_manager_=manager_->getToolManager();
-    ROS_ASSERT(tool_manager_!=NULL);
-   //初始化camera 这行代码实现放大 缩小 平移等操作
+    ROS_ASSERT(manager_!=NULL);
+    //初始化render_panel 实现放大缩小等操作
     render_panel_->initialize(manager_->getSceneManager(),manager_);
+
+    manager_->setFixedFrame("map");
+    //初始化rviz控制对象
     manager_->initialize();
-    tool_manager_->initialize();
+    manager_->startUpdate();
     manager_->removeAllDisplays();
 
-}
-
-    rviz::Display* RobotModel_=NULL;
-//显示robotModel
-  void QRviz::Display_RobotModel(bool enable)
-  {
-
-      if(RobotModel_==NULL)
-      {
-          RobotModel_=manager_->createDisplay("rviz/RobotModel","Qrviz RobotModel",enable);
-      }
-      else{
-          delete RobotModel_;
-          RobotModel_=manager_->createDisplay("rviz/RobotModel","Qrviz RobotModel",enable);
-      }
-  }
-//显示grid
-void QRviz::Display_Grid(bool enable,QString Reference_frame,int Plan_Cell_count,QColor color)
-{
-    if(grid_==NULL)
-    {
-        grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
-        ROS_ASSERT( grid_ != NULL );
-        // Configure the GridDisplay the way we like it.
-        grid_->subProp( "Line Style" )->setValue("Billboards");
-        grid_->subProp( "Color" )->setValue(color);
-        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
-        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
-
-    }
-    else{
-        delete grid_;
-        grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
-        ROS_ASSERT( grid_ != NULL );
-        // Configure the GridDisplay the way we like it.
-        grid_->subProp( "Line Style" )->setValue("Billboards");
-        grid_->subProp( "Color" )->setValue(color);
-        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
-        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
-    }
-    grid_->setEnabled(enable);
-    manager_->startUpdate();
-}
-//显示map
-void QRviz::Display_Map(bool enable,QString topic,double Alpha,QString Color_Scheme)
-{
-    if(!enable&&map_)
-    {
-        map_->setEnabled(false);
-        return ;
-    }
-    if(map_==NULL)
-    {
-        map_=manager_->createDisplay("rviz/Map","QMap",true);
-        ROS_ASSERT(map_);
-        map_->subProp("Topic")->setValue(topic);
-        map_->subProp("Alpha")->setValue(Alpha);
-        map_->subProp("Color Scheme")->setValue(Color_Scheme);
-
-    }
-    else{
-         ROS_ASSERT(map_);
-         qDebug()<<"asdasdasd:"<<topic<<Alpha;
-
-        delete map_;
-        map_=manager_->createDisplay("rviz/Map","QMap",true);
-        ROS_ASSERT(map_);
-        map_->subProp("Topic")->setValue(topic);
-        map_->subProp("Alpha")->setValue(Alpha);
-        map_->subProp("Color Scheme")->setValue(Color_Scheme);
-    }
-
-    map_->setEnabled(enable);
-    manager_->startUpdate();
-}
-//显示激光雷达
-void QRviz::Display_LaserScan(bool enable,QString topic)
-{
-    if(laser_==NULL)
-    {
-        laser_=manager_->createDisplay("rviz/LaserScan","QLaser",enable);
-        ROS_ASSERT(laser_);
-        laser_->subProp("Topic")->setValue(topic);
-    }
-    else{
-        delete laser_;
-        laser_=manager_->createDisplay("rviz/LaserScan","QLaser",enable);
-        ROS_ASSERT(laser_);
-        laser_->subProp("Topic")->setValue(topic);
-    }
-    qDebug()<<"topic:"<<topic;
-    laser_->setEnabled(enable);
-    manager_->startUpdate();
-}
-//设置全局显示
- void QRviz::SetGlobalOptions(QString frame_name,QColor backColor,int frame_rate)
- {
-     manager_->setFixedFrame(frame_name);
-     manager_->setProperty("Background Color",backColor);
-     manager_->setProperty("Frame Rate",frame_rate);
-     manager_->startUpdate();
  }
+void qrviz::Display_Local_Map(QString map_topic,QString map_color,QString planner_topic,QColor planner_color,bool enable)
+{
+    if(Local_Map_!=NULL||Local_Planner_!=NULL)
+    {
+        delete Local_Map_;
+        delete  Local_Planner_;
+        Local_Map_=NULL;
+        Local_Planner_=NULL;
+    }
+    Local_Map_=manager_->createDisplay("rviz/Map","LocalMap",enable);
+    ROS_ASSERT(Local_Map_!=NULL);
+    Local_Planner_=manager_->createDisplay("rviz/Path","LocalPlanner",enable);
+    ROS_ASSERT(Local_Planner_!=NULL);
+    Local_Map_->subProp("Topic")->setValue(map_topic);
+    Local_Map_->subProp("Color Scheme")->setValue(map_color);
+//    Local_Planner_->subProp("Topic")->setValue(planner_topic);
+//    Local_Planner_->subProp("Color")->setValue(planner_color);
 
-// "rviz/MoveCamera";
-// "rviz/Interact";
-// "rviz/Select";
-// "rviz/SetInitialPose";
-// "rviz/SetGoal";
- //设置机器人导航初始位置
- void QRviz::Set_Pos()
- {
-     //获取设置Pos的工具
-     //添加工具
 
-     current_tool= tool_manager_->addTool("rviz/SetInitialPose");
-     //设置当前使用的工具为SetInitialPose（实现在地图上标点）
-     tool_manager_->setCurrentTool( current_tool );
-     manager_->startUpdate();
+}
+void qrviz::Display_Global_Map(QString map_topic,QString map_color,QString planner_topic,QColor planner_color,bool enable)
+{
+    if(Global_Map_!=NULL||Global_Planner_!=NULL)
+    {
+        delete Global_Map_;
+        delete  Global_Planner_;
+        Global_Map_=NULL;
+        Global_Planner_=NULL;
+    }
+    Global_Map_=manager_->createDisplay("rviz/Map","GlobalMap",enable);
+    ROS_ASSERT(Global_Map_!=NULL);
+    Global_Planner_=manager_->createDisplay("rviz/Path","GlobalPlanner",enable);
+    ROS_ASSERT(Global_Planner_!=NULL);
+    Global_Map_->subProp("Topic")->setValue(map_topic);
+    Global_Map_->subProp("Color Scheme")->setValue(map_color);
+//    Global_Planner_->subProp("Topic")->setValue(planner_topic);
+//    Global_Planner_->subProp("Color")->setValue(planner_color);
 
-//     tool_manager_->setCurrentTool()
 
- }
- //设置机器人导航目标点
- void QRviz::Set_Goal()
- {
-     //添加工具
-     current_tool= tool_manager_->addTool("rviz/SetGoal");
-     //设置goal的话题
-     rviz::Property* pro= current_tool->getPropertyContainer();
+}
+void qrviz::Set_Start_Pose()
+{
+    rviz::Tool* current_tool_=tool_manager_->addTool("rviz/SetInitialPose");
+    //设置当前使用的工具
+    tool_manager_->setCurrentTool(current_tool_);
+}
+void qrviz::Set_Goal_Pose()
+{
+     rviz::Tool* current_tool_=tool_manager_->addTool("rviz/SetGoal");
+     //获取属性容器
+     rviz::Property* pro=current_tool_->getPropertyContainer();
+     //设置发布导航目标点的topic
      pro->subProp("Topic")->setValue("/move_base_simple/goal");
-     //设置当前frame
-     manager_->setFixedFrame("map");
-     //设置当前使用的工具为SetGoal（实现在地图上标点）
-     tool_manager_->setCurrentTool( current_tool );
-
-     manager_->startUpdate();
-
- }
- void QRviz::Set_MoveCamera()
- {
-     //获取设置Pos的工具
-     //添加工具
-
-     current_tool= tool_manager_->addTool("rviz/MoveCamera");
-     //设置当前使用的工具为SetInitialPose（实现在地图上标点）
-     tool_manager_->setCurrentTool( current_tool );
-     manager_->startUpdate();
- }
- void QRviz::Set_Select()
- {
-     //获取设置Pos的工具
-     //添加工具
-
-     current_tool= tool_manager_->addTool("rviz/Select");
-     //设置当前使用的工具为SetInitialPose（实现在地图上标点）
-     tool_manager_->setCurrentTool( current_tool );
-     manager_->startUpdate();
- }
- //显示tf坐标变换
- void QRviz::Display_TF(bool enable)
- {
-     if(TF_){delete TF_;TF_=NULL;}
-     TF_=manager_->createDisplay("rviz/TF","QTF",enable);
- }
- //显示导航相关
- void QRviz::Display_Navigate(bool enable,QString Global_topic,QString Global_planner,QString Local_topic,QString Local_planner)
- {
-    if(Navigate_localmap) {delete Navigate_localmap; Navigate_localmap=NULL;}
-    if(Navigate_localplanner) {delete Navigate_localplanner; Navigate_localplanner=NULL;}
-    if(Navigate_globalmap) {delete Navigate_globalmap; Navigate_globalmap=NULL;}
-    if(Navigate_globalplanner) {delete Navigate_globalplanner; Navigate_globalplanner=NULL;}
-    //local map
-    Navigate_localmap=manager_->createDisplay("rviz/Map","Qlocalmap",enable);
-    Navigate_localmap->subProp("Topic")->setValue(Local_topic);
-    Navigate_localmap->subProp("Color Scheme")->setValue("costmap");
-    Navigate_localplanner=manager_->createDisplay("rviz/Path","QlocalPath",enable);
-    Navigate_localplanner->subProp("Topic")->setValue(Local_planner);
-    Navigate_localplanner->subProp("Color")->setValue(QColor(0,12,255));
-    //global map
-    Navigate_globalmap=manager_->createDisplay("rviz/Map","QGlobalmap",enable);
-    Navigate_globalmap->subProp("Topic")->setValue(Global_topic);
-    Navigate_globalmap->subProp("Color Scheme")->setValue("costmap");
-    Navigate_globalplanner=manager_->createDisplay("rviz/Path","QGlobalpath",enable);
-    Navigate_globalplanner->subProp("Topic")->setValue(Global_planner);
-    Navigate_globalplanner->subProp("Color")->setValue(QColor(255,0,0));
-    //更新画面显示
-    manager_->startUpdate();
-
- }
- void QRviz::addTool( rviz::Tool* )
- {
-
- }
-void QRviz::createDisplay(QString display_name,QString topic_name)
+     //设置当前使用的工具
+     tool_manager_->setCurrentTool(current_tool_);
+}
+void qrviz::Set_FixedFrame(QString Frame_name)
 {
-
+    manager_->setFixedFrame(Frame_name);
+    qDebug()<<manager_->getFixedFrame();
+}
+void qrviz::Display_Grid(int Cell_Count,QColor color,bool enable)
+{
+    if(Grid_!=NULL)
+    {
+        delete Grid_;
+        Grid_=NULL;
+    }
+    Grid_=manager_->createDisplay("rviz/Grid","myGrid",enable);
+    //设置cell Count
+    Grid_->subProp("Plane Cell Count")->setValue(Cell_Count);
+    //设置颜色
+    Grid_->subProp("Color")->setValue(color);
+    ROS_ASSERT(Grid_!=NULL);
 
 }
-void QRviz::run()
+void qrviz::Display_TF(bool enable)
 {
-
+    if(TF_!=NULL)
+    {
+        delete TF_;
+        TF_=NULL;
+    }
+    TF_=manager_->createDisplay("rviz/TF","myTF",enable);
+    ROS_ASSERT(TF_!=NULL);
+}
+void qrviz::Display_LaserScan(QString laser_topic,bool enable)
+{
+    if(LaserScan_!=NULL)
+    {
+        delete LaserScan_;
+        LaserScan_=NULL;
+    }
+    LaserScan_=manager_->createDisplay("rviz/LaserScan","myLaser",enable);
+    LaserScan_->subProp("Topic")->setValue(laser_topic);
+    ROS_ASSERT(LaserScan_!=NULL);
+}
+void qrviz::Display_RobotModel(bool enable)
+{
+    if(RobotModel_!=NULL)
+    {
+        delete RobotModel_;
+        RobotModel_=NULL;
+    }
+    RobotModel_=manager_->createDisplay("rviz/RobotModel","myRobotModel",enable);
+    ROS_ASSERT(RobotModel_!=NULL);
+}
+void qrviz::Display_Map(QString topic,QString color_scheme,bool enable)
+{
+    if(Map_!=NULL)
+    {
+        delete Map_;
+        Map_=NULL;
+    }
+    Map_=manager_->createDisplay("rviz/Map","myMap",enable);
+    ROS_ASSERT(Map_!=NULL);
+    Map_->subProp("Topic")->setValue(topic);
+    Map_->subProp("Color Scheme")->setValue(color_scheme);
+}
+void qrviz::Display_Path(QString topic,QColor color,bool enable)
+{
+    if(Path_!=NULL)
+    {
+        delete Path_;
+        Path_=NULL;
+    }
+    Path_=manager_->createDisplay("rviz/Path","myPath",enable);
+    ROS_ASSERT(Path_!=NULL);
+    Path_->subProp("Topic")->setValue(topic);
+    Path_->subProp("Color")->setValue(color);
 }

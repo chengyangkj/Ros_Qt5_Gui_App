@@ -1,43 +1,47 @@
 <RCC>
     <qresource prefix="/">
         <file>images/icon.png</file>
-        <file>images/robot.png</file>
-        <file>images/line.png</file>
-        <file>images/offline.png</file>
-        <file>images/power.png</file>
-        <file>images/robot2.png</file>
-        <file>images/speed.png</file>
-        <file>images/online.png</file>
-        <file>images/power-v.png</file>
-        <file>images/setting.png</file>
-        <file>images/setting2.png</file>
-        <file>images/display.png</file>
-        <file>images/grid.png</file>
-        <file>images/false.png</file>
-        <file>images/ok.png</file>
-        <file>images/crosshair.svg</file>
-        <file>images/cursor.svg</file>
-        <file>images/default_class_icon.png</file>
-        <file>images/default_package_icon.png</file>
-        <file>images/error.png</file>
-        <file>images/failed_display.png</file>
-        <file>images/forbidden.svg</file>
-        <file>images/left_dock.svg</file>
-        <file>images/menu.svg</file>
-        <file>images/minus.png</file>
-        <file>images/move1d.svg</file>
-        <file>images/move2d.svg</file>
-        <file>images/moverotate.svg</file>
-        <file>images/move_z.svg</file>
-        <file>images/options.png</file>
-        <file>images/package.png</file>
-        <file>images/plus.png</file>
-        <file>images/right_dock.svg</file>
-        <file>images/rotate.svg</file>
-        <file>images/rotate_cam.svg</file>
-        <file>images/visibility.svg</file>
-        <file>images/warning.png</file>
         <file>images/zoom.svg</file>
+        <file>images/warning.png</file>
+        <file>images/visibility.svg</file>
+        <file>images/speed.png</file>
+        <file>images/Slam.png</file>
+        <file>images/setting2.png</file>
+        <file>images/setting.png</file>
+        <file>images/set_return.png</file>
+        <file>images/rotate_cam.svg</file>
+        <file>images/rotate.svg</file>
+        <file>images/robot2.png</file>
+        <file>images/robot.png</file>
+        <file>images/right_dock.svg</file>
+        <file>images/return.png</file>
+        <file>images/power-v.png</file>
+        <file>images/power.png</file>
+        <file>images/plus.png</file>
+        <file>images/package.png</file>
+        <file>images/options.png</file>
+        <file>images/online.png</file>
+        <file>images/ok.png</file>
+        <file>images/offline.png</file>
+        <file>images/Navigate.png</file>
+        <file>images/move_z.svg</file>
+        <file>images/moverotate.svg</file>
+        <file>images/move2d.svg</file>
+        <file>images/move1d.svg</file>
+        <file>images/minus.png</file>
+        <file>images/menu.svg</file>
+        <file>images/line.png</file>
+        <file>images/left_dock.svg</file>
+        <file>images/grid.png</file>
+        <file>images/forbidden.svg</file>
+        <file>images/false.png</file>
+        <file>images/failed_display.png</file>
+        <file>images/error.png</file>
+        <file>images/display.png</file>
+        <file>images/default_package_icon.png</file>
+        <file>images/default_class_icon.png</file>
+        <file>images/cursor.svg</file>
+        <file>images/crosshair.svg</file>
         <file>images/classes/WrenchStamped.png</file>
         <file>images/classes/Views.svg</file>
         <file>images/classes/Tool Properties.png</file>
@@ -85,22 +89,5 @@
         <file>images/classes/DepthCloud.png</file>
         <file>images/classes/Camera.png</file>
         <file>images/classes/Axes.png</file>
-        <file>images/classes/src/TF.xcf</file>
-        <file>images/classes/src/RobotModel.xcf</file>
-        <file>images/classes/src/Range.xcf</file>
-        <file>images/classes/src/PoseArray.xcf</file>
-        <file>images/classes/src/Polygon.xcf</file>
-        <file>images/classes/src/Poly.xcf</file>
-        <file>images/classes/src/MarkerArray.xcf</file>
-        <file>images/classes/src/Map.xcf</file>
-        <file>images/classes/src/InteractiveMarker.xcf</file>
-        <file>images/classes/src/GridCells.xcf</file>
-        <file>images/classes/src/Axes.xcf</file>
-        <file>images/classes/src/Arrow.xcf</file>
-        <file>images/Slam.png</file>
-        <file>images/Navigate.png</file>
-        <file>images/set_return.png</file>
-        <file>images/return.png</file>
-        <file>images/refreash.png</file>
     </qresource>
 </RCC>
