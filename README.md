@@ -15,8 +15,7 @@
 
 - 欢迎在issues提交bug
 
-[image.png](https://postimg.cc/f3Vkyh70)
-
+***
 ### The interface overview
 ### 界面大致介绍
 
