@@ -21,13 +21,21 @@
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 
 
-**2. Qml version branch
-   Qml版本分支**
+**2. Qml version branch(To be perfected)
+   Qml版本分支（待完善）**
 - The interface is more beautiful, the function is simple, can be used as a robot on-board display
 - 界面更加美观，功能简单，可作为机器人机载端显示
 - [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_simple)
 
-**3. Windows version branch
+
+**3. Lite branch
+   精简版分支**
+- This version is the implementation of the 《ROS Human-Computer Interactive Software Development》 series of courses, the basic functions of master branch, the code is easy to understand. 
+-此版本为《ROS人机交互软件开发》系列课程中实现的版本，实现了master分支的基本功能，代码易懂 
+- [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
+
+
+**4. Windows version branch
    Windows版本分支**
 - [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/widows_devel)
 
