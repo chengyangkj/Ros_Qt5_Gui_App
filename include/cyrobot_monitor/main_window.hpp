@@ -81,6 +81,7 @@ public slots:
     void cmd_output();
     void cmd_error_output();
     void refreashTopicList();
+    void RvizGetModel(QAbstractItemModel *model);
     /******************************************
     ** Manual connections
     *******************************************/
@@ -91,9 +92,7 @@ public slots:
     void slot_tab_manage_currentChanged(int);
     void slot_tab_Widget_currentChanged(int);
     void slot_add_topic_btn();
-    void slot_choose_topic(QTreeWidgetItem *choose);
-    void slot_treewidget_item_value_change(QString);
-    void slot_treewidget_item_check_change(int);
+    void slot_choose_topic(QTreeWidgetItem *choose, QString name);
     void slot_set_2D_Goal();
     void slot_set_2D_Pos();
     void slot_set_select();
@@ -119,6 +118,10 @@ private:
 	Ui::MainWindowDesign ui;
     void connections();
     void add_quick_cmd(QString name,QString shell);
+    
+    void inform(QString);
+    bool AskInform(QString);
+    
     QNode qnode;
     CCtrlDashBoard *m_DashBoard_x;
     CCtrlDashBoard *m_DashBoard_y;
@@ -136,6 +139,8 @@ private:
     QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
     Settings *set=NULL;
     QSoundEffect *media_player=NULL;
+    
+    QAbstractItemModel* m_modelRvizDisplay;
 
 };
 }// namespace cyrobot_monitor

@@ -17,7 +17,7 @@ public:
     QTreeWidgetItem *choose;
     ~AddTopics();
 signals:
-    void Topic_choose(QTreeWidgetItem *choose);
+    void Topic_choose(QTreeWidgetItem *choose, QString name);
 private slots:
     void on_pushButton_cancel_clicked();
 

@@ -240,7 +240,8 @@ void AddTopics::on_pushButton_ok_clicked()
 //      emit(Topic_choose(Map));
 
 //    }
-    emit(Topic_choose(choose));
+    QString name = ui->lineEdit->text();
+    emit(Topic_choose(choose, name));
     this->close();
 }
 

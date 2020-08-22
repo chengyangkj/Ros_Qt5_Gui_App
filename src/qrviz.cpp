@@ -2,6 +2,7 @@
 
 QRviz::QRviz(QVBoxLayout *layout,QString node_name)
 {
+    nullmap.clear();
 
     this->layout=layout;
     this->nodename=node_name;
@@ -13,10 +14,10 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
     layout->addWidget(render_panel_);
     //初始化rviz控制对象
     manager_=new rviz::VisualizationManager(render_panel_);
-    ROS_ASSERT(manager_!=NULL);
+    ROS_ASSERT(manager_ != nullptr);
     //获取当前rviz控制对象的 tool控制对象
     tool_manager_=manager_->getToolManager();
-    ROS_ASSERT(tool_manager_!=NULL);
+    ROS_ASSERT(tool_manager_ != nullptr);
    //初始化camera 这行代码实现放大 缩小 平移等操作
     render_panel_->initialize(manager_->getSceneManager(),manager_);
     manager_->initialize();
@@ -25,12 +26,123 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
 
 }
 
-    rviz::Display* RobotModel_=NULL;
+///
+/// \brief 获取Rviz Display树状图
+///
+void QRviz::GetDisplayTreeModel()
+{
+    rviz::PropertyTreeModel *rvizmodel = manager_->getDisplayTreeModel();
+    QAbstractItemModel *model = rvizmodel;
+    emit ReturnModelSignal(model);
+}
+
+///
+/// \brief Rviz Display的初始化与设置
+/// \param ClassID
+/// \param namevalue
+///
+void QRviz::DisplayInit(QString ClassID, bool enabled, QMap<QString, QVariant> namevalue)
+{
+    int num = GetDisplayNum(ClassID);
+    if (num == -1)
+    {
+        rviz::Display *rvizDisplay = manager_->createDisplay(ClassID, ClassID, true);
+        ROS_ASSERT(rvizDisplay != nullptr);
+        rvizDisplays_.append(rvizDisplay);
+        num = rvizDisplays_.indexOf(rvizDisplay);
+    }
+    if (!namevalue.empty())
+    {
+        QMap<QString, QVariant>::iterator it;
+        for (it = namevalue.begin(); it != namevalue.end(); it++)
+        {
+            rvizDisplays_[num]->subProp(it.key())->setValue(it.value());
+        }
+    }
+    rvizDisplays_[num]->setEnabled(enabled);
+    manager_->startUpdate();
+}
+void QRviz::DisplayInit(QString ClassID, QString name, bool enabled, QMap<QString, QVariant> namevalue)
+{
+    int num = GetDisplayNum(ClassID, name);
+    if (num == -1)
+    {
+        rviz::Display *rvizDisplay = manager_->createDisplay(ClassID, name, true);
+        ROS_ASSERT(rvizDisplay != nullptr);
+        rvizDisplays_.append(rvizDisplay);
+        num = rvizDisplays_.indexOf(rvizDisplay);
+    }
+    if (!namevalue.empty())
+    {
+        QMap<QString, QVariant>::iterator it;
+        for (it = namevalue.begin(); it != namevalue.end(); it++)
+        {
+            rvizDisplays_[num]->subProp(it.key())->setValue(it.value());
+        }
+    }
+    rvizDisplays_[num]->setEnabled(enabled);
+    manager_->startUpdate();
+}
+
+///
+/// \brief 根据Display的ClassID(和name)获得Display的序号
+/// \param ClassID
+/// \return 
+///
+int QRviz::GetDisplayNum(QString ClassID)
+{
+    int num = -1;
+    for (int i = 0; i < rvizDisplays_.length(); i++)
+    {
+        if (rvizDisplays_[i] != nullptr)
+        {
+            if (ClassID == rvizDisplays_[i]->getClassId())
+            {
+                num = i;
+                break;
+            }
+        }
+    }
+    return num;
+}
+int QRviz::GetDisplayNum(QString ClassID, QString name)
+{
+    int num = -1;
+    for (int i = 0; i < rvizDisplays_.length(); i++)
+    {
+        if (rvizDisplays_[i] != nullptr)
+        {
+            if (ClassID == rvizDisplays_[i]->getClassId() && name == rvizDisplays_[i]->getName())
+            {
+                num = i;
+                break;
+            }
+        }
+    }
+    return num;
+}
+int QRviz::GetDisplayNumName(QString name)
+{
+    int num = -1;
+    for (int i = 0; i < rvizDisplays_.length(); i++)
+    {
+        if (rvizDisplays_[i] != nullptr)
+        {
+            if (name == rvizDisplays_[i]->getName())
+            {
+                num = i;
+                break;
+            }
+        }
+    }
+    return num;
+}
+    
 //显示robotModel
   void QRviz::Display_RobotModel(bool enable)
   {
 
-      if(RobotModel_==NULL)
+      if(RobotModel_ == nullptr)
       {
           RobotModel_=manager_->createDisplay("rviz/RobotModel","Qrviz RobotModel",enable);
       }
@@ -42,26 +154,26 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
 //显示grid
 void QRviz::Display_Grid(bool enable,QString Reference_frame,int Plan_Cell_count,QColor color)
 {
-    if(grid_==NULL)
+    if(grid_ == nullptr)
     {
         grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
-        ROS_ASSERT( grid_ != NULL );
+        ROS_ASSERT( grid_ != nullptr );
         // Configure the GridDisplay the way we like it.
-        grid_->subProp( "Line Style" )->setValue("Billboards");
-        grid_->subProp( "Color" )->setValue(color);
-        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
-        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
+//        grid_->subProp( "Line Style" )->setValue("Billboards");
+//        grid_->subProp( "Color" )->setValue(color);
+//        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
+//        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
 
     }
     else{
         delete grid_;
         grid_ = manager_->createDisplay( "rviz/Grid", "adjustable grid", true );
-        ROS_ASSERT( grid_ != NULL );
+        ROS_ASSERT( grid_ != nullptr );
         // Configure the GridDisplay the way we like it.
-        grid_->subProp( "Line Style" )->setValue("Billboards");
-        grid_->subProp( "Color" )->setValue(color);
-        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
-        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
+//        grid_->subProp( "Line Style" )->setValue("Billboards");
+//        grid_->subProp( "Color" )->setValue(color);
+//        grid_->subProp( "Reference Frame" )->setValue(Reference_frame);
+//        grid_->subProp("Plane Cell Count")->setValue(Plan_Cell_count);
     }
     grid_->setEnabled(enable);
     manager_->startUpdate();
@@ -74,7 +186,7 @@ void QRviz::Display_Map(bool enable,QString topic,double Alpha,QString Color_Sch
         map_->setEnabled(false);
         return ;
     }
-    if(map_==NULL)
+    if(map_ == nullptr)
     {
         map_=manager_->createDisplay("rviz/Map","QMap",true);
         ROS_ASSERT(map_);
@@ -190,10 +302,10 @@ void QRviz::Display_LaserScan(bool enable,QString topic)
  //显示导航相关
  void QRviz::Display_Navigate(bool enable,QString Global_topic,QString Global_planner,QString Local_topic,QString Local_planner)
  {
-    if(Navigate_localmap) {delete Navigate_localmap; Navigate_localmap=NULL;}
-    if(Navigate_localplanner) {delete Navigate_localplanner; Navigate_localplanner=NULL;}
-    if(Navigate_globalmap) {delete Navigate_globalmap; Navigate_globalmap=NULL;}
-    if(Navigate_globalplanner) {delete Navigate_globalplanner; Navigate_globalplanner=NULL;}
+    if(Navigate_localmap) {delete Navigate_localmap; Navigate_localmap=nullptr;}
+    if(Navigate_localplanner) {delete Navigate_localplanner; Navigate_localplanner=nullptr;}
+    if(Navigate_globalmap) {delete Navigate_globalmap; Navigate_globalmap=nullptr;}
+    if(Navigate_globalplanner) {delete Navigate_globalplanner; Navigate_globalplanner=nullptr;}
     //local map
     Navigate_localmap=manager_->createDisplay("rviz/Map","Qlocalmap",enable);
     Navigate_localmap->subProp("Topic")->setValue(Local_topic);
