@@ -3,8 +3,11 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.0)
-project(cyrobot_monitor)
+project(cyrobot_rviz_tree)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(TARGET_NAME cyrobot_rviz_tree)
+
 #添加c++11的支持
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ##############################################################################
@@ -56,7 +59,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Binaries
 ##############################################################################
 
-add_executable(cyrobot_monitor ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(cyrobot_monitor ${QT_LIBRARIES} ${catkin_LIBRARIES})
-install(TARGETS cyrobot_monitor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+add_executable(${TARGET_NAME} ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(${TARGET_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES})
+install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 

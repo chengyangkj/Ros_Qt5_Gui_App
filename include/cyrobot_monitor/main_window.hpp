@@ -91,7 +91,6 @@ public slots:
     void slot_cmd_control();
     void slot_tab_manage_currentChanged(int);
     void slot_tab_Widget_currentChanged(int);
-    void slot_add_topic_btn();
     void slot_choose_topic(QTreeWidgetItem *choose, QString name);
     void slot_set_2D_Goal();
     void slot_set_2D_Pos();
@@ -114,8 +113,19 @@ public slots:
 private slots:
 
 
+    void on_pushButton_add_topic_clicked();
+    
+    void on_pushButton_remove_topic_clicked();
+    
+    void on_pushButton_rename_topic_clicked();
+    
+    void on_treeView_rvizDisplayTree_clicked(const QModelIndex &index);
+    
 private:
-	Ui::MainWindowDesign ui;
+    Ui::MainWindowDesign ui;
+    void initData();
+    QString JudgeDisplayNewName(QString name);
+  
     void connections();
     void add_quick_cmd(QString name,QString shell);
     
@@ -125,22 +135,26 @@ private:
     QNode qnode;
     CCtrlDashBoard *m_DashBoard_x;
     CCtrlDashBoard *m_DashBoard_y;
-    QProcess *quick_cmd=NULL;
-    QProcess *close_remote_cmd=NULL;
-    QProcess *base_cmd=NULL;
-    QRviz *map_rviz=NULL;
-    QStandardItemModel* treeView_rviz_model=NULL;
-    AddTopics *addtopic_form=NULL;
+    QProcess *quick_cmd = nullptr;
+    QProcess *close_remote_cmd = nullptr;
+    QProcess *base_cmd = nullptr;
+    QRviz *map_rviz_ = nullptr;
+    QStandardItemModel* treeView_rviz_model = nullptr;
+    AddTopics *addtopic_form = nullptr;
     //存放rviz treewidget当前显示的控件及控件的父亲的地址
     QMap <QWidget*,QTreeWidgetItem *> widget_to_parentItem_map;
     //存放状态栏的对应关系 display名 状态item
     QMap <QString,QTreeWidgetItem *> tree_rviz_stues;
     //存放display的当前值 item名，参数名称和值
     QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
-    Settings *set=NULL;
-    QSoundEffect *media_player=NULL;
+    Settings *set = nullptr;
+    QSoundEffect *media_player = nullptr;
     
     QAbstractItemModel* m_modelRvizDisplay;
+    
+    QMap<QString, QString> m_mapRvizDisplays;
+    
+    QString m_sRvizDisplayChooseName;
 
 };
 }// namespace cyrobot_monitor

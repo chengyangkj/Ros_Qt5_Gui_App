@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1604</width>
-    <height>787</height>
+    <width>1411</width>
+    <height>833</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -208,7 +208,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <attribute name="title">
@@ -1768,7 +1768,7 @@ color:rgb(238, 238, 236);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1604</width>
+     <width>1411</width>
      <height>28</height>
     </rect>
    </property>

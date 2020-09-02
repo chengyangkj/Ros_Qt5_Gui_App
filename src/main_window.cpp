@@ -34,6 +34,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 	ui.setupUi(this); // Calling this incidentally connects all ui's triggers to on_...() callbacks in this class.
     //QObject::connect(ui.actionAbout_Qt, SIGNAL(triggered(bool)), qApp, SLOT(aboutQt())); // qApp is a global variable for the application
     initUis();
+    initData();
     //读取配置文件
     ReadSettings();
     setWindowIcon(QIcon(":/images/robot.png"));
@@ -55,6 +56,41 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     connections();
 
 }
+
+void MainWindow::initData()
+{
+    m_mapRvizDisplays.insert("Axes", RVIZ_DISPLAY_AXES);
+    m_mapRvizDisplays.insert("Camera", RVIZ_DISPLAY_CAMERA);
+    m_mapRvizDisplays.insert("DepthCloud", RVIZ_DISPLAY_DEPTHCLOUD);
+    m_mapRvizDisplays.insert("Effort", RVIZ_DISPLAY_EFFORT);
+    m_mapRvizDisplays.insert("FluidPressure", RVIZ_DISPLAY_FLUIDPRESSURE);
+    m_mapRvizDisplays.insert("Grid", RVIZ_DISPLAY_GRID);
+    m_mapRvizDisplays.insert("GridCells", RVIZ_DISPLAY_GRIDCELLS);
+    m_mapRvizDisplays.insert("Group", RVIZ_DISPLAY_GROUP);
+    m_mapRvizDisplays.insert("Illuminance", RVIZ_DISPLAY_ILLUMINANCE);
+    m_mapRvizDisplays.insert("Image", RVIZ_DISPLAY_IMAGE);
+    m_mapRvizDisplays.insert("InterativerMarker", RVIZ_DISPLAY_INTERATIVEMARKER);
+    m_mapRvizDisplays.insert("LaserScan", RVIZ_DISPLAY_LASERSCAN);
+    m_mapRvizDisplays.insert("Map", RVIZ_DISPLAY_MAP);
+    m_mapRvizDisplays.insert("Marker", RVIZ_DISPLAY_MARKER);
+    m_mapRvizDisplays.insert("MarkerArray", RVIZ_DISPLAY_MARKERARRAY);
+    m_mapRvizDisplays.insert("Odometry", RVIZ_DISPLAY_ODOMETRY);
+    m_mapRvizDisplays.insert("Path", RVIZ_DISPLAY_PATH);
+    m_mapRvizDisplays.insert("PointCloud", RVIZ_DISPLAY_POINTCLOUD);
+    m_mapRvizDisplays.insert("PointCloud2", RVIZ_DISPLAY_POINTCLOUD2);
+    m_mapRvizDisplays.insert("PointStamped", RVIZ_DISPLAY_POINTSTAMPED);
+    m_mapRvizDisplays.insert("Polygon", RVIZ_DISPLAY_POLYGON);
+    m_mapRvizDisplays.insert("Pose", RVIZ_DISPLAY_POSE);
+    m_mapRvizDisplays.insert("PoseArray", RVIZ_DISPLAY_POSEARRAY);
+    m_mapRvizDisplays.insert("PoseWithCovariance", RVIZ_DISPLAY_POSEWITHCOVARIANCE);
+    m_mapRvizDisplays.insert("Range", RVIZ_DISPLAY_RANGE);
+    m_mapRvizDisplays.insert("RelativeHumidity", RVIZ_DISPLAY_RELATIVEHUMIDITY);
+    m_mapRvizDisplays.insert("RobotModel", RVIZ_DISPLAY_ROBOTMODEL);
+    m_mapRvizDisplays.insert("TF", RVIZ_DISPLAY_TF);
+    m_mapRvizDisplays.insert("Temperature", RVIZ_DISPLAY_TEMPERATURE);
+    m_mapRvizDisplays.insert("WrenchStamped", RVIZ_DISPLAY_WRENCHSTAMPED);
+}
+
 //订阅video话题
 void MainWindow::initVideos()
 {
@@ -119,7 +155,8 @@ void MainWindow::initUis()
     ui.tab_manager->setCurrentIndex(0);
     ui.tabWidget->setCurrentIndex(0);
     
-    
+    ui.pushButton_remove_topic->setEnabled(false);
+    ui.pushButton_rename_topic->setEnabled(false);
 
     //qucik treewidget
     ui.treeWidget_quick_cmd->setHeaderLabels(QStringList()<<"key"<<"values");
@@ -129,14 +166,14 @@ void MainWindow::initUis()
 void MainWindow::initRviz()
 {
     ui.label_rvizShow->hide();
-    map_rviz=new QRviz(ui.verticalLayout_build_map,"qrviz");
-    connect(map_rviz, &QRviz::ReturnModelSignal, this, &MainWindow::RvizGetModel);
-    map_rviz->GetDisplayTreeModel();
+    map_rviz_=new QRviz(ui.verticalLayout_build_map,"qrviz");
+    connect(map_rviz_, &QRviz::ReturnModelSignal, this, &MainWindow::RvizGetModel);
+    map_rviz_->GetDisplayTreeModel();
     QMap<QString, QVariant> namevalue;
     namevalue.insert("Line Style", "Billboards");
     namevalue.insert("Color", QColor(160, 160, 160));
     namevalue.insert("Plane Cell Count", 10);
-    map_rviz->DisplayInit(RVIZ_DISPLAY_GRID, "Grid", true, namevalue);
+    map_rviz_->DisplayInit(RVIZ_DISPLAY_GRID, "Grid", true, namevalue);
 }
 
 void MainWindow::RvizGetModel(QAbstractItemModel *model)
@@ -209,7 +246,8 @@ void MainWindow::slot_setting_frame()
         set->setWindowModality(Qt::ApplicationModal);
         set->show();
     }
-    else{
+    else
+    {
         set=new Settings();
         set->setWindowModality(Qt::ApplicationModal);
         set->show();
@@ -267,47 +305,23 @@ void MainWindow::slot_return_point()
 //设置导航当前位置按钮的槽函数
 void MainWindow::slot_set_2D_Pos()
 {
- map_rviz->Set_Pos();
+ map_rviz_->Set_Pos();
 // ui.label_map_msg->setText("请在地图中选择机器人的初始位置");
 }
 //设置导航目标位置按钮的槽函数
 void MainWindow::slot_set_2D_Goal()
 {
-  map_rviz->Set_Goal();
+  map_rviz_->Set_Goal();
 //  ui.label_map_msg->setText("请在地图中选择机器人导航的目标位置");
 }
 void MainWindow::slot_move_camera_btn()
 {
-    map_rviz->Set_MoveCamera();
+    map_rviz_->Set_MoveCamera();
     qDebug()<<"move camera";
 }
 void MainWindow::slot_set_select()
 {
-    map_rviz->Set_Select();
-}
-
-
-//rviz添加topic的槽函数
-void MainWindow::slot_add_topic_btn()
-{
-
-    if(!addtopic_form)
-    {
-        addtopic_form=new AddTopics();
-        //阻塞其他窗体
-        addtopic_form->setWindowModality(Qt::ApplicationModal);
-        //绑定添加rviz话题信号
-        connect(addtopic_form, SIGNAL(Topic_choose(QTreeWidgetItem *, QString)), this, SLOT(slot_choose_topic(QTreeWidgetItem *, QString)));
-        addtopic_form->show();
-    }
-    else{
-        QPoint p=addtopic_form->pos();
-        delete addtopic_form;
-        addtopic_form=new AddTopics();
-        connect(addtopic_form, SIGNAL(Topic_choose(QTreeWidgetItem *, QString)), this, SLOT(slot_choose_topic(QTreeWidgetItem *, QString)));
-        addtopic_form->show();
-        addtopic_form->move(p.x(),p.y());
-    }
+    map_rviz_->Set_Select();
 }
 
 
@@ -315,13 +329,62 @@ void MainWindow::slot_add_topic_btn()
 void MainWindow::slot_choose_topic(QTreeWidgetItem *choose, QString name)
 {
     QString ClassID = choose->text(0);
-    
-    
     // 检查重名
+    name = JudgeDisplayNewName(name);
+    
+    qDebug() << "choose topic ClassID:" << ClassID << ", name:" << name;
+    QMap<QString, QVariant> namevalue;
+    namevalue.clear();
+    map_rviz_->DisplayInit(m_mapRvizDisplays[ClassID], name, true, namevalue);
+//    if (ClassID == "Axes")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_AXES, name, true, namevalue);
+//    }
+//    else if(ClassID=="Map")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_MAP, name, true, namevalue);
+//    }
+//    else if (ClassID == "Grid")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_GRID, name, true, namevalue);
+//    }
+//    else if (ClassID=="LaserScan")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_LASERSCAN, name, true, namevalue);
+//    }
+//    else if (ClassID == "Camera")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_CAMERA, name, true, namevalue);
+//    }
+//    else if (ClassID == "Image")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_IMAGE, name, true, namevalue);
+//    }
+//    else if (ClassID == "RobotModel")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_ROBOTMODEL, name, true, namevalue);
+//    }
+//    else if(ClassID == "TF")
+//    {
+//        map_rviz_->DisplayInit(RVIZ_DISPLAY_TF, name, true, namevalue);
+//    }
+//    else// if (ClassID=="Navigate")
+//    {
+//        inform("当前不支持选择此项");
+//    }
+}
+
+///
+/// \brief 检查重名
+/// \param name
+/// \return 
+///
+QString MainWindow::JudgeDisplayNewName(QString name)
+{
     if (m_modelRvizDisplay != nullptr)
     {
         bool same = true;
-        while(same)
+        while (same)
         {
             same = false;
             for (int i = 0; i < m_modelRvizDisplay->rowCount(); i++)
@@ -352,155 +415,9 @@ void MainWindow::slot_choose_topic(QTreeWidgetItem *choose, QString name)
             }
         }
     }
-    
-    qDebug() << "choose topic ClassID:" << ClassID << ", name:" << name;
-    QMap<QString, QVariant> namevalue;
-    namevalue.clear();
-    if (ClassID == "Axes")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_AXES, name, true, namevalue);
-    }
-    else if(ClassID=="Map")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_MAP, name, true, namevalue);
-    }
-    else if (ClassID == "Grid")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_GRID, name, true, namevalue);
-    }
-    else if (ClassID=="LaserScan")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_LASERSCAN, name, true, namevalue);
-    }
-    else if (ClassID == "Camera")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_CAMERA, name, true, namevalue);
-    }
-    else if (ClassID == "Image")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_IMAGE, name, true, namevalue);
-    }
-    else if (ClassID == "RobotModel")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_ROBOTMODEL, name, true, namevalue);
-    }
-    else if(ClassID == "TF")
-    {
-        map_rviz->DisplayInit(RVIZ_DISPLAY_TF, name, true, namevalue);
-    }
-    else// if (ClassID=="Navigate")
-    {
-        inform("当前不支持选择此项");
-        //map_rviz->DisplayInit();
-//        //Global Map
-//        QTreeWidgetItem *Global_map=new QTreeWidgetItem(QStringList()<<"Global Map");
-//        Global_map->setIcon(0,QIcon("://images/classes/Group.png"));
-//        choose->addChild(Global_map);
-//        QTreeWidgetItem *Costmap=new QTreeWidgetItem(QStringList()<<"Costmap");
-//        Costmap->setIcon(0,QIcon("://images/classes/Map.png"));
-//        QTreeWidgetItem *Costmap_topic=new QTreeWidgetItem(QStringList()<<"Topic");
-//        Costmap->addChild(Costmap_topic);
-//        QComboBox *Costmap_Topic_Vel=new QComboBox();
-//        Costmap_Topic_Vel->setEditable(true);
-//        Costmap_Topic_Vel->setMaximumWidth(150);
-//        Costmap_Topic_Vel->addItem("/move_base/global_costmap/costmap");
-//        ui.treeWidget_rviz->setItemWidget(Costmap_topic,1,Costmap_Topic_Vel);
-//        Global_map->addChild(Costmap);
-//        //绑定子父关系
-//        widget_to_parentItem_map[Costmap_Topic_Vel]=choose;
-//        //绑定值改变了的事件
-//        connect(Costmap_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-
-//        QTreeWidgetItem* CostMap_Planner=new QTreeWidgetItem(QStringList()<<"Planner");
-//        CostMap_Planner->setIcon(0,QIcon("://images/classes/Path.png"));
-//       Global_map->addChild(CostMap_Planner);
-
-//       QTreeWidgetItem* CostMap_Planner_topic=new QTreeWidgetItem(QStringList()<<"Topic");
-//        QComboBox* Costmap_Planner_Topic_Vel=new QComboBox();
-//        Costmap_Planner_Topic_Vel->setMaximumWidth(150);
-//        Costmap_Planner_Topic_Vel->addItem("/move_base/DWAPlannerROS/global_plan");
-//        Costmap_Planner_Topic_Vel->setEditable(true);
-//        CostMap_Planner->addChild(CostMap_Planner_topic);
-//        ui.treeWidget_rviz->setItemWidget(CostMap_Planner_topic,1,Costmap_Planner_Topic_Vel);
-//        //绑定子父关系
-//        widget_to_parentItem_map[Costmap_Planner_Topic_Vel]=choose;
-//        //绑定值改变了的事件
-//        connect(Costmap_Planner_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-
-
-
-//        //Local Map
-//        QTreeWidgetItem *Local_map=new QTreeWidgetItem(QStringList()<<"Local Map");
-//        Local_map->setIcon(0,QIcon("://images/classes/Group.png"));
-//        choose->addChild(Local_map);
-
-//        QTreeWidgetItem *Local_Costmap=new QTreeWidgetItem(QStringList()<<"Costmap");
-//        Local_Costmap->setIcon(0,QIcon("://images/classes/Map.png"));
-//        Local_map->addChild(Local_Costmap);
-
-//        QTreeWidgetItem *local_costmap_topic=new QTreeWidgetItem(QStringList()<<"Topic");
-//        Local_Costmap->addChild(local_costmap_topic);
-//        QComboBox *local_costmap_topic_vel=new QComboBox();
-//        local_costmap_topic_vel->setEditable(true);
-//        local_costmap_topic_vel->setMaximumWidth(150);
-//        local_costmap_topic_vel->addItem("/move_base/local_costmap/costmap");
-//        ui.treeWidget_rviz->setItemWidget(local_costmap_topic,1,local_costmap_topic_vel);
-
-//        //绑定子父关系
-//        widget_to_parentItem_map[local_costmap_topic_vel]=choose;
-//        //绑定值改变了的事件
-//        connect(local_costmap_topic_vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-
-//        QTreeWidgetItem* LocalMap_Planner=new QTreeWidgetItem(QStringList()<<"Planner");
-//        LocalMap_Planner->setIcon(0,QIcon("://images/classes/Path.png"));
-//       Local_map->addChild(LocalMap_Planner);
-
-//       QTreeWidgetItem* Local_Planner_topic=new QTreeWidgetItem(QStringList()<<"Topic");
-
-//        QComboBox* Local_Planner_Topic_Vel=new QComboBox();
-//        Local_Planner_Topic_Vel->setMaximumWidth(150);
-//        Local_Planner_Topic_Vel->addItem("/move_base/DWAPlannerROS/local_plan");
-//        Local_Planner_Topic_Vel->setEditable(true);
-//        LocalMap_Planner->addChild(Local_Planner_topic);
-//        ui.treeWidget_rviz->setItemWidget(Local_Planner_topic,1, Local_Planner_Topic_Vel);
-//        //绑定子父关系
-//        widget_to_parentItem_map[Local_Planner_Topic_Vel]=choose;
-//        //绑定值改变了的事件
-//        connect(Local_Planner_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-//        //CostCloud
-//        QTreeWidgetItem* CostCloud=new QTreeWidgetItem(QStringList()<<"Cost Cloud");
-//        CostCloud->setIcon(0,QIcon("://images/classes/PointCloud2.png"));
-//        Local_map->addChild(CostCloud);
-//        QTreeWidgetItem *CostCloud_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
-//        QComboBox* CostCloud_Topic_Vel=new QComboBox();
-//        CostCloud_Topic_Vel->setMaximumWidth(150);
-//        CostCloud_Topic_Vel->setEditable(true);
-//        CostCloud_Topic_Vel->addItem("/move_base/DWAPlannerROS/cost_cloud");
-//        CostCloud->addChild(CostCloud_Topic);
-//        ui.treeWidget_rviz->setItemWidget(CostCloud_Topic,1,CostCloud_Topic_Vel);
-//        //绑定子父关系
-//        widget_to_parentItem_map[CostCloud_Topic_Vel]=CostCloud;
-//        //绑定值改变了的事件
-//        connect(CostCloud_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-//        //Trajectory Cloud
-//        QTreeWidgetItem* TrajectoryCloud=new QTreeWidgetItem(QStringList()<<"Trajectory Cloud");
-//        TrajectoryCloud->setIcon(0,QIcon("://images/classes/PointCloud2.png"));
-//        Local_map->addChild(TrajectoryCloud);
-//        QTreeWidgetItem *TrajectoryCloud_Topic=new QTreeWidgetItem(QStringList()<<"Topic");
-//        QComboBox* TrajectoryCloud_Topic_Vel=new QComboBox();
-//        TrajectoryCloud_Topic_Vel->setMaximumWidth(150);
-//        TrajectoryCloud_Topic_Vel->setEditable(true);
-//        TrajectoryCloud_Topic_Vel->addItem("/move_base/DWAPlannerROS/trajectory_cloud");
-//        TrajectoryCloud->addChild(TrajectoryCloud_Topic);
-//        ui.treeWidget_rviz->setItemWidget(TrajectoryCloud_Topic,1,TrajectoryCloud_Topic_Vel);
-//        //绑定子父关系
-//        widget_to_parentItem_map[TrajectoryCloud_Topic_Vel]=TrajectoryCloud;
-//        //绑定值改变了的事件
-//        connect(TrajectoryCloud_Topic_Vel,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-//        ui.treeWidget_rviz->addTopLevelItem(choose);
-//        choose->setExpanded(true);
-    }
+    return name;
 }
+
 //左工具栏索引改变
 void MainWindow::slot_tab_manage_currentChanged(int index)
 {
@@ -705,10 +622,10 @@ MainWindow::~MainWindow() {
         delete base_cmd;
         base_cmd = nullptr;
     }
-    if(map_rviz)
+    if(map_rviz_)
     {
-        delete map_rviz;
-        map_rviz = nullptr;
+        delete map_rviz_;
+        map_rviz_ = nullptr;
     }
 
 
@@ -968,12 +885,71 @@ void MainWindow::WriteSettings() {
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-
-	WriteSettings();
-	QMainWindow::closeEvent(event);
+    WriteSettings();
+    QMainWindow::closeEvent(event);
 }
 
 }  // namespace cyrobot_monitor
 
+///
+/// \brief 增加topic
+///
+void cyrobot_monitor::MainWindow::on_pushButton_add_topic_clicked()
+{
+    if(!addtopic_form)
+    {
+        addtopic_form = new AddTopics();
+        //阻塞其他窗体
+        addtopic_form->setWindowModality(Qt::ApplicationModal);
+        //绑定添加rviz话题信号
+        connect(addtopic_form, SIGNAL(Topic_choose(QTreeWidgetItem *, QString)), this, SLOT(slot_choose_topic(QTreeWidgetItem *, QString)));
+        addtopic_form->show();
+    }
+    else{
+        QPoint p=addtopic_form->pos();
+        delete addtopic_form;
+        addtopic_form = new AddTopics();
+        connect(addtopic_form, SIGNAL(Topic_choose(QTreeWidgetItem *, QString)), this, SLOT(slot_choose_topic(QTreeWidgetItem *, QString)));
+        addtopic_form->show();
+        addtopic_form->move(p.x(),p.y());
+    }
+}
 
+///
+/// \brief 删除topic
+///
+void cyrobot_monitor::MainWindow::on_pushButton_remove_topic_clicked()
+{
+    
+}
 
+///
+/// \brief 重命名topic
+///
+void cyrobot_monitor::MainWindow::on_pushButton_rename_topic_clicked()
+{
+    
+}
+
+void cyrobot_monitor::MainWindow::on_treeView_rvizDisplayTree_clicked(const QModelIndex &index)
+{
+    m_sRvizDisplayChooseName = index.data().value<QString>();
+    if (index.parent().row() == -1)   // Display 的根节点
+    {
+        if (index.row() > 1)
+        {
+            ui.pushButton_remove_topic->setEnabled(true);
+            ui.pushButton_rename_topic->setEnabled(true);
+        }
+        else
+        {
+            ui.pushButton_remove_topic->setEnabled(false);
+            ui.pushButton_rename_topic->setEnabled(false);
+        }
+    }
+    else
+    {
+        ui.pushButton_remove_topic->setEnabled(false);
+        ui.pushButton_rename_topic->setEnabled(false);
+    }
+}
