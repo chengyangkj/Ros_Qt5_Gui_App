@@ -208,7 +208,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <attribute name="title">
@@ -1025,7 +1025,7 @@ QProgressBar {
                   </widget>
                  </item>
                  <item row="9" column="1">
-                  <widget class="QPushButton" name="pushButton">
+                  <widget class="QPushButton" name="button_disconnect">
                    <property name="text">
                     <string>🔗断开</string>
                    </property>

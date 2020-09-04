@@ -54,34 +54,29 @@ class QRviz:public QThread
     Q_OBJECT
 public:
     QRviz(QVBoxLayout *layout,QString node_name);
+    ~QRviz();
     
     QList<rviz::Display *> rvizDisplays_;
     
     void DisplayInit(QString ClassID, bool enabled, QMap<QString, QVariant> namevalue);
     void DisplayInit(QString ClassID, QString name, bool enabled, QMap<QString, QVariant> namevalue);
     
+    void RemoveDisplay(QString name);
+    void RemoveDisplay(QString ClassID, QString name);
+    
+    void RenameDisplay(QString oldname, QString newname);
+    
     void run();
     void createDisplay(QString display_name,QString topic_name);
-    //显示Grid
-    void Display_Grid(bool enable,QString Reference_frame,int Plan_Cell_count,QColor color=QColor(125,125,125));
-    //显示map
-    void Display_Map(bool enable,QString topic,double Alpha,QString Color_Scheme);
     //设置全局显示属性
     void SetGlobalOptions(QString frame_name,QColor backColor,int frame_rate);
-    //显示激光雷达点云
-    void Display_LaserScan(bool enable,QString topic);
-    //显示导航相关控件
-    void Display_Navigate(bool enable,QString Global_topic,QString Global_planner,QString Local_topic,QString Local_planner);
-    //显示tf坐标变换
-    void Display_TF(bool enable);
+
     void Set_Pos();
     void Set_Goal();
     void Set_MoveCamera();
     void Set_Select();
     //发布goal话题的坐标
     void Send_Goal_topic();
-    //显示robotmodel
-    void Display_RobotModel(bool enable);
     
     void GetDisplayTreeModel();
     
@@ -96,19 +91,6 @@ private:
     //rviz显示容器
     rviz::RenderPanel *render_panel_;
     rviz::VisualizationManager *manager_;
-    rviz::Display* grid_=nullptr ;
-
-    //显示tf坐标变换
-    rviz::Display* TF_=nullptr ;
-    rviz::Display* map_=nullptr ;
-    rviz::Display* laser_=nullptr ;
-    rviz::Display* Navigate_localmap=nullptr;
-    rviz::Display* Navigate_localplanner=nullptr;
-    rviz::Display* Navigate_globalmap=nullptr;
-    rviz::Display* Navigate_globalplanner=nullptr;
-    rviz::Display* Navigate_amcl=nullptr;
-    rviz::Display* RobotModel_ = nullptr;
-
 
 
     //rviz工具

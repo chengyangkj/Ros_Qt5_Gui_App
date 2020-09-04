@@ -55,6 +55,7 @@ public:
 	virtual ~QNode();
 	bool init();
 	bool init(const std::string &master_url, const std::string &host_url);
+  void disinit();
     void move_base(char k,float speed_linear,float speed_trun);
     void set_goal(QString frame,double x,double y,double z,double w);
     void Sub_Image(QString topic,int frame_id);

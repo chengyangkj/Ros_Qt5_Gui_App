@@ -28,9 +28,9 @@ namespace cyrobot_monitor {
 *****************************************************************************/
 
 QNode::QNode(int argc, char** argv ) :
-	init_argc(argc),
-	init_argv(argv)
-    {
+    init_argc(argc),
+    init_argv(argv)
+{
 //    读取topic的设置
     QSettings topic_setting("topic_setting","cyrobot_monitor");
     odom_topic= topic_setting.value("topic_odom","raw_odom").toString();
@@ -38,63 +38,79 @@ QNode::QNode(int argc, char** argv ) :
     pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
     power_min=topic_setting.value("power_min","10").toString();
     power_max=topic_setting.value("power_max","12").toString();
-
-    }
-
-QNode::~QNode() {
-    if(ros::isStarted()) {
-      ros::shutdown(); // explicitly needed since we use ros::start();
-      ros::waitForShutdown();
-    }
-	wait();
 }
 
-bool QNode::init() {
-	ros::init(init_argc,init_argv,"cyrobot_monitor");
-	if ( ! ros::master::check() ) {
-		return false;
-	}
-	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-    ros::NodeHandle n;
-	// Add your ros communications here.
+QNode::~QNode() {
+    if(ros::isStarted())
+    {
+        ros::shutdown(); // explicitly needed since we use ros::start();
+        ros::waitForShutdown();
+    }
+    wait();
+}
 
+bool QNode::init()
+{
+    ros::init(init_argc, init_argv, "cyrobot_monitor");
+    if ( ! ros::master::check() )
+    {
+        return false;
+    }
+    ros::start(); // explicitly needed since our nodehandle is going out of scope.
+    ros::NodeHandle n;
+    // Add your ros communications here.
+    
     //创建速度话题的订阅者
-    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
-    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
+    cmdVel_sub = n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
+    power_sub = n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
     //机器人位置话题
-    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
-     //导航目标点发送话题
-     goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
-     //速度控制话题
-     cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-	start();
-	return true;
+    pos_sub = n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
+    //导航目标点发送话题
+    goal_pub = n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
+    //速度控制话题
+    cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+    start();
+    return true;
 }
 
 //初始化的函数*********************************
-bool QNode::init(const std::string &master_url, const std::string &host_url) {
-	std::map<std::string,std::string> remappings;
-	remappings["__master"] = master_url;
-	remappings["__hostname"] = host_url;
-	ros::init(remappings,"cyrobot_monitor");
-	if ( ! ros::master::check() ) {
-		return false;
-	}
-	ros::start(); // explicitly needed since our nodehandle is going out of scope.
+bool QNode::init(const std::string &master_url, const std::string &host_url)
+{
+    std::map<std::string,std::string> remappings;
+    remappings["__master"] = master_url;
+    remappings["__hostname"] = host_url;
+    ros::init(remappings,"cyrobot_monitor");
+    if ( ! ros::master::check() )
+    {
+        return false;
+    }
+    ros::start(); // explicitly needed since our nodehandle is going out of scope.
     ros::NodeHandle n;
     //创建速度话题的订阅者
-    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
-    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
+    cmdVel_sub = n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
+    power_sub = n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
     //机器人位置话题
-    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
+    pos_sub = n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
     //导航目标点发送话题
-    goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
+    goal_pub = n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
     //速度控制话题
     cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-
-	start();
-	return true;
+    
+    start();
+    return true;
 }
+
+void QNode::disinit()
+{
+    if(ros::isStarted())
+    {
+        ROS_INFO("ROS will shutdown");
+        ros::shutdown();
+        ros::waitForShutdown();
+    }
+    this->exit();
+}
+
 QMap<QString,QString> QNode::get_topic_list()
 {
     ros::master::V_TopicInfo topic_list;
@@ -146,7 +162,7 @@ void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
     emit speed_y(msg->twist.twist.linear.y);
 }
 void QNode::run() {
-        int count=0;
+//        int count=0;
         ros::Rate loop_rate(1);
         //当当前节点没有关闭时
         while ( ros::ok() ) {
@@ -156,7 +172,7 @@ void QNode::run() {
             loop_rate.sleep();
         }
         //如果当前节点关闭
-        Q_EMIT rosShutdown(); // used to signal the gui for a shutdown (useful to roslaunch)
+        //Q_EMIT rosShutdown(); // used to signal the gui for a shutdown (useful to roslaunch)
 
 
 }
@@ -197,13 +213,13 @@ void QNode::run() {
      float turn = speed_trun;
      // Update the Twist message
      geometry_msgs::Twist twist;
-    twist.linear.x = x * speed;
-    twist.linear.y = y * speed;
-    twist.linear.z = z * speed;
+    twist.linear.x = static_cast<double>(x * speed);
+    twist.linear.y = static_cast<double>(y * speed);
+    twist.linear.z = static_cast<double>(z * speed);
 
     twist.angular.x = 0;
     twist.angular.y = 0;
-    twist.angular.z = th * turn;
+    twist.angular.z = static_cast<double>(th * turn);
 
     // Publish it and resolve any remaining callbacks
     cmd_pub.publish(twist);
@@ -328,7 +344,7 @@ void QNode::run() {
      if (src.channels() == 1) {
        for (int i = 0; i < src.rows; ++i) {
          for (int j = 0; j < src.cols; ++j) {
-           int level = scale * src.at<float>(i, j);
+           int level = static_cast<int>(scale * src.at<float>(i, j));
            dest.setPixel(j, i, qRgb(level, level, level));
          }
        }
@@ -336,7 +352,7 @@ void QNode::run() {
        for (int i = 0; i < src.rows; ++i) {
          for (int j = 0; j < src.cols; ++j) {
            cv::Vec3f bgr = scale * src.at<cv::Vec3f>(i, j);
-           dest.setPixel(j, i, qRgb(bgr[2], bgr[1], bgr[0]));
+           dest.setPixel(j, i, qRgb(static_cast<int>(bgr[2]), static_cast<int>(bgr[1]), static_cast<int>(bgr[0])));
          }
        }
      }
