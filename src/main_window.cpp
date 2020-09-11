@@ -50,9 +50,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     /*********************
     ** 自动连接master
     **********************/
-    //    if ( ui->checkbox_remember_settings->isChecked() ) {
-    //        on_button_connect_clicked(true);
-    //    }
+    if ( ui->checkbox_remember_settings->isChecked() ) {
+        on_button_connect_clicked();
+    }
     //链接connect
     connections();
 
@@ -194,6 +194,10 @@ void MainWindow::initRviz()
     namevalue.insert("Color", QColor(160, 160, 160));
     namevalue.insert("Plane Cell Count", 10);
     map_rviz_->DisplayInit(RVIZ_DISPLAY_GRID, "Grid", true, namevalue);
+    
+    ui->pushButton_add_topic->setEnabled(true);
+    ui->pushButton_rvizReadDisplaySet->setEnabled(true);
+    ui->pushButton_rvizSaveDisplaySet->setEnabled(true);
 }
 
 void MainWindow::RvizGetModel(QAbstractItemModel *model)
@@ -249,12 +253,6 @@ void MainWindow::connections()
     connect(ui->tabWidget,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_Widget_currentChanged(int)));
     //刷新话题列表
     connect(ui->refreash_topic_btn,SIGNAL(clicked()),this,SLOT(refreashTopicList()));
-    //添加rviz话题的按钮
-    connect(ui->pushButton_add_topic,SIGNAL(clicked()),this,SLOT(slot_add_topic_btn()));
-    //treewidget的值改变的槽函数
-
-    
-    //connect(ui->treeWidget_rviz,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(slot_treewidget_item_value_change(QTreeWidgetItem*,int)));
 }
 //设置界面
 void MainWindow::slot_setting_frame()
@@ -642,76 +640,6 @@ bool MainWindow::AskInform(QString strdata)
  * is already checked or not.
  */
 
-void MainWindow::on_button_connect_clicked(bool check ) {
-    //如果使用环境变量
-    if ( ui->checkbox_use_environment->isChecked() )
-    {
-        if ( !qnode.init() )
-        {
-            //showNoMasterMessage();
-            QMessageBox::warning(nullptr, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes, QMessageBox::Yes);
-            ui->label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-            ui->label_statue_text->setStyleSheet("color:red;");
-            ui->label_statue_text->setText("离线");
-            ui->tab_manager->setTabEnabled(1,false);
-            ui->tabWidget->setTabEnabled(1,false);
-            ui->groupBox_3->setEnabled(false);
-        }
-        else
-        {
-            ui->tab_manager->setTabEnabled(1,true);
-            ui->tabWidget->setTabEnabled(1,true);
-            ui->groupBox_3->setEnabled(true);
-            //初始化rviz
-            initRviz();
-            ui->button_connect->setEnabled(false);
-            ui->label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
-            ui->label_statue_text->setStyleSheet("color:green;");
-            ui->label_statue_text->setText("在线");
-            ui->button_disconnect->setEnabled(true);
-            //初始化视频订阅的显示
-            initVideos();
-            //显示话题列表
-            initTopicList();
-        }
-    }
-    //如果不使用环境变量
-    else
-    {
-        if ( !qnode.init(ui->line_edit_master->text().toStdString(), ui->line_edit_host->text().toStdString()) )
-        {
-            QMessageBox::warning(nullptr, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes, QMessageBox::Yes);
-            ui->label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-            ui->label_statue_text->setStyleSheet("color:red;");
-            ui->label_statue_text->setText("离线");
-            ui->tab_manager->setTabEnabled(1,false);
-            ui->tabWidget->setTabEnabled(1,false);
-            ui->groupBox_3->setEnabled(false);
-            //showNoMasterMessage();
-        }
-        else
-        {
-            ui->tab_manager->setTabEnabled(1,true);
-            ui->tabWidget->setTabEnabled(1,true);
-            
-            //初始化rviz
-            initRviz();
-            ui->button_connect->setEnabled(false);
-            ui->line_edit_master->setReadOnly(true);
-            ui->line_edit_host->setReadOnly(true);
-            ui->line_edit_topic->setReadOnly(true);
-            ui->groupBox_3->setEnabled(true);
-            ui->label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
-            ui->label_statue_text->setStyleSheet("color:green;");
-            ui->label_statue_text->setText("在线");
-            ui->button_disconnect->setEnabled(true);
-            //初始化视频订阅的显示
-            initVideos();
-            //显示话题列表
-            initTopicList();
-        }
-    }
-}
 void MainWindow::initTopicList()
 {
     ui->topic_listWidget->clear();
@@ -897,7 +825,23 @@ void cyrobot_monitor::MainWindow::on_pushButton_add_topic_clicked()
 ///
 void cyrobot_monitor::MainWindow::on_pushButton_remove_topic_clicked()
 {
-    map_rviz_->RemoveDisplay(m_sRvizDisplayChooseName_);
+    if (ui->treeView_rvizDisplayTree->currentIndex().row() >= 0)
+    {
+        m_sRvizDisplayChooseName_ = ui->treeView_rvizDisplayTree->currentIndex().data().value<QString>();
+        map_rviz_->RemoveDisplay(m_sRvizDisplayChooseName_);
+        if (ui->treeView_rvizDisplayTree->currentIndex().row() >= 0)
+        {
+            on_treeView_rvizDisplayTree_clicked(ui->treeView_rvizDisplayTree->currentIndex());
+        }
+        else
+        {
+            m_sRvizDisplayChooseName_.clear();
+        }
+    }
+    else
+    {
+        inform("请选择Display后再执行此操作");
+    }
 }
 
 ///
@@ -905,6 +849,11 @@ void cyrobot_monitor::MainWindow::on_pushButton_remove_topic_clicked()
 ///
 void cyrobot_monitor::MainWindow::on_pushButton_rename_topic_clicked()
 {
+    if (ui->treeView_rvizDisplayTree->currentIndex().row() < 0)
+    {
+        inform("请选择Display后再执行此操作");
+        return ;
+    }
     QString dlgTitle = "重命名";
     QString txtlabel = "请输入名字：";
     QString defaultInupt = m_sRvizDisplayChooseName_;
@@ -953,13 +902,119 @@ void cyrobot_monitor::MainWindow::on_treeView_rvizDisplayTree_clicked(const QMod
     }
 }
 
+/// \brief 连接ROS
+void cyrobot_monitor::MainWindow::on_button_connect_clicked()
+{
+    //如果使用环境变量
+    if ( ui->checkbox_use_environment->isChecked() )
+    {
+        if ( !qnode.init() )
+        {
+            //showNoMasterMessage();
+            QMessageBox::warning(nullptr, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes, QMessageBox::Yes);
+            ui->label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
+            ui->label_statue_text->setStyleSheet("color:red;");
+            ui->label_statue_text->setText("离线");
+            ui->tab_manager->setTabEnabled(1,false);
+            ui->tabWidget->setTabEnabled(1,false);
+            ui->groupBox_3->setEnabled(false);
+            return ;
+        }
+    }
+    //如果不使用环境变量
+    else
+    {
+        if ( !qnode.init(ui->line_edit_master->text().toStdString(), ui->line_edit_host->text().toStdString()) )
+        {
+            QMessageBox::warning(nullptr, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes, QMessageBox::Yes);
+            ui->label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
+            ui->label_statue_text->setStyleSheet("color:red;");
+            ui->label_statue_text->setText("离线");
+            ui->tab_manager->setTabEnabled(1,false);
+            ui->tabWidget->setTabEnabled(1,false);
+            ui->groupBox_3->setEnabled(false);
+            //showNoMasterMessage();
+            return ;
+        }
+        else
+        {
+            ui->line_edit_master->setReadOnly(true);
+            ui->line_edit_host->setReadOnly(true);
+            ui->line_edit_topic->setReadOnly(true);
+        }
+    }
+    ui->tab_manager->setTabEnabled(1,true);
+    ui->tabWidget->setTabEnabled(1,true);
+    ui->groupBox_3->setEnabled(true);
+    //初始化rviz
+    initRviz();
+    
+    
+    ui->button_connect->setEnabled(false);
+    ui->label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
+    ui->label_statue_text->setStyleSheet("color:green;");
+    ui->label_statue_text->setText("在线");
+    ui->button_disconnect->setEnabled(true);
+    //初始化视频订阅的显示
+    initVideos();
+    //显示话题列表
+    initTopicList();
+}
+
+/// \brief 断开ROS
 void cyrobot_monitor::MainWindow::on_button_disconnect_clicked()
 {
     qnode.disinit();
     map_rviz_->quit();
     delete map_rviz_;
     map_rviz_ = nullptr;
+    ui->pushButton_add_topic->setEnabled(false);
+    ui->pushButton_remove_topic->setEnabled(false);
+    ui->pushButton_rename_topic->setEnabled(false);
+    ui->pushButton_rvizReadDisplaySet->setEnabled(false);
+    ui->pushButton_rvizSaveDisplaySet->setEnabled(false);
     ui->label_rvizShow->show();
     ui->button_disconnect->setEnabled(false);
     ui->button_connect->setEnabled(true);
+    
 }
+
+void cyrobot_monitor::MainWindow::on_pushButton_rvizReadDisplaySet_clicked()
+{
+    if (map_rviz_ == nullptr)
+    {
+        return;
+    }
+    QString path = QFileDialog::getOpenFileName(this, "导入 RVIZ Display 配置", "/home/" + getUserName() + "/", "YAML(*.yaml);;ALL(*.*)");
+    if (!path.isEmpty())
+    {
+        map_rviz_->ReadDisplaySet(path);
+    }
+}
+
+void cyrobot_monitor::MainWindow::on_pushButton_rvizSaveDisplaySet_clicked()
+{
+    if (map_rviz_ == nullptr)
+    {
+        return;
+    }
+    QString path = QFileDialog::getSaveFileName(this, "导出 RVIZ Display 配置", "/home/" + getUserName() + "/", "YAML(*.yaml)");
+    
+    if (!path.isEmpty())
+    {
+        if (path.section('/', -1, -1).indexOf('.') < 0)
+        {
+            path = path + ".yaml";
+        }
+        map_rviz_->OutDisplaySet(path);
+    }
+}
+
+QString cyrobot_monitor::MainWindow::getUserName()
+{
+    QString userPath = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    QString userName = userPath.section("/", -1, -1);
+    return userName;
+}
+
+

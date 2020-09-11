@@ -2,6 +2,11 @@
 #define QRVIZ_H
 
 #include <QVBoxLayout>
+#include <QThread>
+#include <QDebug>
+#include <QException>
+#include <QAbstractItemModel>
+
 #include <rviz/visualization_manager.h>
 #include <rviz/render_panel.h>
 #include <rviz/display.h>
@@ -13,10 +18,9 @@
 #include "rviz/image/ros_image_texture.h"
 #include <rviz/tool_manager.h>
 #include <rviz/properties/property_tree_model.h>
-#include <QThread>
-#include <QDebug>
-#include <QException>
-#include <QAbstractItemModel>
+#include <rviz/yaml_config_reader.h>
+#include <rviz/yaml_config_writer.h>
+#include <rviz/display_group.h>
 
 #define RVIZ_DISPLAY_AXES               "rviz/Axes"
 #define RVIZ_DISPLAY_CAMERA             "rviz/Camera"
@@ -56,7 +60,7 @@ public:
     QRviz(QVBoxLayout *layout,QString node_name);
     ~QRviz();
     
-    QList<rviz::Display *> rvizDisplays_;
+//    QList<rviz::Display *> rvizDisplays_;
     
     void DisplayInit(QString ClassID, bool enabled, QMap<QString, QVariant> namevalue);
     void DisplayInit(QString ClassID, QString name, bool enabled, QMap<QString, QVariant> namevalue);
@@ -65,6 +69,9 @@ public:
     void RemoveDisplay(QString ClassID, QString name);
     
     void RenameDisplay(QString oldname, QString newname);
+    
+    void OutDisplaySet(QString path);
+    void ReadDisplaySet(QString path);
     
     void run();
     void createDisplay(QString display_name,QString topic_name);
@@ -92,6 +99,7 @@ private:
     rviz::RenderPanel *render_panel_;
     rviz::VisualizationManager *manager_;
 
+    rviz::DisplayGroup *display_group_;
 
     //rviz工具
     rviz::Tool *current_tool;

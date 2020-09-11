@@ -30,6 +30,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QInputDialog>
+#include <QFileDialog>
 #include <map>
 //rviz
 #include <rviz/visualization_manager.h>
@@ -78,7 +79,6 @@ class MainWindow : public QMainWindow
       ** Auto-connections (connectSlotsByName())
       *******************************************/
         void on_actionAbout_triggered();
-        void on_button_connect_clicked(bool check );
         void on_checkbox_use_environment_stateChanged(int state);
         void slot_speed_x(double x);
         void slot_speed_y(double y);
@@ -130,7 +130,14 @@ class MainWindow : public QMainWindow
         
         void on_button_disconnect_clicked();
         
-    private:
+        /// \brief 导入rviz Display配置
+        void on_pushButton_rvizReadDisplaySet_clicked();
+        /// \brief 导出rviz Display配置
+        void on_pushButton_rvizSaveDisplaySet_clicked();
+        
+        void on_button_connect_clicked();
+        
+private:
         Ui::MainWindowDesign *ui;
         void initData();
         QString JudgeDisplayNewName(QString name);
@@ -140,6 +147,7 @@ class MainWindow : public QMainWindow
         
         void inform(QString);
         bool AskInform(QString);
+        QString getUserName();
         
         QNode qnode;
         CCtrlDashBoard *m_DashBoard_x;

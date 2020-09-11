@@ -9,12 +9,16 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
 
 
     //创建rviz容器
-    render_panel_=new rviz::RenderPanel;
+    render_panel_ = new rviz::RenderPanel;
     //向layout添加widget
     layout->addWidget(render_panel_);
     //初始化rviz控制对象
-    manager_=new rviz::VisualizationManager(render_panel_);
+    manager_ = new rviz::VisualizationManager(render_panel_);
     ROS_ASSERT(manager_ != nullptr);
+    
+    // 获取Display组
+    display_group_ = manager_->getRootDisplayGroup();
+    
     //获取当前rviz控制对象的 tool控制对象
     tool_manager_=manager_->getToolManager();
     ROS_ASSERT(tool_manager_ != nullptr);
@@ -64,18 +68,17 @@ void QRviz::DisplayInit(QString ClassID, bool enabled, QMap<QString, QVariant> n
     {
         rviz::Display *rvizDisplay = manager_->createDisplay(ClassID, ClassID, true);
         ROS_ASSERT(rvizDisplay != nullptr);
-        rvizDisplays_.append(rvizDisplay);
-        num = rvizDisplays_.indexOf(rvizDisplay);
+        num = GetDisplayNum(ClassID);
     }
     if (!namevalue.empty())
     {
         QMap<QString, QVariant>::iterator it;
         for (it = namevalue.begin(); it != namevalue.end(); it++)
         {
-            rvizDisplays_[num]->subProp(it.key())->setValue(it.value());
+            display_group_->getDisplayAt(num)->subProp(it.key())->setValue(it.value());
         }
     }
-    rvizDisplays_[num]->setEnabled(enabled);
+    display_group_->getDisplayAt(num)->setEnabled(enabled);
     manager_->startUpdate();
 }
 void QRviz::DisplayInit(QString ClassID, QString name, bool enabled, QMap<QString, QVariant> namevalue)
@@ -85,18 +88,17 @@ void QRviz::DisplayInit(QString ClassID, QString name, bool enabled, QMap<QStrin
     {
         rviz::Display *rvizDisplay = manager_->createDisplay(ClassID, name, true);
         ROS_ASSERT(rvizDisplay != nullptr);
-        rvizDisplays_.append(rvizDisplay);
-        num = rvizDisplays_.indexOf(rvizDisplay);
+        num = GetDisplayNum(ClassID, name);
     }
     if (!namevalue.empty())
     {
         QMap<QString, QVariant>::iterator it;
         for (it = namevalue.begin(); it != namevalue.end(); it++)
         {
-            rvizDisplays_[num]->subProp(it.key())->setValue(it.value());
+            display_group_->getDisplayAt(num)->subProp(it.key())->setValue(it.value());
         }
     }
-    rvizDisplays_[num]->setEnabled(enabled);
+    display_group_->getDisplayAt(num)->setEnabled(enabled);
     manager_->startUpdate();
 }
 
@@ -111,8 +113,8 @@ void QRviz::RemoveDisplay(QString name)
     {
         return ;
     }
-    delete rvizDisplays_[num];
-    rvizDisplays_.removeAt(num);
+    delete display_group_->getDisplayAt(num);
+//    rvizDisplays_.removeAt(num);
 }
 void QRviz::RemoveDisplay(QString ClassID, QString name)
 {
@@ -121,8 +123,8 @@ void QRviz::RemoveDisplay(QString ClassID, QString name)
     {
         return ;
     }
-    delete rvizDisplays_[num];
-    rvizDisplays_.removeAt(num);
+    delete display_group_->getDisplayAt(num);
+//    rvizDisplays_.removeAt(num);
 }
 
 ///
@@ -137,7 +139,45 @@ void QRviz::RenameDisplay(QString oldname, QString newname)
     {
         return ;
     }
-    rvizDisplays_[num]->setName(newname);
+    display_group_->getDisplayAt(num)->setName(newname);
+}
+
+///
+/// \brief 导出 RVIZ Display 配置
+/// \param path
+///
+void QRviz::OutDisplaySet(QString path)
+{
+    if (!path.isEmpty())
+    {
+        if (manager_ == nullptr)
+        {
+            return;
+        }
+        rviz::Config con;
+        manager_->save(con);
+        rviz::YamlConfigWriter yamlconfigwriter;
+        yamlconfigwriter.writeFile(con, path);
+    }
+}
+
+///
+/// \brief 导入 RVIZ Display 配置
+/// \param path
+///
+void QRviz::ReadDisplaySet(QString path)
+{
+    if (!path.isEmpty())
+    {
+        if (manager_ == nullptr)
+        {
+            return;
+        }
+        rviz::YamlConfigReader yamlconfigreader;
+        rviz::Config con;
+        yamlconfigreader.readFile(con, path);
+        manager_->load(con);
+    }
 }
 
 ///
@@ -148,11 +188,11 @@ void QRviz::RenameDisplay(QString oldname, QString newname)
 int QRviz::GetDisplayNum(QString ClassID)
 {
     int num = -1;
-    for (int i = 0; i < rvizDisplays_.length(); i++)
+    for (int i = 0; i < display_group_->numDisplays(); i++)
     {
-        if (rvizDisplays_[i] != nullptr)
+        if (display_group_->getDisplayAt(i) != nullptr)
         {
-            if (ClassID == rvizDisplays_[i]->getClassId())
+            if (ClassID == display_group_->getDisplayAt(i)->getClassId())
             {
                 num = i;
                 break;
@@ -164,11 +204,11 @@ int QRviz::GetDisplayNum(QString ClassID)
 int QRviz::GetDisplayNum(QString ClassID, QString name)
 {
     int num = -1;
-    for (int i = 0; i < rvizDisplays_.length(); i++)
+    for (int i = 0; i < display_group_->numDisplays(); i++)
     {
-        if (rvizDisplays_[i] != nullptr)
+        if (display_group_->getDisplayAt(i) != nullptr)
         {
-            if (ClassID == rvizDisplays_[i]->getClassId() && name == rvizDisplays_[i]->getName())
+            if (ClassID == display_group_->getDisplayAt(i)->getClassId() && name == display_group_->getDisplayAt(i)->getName())
             {
                 num = i;
                 break;
@@ -180,11 +220,11 @@ int QRviz::GetDisplayNum(QString ClassID, QString name)
 int QRviz::GetDisplayNumName(QString name)
 {
     int num = -1;
-    for (int i = 0; i < rvizDisplays_.length(); i++)
+    for (int i = 0; i < display_group_->numDisplays(); i++)
     {
-        if (rvizDisplays_[i] != nullptr)
+        if (display_group_->getDisplayAt(i) != nullptr)
         {
-            if (name == rvizDisplays_[i]->getName())
+            if (name == display_group_->getDisplayAt(i)->getName())
             {
                 num = i;
                 break;

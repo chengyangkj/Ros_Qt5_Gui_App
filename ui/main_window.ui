@@ -208,7 +208,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <attribute name="title">
@@ -1270,6 +1270,9 @@ QProgressBar {
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
                  <widget class="QPushButton" name="pushButton_add_topic">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Add</string>
                   </property>
@@ -1277,6 +1280,9 @@ QProgressBar {
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_remove_topic">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Remove</string>
                   </property>
@@ -1284,8 +1290,35 @@ QProgressBar {
                 </item>
                 <item>
                  <widget class="QPushButton" name="pushButton_rename_topic">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
                   <property name="text">
                    <string>Rename</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="gridLayout_10">
+                <item row="0" column="0">
+                 <widget class="QPushButton" name="pushButton_rvizReadDisplaySet">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>导入配置</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QPushButton" name="pushButton_rvizSaveDisplaySet">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>导出配置</string>
                   </property>
                  </widget>
                 </item>

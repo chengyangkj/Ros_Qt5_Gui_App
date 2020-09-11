@@ -1,134 +1,91 @@
 ## ROS Qt Deskotp GUI App
 - Use qt5 to implement the ros robot human-machine interface
-
 - 使用qt5实现ros机器人人机界面
 
 - Attention! This code is for learning purposes only and cannot be used for any other purpose without the author's permission.
-
 - 注意！未经作者的许可，此代码仅用于学习，不能用于其他用途。
 
 - Continuously updating.....
-
 - 持续更新中.....
 
 - Welcome to submit bugs in issues
-
 - 欢迎在issues提交bug
 ***
 ## 分支
-**1.~~Kinetic version branch(Branches are merged)~~**
-**~~kinetic 版本分支(分支已合并)~~**
-- ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
+**rviz menu tree branch rviz  菜单树分支**
+- With the rviz menu interface, there is no need to encapsulate the menu yourself.
+- 采用rviz菜单接口，无需自己封装菜单
+- Through the menu interface, all the Display functions of rviz can be implemented.
+- 通过菜单接口，可以实现rviz所有的Display功能
+- Supports the import and export of configured Display items for quick and easy.
+- 支持导入导出已配置好的Display项，方便快速
 
-
-**2. Qml version branch(To be perfected)
-   Qml版本分支（待完善）**
-- The interface is more beautiful, the function is simple, can be used as a robot on-board display
-- 界面更加美观，功能简单，可作为机器人机载端显示
-- [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_simple)
-
-
-**3. Lite branch
-   精简版分支**
-- This version is the implementation of the 《ROS Human-Computer Interactive Software Development》 series of courses, the basic functions of master branch, the code is easy to understand
-- 此版本为《ROS人机交互软件开发》系列课程中实现的版本，实现了master分支的基本功能，代码易懂 
-- [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
-
-
-**4. Windows version branch
-   Windows版本分支**
-- [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/windows_devel)
+[Go back master 回到主分支](https://github.com/chengyangkj/Ros_Qt5_Gui_App)
 
 ***
 
 ### 一，Features
 ### 一，功能介绍
-#### 1，Speed dashboard
-#### 1,速度仪表盘
-- Before use, you must set the odom topic in the menu-settings-and-topic settings:
-- 使用前须在菜单->设置->话题设置中设置odom话题：
+#### 1，Add Display
+#### 1，新增显示
+- The new display can provide a series of functions such as drawing, sweeping, etc.
+- 新增显示后可以提供建图、扫图等一系列功能。
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200507124144542.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405102549333.gif)
-#### 2，Robot speed control
-#### 2, 机器人速度控制
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405104454149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-#### 3，Power display
-#### 3, 电量显示
-- Before use, you must set the power topic(Std_msg/Float32) in the menu-settings-and-topic settings
-- 使用前须在菜单->设置->话题设置中设置电量话题(Std_msg/Float32)
+![Add Display](http://qghk8ygxs.hn-bkt.clouddn.com/images/add_map.gif)
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405153102508.png)
-#### 4，rviz module 
-#### 4, rviz模块
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405151916473.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-##### 4.1 Subscribe to map topics
-##### 4.1 订阅map话题
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408122253344.gif)
-##### 4.2 Laser Display
-##### 4.2 激光雷达图层显示
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408194648822.gif)
-##### 4.3 Set the initial point of navigation
-##### 4.3 设置导航初始点
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201723417.gif)
-##### 4.4 Set up navigation target points
-##### 4.4 设置导航目标点
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201804722.gif)
-##### 4.5 Fixed-point return
-##### 4.5 定点返航
-- Before use, you must set the amcl topic in the menu-settings-and-topic settings
-- 使用前须在菜单->设置->话题设置中设置amcl话题
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200413204212739.gif)
-##### 4.6 Subscribe to image topics
-##### 4.6 订阅图像话题
-
-- Provides four image display forms that can display four images at the same time
-- 提供四个图像显示窗体，可以同时显示四个图像
-![加粗样式](https://img-blog.csdnimg.cn/20200507093831130.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-- Before use, you need to set the topic and image encoding of the image in the menu->settings->-video (the encoding must be correctly set, otherwise the image will not be displayed correctly). When setting the error, the prompt for coding the wrong is output in info, and the correct encoding is set according to the prompt)
+![slammap](http://qghk8ygxs.hn-bkt.clouddn.com/images/slammap.gif)
 
 
-##### 4.7 Quick instructions
-##### 4.7 快捷指令
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200429204153916.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200429204233788.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+#### 2，Displays import or derive
+#### 2,  显示列表的导入导出
+![Displays import or derive](http://qghk8ygxs.hn-bkt.clouddn.com/images/readsavedisplays.gif)
 
-##### 4.8 Display RobotModel
-##### 4.8 显示机器人模型
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200501165154149.gif)
-##### 4.9 Available in six rviz tools
-##### 4.9 提供六种rviz工具
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515184545845.png)
-##### 4.10 Show The Topic List
-##### 4.10 显示话题列表
-[![image.png](https://i.postimg.cc/Z5bGBfgk/image.png)](https://postimg.cc/svL6bJsK)
-##### 4.11 To be perfected....
-##### 4.11 待完善....
+![导航](http://qghk8ygxs.hn-bkt.clouddn.com/images/daohang.gif)
+
+##### 3 To be perfected....
+##### 3 待完善....
+
+***
+
 ### 二，安装教程
 ### 二，Installation tutorial
 #### 1，首先安装ros对qt pkg的支持
 #### 1，first install ros support for qt pkg
-```cpp
+``` bash
 sudo apt-get install ros-melodic-qt-create
 ```
 
-```cpp
+``` bash
 sudo apt-get install ros-melodic-qt-build
 ```
-```cpp
+``` bash
 sudo apt-get install qtmultimedia5-dev
 ```
-#### 2，Compile
-#### 2，编译
+#### 2，Git code
+#### 2，获取源码
+Git code
+获取源码
+``` bash
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App
+```
+Go to the branch
+转到分支
+``` bash
+cd Ros_Qt5_Gui_App
+git checkout rviz_tree
+```
+
+#### 3，Compile
+#### 3，编译
 Put the package in the ros src package directory：
 将软件包放入ros src软件包目录下：
-```cpp
+``` bash
 catkin_make
 ```
-#### 3，run
-#### 3,运行
-```cpp
-rosrun cyrobot_monitor cyrobot_monitor
+#### 4，run
+#### 5，运行
+``` bash
+rosrun cyrobot_rviz_tree cyrobot_rviz_tree
 ```
 ***
 ### LIENSE
