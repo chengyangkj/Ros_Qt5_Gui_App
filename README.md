@@ -22,6 +22,7 @@
 
 [Go back master 回到主分支](https://github.com/chengyangkj/Ros_Qt5_Gui_App)
 
+**警告：图片较大，加载较慢**
 ![rviz_tree-image](http://qghk8ygxs.hn-bkt.clouddn.com/rviz_tree-image.png)
 
 ***
