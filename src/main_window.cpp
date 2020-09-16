@@ -762,7 +762,7 @@ void MainWindow::ReadSettings() {
     ui->label_return_w->setText(return_pos.value("w",QString("0")).toString());
 
     //读取快捷指令的setting
-    QSettings quick_setting("quick_setting","cyrobot_monitor");
+    QSettings quick_setting("quick_setting","cyrobot_rviz_tree");
     QStringList ch_key=quick_setting.childKeys();
     for(auto c:ch_key)
     {
