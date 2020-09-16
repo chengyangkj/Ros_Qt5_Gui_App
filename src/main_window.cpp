@@ -47,6 +47,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     **********************/
     ui->view_logging->setModel(qnode.loggingModel());
     
+    addtopic_form = new AddTopics();
+    //绑定添加rviz话题信号
+    connect(addtopic_form, SIGNAL(Topic_choose(QTreeWidgetItem *, QString)), this, SLOT(slot_choose_topic(QTreeWidgetItem *, QString)));
+    
     /*********************
     ** 自动连接master
     **********************/
@@ -667,9 +671,9 @@ void MainWindow::slot_rosShutdown()
 }
 void MainWindow::slot_power(float p)
 {
-    ui->label_power->setText(QString::number(p).mid(0,5)+"V");
-    double n=(p-10)/1.5;
-    int value=n*100;
+    ui->label_power->setText(QString::number(static_cast<double>(p)).mid(0,5)+"V");
+    double n=(static_cast<double>(p)-10)/1.5;
+    int value = static_cast<int>(n*100);
     ui->progressBar->setValue(value>100?100:value);
     //当电量过低时发出提示
     if(n*100<=20)
@@ -732,7 +736,7 @@ void MainWindow::on_actionAbout_triggered() {
 *****************************************************************************/
 
 void MainWindow::ReadSettings() {
-    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    QSettings settings("Qt-Ros Package", "cyrobot_rviz_tree");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
     QString master_url = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
@@ -751,7 +755,7 @@ void MainWindow::ReadSettings() {
     	//ui->line_edit_topic->setEnabled(false);
     }
 
-    QSettings return_pos("return-position","cyrobot_monitor");
+    QSettings return_pos("return-position","cyrobot_rviz_tree");
     ui->label_return_x->setText(return_pos.value("x",QString("0")).toString());
     ui->label_return_y->setText(return_pos.value("y",QString("0")).toString());
     ui->label_return_z->setText(return_pos.value("z",QString("0")).toString());
@@ -768,7 +772,7 @@ void MainWindow::ReadSettings() {
 }
 
 void MainWindow::WriteSettings() {
-    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    QSettings settings("Qt-Ros Package", "cyrobot_rviz_tree");
     settings.setValue("master_url",ui->line_edit_master->text());
     settings.setValue("host_url",ui->line_edit_host->text());
     //settings.setValue("topic_name",ui->line_edit_topic->text());
@@ -778,12 +782,12 @@ void MainWindow::WriteSettings() {
     settings.setValue("remember_settings",QVariant(ui->checkbox_remember_settings->isChecked()));
 
     //存下快捷指令的setting
-    QSettings quick_setting("quick_setting","cyrobot_monitor");
+    QSettings quick_setting("quick_setting","cyrobot_rviz_tree");
     quick_setting.clear();
     for(int i=0;i<ui->treeWidget_quick_cmd->topLevelItemCount();i++)
     {
         QTreeWidgetItem *top=ui->treeWidget_quick_cmd->topLevelItem(i);
-        QTextEdit *cmd_val=(QTextEdit *)ui->treeWidget_quick_cmd->itemWidget(top->child(0),1);
+        QTextEdit *cmd_val= static_cast<QTextEdit *>(ui->treeWidget_quick_cmd->itemWidget(top->child(0),1));
         quick_setting.setValue(top->text(0),cmd_val->toPlainText());
     }
 }
@@ -801,23 +805,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 ///
 void cyrobot_monitor::MainWindow::on_pushButton_add_topic_clicked()
 {
-    if(!addtopic_form)
-    {
-        addtopic_form = new AddTopics();
-        //阻塞其他窗体
-        addtopic_form->setWindowModality(Qt::ApplicationModal);
-        //绑定添加rviz话题信号
-        connect(addtopic_form, SIGNAL(Topic_choose(QTreeWidgetItem *, QString)), this, SLOT(slot_choose_topic(QTreeWidgetItem *, QString)));
-        addtopic_form->show();
-    }
-    else{
-        QPoint p=addtopic_form->pos();
-        delete addtopic_form;
-        addtopic_form = new AddTopics();
-        connect(addtopic_form, SIGNAL(Topic_choose(QTreeWidgetItem *, QString)), this, SLOT(slot_choose_topic(QTreeWidgetItem *, QString)));
-        addtopic_form->show();
-        addtopic_form->move(p.x(),p.y());
-    }
+    addtopic_form->show();
 }
 
 ///

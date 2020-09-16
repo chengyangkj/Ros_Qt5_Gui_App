@@ -8,6 +8,7 @@ AddTopics::AddTopics(QWidget *parent) :
     ui->setupUi(this);
     initUi();
     connect(ui->treeWidget,SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),this,SLOT(slot_curritem_changed(QTreeWidgetItem *, QTreeWidgetItem *)));
+    this->setWindowModality(Qt::ApplicationModal);
 }
 void AddTopics::initUi()
 {
