@@ -1,5 +1,5 @@
 ## ROS Qt Deskotp GUI App
-
+***
  简体中文 | [English](./README_en.md)
 
 - 使用qt5实现ros机器人人机界面
@@ -10,7 +10,7 @@
 - 持续更新中.....
 
 - 欢迎在issues提交bug
-***
+
 ## 分支
 
 **~~kinetic 版本分支(分支已合并)~~**
