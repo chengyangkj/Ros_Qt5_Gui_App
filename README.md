@@ -34,7 +34,7 @@ English | [简体中文](./README_cn.md)
 **4. Windows version branch**
 - [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/windows_devel)
 
-**5,rviz menu tree branch **
+**5,rviz menu tree branch**
 
 - Use the menu tree that rviz brings with you to add display layers instead of manually creating layer menus and displays.
 
