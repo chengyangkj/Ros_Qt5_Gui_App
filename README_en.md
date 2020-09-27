@@ -1,5 +1,7 @@
 ## ROS Qt Deskotp GUI App
 
+***
+
  [简体中文](./README.md) | English
 
 - Use qt5 to implement the ros robot human-machine interface
@@ -10,7 +12,6 @@
 
 - Welcome to submit bugs in issues
 
-***
 ## Branch
 **1.~~Kinetic version branch(Branches are merged)~~**
 
