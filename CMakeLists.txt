@@ -60,3 +60,10 @@ add_executable(cyrobot_monitor ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP}
 target_link_libraries(cyrobot_monitor ${QT_LIBRARIES} ${catkin_LIBRARIES})
 install(TARGETS cyrobot_monitor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+#如果要生成debug版本
+#SET(CMAKE_BUILD_TYPE "Debug")
+#如果要生成release版本
+#SET(CMAKE_BUILD_TYPE "Release")
+#添加的支持debug和release支持
+#SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+#SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
