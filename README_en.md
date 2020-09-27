@@ -1,6 +1,6 @@
 ## ROS Qt Deskotp GUI App
 
- 简体中文 | [English](./README_en.md)
+ [简体中文](./README.md) | English
 
 - Use qt5 to implement the ros robot human-machine interface
 
