@@ -33,7 +33,7 @@
 
 **5,rviz菜单树分支**
 
-- 使用rviz自带的菜单树，去实现添加显示图层，不用去手动创建图层菜单和display,master分支所有的图层及菜单均需要手动去写代码实现（并且目前仅支持部分图层显示），此分支调用librviz现成api，所有图层均可以实现
+- 使用rviz自带的菜单树，去实现添加显示图层。master分支所有的图层及菜单均需要手动去写代码实现（并且目前仅支持部分图层显示），此分支调用librviz现成api，所有图层均可以实现,不用去手动创建图层菜单和display
 
 - [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)
 
