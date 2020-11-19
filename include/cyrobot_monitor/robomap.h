@@ -18,9 +18,7 @@ public:
   void paint(QPainter* painter) override;
 
   int QColorToInt(const QColor& color);
-  QPolygon m_laserPoints;
-  QPolygon m_highLaserPoints;
-  QPolygon m_lowLaserPoints;
+  QPolygon MapPoints;
   QTimer timer_update;
   double map_size=1;
   Q_INVOKABLE void get_version(){
