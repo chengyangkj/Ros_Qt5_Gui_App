@@ -34,16 +34,14 @@
 - The new display can provide a series of functions such as drawing, sweeping, etc.
 - 新增显示后可以提供建图、扫图等一系列功能。
 
-![Add Display](http://qghk8ygxs.hn-bkt.clouddn.com/images/add_map.gif)
+![Add Display](http://danpe.oss-cn-shanghai.aliyuncs.com/github/add_map.gif)
 
-![slammap](http://qghk8ygxs.hn-bkt.clouddn.com/images/slammap.gif)
+![slammap](http://danpe.oss-cn-shanghai.aliyuncs.com/github/slammap.gif)
 
 
 #### 2，Displays import or derive
 #### 2,  显示列表的导入导出
-![Displays import or derive](http://qghk8ygxs.hn-bkt.clouddn.com/images/readsavedisplays.gif)
-
-![导航](http://qghk8ygxs.hn-bkt.clouddn.com/images/daohang.gif)
+![Displays import or derive](http://danpe.oss-cn-shanghai.aliyuncs.com/github/readsavedisplays.gif)
 
 ##### 3 To be perfected....
 ##### 3 待完善....
