@@ -31,13 +31,21 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/OccupancyGrid.h>
 #include <image_transport/image_transport.h>   //image_transport
 #include <cv_bridge/cv_bridge.h>              //cv_bridge
 #include <sensor_msgs/image_encodings.h>    //图像编码格式
+#include <actionlib/server/simple_action_server.h>
+#include <cyrobot_msgs/DoDishesAction.h>
 #include <map>
 #include <QLabel>
 #include <QImage>
 #include <QSettings>
+#include <QtQml/QQmlApplicationEngine>
+#include <QtQuick/QQuickItem>
+#include <QQmlContext>
+#include <QDebug>
+#include "robomap.h"
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
@@ -84,7 +92,8 @@ Q_SIGNALS:
     void power(float p);
     void Master_shutdown();
     void Show_image(int,QImage);
-    void position(QString frame,double x,double y,double z,double w);
+    void updateRoboPose(QPointF pos);
+    void updateMap(QPolygon map,QSizeF size);
 private:
 	int init_argc;
 	char** init_argv;
@@ -98,28 +107,23 @@ private:
     QStringListModel logging_model;
     //图像订阅
     image_transport::Subscriber image_sub0;
-    image_transport::Subscriber image_sub1;
-    image_transport::Subscriber image_sub2;
-    image_transport::Subscriber image_sub3;
+    //地图订阅
+    ros::Subscriber map_sub;
     //图像format
     QString video0_format;
-    QString video1_format;
-    QString video2_format;
-    QString video3_format;
     QString odom_topic;
     QString power_topic;
     QString pose_topic;
     QString power_max;
     QString power_min;
+    QPolygon mapPonits;
     QImage Mat2QImage(cv::Mat const& src);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void powerCallback(const std_msgs::Float32& message_holder);
     void imageCallback0(const sensor_msgs::ImageConstPtr& msg);
-    void imageCallback1(const sensor_msgs::ImageConstPtr& msg);
-    void imageCallback2(const sensor_msgs::ImageConstPtr& msg);
-    void imageCallback3(const sensor_msgs::ImageConstPtr& msg);
     void myCallback(const std_msgs::Float64& message_holder);
+    void mapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
 };
 
 }  // namespace cyrobot_monitor

@@ -16,9 +16,9 @@ class roboMap  : public QQuickPaintedItem
 public:
   roboMap(QQuickItem* parent=nullptr);
   void paint(QPainter* painter) override;
-
   int QColorToInt(const QColor& color);
   QPolygon MapPoints;
+  QPointF RoboPostion;
   QTimer timer_update;
   double map_size=1;
   Q_INVOKABLE void get_version(){
@@ -27,6 +27,9 @@ public:
   Q_INVOKABLE void setMax();
   Q_INVOKABLE void setMin();
   Q_INVOKABLE void move(double x,double y);
+public slots:
+    void paintMaps(QPolygon poinsts,QSizeF size);
+    void paintRoboPos(QPointF pos);
 };
 
 #endif // ROBOMAP_H

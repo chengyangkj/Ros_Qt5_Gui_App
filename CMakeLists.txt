@@ -16,6 +16,9 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     cv_bridge
     std_msgs
     image_transport
+    actionlib
+    actionlib_msgs
+    cyrobot_msgs
     )
 
 find_package(Qt5 REQUIRED Core Widgets Multimedia Quick Qml)
@@ -59,6 +62,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 add_executable(cyrobot_monitor ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
 target_link_libraries(cyrobot_monitor ${QT_LIBRARIES} ${catkin_LIBRARIES})
 install(TARGETS cyrobot_monitor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
 
 #如果要生成debug版本
 #SET(CMAKE_BUILD_TYPE "Debug")

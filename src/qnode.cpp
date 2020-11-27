@@ -55,18 +55,20 @@ bool QNode::init() {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-    ros::NodeHandle n;
-	// Add your ros communications here.
+  ros::NodeHandle n;
+   // Add your ros communications here.
 
-    //创建速度话题的订阅者
-    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
-    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
+   //创建速度话题的订阅者
+   cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
+   power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
     //机器人位置话题
-    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
-     //导航目标点发送话题
-     goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
-     //速度控制话题
-     cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+   pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
+   //地图订阅
+   map_sub = n.subscribe("map",1000,&QNode::mapCallback,this);
+   //导航目标点发送话题
+   goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
+   //速度控制话题
+   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
 	start();
 	return true;
 }
@@ -102,17 +104,18 @@ QMap<QString,QString> QNode::get_topic_list()
     QMap<QString,QString> res;
     for(auto topic:topic_list)
     {
-
         res.insert(QString::fromStdString(topic.name),QString::fromStdString(topic.datatype));
-
     }
     return res;
 }
 //机器人位置话题的回调函数
 void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
 {
-    emit position(pos.header.frame_id.data(), pos.pose.pose.position.x,pos.pose.pose.position.y,pos.pose.pose.orientation.z,pos.pose.pose.orientation.w);
-//    qDebug()<<<<" "<<pos.pose.pose.position.y;
+    QPointF roboPos;
+    roboPos.setX(pos.pose.pose.position.x);
+    roboPos.setY(pos.pose.pose.position.y);
+    emit updateRoboPose(roboPos);
+
 }
 void QNode::powerCallback(const std_msgs::Float32 &message_holder)
 {
@@ -139,6 +142,24 @@ void QNode::set_goal(QString frame,double x,double y,double z,double w)
     goal_pub.publish(goal);
     ros::spinOnce();
 }
+//地图信息订阅回调函数
+void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
+     uint32_t width=map->info.width;
+     uint32_t height=map->info.width;
+      //一维数组转二维
+      int data[height][width];
+      //将有像素的地方转为坐标值
+      for(int x=0;x<height;x++){
+        for(int y=0;y<width;y++){
+           if(map->data[x*width+y]==100){
+             mapPonits.push_back(QPoint(x,y));
+           }
+        }
+      }
+      QSizeF size(width,height);
+   emit updateMap(mapPonits,size);
+}
+
 //速度回调函数
 void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
@@ -215,21 +236,8 @@ void QNode::run() {
  {
       ros::NodeHandle n;
       image_transport::ImageTransport it_(n);
-     switch (frame_id) {
-         case 0:
-            image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
-         break;
-         case 1:
-             image_sub1=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback1,this);
-          break;
-         case 2:
-             image_sub2=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback2,this);
-          break;
-         case 3:
-             image_sub3=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback3,this);
-          break;
-     }
-     ros::spinOnce();
+       image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
+       ros::spinOnce();
  }
 
  //图像话题的回调函数
@@ -251,57 +259,7 @@ void QNode::run() {
          return;
        }
  }
- //图像话题的回调函数
- void QNode::imageCallback1(const sensor_msgs::ImageConstPtr& msg)
- {
-     cv_bridge::CvImagePtr cv_ptr;
-     try
-       {
-         //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg,video1_format.toStdString());
-         QImage im=Mat2QImage(cv_ptr->image);
-         emit Show_image(1,im);
-       }
-       catch (cv_bridge::Exception& e)
-       {
-         log(Error,("video frame1 exception: "+QString(e.what())).toStdString());
-         return;
-       }
- }
- //图像话题的回调函数
- void QNode::imageCallback2(const sensor_msgs::ImageConstPtr& msg)
- {
-     cv_bridge::CvImagePtr cv_ptr;
-     try
-       {
-         //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
-         QImage im=Mat2QImage(cv_ptr->image);
-         emit Show_image(2,im);
-       }
-       catch (cv_bridge::Exception& e)
-       {
-         log(Error,("video frame2 exception: "+QString(e.what())).toStdString());
-         return;
-       }
- }
- //图像话题的回调函数
- void QNode::imageCallback3(const sensor_msgs::ImageConstPtr& msg)
- {
-     cv_bridge::CvImagePtr cv_ptr;
-     try
-       {
-         //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
-         QImage im=Mat2QImage(cv_ptr->image);
-         emit Show_image(3,im);
-       }
-       catch (cv_bridge::Exception& e)
-       {
-         log(Error,("video frame3 exception: "+QString(e.what())).toStdString());
-         return;
-       }
- }
+
  QImage QNode::Mat2QImage(cv::Mat const& src)
  {
    QImage dest(src.cols, src.rows, QImage::Format_ARGB32);

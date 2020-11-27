@@ -37,16 +37,11 @@ Window {
         height: parent.height
         RoboMap{
             id:roboMap_
+            objectName: "roboMap_"
             anchors.fill: parent
             height:parent.height
             width:parent.width
         }
     }
 
-
-
-    Button{
-        text: "click"
-        onClicked: roboMap.get_version()
-    }
 }
