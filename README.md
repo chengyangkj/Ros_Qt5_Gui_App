@@ -41,6 +41,10 @@
 
 ***
 
+**6,ROS Qt Demo**
+- cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行
+
+- - [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo)
 
 ### 一，功能介绍
 
