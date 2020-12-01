@@ -16,10 +16,10 @@
 **~~kinetic 版本分支(分支已合并)~~**
 - ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 
-**2. Qml版本分支（待完善）**
+**2. Qml版本分支（开发中）**
 
-- 界面更加美观，功能简单，可作为机器人机载端显示
-- [qml_simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_simple)
+- ROS + QML + C++混合编程，使用qml自绘制地图，激光雷达点云等
+- [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
 
 
 **3. Lite branch**
