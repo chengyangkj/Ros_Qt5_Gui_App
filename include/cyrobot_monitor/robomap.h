@@ -4,11 +4,13 @@
 #include <QObject>
 #include <QDebug>
 #include <QQuickPaintedItem>
+#include <QGraphicsItem>
 #include <QPainter>
 #include <QPolygon>
 #include <QTimer>
 #include <QColor>
 #include <opencv2/highgui/highgui.hpp>
+#include <QCursor>
 class roboMap  : public QQuickPaintedItem
 {
     Q_OBJECT
@@ -19,6 +21,7 @@ public:
   int QColorToInt(const QColor& color);
   QPolygon MapPoints;
   QPointF RoboPostion;
+  QSizeF mapSize;
   QTimer timer_update;
   double map_size=1;
   Q_INVOKABLE void get_version(){

@@ -63,10 +63,10 @@ public:
 	virtual ~QNode();
 	bool init();
 	bool init(const std::string &master_url, const std::string &host_url);
-    void move_base(char k,float speed_linear,float speed_trun);
-    void set_goal(QString frame,double x,double y,double z,double w);
-    void Sub_Image(QString topic,int frame_id);
-    QMap<QString,QString> get_topic_list();
+  void move_base(char k,float speed_linear,float speed_trun);
+  void set_goal(QString frame,double x,double y,double z,double w);
+  void Sub_Image(QString topic,int frame_id);
+  QMap<QString,QString> get_topic_list();
 	void run();
 
 	/*********************
@@ -117,6 +117,15 @@ private:
     QString power_max;
     QString power_min;
     QPolygon mapPonits;
+    int mapWidth;
+    int mapHeight;
+    //地图 0 0点坐标对应世界坐标系的坐标
+    int m_mapOriginX;
+    int m_mapOriginY;
+    //地图一个像素对应真实世界的距离
+    float m_mapResolution;
+    //地图是否被初始化
+    bool m_bMapIsInit=false;
     QImage Mat2QImage(cv::Mat const& src);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);

@@ -14,6 +14,7 @@ Window {
         height: parent.height
         anchors.fill: parent
         hoverEnabled: true
+        property bool isPressed: false
         onWheel: {
             if(wheel.angleDelta.y>0){
                 roboMap_.setMax()
@@ -22,17 +23,12 @@ Window {
                 roboMap_.setMin()
             }
         }
-        onMouseXChanged: {
-           console.log(mouse.x)
+        onPressed: {
+            roboMap_.move(mouse.x,mouse.y)
         }
-        onPressAndHold: {
-            console.log(mouse.x)
-        }
-
     }
     Rectangle{
         id:content
-        border.color: "red"
         width: parent.width
         height: parent.height
         RoboMap{

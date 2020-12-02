@@ -14,19 +14,26 @@ int roboMap::QColorToInt(const QColor& color) {
 }
 void roboMap::paintMaps(QPolygon poinsts,QSizeF size){
    this->setSize(size);
+   mapSize=size;
    MapPoints=poinsts;
    update();
 }
 void roboMap::paintRoboPos(QPointF pos){
    RoboPostion=pos;
-   qDebug()<<"pos:"<<pos;
    update();
 }
 void roboMap::paint(QPainter *painter){
    painter->setPen(QPen(QColor(0, 0, 0, 255), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
    painter->drawPoints(MapPoints);
-   painter->setPen(QPen(QColor(255, 0, 0, 255), 1.5, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+   painter->drawRect(0,0,mapSize.width(),mapSize.height());
+   painter->save();
+   //设置地图中心为坐标原点
+//   painter->translate(mapSize.width()/2,mapSize.height()/2);
+   painter->setPen(QPen(QColor(255, 0, 0, 255), 3, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
    painter->drawPoint(RoboPostion);
+   painter->restore();
+  // painter->drawPoint(QPoint(-mapSize.width()/2,mapSize.height()/2));
+//   painter->drawPoint(QPoint(mapSize.width(),-mapSize.height()));
 }
 void roboMap::setMax(){
      map_size+=0.1;
@@ -41,8 +48,11 @@ void roboMap::setMin(){
 void roboMap::move(double x,double y){
    //this->setTransformOrigin(50,50);
 //   this->setRotation(180);
-  this->setTransformOrigin(TransformOrigin::Top);
-   this->setX(-100);
-   this->setY(-100);
+//  this->setTransformOrigin(TransformOrigin::Top);
+//   this->setX(-100);
+//   this->setY(-100);
+ // this->setPosition(QPointF(x,y));
+
+  //this->setCursor(QCursor(Qt::OpenHandCursor));
    qDebug()<<"ok!";
 }

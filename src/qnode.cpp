@@ -61,10 +61,10 @@ bool QNode::init() {
    //创建速度话题的订阅者
    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
-    //机器人位置话题
-   pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
    //地图订阅
    map_sub = n.subscribe("map",1000,&QNode::mapCallback,this);
+   //机器人位置话题
+  pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
    //导航目标点发送话题
    goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
    //速度控制话题
@@ -111,15 +111,13 @@ QMap<QString,QString> QNode::get_topic_list()
 //机器人位置话题的回调函数
 void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
 {
-    QPointF roboPos;
-    roboPos.setX(pos.pose.pose.position.x);
-    roboPos.setY(pos.pose.pose.position.y);
-    emit updateRoboPose(roboPos);
-
+      QPointF roboPos;
+      roboPos.setX((pos.pose.pose.position.x-m_mapOriginX)/m_mapResolution);
+      roboPos.setY((pos.pose.pose.position.y-m_mapOriginY)/m_mapResolution);
+      emit updateRoboPose(roboPos);
 }
 void QNode::powerCallback(const std_msgs::Float32 &message_holder)
 {
-
     emit power(message_holder.data);
 }
 void QNode::myCallback(const std_msgs::Float64 &message_holder)
@@ -144,19 +142,20 @@ void QNode::set_goal(QString frame,double x,double y,double z,double w)
 }
 //地图信息订阅回调函数
 void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
-     uint32_t width=map->info.width;
-     uint32_t height=map->info.width;
-      //一维数组转二维
-      int data[height][width];
+      mapWidth=map->info.width;
+      mapHeight=map->info.width;
+      m_mapOriginX=map->info.origin.position.x;
+      m_mapOriginY=map->info.origin.position.y;
+      m_mapResolution=map->info.resolution;
       //将有像素的地方转为坐标值
-      for(int x=0;x<height;x++){
-        for(int y=0;y<width;y++){
-           if(map->data[x*width+y]==100){
+      for(int x=0;x<mapHeight;x++){
+        for(int y=0;y<mapWidth;y++){
+           if(map->data[x*mapWidth+y]==100){
              mapPonits.push_back(QPoint(x,y));
            }
         }
       }
-      QSizeF size(width,height);
+      QSizeF size(mapWidth,mapHeight);
    emit updateMap(mapPonits,size);
 }
 
@@ -167,8 +166,7 @@ void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
     emit speed_y(msg->twist.twist.linear.y);
 }
 void QNode::run() {
-        int count=0;
-        ros::Rate loop_rate(1);
+        ros::Rate loop_rate(30);
         //当当前节点没有关闭时
         while ( ros::ok() ) {
             //调用消息处理回调函数
