@@ -13,25 +13,19 @@
 
 ## 分支
 
-**~~kinetic 版本分支(分支已合并)~~**
-- ~~[kinetic-devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/kinetic-devel "kinetic-devel")~~
 
-**2. Qml版本分支（开发中）**
+**1. Qml版本分支（开发中）**
 
 - ROS + QML + C++混合编程，使用qml自绘制地图，激光雷达点云等
 - [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
 
 
-**3. Lite branch**
+**2. Lite branch**
 
 - 此版本为《ROS人机交互软件开发》系列课程中实现的版本，实现了master分支的基本功能，代码易懂 
 - [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
 
-
-**4. Windows版本分支**
-- [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/windows_devel)
-
-**5,rviz菜单树分支**
+**3,rviz菜单树分支**
 
 - 使用rviz自带的菜单树，去实现添加显示图层。master分支所有的图层及菜单均需要手动去写代码实现（并且目前仅支持部分图层显示），此分支调用librviz现成api，所有图层均可以实现,不用去手动创建图层菜单和display
 
@@ -41,7 +35,7 @@
 
 ***
 
-**6,ROS Qt Demo**
+**4,ROS Qt Demo**
 - cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行
 
 - [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo)
