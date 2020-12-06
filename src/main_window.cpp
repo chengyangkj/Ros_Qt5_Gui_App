@@ -116,9 +116,6 @@ void MainWindow::initUis()
     m_DashBoard_x =new CCtrlDashBoard(ui.widget_speed_x);
     m_DashBoard_x->setGeometry(ui.widget_speed_x->rect());
     m_DashBoard_x->setValue(0);
-    m_DashBoard_y =new CCtrlDashBoard(ui.widget_speed_y);
-    m_DashBoard_y->setGeometry(ui.widget_speed_y->rect());
-    m_DashBoard_y->setValue(0);
 
     ui.tab_manager->setCurrentIndex(0);
     ui.tabWidget->setCurrentIndex(0);
@@ -1056,12 +1053,7 @@ void MainWindow::slot_speed_x(double x)
 
     m_DashBoard_x->setValue(abs(x*100));
 }
-void MainWindow::slot_speed_y(double x)
-{
-    if(x>=0) ui.label_dir_y->setText("正向");
-    else ui.label_dir_y->setText("反向");
-    m_DashBoard_y->setValue(abs(x*100));
-}
+
 void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 	bool enabled;
 	if ( state == 0 ) {
