@@ -147,7 +147,7 @@ void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
 }
 void QNode::run() {
         int count=0;
-        ros::Rate loop_rate(1);
+        ros::Rate loop_rate(40);
         //当当前节点没有关闭时
         while ( ros::ok() ) {
             //调用消息处理回调函数
