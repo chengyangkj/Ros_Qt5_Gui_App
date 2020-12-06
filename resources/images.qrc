@@ -102,5 +102,8 @@
         <file>images/set_return.png</file>
         <file>images/return.png</file>
         <file>images/refreash.png</file>
+        <file>images/wait1.gif</file>
+        <file>images/wait2.gif</file>
+        <file>images/wait3.gif</file>
     </qresource>
 </RCC>

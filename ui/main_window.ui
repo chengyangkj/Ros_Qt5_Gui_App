@@ -353,36 +353,6 @@ QProgressBar {
                 </item>
                </layout>
               </widget>
-              <widget class="QWidget" name="">
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_2">
-                  <item>
-                   <widget class="QLabel" name="label_8">
-                    <property name="minimumSize">
-                     <size>
-                      <width>32</width>
-                      <height>32</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>32</width>
-                      <height>32</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="pixmap">
-                     <pixmap>:/images/speed.png</pixmap>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
               <widget class="QWidget" name="widget_speed_x" native="true">
                <property name="geometry">
                 <rect>
@@ -404,58 +374,6 @@ QProgressBar {
                  <height>300</height>
                 </size>
                </property>
-              </widget>
-              <widget class="QWidget" name="">
-               <layout class="QHBoxLayout" name="horizontalLayout">
-                <item>
-                 <widget class="QLabel" name="label_7">
-                  <property name="minimumSize">
-                   <size>
-                    <width>32</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>32</width>
-                    <height>32</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string/>
-                  </property>
-                  <property name="pixmap">
-                   <pixmap>:/images/speed.png</pixmap>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_4">
-                  <property name="maximumSize">
-                   <size>
-                    <width>80</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>X轴线速度</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_dir_x">
-                  <property name="maximumSize">
-                   <size>
-                    <width>30</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>正向</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
               </widget>
              </widget>
             </item>
