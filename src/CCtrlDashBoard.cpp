@@ -7,8 +7,8 @@ CCtrlDashBoard::CCtrlDashBoard(QWidget *parent, StyleType type) :
     QWidget(parent),
     m_StyleType(type)
 {
-    m_BorderColor = QColor(60,60,60);
-    m_BgColor = QColor(160,160,160);
+    m_BorderColor = QColor(172,172,172);
+    m_BgColor = QColor(40,40,40);
     m_FrontColor = Qt::white;
 
     m_DashValue= 0;
@@ -33,7 +33,7 @@ void CCtrlDashBoard::drawBackGround(QPainter *painter, qreal hlafWidth)
     QPainterPath bigCircle;
     bigCircle.addEllipse(startX, startX, (m_MaxBorderRadius*2), (m_MaxBorderRadius*2));
 
-    m_MinBorderRadius = m_MaxBorderRadius-20;
+    m_MinBorderRadius = m_MaxBorderRadius-15;
     startX=hlafWidth-m_MinBorderRadius;
     QPainterPath smallCircle;
     smallCircle.addEllipse(startX, startX, (m_MinBorderRadius*2), (m_MinBorderRadius*2));
@@ -45,7 +45,14 @@ void CCtrlDashBoard::drawBackGround(QPainter *painter, qreal hlafWidth)
     painter->save();
     painter->setBrush(m_BgColor);
     painter->drawEllipse(startX,startX,(m_MinBorderRadius*2), (m_MinBorderRadius*2));
-    painter->drawText(startX+90,startX+170,"CM/S");
+    if(m_DashValue==0){
+      QString speed = "0.0 cm/s";
+      painter->drawText(startX+85,startX+170,speed);
+    }
+    else{
+      QString speed = QString::number(m_DashValue).mid(0,3) + " cm/s";
+      painter->drawText(startX+85,startX+170,speed);
+    }
     painter->restore();
     m_DialsRadius = m_MinBorderRadius-10;
     if(m_DialsRadius < 0){
@@ -56,10 +63,9 @@ void CCtrlDashBoard::drawScaleDials(QPainter *painter, qreal hlafWidth)
 {
     qreal tSteps = (m_MaxValue - m_MinValue)/m_DashNum; //相乘后的值是分的份数
     qreal angleStep = 1.0*(360.0-m_StartAngle - m_EndAngle) / tSteps; //每一个份数的角度
-
-    painter->save();
     QPen pen ;
     pen.setColor(m_FrontColor); //推荐使用第二种方式
+    painter->save();
     painter->translate(hlafWidth,hlafWidth);
     painter->rotate(m_StartAngle);
     m_LineLength = (hlafWidth/16);
@@ -68,6 +74,7 @@ void CCtrlDashBoard::drawScaleDials(QPainter *painter, qreal hlafWidth)
     qreal lineEnd = m_DialsRadius-4*m_LineLength;
     for (int i = 0; i <= tSteps; i++)
     {
+        if(i>80) pen.setColor(QColor(250,0,0));
         if (i % 10 == 0)//整数刻度显示加粗
         {
             pen.setWidth(2); //设置线宽
@@ -83,8 +90,8 @@ void CCtrlDashBoard::drawScaleDials(QPainter *painter, qreal hlafWidth)
         }
         painter->rotate(angleStep);
     }
+    pen.setColor(m_FrontColor);
     painter->restore();
-
     painter->save();
     painter->setPen(pen);
     //m_startAngle是起始角度，m_endAngle是结束角度，m_scaleMajor在一个量程中分成的刻度数
