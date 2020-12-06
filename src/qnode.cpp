@@ -217,7 +217,7 @@ void QNode::run() {
       image_transport::ImageTransport it_(n);
      switch (frame_id) {
          case 0:
-            image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
+            image_sub0=n.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
          break;
          case 1:
              image_sub1=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback1,this);
@@ -233,20 +233,23 @@ void QNode::run() {
  }
 
  //图像话题的回调函数
- void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
+ void QNode::imageCallback0(const sensor_msgs::CompressedImageConstPtr& msg)
  {
      cv_bridge::CvImagePtr cv_ptr;
-
      try
        {
+       if(msg->format.substr(0,4)=="rgb8"){
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
+         cv_ptr = cv_bridge::toCvCopy(msg,sensor_msgs::image_encodings::BGR8);
+       }
+       else{
+         cv_ptr = cv_bridge::toCvCopy(msg,msg->format.substr(0,4));
+       }
          QImage im=Mat2QImage(cv_ptr->image);
          emit Show_image(0,im);
        }
-       catch (cv_bridge::Exception& e)
+       catch (std::runtime_error& e)
        {
-
          log(Error,("video frame0 exception: "+QString(e.what())).toStdString());
          return;
        }
@@ -258,7 +261,7 @@ void QNode::run() {
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg,video1_format.toStdString());
+         cv_ptr = cv_bridge::toCvCopy(msg,msg->encoding);
          QImage im=Mat2QImage(cv_ptr->image);
          emit Show_image(1,im);
        }

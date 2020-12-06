@@ -78,8 +78,7 @@
 
 ##### 4.6 订阅图像话题
 
-- Provides four image display forms that can display four images at the same time
-- 提供四个图像显示窗体，可以同时显示四个图像
+- 提供四个图像显示窗体，可以同时显示四个图像 解决卡顿问题，在video0订阅（image_raw/compressed）即compressed后的图像即可不卡顿，且video0只能订阅压缩后的图像
 
 ![加粗样式](https://img-blog.csdnimg.cn/20200507093831130.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
 

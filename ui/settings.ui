@@ -184,7 +184,27 @@
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
               <layout class="QVBoxLayout" name="verticalLayout_3">
+               <item>
+                <widget class="QLabel" name="label_3">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>17</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>video0 需为压缩图像话题</string>
+                 </property>
+                </widget>
+               </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                  <item>
@@ -201,7 +221,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="video0_name_set"/>
+                  <widget class="QLineEdit" name="video0_name_set">
+                   <property name="text">
+                    <string>compressed1</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -221,7 +245,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="video0_topic_set"/>
+                  <widget class="QLineEdit" name="video0_topic_set">
+                   <property name="text">
+                    <string>image_raw/compressed</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -272,7 +300,11 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLineEdit" name="video0_name_set_2"/>
+                  <widget class="QLineEdit" name="video0_name_set_2">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -469,7 +501,7 @@
           <string>ok</string>
          </property>
          <property name="icon">
-          <iconset resource="../resources/images.qrc">
+          <iconset>
            <normaloff>:/images/ok.png</normaloff>:/images/ok.png</iconset>
          </property>
         </widget>
@@ -480,7 +512,7 @@
           <string>Cancel</string>
          </property>
          <property name="icon">
-          <iconset resource="../resources/images.qrc">
+          <iconset>
            <normaloff>:/images/false.png</normaloff>:/images/false.png</iconset>
          </property>
         </widget>
@@ -491,8 +523,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resources/images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

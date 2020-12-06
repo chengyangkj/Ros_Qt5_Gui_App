@@ -33,6 +33,7 @@
 #include <geometry_msgs/Twist.h>
 #include <image_transport/image_transport.h>   //image_transport
 #include <cv_bridge/cv_bridge.h>              //cv_bridge
+#include <opencv2/highgui/highgui.hpp>
 #include <sensor_msgs/image_encodings.h>    //图像编码格式
 #include <map>
 #include <QLabel>
@@ -97,7 +98,7 @@ private:
     ros::Publisher cmd_pub;
     QStringListModel logging_model;
     //图像订阅
-    image_transport::Subscriber image_sub0;
+    ros::Subscriber image_sub0;
     image_transport::Subscriber image_sub1;
     image_transport::Subscriber image_sub2;
     image_transport::Subscriber image_sub3;
@@ -115,7 +116,7 @@ private:
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void powerCallback(const std_msgs::Float32& message_holder);
-    void imageCallback0(const sensor_msgs::ImageConstPtr& msg);
+    void imageCallback0(const sensor_msgs::CompressedImageConstPtr& msg);
     void imageCallback1(const sensor_msgs::ImageConstPtr& msg);
     void imageCallback2(const sensor_msgs::ImageConstPtr& msg);
     void imageCallback3(const sensor_msgs::ImageConstPtr& msg);
