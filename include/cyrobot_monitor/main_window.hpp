@@ -111,6 +111,7 @@ public slots:
     //显示图像
     //显示图像
     void slot_show_image(int,QImage);
+    void slot_dis_connect();
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 

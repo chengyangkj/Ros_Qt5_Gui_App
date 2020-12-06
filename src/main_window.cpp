@@ -37,8 +37,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     //读取配置文件
     ReadSettings();
     setWindowIcon(QIcon(":/images/robot.png"));
-	ui.tab_manager->setCurrentIndex(0); // ensure the first tab is showing - qt-designer should have this already hardwired, but often loses it (settings?).
-    QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
+    ui.tab_manager->setCurrentIndex(0); // ensure the first tab is showing - qt-designer should have this already hardwired, but often loses it (settings?).
+    //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
 
 	/*********************
 	** Logging
@@ -48,9 +48,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     /*********************
     ** 自动连接master
     **********************/
-//    if ( ui.checkbox_remember_settings->isChecked() ) {
-//        on_button_connect_clicked(true);
-//    }
+    if ( ui.checkbox_remember_settings->isChecked() ) {
+        on_button_connect_clicked(true);
+    }
     //链接connect
     connections();
 
@@ -248,6 +248,7 @@ void MainWindow::connections()
    connect(ui.pushButton_m,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));
    connect(ui.pushButton_back,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));
    connect(ui.pushButton_backr,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));
+   connect(ui.pushButton,SIGNAL(clicked()),this,SLOT(slot_dis_connect()));
    //设置2D Pose
    connect(ui.set_pos_btn,SIGNAL(clicked()),this,SLOT(slot_set_2D_Pos()));
    //设置2D goal
@@ -405,7 +406,7 @@ void MainWindow::slot_set_select()
 void MainWindow::slot_treewidget_item_check_change(int is_check)
 {
     QCheckBox* sen = (QCheckBox*)sender();
-    qDebug()<<"check:"<<is_check<<"parent:"<<widget_to_parentItem_map[sen]->text(0)<<"地址："<<widget_to_parentItem_map[sen];
+    //qDebug()<<"check:"<<is_check<<"parent:"<<widget_to_parentItem_map[sen]->text(0)<<"地址："<<widget_to_parentItem_map[sen];
     QTreeWidgetItem *parentItem=widget_to_parentItem_map[sen];
     QString dis_name=widget_to_parentItem_map[sen]->text(0);
     bool enable=is_check>1?true:false;
@@ -460,8 +461,8 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
 {
 
     QWidget* sen = (QWidget*)sender();
-    qDebug()<<sen->metaObject()->className()<<"parent:"<<widget_to_parentItem_map[sen]->text(0);
-    qDebug()<<value;
+    //qDebug()<<sen->metaObject()->className()<<"parent:"<<widget_to_parentItem_map[sen]->text(0);
+    //qDebug()<<value;
     QTreeWidgetItem *parentItem=widget_to_parentItem_map[sen];
     QString Dis_Name=widget_to_parentItem_map[sen]->text(0);
 
@@ -506,7 +507,7 @@ void MainWindow::slot_treewidget_item_value_change(QString value)
         QComboBox *topic_box=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(1),1);
         QLineEdit *alpha=(QLineEdit *) ui.treeWidget_rviz->itemWidget(parentItem->child(2),1);
         QComboBox *scheme=(QComboBox *) ui.treeWidget_rviz->itemWidget(parentItem->child(3),1);
-        qDebug()<<topic_box->currentText()<<alpha->text()<<scheme->currentText();
+        //qDebug()<<topic_box->currentText()<<alpha->text()<<scheme->currentText();
         map_rviz->Display_Map(enable,topic_box->currentText(),alpha->text().toDouble(),scheme->currentText());
     }
     else if(Dis_Name=="LaserScan")
@@ -942,11 +943,21 @@ void MainWindow::showNoMasterMessage() {
  * These triggers whenever the button is clicked, regardless of whether it
  * is already checked or not.
  */
-
+void MainWindow::slot_dis_connect(){
+  ros::shutdown();
+  slot_rosShutdown();
+}
 void MainWindow::on_button_connect_clicked(bool check ) {
+  QDialog connecting_dia;
+  QLabel text_info;
+  text_info.setText("连接master中，请稍后.............");
+  text_info.setParent(&connecting_dia);
+  connecting_dia.resize(300,100);
+  connecting_dia.show();
     //如果使用环境变量
 	if ( ui.checkbox_use_environment->isChecked() ) {
 		if ( !qnode.init() ) {
+           connecting_dia.close();
             //showNoMasterMessage();
             QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
@@ -977,6 +988,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
     else {
 		if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
 				   ui.line_edit_host->text().toStdString()) ) {
+            connecting_dia.close();
             QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
              ui.label_statue_text->setStyleSheet("color:red;");
@@ -1026,12 +1038,16 @@ void MainWindow::refreashTopicList()
 void MainWindow::slot_rosShutdown()
 {
     ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-     ui.label_statue_text->setStyleSheet("color:red;");
+    ui.label_statue_text->setStyleSheet("color:red;");
     ui.label_statue_text->setText("离线");
     ui.button_connect->setEnabled(true);
     ui.line_edit_master->setReadOnly(false);
     ui.line_edit_host->setReadOnly(false);
     ui.line_edit_topic->setReadOnly(false);
+    ui.treeWidget_rviz->setEnabled(false);
+    ui.tab_manager->setTabEnabled(1,false);
+    ui.tabWidget->setTabEnabled(1,false);
+    ui.groupBox_3->setEnabled(false);
 }
 void MainWindow::slot_power(float p)
 {
@@ -1051,9 +1067,6 @@ void MainWindow::slot_power(float p)
 }
 void MainWindow::slot_speed_x(double x)
 {
-    if(x>=0) ui.label_dir_x->setText("正向");
-    else ui.label_dir_x->setText("反向");
-
     m_DashBoard_x->setValue(abs(x*100));
 }
 void MainWindow::slot_speed_y(double x)
