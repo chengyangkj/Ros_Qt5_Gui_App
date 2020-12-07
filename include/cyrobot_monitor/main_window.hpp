@@ -136,7 +136,10 @@ private:
     QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
     Settings *set=NULL;
     QSoundEffect *media_player=NULL;
-
+    bool m_useEnviorment=false;
+    bool m_autoConnect=false;
+    QString m_masterUrl;
+    QString m_hostUrl;
 };
 }// namespace cyrobot_monitor
 

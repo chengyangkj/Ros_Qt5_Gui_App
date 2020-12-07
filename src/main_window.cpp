@@ -48,7 +48,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     /*********************
     ** 自动连接master
     **********************/
-    if ( ui.checkbox_remember_settings->isChecked() ) {
+    if (m_autoConnect) {
         on_button_connect_clicked(true);
     }
     //链接connect
@@ -945,14 +945,15 @@ void MainWindow::slot_dis_connect(){
   slot_rosShutdown();
 }
 void MainWindow::on_button_connect_clicked(bool check ) {
+  ReadSettings();
   QDialog connecting_dia;
   QLabel text_info;
-  text_info.setText("连接master中，请稍后.............");
+  text_info.setText("连接master中/n "+m_masterUrl+"\n"+m_hostUrl+"\n请稍后.............");
   text_info.setParent(&connecting_dia);
   connecting_dia.resize(300,100);
   connecting_dia.show();
     //如果使用环境变量
-	if ( ui.checkbox_use_environment->isChecked() ) {
+  if (m_useEnviorment) {
 		if ( !qnode.init() ) {
            connecting_dia.close();
             //showNoMasterMessage();
@@ -983,8 +984,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
     }
     //如果不使用环境变量
     else {
-		if ( ! qnode.init(ui.line_edit_master->text().toStdString(),
-				   ui.line_edit_host->text().toStdString()) ) {
+    if ( ! qnode.init(m_masterUrl.toStdString(),m_hostUrl.toStdString())) {
             connecting_dia.close();
             QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
@@ -1002,9 +1002,6 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             initRviz();
             ui.treeWidget_rviz->setEnabled(true);
 			ui.button_connect->setEnabled(false);
-			ui.line_edit_master->setReadOnly(true);
-			ui.line_edit_host->setReadOnly(true);
-			ui.line_edit_topic->setReadOnly(true);
             ui.groupBox_3->setEnabled(true);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
             ui.label_statue_text->setStyleSheet("color:green;");
@@ -1038,9 +1035,6 @@ void MainWindow::slot_rosShutdown()
     ui.label_statue_text->setStyleSheet("color:red;");
     ui.label_statue_text->setText("离线");
     ui.button_connect->setEnabled(true);
-    ui.line_edit_master->setReadOnly(false);
-    ui.line_edit_host->setReadOnly(false);
-    ui.line_edit_topic->setReadOnly(false);
     ui.treeWidget_rviz->setEnabled(false);
     ui.tab_manager->setTabEnabled(1,false);
     ui.tabWidget->setTabEnabled(1,false);
@@ -1074,8 +1068,6 @@ void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 	} else {
 		enabled = false;
 	}
-	ui.line_edit_master->setEnabled(enabled);
-	ui.line_edit_host->setEnabled(enabled);
 	//ui.line_edit_topic->setEnabled(enabled);
 }
 
@@ -1108,48 +1100,22 @@ void MainWindow::ReadSettings() {
     QSettings settings("Qt-Ros Package", "cyrobot_monitor");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
-    QString master_url = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
-    QString host_url = settings.value("host_url", QString("192.168.1.3")).toString();
+    m_masterUrl = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
+    m_hostUrl = settings.value("host_url", QString("192.168.1.3")).toString();
+    m_useEnviorment=settings.value("use_enviorment",bool(false)).toBool();
+    m_autoConnect=settings.value("auto_connect",bool(false)).toBool();
     //QString topic_name = settings.value("topic_name", QString("/chatter")).toString();
-    ui.line_edit_master->setText(master_url);
-    ui.line_edit_host->setText(host_url);
     //ui.line_edit_topic->setText(topic_name);
-    bool remember = settings.value("remember_settings", false).toBool();
-    ui.checkbox_remember_settings->setChecked(remember);
-    bool checked = settings.value("use_environment_variables", false).toBool();
-    ui.checkbox_use_environment->setChecked(checked);
-    if ( checked ) {
-    	ui.line_edit_master->setEnabled(false);
-    	ui.line_edit_host->setEnabled(false);
-    	//ui.line_edit_topic->setEnabled(false);
-    }
-
     QSettings return_pos("return-position","cyrobot_monitor");
     ui.label_return_x->setText(return_pos.value("x",QString("0")).toString());
     ui.label_return_y->setText(return_pos.value("y",QString("0")).toString());
     ui.label_return_z->setText(return_pos.value("z",QString("0")).toString());
     ui.label_return_w->setText(return_pos.value("w",QString("0")).toString());
 
-    //读取快捷指令的setting
-    QSettings quick_setting("quick_setting","cyrobot_monitor");
-    QStringList ch_key=quick_setting.childKeys();
-    for(auto c:ch_key)
-    {
-        add_quick_cmd(c,quick_setting.value(c,QString("")).toString());
-    }
 
 }
 
 void MainWindow::WriteSettings() {
-    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
-    settings.setValue("master_url",ui.line_edit_master->text());
-    settings.setValue("host_url",ui.line_edit_host->text());
-    //settings.setValue("topic_name",ui.line_edit_topic->text());
-    settings.setValue("use_environment_variables",QVariant(ui.checkbox_use_environment->isChecked()));
-    settings.setValue("geometry", saveGeometry());
-    //settings.setValue("windowState", saveState());
-    settings.setValue("remember_settings",QVariant(ui.checkbox_remember_settings->isChecked()));
-
     //存下快捷指令的setting
     QSettings quick_setting("quick_setting","cyrobot_monitor");
     quick_setting.clear();

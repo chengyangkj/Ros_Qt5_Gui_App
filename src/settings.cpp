@@ -23,7 +23,15 @@ Settings::Settings(QWidget *parent) :
         ui->video0_topic_set_3->setText(topics[2]);
         ui->video0_topic_set_4->setText(topics[3]);
     }
-
+    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    QString master_url = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
+    QString host_url = settings.value("host_url", QString("192.168.1.3")).toString();
+    bool use_enviorment=settings.value("use_enviorment",bool(false)).toBool();
+    bool auto_connect=settings.value("auto_connect",bool(false)).toBool();
+    ui->checkbox_use_environment->setChecked(use_enviorment);
+    ui->checkbox_remember_settings->setChecked(auto_connect);
+    ui->line_edit_master->setText(master_url);
+    ui->line_edit_host->setText(host_url);
     QSettings main_setting("topic_setting","cyrobot_monitor");
     ui->lineEdit_odm->setText(main_setting.value("topic_odom","raw_odom").toString());
     ui->lineEdit_power->setText(main_setting.value("topic_power","power").toString());
@@ -57,7 +65,13 @@ void Settings::slot_ok_btn_click()
 
     video_topic_setting.setValue("names",name_data);
     video_topic_setting.setValue("topics",topic_data);
-    QMessageBox::critical(NULL, "保存成功！", "保存成功，部分功能需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    settings.setValue("master_url",ui->line_edit_master->text());
+    settings.setValue("host_url",ui->line_edit_host->text());
+    settings.setValue("use_enviorment",QVariant(ui->checkbox_use_environment->isChecked()));
+    settings.setValue("auto_connect",QVariant(ui->checkbox_remember_settings->isChecked()));
+    QMessageBox::critical(NULL, "保存成功！", "保存成功，需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     this->close();
 }
 void Settings::slot_cancel_btn_click()
