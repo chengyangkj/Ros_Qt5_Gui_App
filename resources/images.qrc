@@ -105,5 +105,11 @@
         <file>images/wait1.gif</file>
         <file>images/wait2.gif</file>
         <file>images/wait3.gif</file>
+        <file>images/turnLeft_h.png</file>
+        <file>images/turnLeft_hl.png</file>
+        <file>images/turnLeft_l.png</file>
+        <file>images/turnRight_h.png</file>
+        <file>images/turnRight_hl.png</file>
+        <file>images/turnRight_l.png</file>
     </qresource>
 </RCC>

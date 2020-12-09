@@ -19,7 +19,7 @@
      <item>
       <widget class="QToolBox" name="toolBox">
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page">
         <property name="geometry">
@@ -39,10 +39,24 @@
            <x>0</x>
            <y>10</y>
            <width>361</width>
-           <height>155</height>
+           <height>161</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_18">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>转向灯亮起的yaw角阈值:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_turnLightThre"/>
+            </item>
+           </layout>
+          </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
@@ -492,6 +506,14 @@
         </attribute>
        </widget>
        <widget class="QWidget" name="page_2">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>382</width>
+          <height>444</height>
+         </rect>
+        </property>
         <attribute name="label">
          <string>主节点配置</string>
         </attribute>

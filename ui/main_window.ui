@@ -226,155 +226,187 @@ QProgressBar {
               <property name="title">
                <string>速度</string>
               </property>
-              <widget class="QGroupBox" name="groupBox_12">
-               <property name="geometry">
-                <rect>
-                 <x>13</x>
-                 <y>383</y>
-                 <width>504</width>
-                 <height>313</height>
-                </rect>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>300</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="title">
-                <string>消息</string>
-               </property>
-               <layout class="QHBoxLayout" name="horizontalLayout_14">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <item>
+                  <widget class="QLabel" name="label_turnLeft">
+                   <property name="minimumSize">
+                    <size>
+                     <width>200</width>
+                     <height>200</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>200</width>
+                     <height>200</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="widget_speed_x" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>300</width>
+                     <height>300</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>300</width>
+                     <height>300</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_turnRight">
+                   <property name="minimumSize">
+                    <size>
+                     <width>200</width>
+                     <height>200</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>200</width>
+                     <height>200</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="groupBox_12">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>300</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="title">
+                  <string>消息</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_14">
                   <item>
-                   <widget class="QGroupBox" name="groupBox_6">
-                    <property name="title">
-                     <string>Video</string>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_7">
-                     <item row="0" column="0">
-                      <layout class="QGridLayout" name="gridLayout_3">
-                       <item row="0" column="1">
-                        <widget class="QLabel" name="label_video1">
-                         <property name="minimumSize">
-                          <size>
-                           <width>200</width>
-                           <height>200</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>200</width>
-                           <height>200</height>
-                          </size>
-                         </property>
-                         <property name="styleSheet">
-                          <string notr="true">border:1px solid rgb(0, 0, 0)</string>
-                         </property>
-                         <property name="text">
-                          <string>No Video</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="0">
-                        <widget class="QLabel" name="label_v_name0">
-                         <property name="maximumSize">
-                          <size>
-                           <width>16777215</width>
-                           <height>15</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Video0</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item row="1" column="1">
-                        <widget class="QLabel" name="label_v_name1">
-                         <property name="maximumSize">
-                          <size>
-                           <width>16777215</width>
-                           <height>15</height>
-                          </size>
-                         </property>
-                         <property name="text">
-                          <string>Video1</string>
-                         </property>
-                        </widget>
-                       </item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                    <item>
+                     <widget class="QGroupBox" name="groupBox_6">
+                      <property name="title">
+                       <string>Video</string>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout_7">
                        <item row="0" column="0">
-                        <widget class="QLabel" name="label_video0">
-                         <property name="minimumSize">
+                        <layout class="QGridLayout" name="gridLayout_3">
+                         <item row="0" column="1">
+                          <widget class="QLabel" name="label_video1">
+                           <property name="minimumSize">
+                            <size>
+                             <width>200</width>
+                             <height>200</height>
+                            </size>
+                           </property>
+                           <property name="maximumSize">
+                            <size>
+                             <width>200</width>
+                             <height>200</height>
+                            </size>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true">border:1px solid rgb(0, 0, 0)</string>
+                           </property>
+                           <property name="text">
+                            <string>No Video</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="1" column="0">
+                          <widget class="QLabel" name="label_v_name0">
+                           <property name="maximumSize">
+                            <size>
+                             <width>16777215</width>
+                             <height>15</height>
+                            </size>
+                           </property>
+                           <property name="text">
+                            <string>Video0</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="1" column="1">
+                          <widget class="QLabel" name="label_v_name1">
+                           <property name="maximumSize">
+                            <size>
+                             <width>16777215</width>
+                             <height>15</height>
+                            </size>
+                           </property>
+                           <property name="text">
+                            <string>Video1</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="label_video0">
+                           <property name="minimumSize">
+                            <size>
+                             <width>200</width>
+                             <height>200</height>
+                            </size>
+                           </property>
+                           <property name="maximumSize">
+                            <size>
+                             <width>200</width>
+                             <height>200</height>
+                            </size>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true">border:1px solid rgb(0, 0, 0)</string>
+                           </property>
+                           <property name="text">
+                            <string>No Video</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item row="0" column="1">
+                        <spacer name="horizontalSpacer_3">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
                           <size>
-                           <width>200</width>
-                           <height>200</height>
+                           <width>40</width>
+                           <height>20</height>
                           </size>
                          </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>200</width>
-                           <height>200</height>
-                          </size>
-                         </property>
-                         <property name="styleSheet">
-                          <string notr="true">border:1px solid rgb(0, 0, 0)</string>
-                         </property>
-                         <property name="text">
-                          <string>No Video</string>
-                         </property>
-                        </widget>
+                        </spacer>
                        </item>
                       </layout>
-                     </item>
-                     <item row="0" column="1">
-                      <spacer name="horizontalSpacer_3">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                    </layout>
-                   </widget>
+                     </widget>
+                    </item>
+                   </layout>
                   </item>
                  </layout>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="widget_speed_x" native="true">
-               <property name="geometry">
-                <rect>
-                 <x>15</x>
-                 <y>35</y>
-                 <width>300</width>
-                 <height>300</height>
-                </rect>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>300</width>
-                 <height>300</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>300</width>
-                 <height>300</height>
-                </size>
-               </property>
-              </widget>
+                </widget>
+               </item>
+              </layout>
              </widget>
             </item>
            </layout>
