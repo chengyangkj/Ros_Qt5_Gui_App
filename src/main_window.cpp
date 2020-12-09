@@ -204,6 +204,8 @@ void MainWindow::initUis()
     //qucik treewidget
     ui.treeWidget_quick_cmd->setHeaderLabels(QStringList()<<"key"<<"values");
     ui.treeWidget_quick_cmd->setHeaderHidden(true);
+    ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
+    ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
 
 }
 void MainWindow::initRviz()
@@ -223,7 +225,7 @@ void MainWindow::connections()
     QObject::connect(&qnode, SIGNAL(Master_shutdown()), this, SLOT(slot_rosShutdown()));
     //connect速度的信号
     connect(&qnode,SIGNAL(speed_x(double)),this,SLOT(slot_speed_x(double)));
-    connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_y(double)));
+    connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_yaw(double)));
     //电源的信号
     connect(&qnode,SIGNAL(power(float)),this,SLOT(slot_power(float)));
     //机器人位置信号
@@ -1060,7 +1062,20 @@ void MainWindow::slot_speed_x(double x)
 {
     m_DashBoard_x->setValue(abs(x*100));
 }
-
+void MainWindow::slot_speed_yaw(double yaw)
+{
+  qDebug()<<yaw;
+  if(yaw>m_turnLightThre){
+      ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_hl.png")));
+  }
+  else if(yaw<-m_turnLightThre){
+    ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_hl.png")));
+  }
+  else{
+    ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
+    ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
+  }
+}
 void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
 	bool enabled;
 	if ( state == 0 ) {
@@ -1104,6 +1119,7 @@ void MainWindow::ReadSettings() {
     m_hostUrl = settings.value("host_url", QString("192.168.1.3")).toString();
     m_useEnviorment=settings.value("use_enviorment",bool(false)).toBool();
     m_autoConnect=settings.value("auto_connect",bool(false)).toBool();
+    m_turnLightThre=settings.value("lineEdit_turnLightThre",double(0.1)).toDouble();
     //QString topic_name = settings.value("topic_name", QString("/chatter")).toString();
     //ui.line_edit_topic->setText(topic_name);
     QSettings return_pos("return-position","cyrobot_monitor");

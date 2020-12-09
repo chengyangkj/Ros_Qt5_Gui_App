@@ -28,6 +28,7 @@ Settings::Settings(QWidget *parent) :
     QString host_url = settings.value("host_url", QString("192.168.1.3")).toString();
     bool use_enviorment=settings.value("use_enviorment",bool(false)).toBool();
     bool auto_connect=settings.value("auto_connect",bool(false)).toBool();
+    ui->lineEdit_turnLightThre->setText(settings.value("lineEdit_turnLightThre",double(0.1)).toString());
     ui->checkbox_use_environment->setChecked(use_enviorment);
     ui->checkbox_remember_settings->setChecked(auto_connect);
     ui->line_edit_master->setText(master_url);
@@ -71,6 +72,7 @@ void Settings::slot_ok_btn_click()
     settings.setValue("host_url",ui->line_edit_host->text());
     settings.setValue("use_enviorment",QVariant(ui->checkbox_use_environment->isChecked()));
     settings.setValue("auto_connect",QVariant(ui->checkbox_remember_settings->isChecked()));
+    settings.setValue("lineEdit_turnLightThre",QVariant(ui->lineEdit_turnLightThre->text()));
     QMessageBox::critical(NULL, "保存成功！", "保存成功，需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     this->close();
 }

@@ -53,7 +53,11 @@
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_turnLightThre"/>
+             <widget class="QLineEdit" name="lineEdit_turnLightThre">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
