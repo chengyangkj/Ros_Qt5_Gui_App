@@ -7,7 +7,7 @@
 - 注意！未经作者的许可，此代码仅用于学习，不能用于其他用途。
 
 
-- 持续更新中.....
+- 本仓库以分支的形式，长期维护各种有趣的ROS Qt项目，持续更新中.....
 
 - 欢迎在issues提交bug
 
@@ -19,13 +19,17 @@
 - ROS + QML + C++混合编程，使用qml自绘制地图，激光雷达点云等
 - [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
 
+**2. Windows版本分支**
+- 此版本为windows版本，可在win10平板使用，安装教程[如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
+- ubuntu也可直接使用catkin_make编译使用
+- [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
 
-**2. Lite branch**
+**3. Lite branch**
 
 - 此版本为《ROS人机交互软件开发》系列课程中实现的版本，实现了master分支的基本功能，代码易懂 
 - [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
 
-**3,rviz菜单树分支**
+**4,rviz菜单树分支**
 
 - 使用rviz自带的菜单树，去实现添加显示图层。master分支所有的图层及菜单均需要手动去写代码实现（并且目前仅支持部分图层显示），此分支调用librviz现成api，所有图层均可以实现,不用去手动创建图层菜单和display
 
@@ -35,10 +39,13 @@
 
 ***
 
-**4,ROS Qt Demo**
+**5,ROS Qt Demo**
 - cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行
 
 - [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo)
+
+**6，android版本分支 敬请期待**
+**7，web版本分支 敬请期待**
 
 ### 一，功能介绍
 
