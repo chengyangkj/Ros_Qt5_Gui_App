@@ -33,7 +33,7 @@ void CCtrlDashBoard::drawBackGround(QPainter *painter, qreal hlafWidth)
     QPainterPath bigCircle;
     bigCircle.addEllipse(startX, startX, (m_MaxBorderRadius*2), (m_MaxBorderRadius*2));
 
-    m_MinBorderRadius = m_MaxBorderRadius-15;
+    m_MinBorderRadius = m_MaxBorderRadius-10;
     startX=hlafWidth-m_MinBorderRadius;
     QPainterPath smallCircle;
     smallCircle.addEllipse(startX, startX, (m_MinBorderRadius*2), (m_MinBorderRadius*2));

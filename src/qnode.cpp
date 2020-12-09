@@ -143,7 +143,7 @@ void QNode::set_goal(QString frame,double x,double y,double z,double w)
 void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
     emit speed_x(msg->twist.twist.linear.x);
-    emit speed_y(msg->twist.twist.linear.y);
+    emit speed_y(msg->twist.twist.angular.z);
 }
 void QNode::run() {
         int count=0;

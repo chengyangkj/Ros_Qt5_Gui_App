@@ -23,7 +23,8 @@ Settings::Settings(QWidget *parent) :
         ui->video0_topic_set_3->setText(topics[2]);
         ui->video0_topic_set_4->setText(topics[3]);
     }
-
+    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    ui->lineEdit_turnLightThre->setText(settings.value("lineEdit_turnLightThre",double(0.1)).toString());
     QSettings main_setting("topic_setting","cyrobot_monitor");
     ui->lineEdit_odm->setText(main_setting.value("topic_odom","raw_odom").toString());
     ui->lineEdit_power->setText(main_setting.value("topic_power","power").toString());
@@ -57,7 +58,10 @@ void Settings::slot_ok_btn_click()
 
     video_topic_setting.setValue("names",name_data);
     video_topic_setting.setValue("topics",topic_data);
-    QMessageBox::critical(NULL, "保存成功！", "保存成功，部分功能需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    settings.setValue("lineEdit_turnLightThre",QVariant(ui->lineEdit_turnLightThre->text()));
+    QMessageBox::critical(NULL, "保存成功！", "保存成功，需重启后生效！", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     this->close();
 }
 void Settings::slot_cancel_btn_click()

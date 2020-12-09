@@ -102,5 +102,11 @@
         <file>images/set_return.png</file>
         <file>images/return.png</file>
         <file>images/refreash.png</file>
+        <file>images/turnLeft_h.png</file>
+        <file>images/turnLeft_hl.png</file>
+        <file>images/turnLeft_l.png</file>
+        <file>images/turnRight_h.png</file>
+        <file>images/turnRight_hl.png</file>
+        <file>images/turnRight_l.png</file>
     </qresource>
 </RCC>

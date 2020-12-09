@@ -74,7 +74,7 @@ public slots:
     void on_button_connect_clicked(bool check );
     void on_checkbox_use_environment_stateChanged(int state);
     void slot_speed_x(double x);
-    void slot_speed_y(double y);
+    void slot_speed_yaw(double yaw);
     void slot_power(float p);
     void slot_rosShutdown();
     void quick_cmds_check_change(int);
@@ -137,7 +137,11 @@ private:
     QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
     Settings *set=NULL;
     QSoundEffect *media_player=NULL;
-
+    bool m_useEnviorment=false;
+    bool m_autoConnect=false;
+    QString m_masterUrl;
+    QString m_hostUrl;
+    double m_turnLightThre=0.1;
 };
 }// namespace cyrobot_monitor
 
