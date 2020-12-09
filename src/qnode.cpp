@@ -114,7 +114,12 @@ void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
       QPointF roboPos;
       roboPos.setX((pos.pose.pose.position.x-m_mapOriginX)/m_mapResolution);
       roboPos.setY((pos.pose.pose.position.y-m_mapOriginY)/m_mapResolution);
-      emit updateRoboPose(roboPos);
+      //yaw
+      tf::Quaternion quat;
+      tf::quaternionMsgToTF(pos.pose.pose.orientation, quat);
+      double roll, pitch, yaw;//定义存储r\p\y的容器
+      tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);//进行转换
+      emit updateRoboPose(roboPos,yaw);
 }
 void QNode::powerCallback(const std_msgs::Float32 &message_holder)
 {
@@ -147,16 +152,31 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
       m_mapOriginX=map->info.origin.position.x;
       m_mapOriginY=map->info.origin.position.y;
       m_mapResolution=map->info.resolution;
-      //将有像素的地方转为坐标值
-      for(int x=0;x<mapHeight;x++){
-        for(int y=0;y<mapWidth;y++){
-           if(map->data[x*mapWidth+y]==100){
-             mapPonits.push_back(QPoint(x,y));
-           }
-        }
+      int row, col, value;
+      cv::Mat image(map->info.width, map->info.height, CV_8UC1);
+      for(int array_index=0; array_index < map->data.size(); array_index++) {
+          //计算当前所在行
+          row = (int)array_index/image.cols;
+          //计算当前所在列
+          col = array_index%image.cols;
+          //获取当前位置的像素值
+          int curr_data=map->data[array_index];
+          //计算值
+          if ( curr_data== -1) {
+              value = 125;    // grey
+          } else if (curr_data == 100) {
+              value = 0;      // black
+          } else if (curr_data == 0) {
+              value = 255;    // white
+          } else {
+              ROS_WARN("Unsupported value in Occupancy Grid");
+              value == 125;
+          }
+          image.at<uchar>(row, col) = (uchar)value;
       }
+      QImage imageMap=Mat2QImage(image);
       QSizeF size(mapWidth,mapHeight);
-   emit updateMap(mapPonits,size);
+      emit updateMap(imageMap,size);
 }
 
 //速度回调函数

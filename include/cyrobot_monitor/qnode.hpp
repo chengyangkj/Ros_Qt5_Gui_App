@@ -35,6 +35,7 @@
 #include <image_transport/image_transport.h>   //image_transport
 #include <cv_bridge/cv_bridge.h>              //cv_bridge
 #include <sensor_msgs/image_encodings.h>    //图像编码格式
+#include <tf/tf.h>
 #include <actionlib/server/simple_action_server.h>
 #include <cyrobot_msgs/DoDishesAction.h>
 #include <map>
@@ -92,8 +93,8 @@ Q_SIGNALS:
     void power(float p);
     void Master_shutdown();
     void Show_image(int,QImage);
-    void updateRoboPose(QPointF pos);
-    void updateMap(QPolygon map,QSizeF size);
+    void updateRoboPose(QPointF pos,float yaw);
+    void updateMap(QImage map,QSizeF size);
 private:
 	int init_argc;
 	char** init_argv;

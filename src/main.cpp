@@ -38,8 +38,9 @@ int main(int argc, char **argv) {
    roboMap *roboMap_ =(roboMap*) objList.at(0)->findChild<QObject*>("roboMap_");
    QNode node(argc,argv);
    node.init();
-   QObject::connect(&node,SIGNAL(updateMap(QPolygon,QSizeF)),roboMap_,SLOT(paintMaps(QPolygon,QSizeF)));
-   QObject::connect(&node,SIGNAL(updateRoboPose(QPointF)),roboMap_,SLOT(paintRoboPos(QPointF)));
+   QObject::connect(&node,SIGNAL(updateMap(QImage,QSizeF)),roboMap_,SLOT(paintMaps(QImage,QSizeF)));
+   QObject::connect(&node,SIGNAL(updateRoboPose(QPointF,float)),roboMap_,SLOT(paintRoboPos(QPointF,float)));
+   QObject::connect(&node,SIGNAL(Show_image(int,QImage)),roboMap_,SLOT(paintImage(int,QImage)));
    int result = app.exec();
    return result;
 }
