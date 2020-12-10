@@ -800,6 +800,12 @@ QProgressBar {
                   <layout class="QGridLayout" name="gridLayout_6">
                    <item row="2" column="1">
                     <widget class="QPushButton" name="pushButton_back">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_back:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>
@@ -820,6 +826,12 @@ QProgressBar {
                    </item>
                    <item row="0" column="1">
                     <widget class="QPushButton" name="pushButton_i">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_u:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>
@@ -840,6 +852,12 @@ QProgressBar {
                    </item>
                    <item row="1" column="0">
                     <widget class="QPushButton" name="pushButton_j">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_j:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>
@@ -853,6 +871,12 @@ QProgressBar {
                    </item>
                    <item row="2" column="0">
                     <widget class="QPushButton" name="pushButton_m">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_m:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>
@@ -866,6 +890,12 @@ QProgressBar {
                    </item>
                    <item row="1" column="2">
                     <widget class="QPushButton" name="pushButton_l">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_l:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>
@@ -879,6 +909,12 @@ QProgressBar {
                    </item>
                    <item row="0" column="2">
                     <widget class="QPushButton" name="pushButton_o">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_o:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>
@@ -909,6 +945,12 @@ QProgressBar {
                    </item>
                    <item row="2" column="2">
                     <widget class="QPushButton" name="pushButton_backr">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_backr:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>
@@ -958,6 +1000,12 @@ QProgressBar {
                    </item>
                    <item row="0" column="0">
                     <widget class="QPushButton" name="pushButton_u">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton#pushButton_u:pressed{background-color:rgb(239, 41, 41)}</string>
                      </property>

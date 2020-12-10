@@ -1064,7 +1064,6 @@ void MainWindow::slot_speed_x(double x)
 }
 void MainWindow::slot_speed_yaw(double yaw)
 {
-  qDebug()<<yaw;
   if(yaw>m_turnLightThre){
       ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_hl.png")));
   }
