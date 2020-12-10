@@ -214,7 +214,7 @@ QProgressBar {
            <attribute name="title">
             <string>基本</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_13">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="minimumSize">
