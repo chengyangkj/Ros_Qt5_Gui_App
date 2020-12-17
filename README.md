@@ -11,25 +11,49 @@
 
 - 欢迎在issues提交bug
 
-## 分支
+## 一，安装教程
 
+#### 1，首先安装ros对qt pkg的支持
 
-**1. Qml版本分支（开发中）**
+```cpp
+sudo apt-get install ros-melodic-qt-create
+```
+
+```cpp
+sudo apt-get install ros-melodic-qt-build
+```
+```cpp
+sudo apt-get install qtmultimedia5-dev
+```
+
+#### 2，编译
+Put the package in the ros src package directory：
+将软件包放入ros src软件包目录下：
+```cpp
+catkin_make
+```
+#### 3,运行
+```cpp
+rosrun cyrobot_monitor cyrobot_monitor
+```
+***
+#### 4，windows编译
+
+- 借助 ROS windows版本，编译后可在win10平板使用，安装教程[古月学院 如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
+
+## 二，分支
+
+#### 1. Qml版本分支（开发中）
 
 - ROS + QML + C++混合编程，使用qml自绘制地图，激光雷达点云等
 - [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
 
-**2. Windows版本分支**
-- 此版本为windows版本，可在win10平板使用，安装教程[如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
-- ubuntu也可直接使用catkin_make编译使用
-- [windows_devel](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
-
-**3. Lite branch**
+#### 3. Lite branch
 
 - 此版本为《ROS人机交互软件开发》系列课程中实现的版本，实现了master分支的基本功能，代码易懂 
 - [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
 
-**4,rviz菜单树分支**
+#### 4,rviz菜单树分支
 
 - 使用rviz自带的菜单树，去实现添加显示图层。master分支所有的图层及菜单均需要手动去写代码实现（并且目前仅支持部分图层显示），此分支调用librviz现成api，所有图层均可以实现,不用去手动创建图层菜单和display
 
@@ -37,17 +61,17 @@
 
 - [![image.png](https://i.postimg.cc/KY0XyzKD/image.png)](https://postimg.cc/2qL9QC71)
 
-***
 
-**5,ROS Qt Demo**
+#### 5,ROS Qt Demo
 - cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行
 
 - [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo)
 
-**6，android版本分支 敬请期待**
-**7，web版本分支 敬请期待**
+#### 6，android版本分支 敬请期待
 
-### 一，功能介绍
+#### 7，web版本分支 敬请期待
+
+## 三，功能介绍
 
 #### 1,速度仪表盘
 
@@ -105,32 +129,7 @@
 [![image.png](https://i.postimg.cc/Z5bGBfgk/image.png)](https://postimg.cc/svL6bJsK)
 .
 ##### 4.11 待完善....
-### 二，安装教程
 
-#### 1，首先安装ros对qt pkg的支持
-
-```cpp
-sudo apt-get install ros-melodic-qt-create
-```
-
-```cpp
-sudo apt-get install ros-melodic-qt-build
-```
-```cpp
-sudo apt-get install qtmultimedia5-dev
-```
-
-#### 2，编译
-Put the package in the ros src package directory：
-将软件包放入ros src软件包目录下：
-```cpp
-catkin_make
-```
-#### 3,运行
-```cpp
-rosrun cyrobot_monitor cyrobot_monitor
-```
-***
 
 ### 开源协议
 **GNU GPL（GNU General Public License，GNU通用公共许可证）**
