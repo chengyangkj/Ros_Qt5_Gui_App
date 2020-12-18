@@ -17,8 +17,9 @@
 - [分支](#分支)
 - [功能介绍](#功能介绍)
 - [开源协议](#开源协议)
+- [相关教程及交流群](#相关教程及交流群)
 
-## 一，安装教程
+## 安装教程
 
 #### 1，首先安装ros对qt pkg的支持（非必须）
 
@@ -55,7 +56,7 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 - 借助 ROS windows版本，编译后可在win10平板使用，安装教程[古月学院 如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
 
-## 二，分支
+## 分支
 
 #### 1. Qml版本分支（开发中）
 
@@ -85,7 +86,7 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 #### 7，web版本分支 敬请期待
 
-## 三，功能介绍
+## 功能介绍
 
 #### 1,速度仪表盘
 
@@ -145,7 +146,7 @@ rosrun cyrobot_monitor cyrobot_monitor
 ##### 4.11 待完善....
 
 
-### 开源协议
+## 开源协议
 **GNU GPL（GNU General Public License，GNU通用公共许可证）**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408135643929.png)
 
@@ -161,3 +162,18 @@ rosrun cyrobot_monitor cyrobot_monitor
 - 收费传播 	允许在各种媒介上出售该软件，但必须提前让买家知道这个软件是可以免费获得的；因此，一般来讲，开源软件都是通过为用户提供有偿服务的形式来盈利的。
 
 - 修改自由 	允许开发人员增加或删除软件的功能，但软件修改后必须依然基于GPL许可协议授权。
+
+## 相关教程及交流群
+
+ **本系列教程文章专栏:**
+
+[ROS机器人GUI程序开发](https://blog.csdn.net/qq_38441692/category_9863968.html)
+
+ **本系列课程已上线古月学院，欢迎感兴趣的小伙伴订阅：**
+
+ 1. [ROS Qt开发环境搭建以及基础知识介绍](https://class.guyuehome.com/detail/p_5eba414d58533_Uh4XTbPi/6)
+ 2. [ROS人机交互软件的界面开发](https://class.guyuehome.com/detail/p_5ec490a8d7bd7_b7ucPqUs/6)
+ 3. [ROS Rviz组件开发方法](https://class.guyuehome.com/detail/p_5edf2d27a1942_foy4nqci/6)
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612194143186.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+**开发交流QQ群：** 797497206
