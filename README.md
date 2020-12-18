@@ -32,19 +32,19 @@ sudo apt-get install ros-melodic-qt-build
 sudo apt-get install qtmultimedia5-dev
 ```
 
-#### 2，编译
+#### 3，编译
 
 将软件包放入ros src软件包目录下：
 
 ```cpp
 catkin_make
 ```
-#### 3,运行
+#### 4,运行
 ```cpp
 rosrun cyrobot_monitor cyrobot_monitor
 ```
 ***
-#### 4，windows编译
+#### 5，windows编译
 
 - 借助 ROS windows版本，编译后可在win10平板使用，安装教程[古月学院 如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
 
