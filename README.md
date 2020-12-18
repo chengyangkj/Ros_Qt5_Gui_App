@@ -13,7 +13,9 @@
 
 ## 一，安装教程
 
-#### 1，首先安装ros对qt pkg的支持
+#### 1，首先安装ros对qt pkg的支持（非必须）
+
+melodic需要换成自己的ROS版本号
 
 ```cpp
 sudo apt-get install ros-melodic-qt-create
@@ -22,13 +24,18 @@ sudo apt-get install ros-melodic-qt-create
 ```cpp
 sudo apt-get install ros-melodic-qt-build
 ```
+#### 2,安装Qtmultimedia5依赖
+
+程序依赖Qtmultimedia实现音频功能，因此需要安装依赖
+
 ```cpp
 sudo apt-get install qtmultimedia5-dev
 ```
 
 #### 2，编译
-Put the package in the ros src package directory：
+
 将软件包放入ros src软件包目录下：
+
 ```cpp
 catkin_make
 ```
