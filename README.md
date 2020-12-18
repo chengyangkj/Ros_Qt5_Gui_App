@@ -11,6 +11,8 @@
 
 - 欢迎在issues提交bug
 
+<hr style="border:0;background-color:#078;height:3px;">  
+
 ## 一，安装教程
 
 #### 1，首先安装ros对qt pkg的支持（非必须）
