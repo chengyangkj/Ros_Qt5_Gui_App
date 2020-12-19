@@ -802,227 +802,330 @@ border:none;</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_10">
                  <item>
-                  <layout class="QGridLayout" name="gridLayout_6">
-                   <item row="2" column="1">
-                    <widget class="QPushButton" name="pushButton_back">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_back:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>,</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>,</string>
-                     </property>
-                    </widget>
+                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_2">
+                     <item>
+                      <widget class="QPushButton" name="pushButton_u">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/up_left.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/up_left_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>u</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>U</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_i">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/up.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/up_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>i</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>I</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_o">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/up_right.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/up_right_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>o</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>O</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
-                   <item row="4" column="2">
-                    <widget class="QLabel" name="label_linear">
-                     <property name="text">
-                      <string>50</string>
-                     </property>
-                    </widget>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_18">
+                     <item>
+                      <widget class="QPushButton" name="pushButton_j">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/left.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/left_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>j</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>J</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_use_all">
+                       <property name="maximumSize">
+                        <size>
+                         <width>90</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>全向模式（k）</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>K</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_l">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/right.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/right_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>l</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>L</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
-                   <item row="0" column="1">
-                    <widget class="QPushButton" name="pushButton_i">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_u:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>i</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>I</string>
-                     </property>
-                    </widget>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_19">
+                     <item>
+                      <widget class="QPushButton" name="pushButton_m">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/down_left.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/down_left_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>m</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>M</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_back">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/down.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/down_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>,</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>,</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="pushButton_backr">
+                       <property name="minimumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>64</width>
+                         <height>64</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true">QPushButton{border-image: url(://images/down_right.png);}
+QPushButton{border:none;}
+QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
+                       </property>
+                       <property name="text">
+                        <string>.</string>
+                       </property>
+                       <property name="shortcut">
+                        <string>.</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
-                   <item row="3" column="2">
-                    <widget class="QLabel" name="label_raw">
-                     <property name="text">
-                      <string>100</string>
-                     </property>
-                    </widget>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_20">
+                     <item>
+                      <widget class="QLabel" name="label_14">
+                       <property name="text">
+                        <string>角速度(cm/s)：</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="horizontalSlider_raw">
+                       <property name="maximum">
+                        <number>100</number>
+                       </property>
+                       <property name="value">
+                        <number>100</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_raw">
+                       <property name="text">
+                        <string>100</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
-                   <item row="1" column="0">
-                    <widget class="QPushButton" name="pushButton_j">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_j:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>j</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>J</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="0">
-                    <widget class="QPushButton" name="pushButton_m">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_m:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>m</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>M</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="2">
-                    <widget class="QPushButton" name="pushButton_l">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_l:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>l</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>L</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="2">
-                    <widget class="QPushButton" name="pushButton_o">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_o:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>o</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>O</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="0">
-                    <widget class="QLabel" name="label_14">
-                     <property name="text">
-                      <string>角速度(cm/s)：</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="1" column="1">
-                    <widget class="QCheckBox" name="checkBox_use_all">
-                     <property name="text">
-                      <string>全向轮模式（k）</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>K</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="2" column="2">
-                    <widget class="QPushButton" name="pushButton_backr">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_backr:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>.</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>.</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="1">
-                    <widget class="QSlider" name="horizontalSlider_linear">
-                     <property name="maximum">
-                      <number>100</number>
-                     </property>
-                     <property name="singleStep">
-                      <number>1</number>
-                     </property>
-                     <property name="value">
-                      <number>50</number>
-                     </property>
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="3" column="1">
-                    <widget class="QSlider" name="horizontalSlider_raw">
-                     <property name="maximum">
-                      <number>100</number>
-                     </property>
-                     <property name="value">
-                      <number>100</number>
-                     </property>
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="4" column="0">
-                    <widget class="QLabel" name="label_9">
-                     <property name="text">
-                      <string>线速度(cm/s)：</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QPushButton" name="pushButton_u">
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton#pushButton_u:pressed{background-color:rgb(239, 41, 41)}</string>
-                     </property>
-                     <property name="text">
-                      <string>u</string>
-                     </property>
-                     <property name="shortcut">
-                      <string>U</string>
-                     </property>
-                    </widget>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_21">
+                     <item>
+                      <widget class="QLabel" name="label_9">
+                       <property name="text">
+                        <string>线速度(cm/s)：</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QSlider" name="horizontalSlider_linear">
+                       <property name="maximum">
+                        <number>100</number>
+                       </property>
+                       <property name="singleStep">
+                        <number>1</number>
+                       </property>
+                       <property name="value">
+                        <number>50</number>
+                       </property>
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="label_linear">
+                       <property name="text">
+                        <string>50</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                   </layout>
+                 </item>
+                 <item>
+                  <spacer name="verticalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
                  </item>
                 </layout>
                </widget>

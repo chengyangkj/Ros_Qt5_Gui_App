@@ -113,5 +113,22 @@
         <file>images/turnRight_l.png</file>
         <file>images/hide.png</file>
         <file>images/show.png</file>
+        <file>images/all_control.png</file>
+        <file>images/down.png</file>
+        <file>images/down_left.png</file>
+        <file>images/down_right.png</file>
+        <file>images/left.png</file>
+        <file>images/right.png</file>
+        <file>images/up_left.png</file>
+        <file>images/up_right.png</file>
+        <file>images/up.png</file>
+        <file>images/right_2.png</file>
+        <file>images/down_2.png</file>
+        <file>images/down_left_2.png</file>
+        <file>images/down_right_2.png</file>
+        <file>images/left_2.png</file>
+        <file>images/up_2.png</file>
+        <file>images/up_left_2.png</file>
+        <file>images/up_right_2.png</file>
     </qresource>
 </RCC>
