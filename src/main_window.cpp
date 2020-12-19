@@ -108,7 +108,8 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 //初始化UI
 void MainWindow::initUis()
 {
-
+    ui.horizontalLayout_4->setSpacing(0);
+    ui.horizontalLayout_4->setMargin(0);
     ui.tab_manager->setTabEnabled(1,false);
     ui.tabWidget->setTabEnabled(1,false);
     ui.groupBox_3->setEnabled(false);
@@ -268,6 +269,8 @@ void MainWindow::connections()
     connect(ui.refreash_topic_btn,SIGNAL(clicked()),this,SLOT(refreashTopicList()));
     //添加rviz话题的按钮
     connect(ui.pushButton_add_topic,SIGNAL(clicked()),this,SLOT(slot_add_topic_btn()));
+    //hide
+    QObject::connect(ui.table_hide_btn,SIGNAL(clicked()),this,SLOT(slot_hide_table_widget()));
     //treewidget的值改变的槽函数
     //绑定treeiew所有控件的值改变函数
     for(int i=0;i<ui.treeWidget_rviz->topLevelItemCount();i++)
@@ -314,6 +317,16 @@ void MainWindow::connections()
 
     }
     //connect(ui.treeWidget_rviz,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(slot_treewidget_item_value_change(QTreeWidgetItem*,int)));
+}
+void MainWindow::slot_hide_table_widget(){
+  if(ui.tabWidget->isHidden()){
+    ui.tabWidget->show();
+    ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/hide.png);border:none;}");
+  }
+  else{
+    ui.tabWidget->hide();
+    ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/show.png);border:none;}");
+  }
 }
 //设置界面
 void MainWindow::slot_setting_frame()

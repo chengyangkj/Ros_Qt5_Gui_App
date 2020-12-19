@@ -111,5 +111,7 @@
         <file>images/turnRight_h.png</file>
         <file>images/turnRight_hl.png</file>
         <file>images/turnRight_l.png</file>
+        <file>images/hide.png</file>
+        <file>images/show.png</file>
     </qresource>
 </RCC>
