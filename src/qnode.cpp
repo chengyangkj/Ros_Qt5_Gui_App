@@ -35,6 +35,7 @@ QNode::QNode(int argc, char** argv ) :
     QSettings topic_setting("topic_setting","cyrobot_monitor");
     odom_topic= topic_setting.value("topic_odom","raw_odom").toString();
     power_topic=topic_setting.value("topic_power","power").toString();
+    laser_topic=topic_setting.value("topic_laser","scan").toString();
     pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
     power_min=topic_setting.value("power_min","10").toString();
     power_max=topic_setting.value("power_max","12").toString();
@@ -69,6 +70,9 @@ bool QNode::init() {
    goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
    //速度控制话题
    cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+   //激光雷达点云话题订阅
+   m_laserSub=n.subscribe(laser_topic.toStdString(),1000,&QNode::laserScanCallback,this);
+   //m_rosTimer=n.createTimer(ros::Duration(1.0),boost::bind(&QNode::transformPoint,boost::ref(m_tfListener)));
 	start();
 	return true;
 }
@@ -97,6 +101,32 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 	start();
 	return true;
 }
+void QNode::transformPoint(const tf::TransformListener& listener){
+  //we'll create a point in the base_laser frame that we'd like to transform to the base_link frame
+  geometry_msgs::PointStamped laser_point;
+  laser_point.header.frame_id = "base_laser";
+
+  //we'll just use the most recent transform available for our simple example
+  laser_point.header.stamp = ros::Time();
+
+  //just an arbitrary point in space
+  laser_point.point.x = 1.0;
+  laser_point.point.y = 0.2;
+  laser_point.point.z = 0.0;
+
+  try{
+    geometry_msgs::PointStamped base_point;
+    listener.transformPoint("base_link", laser_point, base_point);
+
+    ROS_INFO("base_laser: (%.2f, %.2f. %.2f) -----> base_link: (%.2f, %.2f, %.2f) at time %.2f",
+        laser_point.point.x, laser_point.point.y, laser_point.point.z,
+        base_point.point.x, base_point.point.y, base_point.point.z, base_point.header.stamp.toSec());
+  }
+  catch(tf::TransformException& ex){
+    ROS_ERROR("Received an exception trying to transform a point from \"base_laser\" to \"base_link\": %s", ex.what());
+  }
+}
+
 QMap<QString,QString> QNode::get_topic_list()
 {
     ros::master::V_TopicInfo topic_list;
@@ -108,6 +138,21 @@ QMap<QString,QString> QNode::get_topic_list()
     }
     return res;
 }
+//激光雷达点云话题回调
+void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr msg){
+  std::vector<float> ranges = msg->ranges;
+
+  //转换到二维XY平面坐标系下;
+  for(int i=0; i< ranges.size(); i++)
+  {
+    double angle = msg->angle_min + i * msg->angle_increment;
+    double X = ranges[i] * cos(angle);
+    double Y = ranges[i] * sin(angle);
+    float intensity = msg->intensities[i];
+ //   std::cout << ranges[i] << " , " << std::endl;
+  }
+}
+
 //机器人位置话题的回调函数
 void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
 {

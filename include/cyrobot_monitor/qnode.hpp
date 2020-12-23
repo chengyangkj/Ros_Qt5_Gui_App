@@ -35,7 +35,8 @@
 #include <image_transport/image_transport.h>   //image_transport
 #include <cv_bridge/cv_bridge.h>              //cv_bridge
 #include <sensor_msgs/image_encodings.h>    //图像编码格式
-#include <tf/tf.h>
+#include <sensor_msgs/LaserScan.h>
+#include <tf/transform_listener.h>
 #include <actionlib/server/simple_action_server.h>
 #include <cyrobot_msgs/DoDishesAction.h>
 #include <map>
@@ -102,6 +103,7 @@ private:
     ros::Subscriber cmdVel_sub;
     ros::Subscriber chatter_subscriber;
     ros::Subscriber pos_sub;
+    ros::Subscriber m_laserSub;
     ros::Subscriber power_sub;
     ros::Publisher goal_pub;
     ros::Publisher cmd_pub;
@@ -115,6 +117,7 @@ private:
     QString odom_topic;
     QString power_topic;
     QString pose_topic;
+    QString laser_topic;
     QString power_max;
     QString power_min;
     QPolygon mapPonits;
@@ -127,6 +130,8 @@ private:
     float m_mapResolution;
     //地图是否被初始化
     bool m_bMapIsInit=false;
+    //tf::TransformListener m_tfListener(ros::Duration(10));
+    //ros::Timer m_rosTimer;
     QImage Mat2QImage(cv::Mat const& src);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
@@ -134,6 +139,8 @@ private:
     void imageCallback0(const sensor_msgs::ImageConstPtr& msg);
     void myCallback(const std_msgs::Float64& message_holder);
     void mapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
+    void laserScanCallback(sensor_msgs::LaserScanConstPtr scan);
+    void transformPoint(const tf::TransformListener& listener);
 };
 
 }  // namespace cyrobot_monitor
