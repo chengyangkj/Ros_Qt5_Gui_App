@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
    QObject::connect(&node,SIGNAL(updateMap(QImage,QSizeF)),roboMap_,SLOT(paintMaps(QImage,QSizeF)));
    QObject::connect(&node,SIGNAL(updateRoboPose(QPointF,float)),roboMap_,SLOT(paintRoboPos(QPointF,float)));
    QObject::connect(&node,SIGNAL(Show_image(int,QImage)),roboMap_,SLOT(paintImage(int,QImage)));
+   QObject::connect(&node,SIGNAL(plannerPath(QPolygonF)),roboMap_,SLOT(paintPlannerPath(QPolygonF)));
    int result = app.exec();
    return result;
 }

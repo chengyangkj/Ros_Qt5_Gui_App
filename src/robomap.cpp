@@ -15,7 +15,11 @@ int roboMap::QColorToInt(const QColor& color) {
 void roboMap::paintImage(int id, QImage image){
   m_image=image;
 }
-
+//palnner规划path绘制
+void roboMap::paintPlannerPath(QPolygonF path){
+  plannerPath=path;
+  update();
+}
 void roboMap::paintMaps(QImage map,QSizeF size){
    this->setSize(size);
    mapSize=size;
@@ -43,7 +47,6 @@ void roboMap::paint(QPainter *painter){
    //画等边三角形 以小车位置为中心 m_roboR为半径的外接圆
    //x+r*cos(yaw)
    //y-r*sin(yaw)
-
    QPointF head;
    head.setX(RoboPostion.x()+m_roboR*cos(m_roboYaw));
    head.setY(RoboPostion.y()-m_roboR*sin(m_roboYaw));
@@ -57,8 +60,7 @@ void roboMap::paint(QPainter *painter){
 
    painter->setPen(QPen(QColor(0, 0, 255, 255), 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
 //   painter->drawLine(QLineF(RoboPostion,head));
-
-
+   //三角形
    QPainterPath path;
    path.moveTo(head);
    path.lineTo(backR);
@@ -66,6 +68,9 @@ void roboMap::paint(QPainter *painter){
    path.lineTo(head);
 
    painter->fillPath(path, QBrush(QColor ("blue")));
+   //绘制planner Path
+   painter->setPen(QPen(QColor(0, 0, 0, 255), 1));
+   painter->drawPoints(plannerPath);
 }
 void roboMap::setMax(){
      map_size+=0.1;

@@ -56,6 +56,27 @@ bool QNode::init() {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
+  SubAndPubTopic();
+	start();
+	return true;
+}
+
+//初始化的函数*********************************
+bool QNode::init(const std::string &master_url, const std::string &host_url) {
+	std::map<std::string,std::string> remappings;
+	remappings["__master"] = master_url;
+	remappings["__hostname"] = host_url;
+	ros::init(remappings,"cyrobot_monitor");
+	if ( ! ros::master::check() ) {
+		return false;
+	}
+	ros::start(); // explicitly needed since our nodehandle is going out of scope.
+  SubAndPubTopic();
+	start();
+	return true;
+}
+//创建订阅者与发布者
+void QNode::SubAndPubTopic(){
   ros::NodeHandle n;
    // Add your ros communications here.
 
@@ -73,34 +94,10 @@ bool QNode::init() {
    //激光雷达点云话题订阅
    m_laserSub=n.subscribe(laser_topic.toStdString(),1000,&QNode::laserScanCallback,this);
    //m_rosTimer=n.createTimer(ros::Duration(1.0),boost::bind(&QNode::transformPoint,boost::ref(m_tfListener)));
-	start();
-	return true;
+   //全局规划Path
+   m_plannerPathSub=n.subscribe("/move_base/NavfnROS/plan",1000,&QNode::plannerPathCallback,this);
 }
 
-//初始化的函数*********************************
-bool QNode::init(const std::string &master_url, const std::string &host_url) {
-	std::map<std::string,std::string> remappings;
-	remappings["__master"] = master_url;
-	remappings["__hostname"] = host_url;
-	ros::init(remappings,"cyrobot_monitor");
-	if ( ! ros::master::check() ) {
-		return false;
-	}
-	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-    ros::NodeHandle n;
-    //创建速度话题的订阅者
-    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
-    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
-    //机器人位置话题
-    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
-    //导航目标点发送话题
-    goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
-    //速度控制话题
-    cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-
-	start();
-	return true;
-}
 void QNode::transformPoint(const tf::TransformListener& listener){
   //we'll create a point in the base_laser frame that we'd like to transform to the base_link frame
   geometry_msgs::PointStamped laser_point;
@@ -138,6 +135,18 @@ QMap<QString,QString> QNode::get_topic_list()
     }
     return res;
 }
+//planner的路径话题回调
+void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path){
+     plannerPoints.clear();
+     for(int i=0;i<path->poses.size();i++){
+       QPointF roboPos;
+       roboPos.setX((path->poses[i].pose.position.x-m_mapOriginX)/m_mapResolution);
+       roboPos.setY((path->poses[i].pose.position.y-m_mapOriginY)/m_mapResolution);
+       plannerPoints.append(roboPos);
+     }
+     emit plannerPath(plannerPoints);
+}
+
 //激光雷达点云话题回调
 void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr msg){
   std::vector<float> ranges = msg->ranges;

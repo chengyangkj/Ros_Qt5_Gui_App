@@ -32,6 +32,7 @@
 #include <std_msgs/Float32.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/OccupancyGrid.h>
+#include <nav_msgs/Path.h>
 #include <image_transport/image_transport.h>   //image_transport
 #include <cv_bridge/cv_bridge.h>              //cv_bridge
 #include <sensor_msgs/image_encodings.h>    //图像编码格式
@@ -95,6 +96,7 @@ Q_SIGNALS:
     void Show_image(int,QImage);
     void updateRoboPose(QPointF pos,float yaw);
     void updateMap(QImage map,QSizeF size);
+    void plannerPath(QPolygonF path);
 private:
 	int init_argc;
 	char** init_argv;
@@ -104,6 +106,7 @@ private:
     ros::Subscriber pos_sub;
     ros::Subscriber m_laserSub;
     ros::Subscriber power_sub;
+    ros::Subscriber m_plannerPathSub;
     ros::Publisher goal_pub;
     ros::Publisher cmd_pub;
     QStringListModel logging_model;
@@ -120,6 +123,7 @@ private:
     QString power_max;
     QString power_min;
     QPolygon mapPonits;
+    QPolygonF plannerPoints;
     int mapWidth;
     int mapHeight;
     //地图 0 0点坐标对应世界坐标系的坐标
@@ -140,6 +144,8 @@ private:
     void mapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
     void laserScanCallback(sensor_msgs::LaserScanConstPtr scan);
     void transformPoint(const tf::TransformListener& listener);
+    void plannerPathCallback(nav_msgs::Path::ConstPtr path);
+    void SubAndPubTopic();
 };
 
 }  // namespace cyrobot_monitor

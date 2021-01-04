@@ -21,6 +21,7 @@ public:
   void paint(QPainter* painter) override;
   int QColorToInt(const QColor& color);
   QPolygon MapPoints;
+  QPolygonF plannerPath;
   QPointF RoboPostion;
   QSizeF mapSize;
   QImage m_image;
@@ -40,6 +41,7 @@ public slots:
     void paintMaps(QImage map,QSizeF size);
     void paintRoboPos(QPointF pos,float yaw);
     void paintImage(int,QImage);
+    void paintPlannerPath(QPolygonF);
 };
 
 #endif // ROBOMAP_H
