@@ -149,17 +149,37 @@ void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path){
 
 //激光雷达点云话题回调
 void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr msg){
-  std::vector<float> ranges = msg->ranges;
+  //获取tf变换 机器人坐标系变换到map坐标系
+  tf::TransformListener listener;
+  tf::StampedTransform transform;
+  try {
+    listener.waitForTransform("/odom",
+                              "/map",
+                              ros::Time(0), ros::Duration(0.2));
+    listener.lookupTransform("/odom",
+                             "/map",
+                             ros::Time(0), transform);
+  } catch (tf::TransformException& ex) {
+    ROS_ERROR("%s", ex.what());
+  }
+  float qx = transform.getOrigin().x(), qy = transform.getOrigin().y();
 
+  qDebug()<<qx<<" "<<qy<<" "<<" ";
+  std::vector<float> ranges = msg->ranges;
+  laserPoints.clear();
   //转换到二维XY平面坐标系下;
   for(int i=0; i< ranges.size(); i++)
   {
+    //scan_laser坐标系下
     double angle = msg->angle_min + i * msg->angle_increment;
-    double X = ranges[i] * cos(angle);
-    double Y = ranges[i] * sin(angle);
-    float intensity = msg->intensities[i];
- //   std::cout << ranges[i] << " , " << std::endl;
+    double X = ranges[i] * cos(angle)+qx;
+    double Y = ranges[i] * sin(angle)+qy;
+    QPointF roboPos;
+    roboPos.setX((X-m_mapOriginX)/m_mapResolution);
+    roboPos.setY((Y-m_mapOriginY)/m_mapResolution);
+    laserPoints.append(roboPos);
   }
+  updateLaserScan(laserPoints);
 }
 
 //机器人位置话题的回调函数

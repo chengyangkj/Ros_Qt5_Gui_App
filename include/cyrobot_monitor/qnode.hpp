@@ -97,6 +97,7 @@ Q_SIGNALS:
     void updateRoboPose(QPointF pos,float yaw);
     void updateMap(QImage map,QSizeF size);
     void plannerPath(QPolygonF path);
+    void updateLaserScan(QPolygonF points);
 private:
 	int init_argc;
 	char** init_argv;
@@ -124,6 +125,7 @@ private:
     QString power_min;
     QPolygon mapPonits;
     QPolygonF plannerPoints;
+    QPolygonF laserPoints;
     int mapWidth;
     int mapHeight;
     //地图 0 0点坐标对应世界坐标系的坐标

@@ -22,6 +22,7 @@ public:
   int QColorToInt(const QColor& color);
   QPolygon MapPoints;
   QPolygonF plannerPath;
+  QPolygonF laserPoints;
   QPointF RoboPostion;
   QSizeF mapSize;
   QImage m_image;
@@ -42,6 +43,7 @@ public slots:
     void paintRoboPos(QPointF pos,float yaw);
     void paintImage(int,QImage);
     void paintPlannerPath(QPolygonF);
+    void paintLaserScan(QPolygonF);
 };
 
 #endif // ROBOMAP_H

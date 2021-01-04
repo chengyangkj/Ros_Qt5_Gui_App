@@ -15,6 +15,10 @@ int roboMap::QColorToInt(const QColor& color) {
 void roboMap::paintImage(int id, QImage image){
   m_image=image;
 }
+void roboMap::paintLaserScan(QPolygonF points){
+  laserPoints=points;
+  update();
+}
 //palnner规划path绘制
 void roboMap::paintPlannerPath(QPolygonF path){
   plannerPath=path;
@@ -71,6 +75,10 @@ void roboMap::paint(QPainter *painter){
    //绘制planner Path
    painter->setPen(QPen(QColor(0, 0, 0, 255), 1));
    painter->drawPoints(plannerPath);
+
+   //绘制planner Path
+   painter->setPen(QPen(QColor(255, 0, 0, 255), 1));
+   painter->drawPoints(laserPoints);
 }
 void roboMap::setMax(){
      map_size+=0.1;
