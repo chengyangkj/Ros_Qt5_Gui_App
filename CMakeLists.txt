@@ -18,7 +18,6 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     image_transport
     actionlib
     actionlib_msgs
-    cyrobot_msgs
     )
 
 find_package(Qt5 REQUIRED Core Widgets Multimedia Quick Qml)

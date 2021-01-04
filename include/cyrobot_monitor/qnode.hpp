@@ -38,7 +38,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_listener.h>
 #include <actionlib/server/simple_action_server.h>
-#include <cyrobot_msgs/DoDishesAction.h>
 #include <map>
 #include <QLabel>
 #include <QImage>
