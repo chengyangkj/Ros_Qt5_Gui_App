@@ -2,9 +2,12 @@
 
 ### 1，安装qtcreator
 
-这里使用的为5.9.9版本（qt5版本的均可）
+这里使用的为5.9.9版本（qt5版本的均可）:
+
 [qt5.9.9 download](http://download.qt.io/archive/qt/5.9/5.9.9/qt-opensource-linux-x64-5.9.9.run)
+
 [qt all download](http://download.qt.io/archive/qt/)
+
 qt安装路径需为默认，即为用户的宿主目录，如果安装路径更改了，在下一步配置环境变量中也需要根据自己的实际安装路径进行更改
 ### 2,配置qt环境变量
 
