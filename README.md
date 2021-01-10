@@ -30,7 +30,7 @@ export QT_QPA_PLATFORM_PLUGIN_PATH=$QTDIR/plugins/platforms/
 进入工作空间的src目录下：
 
 ```shell
-git clonehttps://github.com/chengyangkj/Ros_Qt5_Gui_App
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App
 ```
 切换分支：
 ```shell
