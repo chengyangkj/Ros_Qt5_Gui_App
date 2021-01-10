@@ -1,3 +1,8 @@
+
+## 软件界面（开发中）
+
+[001.png](https://postimg.cc/7CnZr7tm)
+
 ## 一，安装教程
 
 ### 1，安装qtcreator

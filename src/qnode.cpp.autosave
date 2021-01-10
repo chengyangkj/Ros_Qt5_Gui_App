@@ -149,7 +149,7 @@ void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path){
 
 //激光雷达点云话题回调
 void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
-  //获取tf变换 机器人坐标系变换到map坐标系
+  //获取tf变换 laser坐标系变换到map坐标系
   tf::TransformListener listener;
   tf::StampedTransform transform;
   static float qx=0,qy=0;
