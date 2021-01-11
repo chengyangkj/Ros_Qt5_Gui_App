@@ -1,7 +1,7 @@
 
 ## 软件界面（开发中）
 
-[![image.png](https://postimg.cc/7CnZr7tm)
+![image.png](https://postimg.cc/7CnZr7tm)
 
 ## 一，安装教程
 
