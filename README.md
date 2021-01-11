@@ -1,9 +1,11 @@
 
 ## 软件界面（开发中）
 
-[001.png](https://postimg.cc/7CnZr7tm)
+[![image.png](https://postimg.cc/7CnZr7tm)
 
 ## 一，安装教程
+
+开发期间，目前基于turtlebot3仿真环境进行开发，暂未预留其他接口，移植使用的话需要更改代码中的一些话题，tf变换等信息
 
 ### 1，安装qtcreator
 
