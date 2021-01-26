@@ -30,6 +30,7 @@ export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
 # export PATH=$PATH:$QTDIR/plugins/platforms
 export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PAth:$QTDIR/lib/cmake
 export QT_QPA_PLATFORM_PLUGIN_PATH=$QTDIR/plugins/platforms/
+export QML2_IMPORT_PATH=$QTDIR/qml
 #export QT_DEBUG_PLUGINS=1
 ```
 
