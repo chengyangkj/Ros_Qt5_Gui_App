@@ -20,6 +20,7 @@
 #include "qrviz.hpp"
 //仪表盘头文件
 #include "CCtrlDashBoard.h"
+#include "rocker.h"
 #include "QProcess"
 #include <QStandardItemModel>
 #include <QTreeWidgetItem>
@@ -56,7 +57,7 @@ Q_OBJECT
 public:
 	MainWindow(int argc, char** argv, QWidget *parent = 0);
 	~MainWindow();
-
+  enum {upleft=0,up,upright,left,stop,right,downleft,down,downright};
 	void ReadSettings(); // Load up qt program settings at startup
 	void WriteSettings(); // Save qt program settings when closing
 
@@ -113,6 +114,7 @@ public slots:
     void slot_show_image(int,QImage);
     void slot_dis_connect();
     void slot_hide_table_widget();
+    void slot_rockKeyChange(int);
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
@@ -143,6 +145,7 @@ private:
     QString m_masterUrl;
     QString m_hostUrl;
     double m_turnLightThre=0.1;
+    rocker *rock_widget;
 };
 }// namespace cyrobot_monitor
 

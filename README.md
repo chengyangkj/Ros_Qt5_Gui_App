@@ -15,6 +15,7 @@
 
 - [安装教程](#安装教程)
 - [分支](#分支)
+- [使用说明] (#使用说明)
 - [功能介绍](#功能介绍)
 - [开源协议](#开源协议)
 - [相关教程及交流群](#相关教程及交流群)
@@ -86,6 +87,18 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 #### 7，web版本分支 敬请期待
 
+## 使用说明
+
+- 使用前需要在菜单->设置 中进行必要设置
+
+![image.png](https://i.postimg.cc/9XYJ7s0m/image.png)
+
+- ROS_MASTER_URI: ROS多机通讯主节点地址，如果只是单机通讯填127.0.0.1即可
+- ROS_IP: 软件运行的机器的IP 如果是单机通讯填127.0.0.1即可
+- 其他一些话题设置
+
+- 注意！保存设置后需要重启软件生效
+
 ## 功能介绍
 
 #### 1,速度仪表盘
@@ -96,7 +109,8 @@ rosrun cyrobot_monitor cyrobot_monitor
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405102549333.gif)
 
 #### 2, 机器人速度控制
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405104454149.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+
+![在这里插入图片描述](https://i.postimg.cc/nrjgHkKj/image.png)
 
 #### 3, 电量显示
 

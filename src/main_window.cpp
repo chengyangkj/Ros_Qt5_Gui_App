@@ -208,6 +208,9 @@ void MainWindow::initUis()
     ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
     ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
 
+    rock_widget =new rocker(ui.rocker_widget);
+    rock_widget->show();
+
 }
 void MainWindow::initRviz()
 {
@@ -271,6 +274,7 @@ void MainWindow::connections()
     connect(ui.pushButton_add_topic,SIGNAL(clicked()),this,SLOT(slot_add_topic_btn()));
     //hide
     QObject::connect(ui.table_hide_btn,SIGNAL(clicked()),this,SLOT(slot_hide_table_widget()));
+    connect(rock_widget,SIGNAL(keyNumchanged(int)),this,SLOT(slot_rockKeyChange(int)));
     //treewidget的值改变的槽函数
     //绑定treeiew所有控件的值改变函数
     for(int i=0;i<ui.treeWidget_rviz->topLevelItemCount();i++)
@@ -757,6 +761,39 @@ void MainWindow::slot_tab_Widget_currentChanged(int index)
         break;
 
     }
+}
+void MainWindow::slot_rockKeyChange(int key){
+  qDebug()<<"key: "<<key;
+  //速度
+  float liner=ui.horizontalSlider_linear->value()*0.01;
+  float turn=ui.horizontalSlider_raw->value()*0.01;
+  bool is_all=ui.checkBox_use_all->isChecked();
+  switch (key) {
+      case upleft:
+          qnode.move_base(is_all?'U':'u',liner,turn);
+      break;
+      case up:
+          qnode.move_base(is_all?'I':'i',liner,turn);
+      break;
+      case upright:
+          qnode.move_base(is_all?'O':'o',liner,turn);
+      break;
+      case left:
+          qnode.move_base(is_all?'J':'j',liner,turn);
+      break;
+      case right:
+          qnode.move_base(is_all?'L':'l',liner,turn);
+      break;
+      case down:
+          qnode.move_base(is_all?'M':'m',liner,turn);
+      break;
+      case downleft:
+          qnode.move_base(is_all?'<':',',liner,turn);
+      break;
+      case downright:
+          qnode.move_base(is_all?'>':'.',liner,turn);
+      break;
+  }
 }
 //速度控制相关按钮处理槽函数
 void MainWindow::slot_cmd_control()
