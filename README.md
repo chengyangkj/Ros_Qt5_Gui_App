@@ -110,6 +110,15 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 #### 2, 机器人速度控制
 
+控制方式：
+
+- 键盘热键控制
+
+- 鼠标点击控制
+
+- 虚拟摇杆控制
+
+
 ![在这里插入图片描述](https://i.postimg.cc/nrjgHkKj/image.png)
 
 #### 3, 电量显示
