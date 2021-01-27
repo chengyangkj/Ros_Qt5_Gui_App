@@ -108,15 +108,15 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 //初始化UI
 void MainWindow::initUis()
 {
+    qDebug()<<qApp->applicationDirPath();
+    ui.widget_velView->load(QUrl("file:///" + qApp->applicationDirPath()+"/html/linex.html"));
+    ui.widget_speed_x->load(QUrl("file:///home/chengyangkj/catkin_ws/src/Ros_Qt5_Gui_App/resources/html/gauge.html"));
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
     ui.tab_manager->setTabEnabled(1,false);
     ui.tabWidget->setTabEnabled(1,false);
     ui.groupBox_3->setEnabled(false);
     ui.treeWidget_rviz->setEnabled(false);
-    m_DashBoard_x =new CCtrlDashBoard(ui.widget_speed_x);
-    m_DashBoard_x->setGeometry(ui.widget_speed_x->rect());
-    m_DashBoard_x->setValue(0);
 
     ui.tab_manager->setCurrentIndex(0);
     ui.tabWidget->setCurrentIndex(0);
@@ -208,7 +208,7 @@ void MainWindow::initUis()
     ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
     ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
 
-    rock_widget =new rocker(ui.rocker_widget);
+    rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
 
 }
@@ -238,8 +238,8 @@ void MainWindow::connections()
     connect(ui.quick_cmd_add_btn,SIGNAL(clicked()),this,SLOT(quick_cmd_add()));
     connect(ui.quick_cmd_remove_btn,SIGNAL(clicked()),this,SLOT(quick_cmd_remove()));
    //绑定slider的函数
-   connect(ui.horizontalSlider_raw,SIGNAL(valueChanged(int)),this,SLOT(on_Slider_raw_valueChanged(int)));
-   connect(ui.horizontalSlider_linear,SIGNAL(valueChanged(int)),this,SLOT(on_Slider_linear_valueChanged(int)));
+   connect(ui.horizontalSlider_raw,SIGNAL(valueChanged(int)),this,SLOT(Slider_raw_valueChanged(int)));
+   connect(ui.horizontalSlider_linear,SIGNAL(valueChanged(int)),this,SLOT(Slider_linear_valueChanged(int)));
    //设置界面
    connect(ui.action_2,SIGNAL(triggered(bool)),this,SLOT(slot_setting_frame()));
    //绑定速度控制按钮
@@ -833,12 +833,12 @@ void MainWindow::slot_cmd_control()
     }
 }
 //滑动条处理槽函数
-void MainWindow::on_Slider_raw_valueChanged(int v)
+void MainWindow::Slider_raw_valueChanged(int v)
 {
     ui.label_raw->setText(QString::number(v));
 }
 //滑动条处理槽函数
-void MainWindow::on_Slider_linear_valueChanged(int v)
+void MainWindow::Slider_linear_valueChanged(int v)
 {
     ui.label_linear->setText(QString::number(v));
 }
@@ -1124,15 +1124,6 @@ void MainWindow::slot_speed_yaw(double yaw)
     ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
     ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
   }
-}
-void MainWindow::on_checkbox_use_environment_stateChanged(int state) {
-	bool enabled;
-	if ( state == 0 ) {
-		enabled = true;
-	} else {
-		enabled = false;
-	}
-	//ui.line_edit_topic->setEnabled(enabled);
 }
 
 /*****************************************************************************

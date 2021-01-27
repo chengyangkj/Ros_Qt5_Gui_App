@@ -1,5 +1,5 @@
-#ifndef rocker_H
-#define rocker_H
+#ifndef JOYSTICK_H
+#define JOYSTICK_H
 
 #include <QWidget>
 #include <QPainter>
@@ -8,13 +8,13 @@
 #include <QtMath>
 #include <QTimer>
 #include <QDebug>
-class rocker : public QWidget
+class JoyStick : public QWidget
 {
     Q_OBJECT
 
 public:
-    rocker(QWidget *parent = 0);
-    ~rocker();
+    JoyStick(QWidget *parent = 0);
+    ~JoyStick();
     enum {upleft=0,up,upright,left,stop,right,downleft,down,downright};
 signals:
     void keyNumchanged(int num);
@@ -27,9 +27,9 @@ protected:
 private:
     int mouseX;
     int mouseY;
-  int rockerX;//摇杆
-  int rockerY;
-  int rockerR;
+  int JoyStickX;//摇杆
+  int JoyStickY;
+  int JoyStickR;
   int padX;//底盘
   int padY;
   int padR;
@@ -42,4 +42,4 @@ private:
 
 };
 
-#endif // rocker_H
+#endif // JoyStick_H

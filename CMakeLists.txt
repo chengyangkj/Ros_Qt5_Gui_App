@@ -10,7 +10,15 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ##############################################################################
 # Catkin
 ##############################################################################
-
+#file(COPY ./resources/html/ DESTINATION ./html)
+#add_custom_command (
+#  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources/html/line.html
+#  DEPENDS MakeTable
+#  COMMENT "This is a test"
+#  )
+message("LIBRARY_OUTPUT_PATH = ${CATKIN_PACKAGE_BIN_DESTINATION}")
+message("CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
+message("PROJECT_BINARY_DIR = ${PROJECT_BINARY_DIR}")
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
 find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     cv_bridge
@@ -18,8 +26,8 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     image_transport
     )
 
-find_package(Qt5 REQUIRED Core Widgets Multimedia)
-set(QT_LIBRARIES Qt5::Widgets Qt5::Multimedia)
+find_package(Qt5 REQUIRED Core Widgets Multimedia WebEngineWidgets)
+set(QT_LIBRARIES Qt5::Widgets Qt5::Multimedia Qt5::WebEngineWidgets)
 include_directories(${catkin_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
@@ -65,5 +73,5 @@ install(TARGETS cyrobot_monitor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINA
 #如果要生成release版本
 #SET(CMAKE_BUILD_TYPE "Release")
 #添加的支持debug和release支持
-#SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
 #SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")

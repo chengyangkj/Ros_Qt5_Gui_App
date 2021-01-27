@@ -20,7 +20,7 @@
 #include "qrviz.hpp"
 //仪表盘头文件
 #include "CCtrlDashBoard.h"
-#include "rocker.h"
+#include "joystick.h"
 #include "QProcess"
 #include <QStandardItemModel>
 #include <QTreeWidgetItem>
@@ -73,7 +73,6 @@ public slots:
 	*******************************************/
     void on_actionAbout_triggered();
     void on_button_connect_clicked(bool check );
-    void on_checkbox_use_environment_stateChanged(int state);
     void slot_speed_x(double x);
     void slot_speed_yaw(double yaw);
     void slot_power(float p);
@@ -86,8 +85,8 @@ public slots:
     ** Manual connections
     *******************************************/
     void updateLoggingView(); // no idea why this can't connect automatically
-    void on_Slider_raw_valueChanged(int value);
-    void on_Slider_linear_valueChanged(int value);
+    void Slider_raw_valueChanged(int v);
+    void Slider_linear_valueChanged(int value);
     void slot_cmd_control();
     void slot_tab_manage_currentChanged(int);
     void slot_tab_Widget_currentChanged(int);
@@ -145,7 +144,7 @@ private:
     QString m_masterUrl;
     QString m_hostUrl;
     double m_turnLightThre=0.1;
-    rocker *rock_widget;
+    JoyStick *rock_widget;
 };
 }// namespace cyrobot_monitor
 

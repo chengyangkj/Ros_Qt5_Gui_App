@@ -1,9 +1,8 @@
-#include "../include/cyrobot_monitor/rocker.h"
+#include "../include/cyrobot_monitor/joystick.h"
 #include <QDebug>
-rocker::rocker(QWidget *parent)
+JoyStick::JoyStick(QWidget *parent)
     : QWidget(parent)
 {
-    qDebug()<<parent->width()<<" "<<parent->height();
     setPalette(QPalette(Qt::white));
     resize(parent->width(),parent->height());
     setMinimumSize(100,100);
@@ -13,16 +12,16 @@ rocker::rocker(QWidget *parent)
     connect(tim,&QTimer::timeout,this,[=]{
        emit keyNumchanged(getKeyNum());
    });
-//    connect(this,&rocker::keyNumchanged,this,[=](int num){
+//    connect(this,&JoyStick::keyNumchanged,this,[=](int num){
 //        qDebug()<<num<<endl;
 //    });
 }
 
-rocker::~rocker()
+JoyStick::~JoyStick()
 {
 
 }
-void rocker::paintEvent(QPaintEvent *){
+void JoyStick::paintEvent(QPaintEvent *){
 
     QPainter painter(this);
 
@@ -31,9 +30,9 @@ void rocker::paintEvent(QPaintEvent *){
     padR=side/2; //底盘半径
     padX=padR;//底盘圆心
     padY=padR;//底盘圆心
-    rockerR=padR/4;//摇杆圆半径
-    int rockerMaxR=padR-rockerR;
-    QColor rockerColor(Qt::gray);
+    JoyStickR=padR/4;//摇杆圆半径
+    int JoyStickMaxR=padR-JoyStickR;
+    QColor JoyStickColor(Qt::gray);
     //加载底盘图像
 //    painter.save();
 
@@ -57,20 +56,20 @@ void rocker::paintEvent(QPaintEvent *){
         mouseY=padY;
     }
     handPadDis=Pointdis(padR,padR,mouseX,mouseY);
-    if(handPadDis<=rockerMaxR){
-        rockerX=mouseX;
-        rockerY=mouseY;
+    if(handPadDis<=JoyStickMaxR){
+        JoyStickX=mouseX;
+        JoyStickY=mouseY;
     }
     else {
-        rockerX=(int)(rockerMaxR*(mouseX-padX)/handPadDis+padX);
-        rockerY=(int)(rockerMaxR*(mouseY-padY)/handPadDis+padY);
+        JoyStickX=(int)(JoyStickMaxR*(mouseX-padX)/handPadDis+padX);
+        JoyStickY=(int)(JoyStickMaxR*(mouseY-padY)/handPadDis+padY);
     }
-   // painter.drawText(200,200,tr("%1,%2,%3").arg(rockerX).arg(rockerY).arg(handPaddis));
+   // painter.drawText(200,200,tr("%1,%2,%3").arg(JoyStickX).arg(JoyStickY).arg(handPaddis));
     painter.setPen(Qt::NoPen);
-    painter.setBrush(rockerColor);
-    painter.drawEllipse(QPoint(rockerX,rockerY),rockerR,rockerR);//摇杆
+    painter.setBrush(JoyStickColor);
+    painter.drawEllipse(QPoint(JoyStickX,JoyStickY),JoyStickR,JoyStickR);//摇杆
 }
-void rocker::mouseMoveEvent(QMouseEvent* event){
+void JoyStick::mouseMoveEvent(QMouseEvent* event){
     static bool r=false;
     mouseX=event->pos().x();
     mouseY=event->pos().y();
@@ -82,15 +81,15 @@ void rocker::mouseMoveEvent(QMouseEvent* event){
         r=true;
     }
 }
-void rocker::mouseReleaseEvent(QMouseEvent* event){
+void JoyStick::mouseReleaseEvent(QMouseEvent* event){
     mouseX=width()/2;
     mouseY=height()/2;
     tim->stop();
     mousePressed=false;
-    emit keyNumchanged(rocker::stop);
+    emit keyNumchanged(JoyStick::stop);
     update();
 }
-void rocker::mousePressEvent(QMouseEvent* event){
+void JoyStick::mousePressEvent(QMouseEvent* event){
     mouseX=event->pos().x();
     mouseY=event->pos().y();
     tim->start(100);
@@ -98,14 +97,14 @@ void rocker::mousePressEvent(QMouseEvent* event){
     update();
 }
 
-double rocker::Pointdis(int a,int b,int x,int y){
+double JoyStick::Pointdis(int a,int b,int x,int y){
     return sqrt((double)((x-a)*(x-a)+(y-b)*(y-b)));
 }
-int rocker::getKeyNum(){
+int JoyStick::getKeyNum(){
     int x,y;
     int keynum;
-    x=(int)(rockerX*3.0/(padR*2));
-    y=(int)(rockerY*3.0/(padR*2));
+    x=(int)(JoyStickX*3.0/(padR*2));
+    y=(int)(JoyStickY*3.0/(padR*2));
     keynum=3*y+x;
     return keynum;
 }

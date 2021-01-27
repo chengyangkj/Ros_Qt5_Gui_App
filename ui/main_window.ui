@@ -237,7 +237,7 @@ QProgressBar {
                   </widget>
                  </item>
                  <item>
-                  <widget class="QWidget" name="widget_speed_x" native="true">
+                  <widget class="QWebEngineView" name="widget_speed_x" native="true">
                    <property name="minimumSize">
                     <size>
                      <width>300</width>
@@ -287,6 +287,19 @@ QProgressBar {
                        <string>Video</string>
                       </property>
                       <layout class="QGridLayout" name="gridLayout_7">
+                       <item row="0" column="2">
+                        <spacer name="horizontalSpacer_3">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
                        <item row="0" column="0">
                         <layout class="QGridLayout" name="gridLayout_3">
                          <item row="0" column="1">
@@ -362,17 +375,14 @@ QProgressBar {
                         </layout>
                        </item>
                        <item row="0" column="1">
-                        <spacer name="horizontalSpacer_3">
-                         <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
+                        <widget class="QWebEngineView" name="widget_velView" native="true">
+                         <property name="minimumSize">
                           <size>
-                           <width>40</width>
-                           <height>20</height>
+                           <width>200</width>
+                           <height>200</height>
                           </size>
                          </property>
-                        </spacer>
+                        </widget>
                        </item>
                       </layout>
                      </widget>
@@ -1128,7 +1138,7 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                       </spacer>
                      </item>
                      <item>
-                      <widget class="QWidget" name="rocker_widget" native="true">
+                      <widget class="QWidget" name="JoyStick_widget" native="true">
                        <property name="minimumSize">
                         <size>
                          <width>200</width>
@@ -1810,6 +1820,14 @@ color:rgb(238, 238, 236);</string>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebEngineView</class>
+   <extends>QWidget</extends>
+   <header location="global">qwebengineview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
