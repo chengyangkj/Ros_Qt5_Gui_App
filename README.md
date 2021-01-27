@@ -23,15 +23,15 @@ sudo gedit ~/.bashrc
 ```
 添加如下(注意将QT_VERSION改为自己实际版本，我这里版本为5.9.9)：
 ```shell
-#qt
+# QT
 export QT_VERSION=5.9.9
 export QTDIR=~/Qt$QT_VERSION/$QT_VERSION/gcc_64
 export LD_LIBRARY_PATH=$QTDIR/lib:$LD_LIBRARY_PATH
-# export PATH=$PATH:$QTDIR/plugins/platforms
-export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PAth:$QTDIR/lib/cmake
+# export PATH=$PATH:$QTDIR/bin::$QTDIR/plugins/platforms
+export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$QTDIR:$QTDIR/lib/cmake
 export QT_QPA_PLATFORM_PLUGIN_PATH=$QTDIR/plugins/platforms/
-export QML2_IMPORT_PATH=$QTDIR/qml
-#export QT_DEBUG_PLUGINS=1
+
+# export QT_DEBUG_PLUGINS=1
 ```
 
 ### 3，克隆源码
