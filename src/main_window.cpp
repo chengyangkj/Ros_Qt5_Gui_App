@@ -109,7 +109,7 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 void MainWindow::initUis()
 {
     qDebug()<<qApp->applicationDirPath();
-    ui.widget_velView->load(QUrl("file:///" + qApp->applicationDirPath()+"/html/linex.html"));
+    ui.widget_velView->load(QUrl("file:///home/chengyangkj/catkin_ws/src/Ros_Qt5_Gui_App/resources/html/linex.html"));
     ui.widget_speed_x->load(QUrl("file:///home/chengyangkj/catkin_ws/src/Ros_Qt5_Gui_App/resources/html/gauge.html"));
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
@@ -973,7 +973,7 @@ MainWindow::~MainWindow() {
         delete map_rviz;
         map_rviz=NULL;
     }
-
+   ui.widget_speed_x->deleteLater();
 
 }
 

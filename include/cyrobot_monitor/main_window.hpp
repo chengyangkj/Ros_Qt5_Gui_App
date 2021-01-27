@@ -31,6 +31,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <map>
+#include <QtWebEngineWidgets/QWebEngineSettings>
 //rviz
 #include <rviz/visualization_manager.h>
 #include <rviz/render_panel.h>
