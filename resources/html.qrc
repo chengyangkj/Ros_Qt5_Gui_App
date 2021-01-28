@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>html/line.html</file>
+        <file>html/gauge.html</file>
+        <file>html/echarts.js</file>
+        <file>html/echarts-all.js</file>
     </qresource>
 </RCC>

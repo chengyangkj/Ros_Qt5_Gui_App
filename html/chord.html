@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:400px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="build/dist/echarts.js"></script>
+    <script type="text/javascript">
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'build/dist'
+            }
+        });
+        
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/chord'
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('main'),'macarons'); 
+                
+                var option = {
+    title : {
+        text: '测试数据',
+        subtext: 'From d3.js',
+        x:'right',
+        y:'bottom'
+    },
+    tooltip : {
+        trigger: 'item',
+        formatter: function (params) {
+            if (params.indicator2) { // is edge
+                return params.value.weight;
+            } else {// is node
+                return params.name
+            }
+        }
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            restore : {show: true},
+            magicType: {show: true, type: ['force', 'chord']},
+            saveAsImage : {show: true}
+        }
+    },
+    legend: {
+        x: 'left',
+        data:['group1','group2', 'group3', 'group4']
+    },
+    series : [
+        {
+            type:'chord',
+            sort : 'ascending',
+            sortSub : 'descending',
+            showScale : true,
+            showScaleText : true,
+            data : [
+                {name : 'group1'},
+                {name : 'group2'},
+                {name : 'group3'},
+                {name : 'group4'}
+            ],
+            itemStyle : {
+                normal : {
+                    label : {
+                        show : false
+                    }
+                }
+            },
+            matrix : [
+                [11975,  5871, 8916, 2868],
+                [ 1951, 10048, 2060, 6171],
+                [ 8010, 16145, 8090, 8045],
+                [ 1013,   990,  940, 6907]
+            ]
+        }
+    ]
+};
+                    
+                //窗体自适应    
+ 				window.onresize = myChart.resize ;        
+                // 为echarts对象加载数据 
+                myChart.setOption(option); 
+            }
+        );
+    </script>
+</body>

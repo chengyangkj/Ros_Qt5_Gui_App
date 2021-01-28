@@ -10,15 +10,6 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ##############################################################################
 # Catkin
 ##############################################################################
-#file(COPY ./resources/html/ DESTINATION ./html)
-#add_custom_command (
-#  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resources/html/line.html
-#  DEPENDS MakeTable
-#  COMMENT "This is a test"
-#  )
-message("LIBRARY_OUTPUT_PATH = ${CATKIN_PACKAGE_BIN_DESTINATION}")
-message("CMAKE_CURRENT_BINARY_DIR = ${CMAKE_CURRENT_BINARY_DIR}")
-message("PROJECT_BINARY_DIR = ${PROJECT_BINARY_DIR}")
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
 find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     cv_bridge
@@ -68,6 +59,14 @@ add_executable(cyrobot_monitor ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP}
 target_link_libraries(cyrobot_monitor ${QT_LIBRARIES} ${catkin_LIBRARIES})
 install(TARGETS cyrobot_monitor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+
+#############################################################################
+#HTML 将html文件拷贝到可执行文件同级目录
+#############################################################################
+
+file(COPY ${PROJECT_SOURCE_DIR}/html  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION})
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/html DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+#message("PROJECT_SOURCE_DIR:${PROJECT_SOURCE_DIR}")
 #如果要生成debug版本
 #SET(CMAKE_BUILD_TYPE "Debug")
 #如果要生成release版本

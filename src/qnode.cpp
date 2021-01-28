@@ -35,6 +35,7 @@ QNode::QNode(int argc, char** argv ) :
     QSettings topic_setting("topic_setting","cyrobot_monitor");
     odom_topic= topic_setting.value("topic_odom","raw_odom").toString();
     power_topic=topic_setting.value("topic_power","power").toString();
+    laser_topic=topic_setting.value("topic_laser","scan").toString();
     pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
     power_min=topic_setting.value("power_min","10").toString();
     power_max=topic_setting.value("power_max","12").toString();
@@ -55,18 +56,7 @@ bool QNode::init() {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-    ros::NodeHandle n;
-	// Add your ros communications here.
-
-    //创建速度话题的订阅者
-    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
-    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
-    //机器人位置话题
-    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
-     //导航目标点发送话题
-     goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
-     //速度控制话题
-     cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+  SubAndPubTopic();
 	start();
 	return true;
 }
@@ -81,20 +71,59 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
 		return false;
 	}
 	ros::start(); // explicitly needed since our nodehandle is going out of scope.
-    ros::NodeHandle n;
-    //创建速度话题的订阅者
-    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
-    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
-    //机器人位置话题
-    pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
-    //导航目标点发送话题
-    goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
-    //速度控制话题
-    cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
-
+  SubAndPubTopic();
 	start();
 	return true;
 }
+//创建订阅者与发布者
+void QNode::SubAndPubTopic(){
+  ros::NodeHandle n;
+   // Add your ros communications here.
+
+   //创建速度话题的订阅者
+   cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
+   power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
+   //地图订阅
+   map_sub = n.subscribe("map",1000,&QNode::mapCallback,this);
+   //机器人位置话题
+  pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
+   //导航目标点发送话题
+   goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
+   //速度控制话题
+   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
+   //激光雷达点云话题订阅
+   m_laserSub=n.subscribe(laser_topic.toStdString(),1000,&QNode::laserScanCallback,this);
+   //m_rosTimer=n.createTimer(ros::Duration(1.0),boost::bind(&QNode::transformPoint,boost::ref(m_tfListener)));
+   //全局规划Path
+   m_plannerPathSub=n.subscribe("/move_base/NavfnROS/plan",1000,&QNode::plannerPathCallback,this);
+}
+
+void QNode::transformPoint(const tf::TransformListener& listener){
+  //we'll create a point in the base_laser frame that we'd like to transform to the base_link frame
+  geometry_msgs::PointStamped laser_point;
+  laser_point.header.frame_id = "base_laser";
+
+  //we'll just use the most recent transform available for our simple example
+  laser_point.header.stamp = ros::Time();
+
+  //just an arbitrary point in space
+  laser_point.point.x = 1.0;
+  laser_point.point.y = 0.2;
+  laser_point.point.z = 0.0;
+
+  try{
+    geometry_msgs::PointStamped base_point;
+    listener.transformPoint("base_link", laser_point, base_point);
+
+    ROS_INFO("base_laser: (%.2f, %.2f. %.2f) -----> base_link: (%.2f, %.2f, %.2f) at time %.2f",
+        laser_point.point.x, laser_point.point.y, laser_point.point.z,
+        base_point.point.x, base_point.point.y, base_point.point.z, base_point.header.stamp.toSec());
+  }
+  catch(tf::TransformException& ex){
+    ROS_ERROR("Received an exception trying to transform a point from \"base_laser\" to \"base_link\": %s", ex.what());
+  }
+}
+
 QMap<QString,QString> QNode::get_topic_list()
 {
     ros::master::V_TopicInfo topic_list;
@@ -102,21 +131,78 @@ QMap<QString,QString> QNode::get_topic_list()
     QMap<QString,QString> res;
     for(auto topic:topic_list)
     {
-
         res.insert(QString::fromStdString(topic.name),QString::fromStdString(topic.datatype));
-
     }
     return res;
 }
+//planner的路径话题回调
+void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path){
+     plannerPoints.clear();
+     for(int i=0;i<path->poses.size();i++){
+       QPointF roboPos;
+       roboPos.setX((path->poses[i].pose.position.x-m_mapOriginX)/m_mapResolution);
+       roboPos.setY((path->poses[i].pose.position.y-m_mapOriginY)/m_mapResolution);
+       plannerPoints.append(roboPos);
+     }
+     emit plannerPath(plannerPoints);
+}
+
+//激光雷达点云话题回调
+void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
+  //获取tf变换 机器人坐标系变换到map坐标系
+  tf::TransformListener listener;
+  tf::StampedTransform transform;
+  static float qx=0,qy=0;
+  geometry_msgs::PointStamped laser_point;
+  geometry_msgs::PointStamped map_point;
+  laser_point.header.frame_id = laser_msg->header.frame_id;
+  std::vector<float> ranges = laser_msg->ranges;
+  laserPoints.clear();
+  //转换到二维XY平面坐标系下;
+  for(int i=0; i< ranges.size(); i++)
+  {
+    //scan_laser坐标系下
+    double angle = laser_msg->angle_min + i * laser_msg->angle_increment;
+    double X = ranges[i] * cos(angle);
+    double Y = ranges[i] * sin(angle);
+    laser_point.point.x=X;
+    laser_point.point.y=Y;
+    laser_point.point.z = 0.0;
+    //change to map frame
+    try{
+      listener.waitForTransform("odom",laser_point.header.frame_id,ros::Time(0),ros::Duration(0.4));
+      listener.transformPoint("odom", laser_point, map_point);
+      listener.waitForTransform("map","odom",ros::Time(0),ros::Duration(0.4));
+      listener.lookupTransform("map","odom",ros::Time(0), transform);
+      map_point.point.x += transform.getOrigin().x();
+      map_point.point.y += transform.getOrigin().y();
+    }
+    catch(tf::TransformException& ex){
+      ROS_ERROR("Received an exception trying to transform  %s", ex.what());
+    }
+    QPointF roboPos;
+    roboPos.setX((map_point.point.x-m_mapOriginX)/m_mapResolution);
+    roboPos.setY((map_point.point.y-m_mapOriginY)/m_mapResolution);
+    laserPoints.append(roboPos);
+  }
+  updateLaserScan(laserPoints);
+}
+
 //机器人位置话题的回调函数
 void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
 {
-    emit position(pos.header.frame_id.data(), pos.pose.pose.position.x,pos.pose.pose.position.y,pos.pose.pose.orientation.z,pos.pose.pose.orientation.w);
-//    qDebug()<<<<" "<<pos.pose.pose.position.y;
+      QPointF roboPos;
+      roboPos.setX((pos.pose.pose.position.x-m_mapOriginX)/m_mapResolution);
+      roboPos.setY((pos.pose.pose.position.y-m_mapOriginY)/m_mapResolution);
+      //yaw
+      tf::Quaternion quat;
+      tf::quaternionMsgToTF(pos.pose.pose.orientation, quat);
+      double roll, pitch, yaw;//定义存储r\p\y的容器
+      tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);//进行转换
+      emit updateRoboPose(roboPos,yaw);
 }
 void QNode::powerCallback(const std_msgs::Float32 &message_holder)
 {
-
     emit power(message_holder.data);
 }
 void QNode::myCallback(const std_msgs::Float64 &message_holder)
@@ -139,15 +225,48 @@ void QNode::set_goal(QString frame,double x,double y,double z,double w)
     goal_pub.publish(goal);
     ros::spinOnce();
 }
+//地图信息订阅回调函数
+void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
+      mapWidth=map->info.width;
+      mapHeight=map->info.width;
+      m_mapOriginX=map->info.origin.position.x;
+      m_mapOriginY=map->info.origin.position.y;
+      m_mapResolution=map->info.resolution;
+      int row, col, value;
+      cv::Mat image(map->info.width, map->info.height, CV_8UC1);
+      for(int array_index=0; array_index < map->data.size(); array_index++) {
+          //计算当前所在行
+          row = (int)array_index/image.cols;
+          //计算当前所在列
+          col = array_index%image.cols;
+          //获取当前位置的像素值
+          int curr_data=map->data[array_index];
+          //计算值
+          if ( curr_data== -1) {
+              value = 125;    // grey
+          } else if (curr_data == 100) {
+              value = 0;      // black
+          } else if (curr_data == 0) {
+              value = 255;    // white
+          } else {
+              ROS_WARN("Unsupported value in Occupancy Grid");
+              value == 125;
+          }
+          image.at<uchar>(row, col) = (uchar)value;
+      }
+      QImage imageMap=Mat2QImage(image);
+      QSizeF size(mapWidth,mapHeight);
+      emit updateMap(imageMap,size);
+}
+
 //速度回调函数
 void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
     emit speed_x(msg->twist.twist.linear.x);
-    emit speed_y(msg->twist.twist.angular.z);
+    emit speed_y(msg->twist.twist.linear.y);
 }
 void QNode::run() {
-        int count=0;
-        ros::Rate loop_rate(40);
+        ros::Rate loop_rate(30);
         //当当前节点没有关闭时
         while ( ros::ok() ) {
             //调用消息处理回调函数
@@ -215,96 +334,30 @@ void QNode::run() {
  {
       ros::NodeHandle n;
       image_transport::ImageTransport it_(n);
-     switch (frame_id) {
-         case 0:
-            image_sub0=n.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
-         break;
-         case 1:
-             image_sub1=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback1,this);
-          break;
-         case 2:
-             image_sub2=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback2,this);
-          break;
-         case 3:
-             image_sub3=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback3,this);
-          break;
-     }
-     ros::spinOnce();
+       image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
+       ros::spinOnce();
  }
 
  //图像话题的回调函数
- void QNode::imageCallback0(const sensor_msgs::CompressedImageConstPtr& msg)
+ void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
  {
      cv_bridge::CvImagePtr cv_ptr;
+
      try
        {
-       if(msg->format.substr(0,4)=="rgb8"){
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg,sensor_msgs::image_encodings::BGR8);
-       }
-       else{
-         cv_ptr = cv_bridge::toCvCopy(msg,msg->format.substr(0,4));
-       }
+         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
          QImage im=Mat2QImage(cv_ptr->image);
          emit Show_image(0,im);
        }
-       catch (std::runtime_error& e)
+       catch (cv_bridge::Exception& e)
        {
+
          log(Error,("video frame0 exception: "+QString(e.what())).toStdString());
          return;
        }
  }
- //图像话题的回调函数
- void QNode::imageCallback1(const sensor_msgs::ImageConstPtr& msg)
- {
-     cv_bridge::CvImagePtr cv_ptr;
-     try
-       {
-         //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg,msg->encoding);
-         QImage im=Mat2QImage(cv_ptr->image);
-         emit Show_image(1,im);
-       }
-       catch (cv_bridge::Exception& e)
-       {
-         log(Error,("video frame1 exception: "+QString(e.what())).toStdString());
-         return;
-       }
- }
- //图像话题的回调函数
- void QNode::imageCallback2(const sensor_msgs::ImageConstPtr& msg)
- {
-     cv_bridge::CvImagePtr cv_ptr;
-     try
-       {
-         //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
-         QImage im=Mat2QImage(cv_ptr->image);
-         emit Show_image(2,im);
-       }
-       catch (cv_bridge::Exception& e)
-       {
-         log(Error,("video frame2 exception: "+QString(e.what())).toStdString());
-         return;
-       }
- }
- //图像话题的回调函数
- void QNode::imageCallback3(const sensor_msgs::ImageConstPtr& msg)
- {
-     cv_bridge::CvImagePtr cv_ptr;
-     try
-       {
-         //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
-         QImage im=Mat2QImage(cv_ptr->image);
-         emit Show_image(3,im);
-       }
-       catch (cv_bridge::Exception& e)
-       {
-         log(Error,("video frame3 exception: "+QString(e.what())).toStdString());
-         return;
-       }
- }
+
  QImage QNode::Mat2QImage(cv::Mat const& src)
  {
    QImage dest(src.cols, src.rows, QImage::Format_ARGB32);

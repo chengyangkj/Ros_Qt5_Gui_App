@@ -513,7 +513,11 @@ QProgressBar {
               </layout>
              </item>
              <item>
-              <layout class="QVBoxLayout" name="verticalLayout_build_map"/>
+              <layout class="QVBoxLayout" name="verticalLayout_build_map">
+               <item>
+                <widget class="QGraphicsView" name="mapViz"/>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
@@ -793,7 +797,7 @@ border:none;</string>
            <enum>Qt::DefaultContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="movable">
            <bool>false</bool>

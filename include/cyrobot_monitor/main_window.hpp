@@ -15,11 +15,7 @@
 //#include <QtGui/QMainWindow>
 #include "ui_main_window.h"
 #include "qnode.hpp"
-#include "addtopics.h"
 #include "settings.h"
-#include "qrviz.hpp"
-//仪表盘头文件
-#include "CCtrlDashBoard.h"
 #include "joystick.h"
 #include "QProcess"
 #include <QStandardItemModel>
@@ -32,15 +28,6 @@
 #include <QVBoxLayout>
 #include <map>
 #include <QtWebEngineWidgets/QWebEngineSettings>
-//rviz
-#include <rviz/visualization_manager.h>
-#include <rviz/render_panel.h>
-#include <rviz/display.h>
-#include <rviz/tool_manager.h>
-#include <rviz/visualization_manager.h>
-#include <rviz/render_panel.h>
-#include <rviz/display.h>
-#include<rviz/tool.h>
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
@@ -64,12 +51,11 @@ public:
 
 	void closeEvent(QCloseEvent *event); // Overloaded function
 	void showNoMasterMessage();
-    void initRviz();
     void initUis();
     void initVideos();
     void initTopicList();
 public slots:
-	/******************************************
+    /******************************************
 	** Auto-connections (connectSlotsByName())
 	*******************************************/
     void on_actionAbout_triggered();
@@ -91,10 +77,6 @@ public slots:
     void slot_cmd_control();
     void slot_tab_manage_currentChanged(int);
     void slot_tab_Widget_currentChanged(int);
-    void slot_add_topic_btn();
-    void slot_choose_topic(QTreeWidgetItem *choose);
-    void slot_treewidget_item_value_change(QString);
-    void slot_treewidget_item_check_change(int);
     void slot_set_2D_Goal();
     void slot_set_2D_Pos();
     void slot_set_select();
@@ -124,14 +106,10 @@ private:
     void connections();
     void add_quick_cmd(QString name,QString shell);
     QNode qnode;
-    CCtrlDashBoard *m_DashBoard_x;
-    CCtrlDashBoard *m_DashBoard_y;
     QProcess *quick_cmd=NULL;
     QProcess *close_remote_cmd=NULL;
     QProcess *base_cmd=NULL;
-    QRviz *map_rviz=NULL;
     QStandardItemModel* treeView_rviz_model=NULL;
-    AddTopics *addtopic_form=NULL;
     //存放rviz treewidget当前显示的控件及控件的父亲的地址
     QMap <QWidget*,QTreeWidgetItem *> widget_to_parentItem_map;
     //存放状态栏的对应关系 display名 状态item
