@@ -1,12 +1,15 @@
 #include "../include/cyrobot_monitor/robomap.h"
 #include <QDebug>
-roboMap::roboMap(QQuickItem *parent) : QQuickPaintedItem (parent)
+roboMap::roboMap()
 {
   setAcceptHoverEvents(true);
   setAcceptedMouseButtons(Qt::AllButtons);
+  setAcceptDrops(true);
   setFlag(ItemAcceptsInputMethod, true);
-  setAntialiasing(true);
-  setMipmap(true);
+//  m_scaleValue =10;
+//  setScale(m_scaleValue);
+  moveBy(0,0);
+  //setCursor(Qt::CrossCursor);   //改变光标形状
 }
 int roboMap::QColorToInt(const QColor& color) {
   //将Color 从QColor 转换成 int
@@ -24,13 +27,12 @@ void roboMap::paintPlannerPath(QPolygonF path){
   plannerPath=path;
   update();
 }
-void roboMap::paintMaps(QImage map,QSizeF size){
-   this->setSize(size);
-   mapSize=size;
+void roboMap::paintMaps(QImage map){
    m_imageMap=map;
    update();
 }
 void roboMap::paintRoboPos(QPointF pos,float yaw){
+  qDebug()<<"pos:"<<pos;
    RoboPostion=pos;
    //yaw弧度全转换为正值
    m_roboYaw=abs(yaw);
@@ -40,7 +42,7 @@ void roboMap::paintRoboPos(QPointF pos,float yaw){
 
    update();
 }
-void roboMap::paint(QPainter *painter){
+void roboMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
   //map
   painter->drawImage(0,0,m_imageMap);
   /* painter->save();
@@ -76,7 +78,7 @@ void roboMap::paint(QPainter *painter){
    painter->setPen(QPen(QColor(0, 0, 0, 255), 1));
    painter->drawPoints(plannerPath);
 
-   //绘制planner Path
+   //绘制laser
    painter->setPen(QPen(QColor(255, 0, 0, 255), 1));
    painter->drawPoints(laserPoints);
 }
@@ -90,6 +92,11 @@ void roboMap::setMin(){
   }
    this->setScale(map_size);
 }
+QRectF roboMap::boundingRect() const{
+  //设置当前item绘制区域 (x,y,width,height)
+  return QRectF(0,0,m_imageMap.width(),m_imageMap.height());
+}
+
 void roboMap::move(double x,double y){
    //this->setTransformOrigin(50,50);
 //   this->setRotation(180);
@@ -100,4 +107,60 @@ void roboMap::move(double x,double y){
 
   //this->setCursor(QCursor(Qt::OpenHandCursor));
    qDebug()<<"ok!";
+}
+//mouse event
+void roboMap::wheelEvent(QGraphicsSceneWheelEvent *event){
+  if((event->delta() > 0)&&(m_scaleValue >= 50))//最大放大到原始图像的50倍
+  {
+      return;
+  }
+  else if((event->delta() < 0)&&(m_scaleValue <= m_scaleDafault))//图像缩小到自适应大小之后就不继续缩小
+  {
+      //ResetItemPos();//重置图片大小和位置，使之自适应控件窗口大小
+  }
+  else
+  {
+      qreal qrealOriginScale = m_scaleValue;
+      if(event->delta() > 0)//鼠标滚轮向前滚动
+      {
+          m_scaleValue*=1.1;//每次放大10%
+      }
+      else
+      {
+          m_scaleValue*=0.9;//每次缩小10%
+      }
+      setScale(m_scaleValue);
+      if(event->delta() > 0)
+      {
+          moveBy(-event->pos().x()*qrealOriginScale*0.1, -event->pos().y()*qrealOriginScale*0.1);//使图片缩放的效果看起来像是以鼠标所在点为中心进行缩放的
+      }
+      else
+      {
+          moveBy(event->pos().x()*qrealOriginScale*0.1, event->pos().y()*qrealOriginScale*0.1);//使图片缩放的效果看起来像是以鼠标所在点为中心进行缩放的
+      }
+  }
+}
+
+void roboMap::mousePressEvent(QGraphicsSceneMouseEvent *event){
+      if(event->button()== Qt::LeftButton)
+      {
+          m_startPos = event->pos();//鼠标左击时，获取当前鼠标在图片中的坐标，
+          m_isPress = true;//标记鼠标左键被按下
+      }
+      else if(event->button() == Qt::RightButton)
+      {
+          //ResetItemPos();//右击鼠标重置大小
+      }
+}
+
+void roboMap::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
+      if(m_isPress)
+      {
+          QPointF point = (event->pos() - m_startPos)*m_scaleValue;
+          moveBy(point.x(), point.y());
+      }
+}
+
+void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
+     m_isPress = false;//标记鼠标左键已经抬起
 }

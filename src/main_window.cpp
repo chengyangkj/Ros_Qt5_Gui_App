@@ -37,9 +37,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     //读取配置文件
     ReadSettings();
     setWindowIcon(QIcon(":/images/robot.png"));
-    ui.tab_manager->setCurrentIndex(0); // ensure the first tab is showing - qt-designer should have this already hardwired, but often loses it (settings?).
     //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
-
 	/*********************
 	** Logging
 	**********************/
@@ -108,6 +106,17 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 //初始化UI
 void MainWindow::initUis()
 {
+    //视图场景加载
+    m_qgraphicsScene = new QGraphicsScene;//要用QGraphicsView就必须要有QGraphicsScene搭配着用
+    m_qgraphicsScene->clear();
+    //创建item
+    m_roboMap =new roboMap();
+    //视图添加item
+    m_qgraphicsScene->addItem(m_roboMap);
+    //设置item的坐标原点与视图的原点重合（默认为视图中心）
+//    m_roboMap->setPos(100,100);
+    //widget添加视图
+    ui.mapViz->setScene(m_qgraphicsScene);
     ui.widget_velView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/linex.html"));
     ui.widget_speed_x->load(QUrl("qrc:/html/gauge.html"));
     //关闭滚动条
@@ -115,11 +124,11 @@ void MainWindow::initUis()
     ui.widget_speed_x->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
-    ui.tab_manager->setTabEnabled(1,false);
-    ui.tabWidget->setTabEnabled(1,false);
-    ui.groupBox_3->setEnabled(false);
-    ui.tab_manager->setCurrentIndex(0);
-    ui.tabWidget->setCurrentIndex(0);
+    //ui.tab_manager->setTabEnabled(1,false);
+    //ui.tabWidget->setTabEnabled(1,false);
+   // ui.groupBox_3->setEnabled(false);
+   ui.tab_manager->setCurrentIndex(1);
+   ui.tabWidget->setCurrentIndex(1);
 
     //qucik treewidget
     ui.treeWidget_quick_cmd->setHeaderLabels(QStringList()<<"key"<<"values");
@@ -183,52 +192,10 @@ void MainWindow::connections()
     //hide
     QObject::connect(ui.table_hide_btn,SIGNAL(clicked()),this,SLOT(slot_hide_table_widget()));
     connect(rock_widget,SIGNAL(keyNumchanged(int)),this,SLOT(slot_rockKeyChange(int)));
-    //treewidget的值改变的槽函数
-    //绑定treeiew所有控件的值改变函数
-    for(int i=0;i<ui.treeWidget_rviz->topLevelItemCount();i++)
-    {
-        //top 元素
-        QTreeWidgetItem *top=ui.treeWidget_rviz->topLevelItem(i);
-//        qDebug()<<top->text(0)<<endl;
-        for(int j=0;j<top->childCount();j++)
-        {
-
-             //获取该WidgetItem的子节点
-             QTreeWidgetItem* tmp= top->child(j);
-             QWidget* controls=ui.treeWidget_rviz->itemWidget(tmp,1);
-//             qDebug()<<controls;
-             //将当前控件对象和父级对象加入到map中
-             widget_to_parentItem_map[controls]=top;
-             //判断这些widget的类型 并分类型进行绑定槽函数
-             if(QString(controls->metaObject()->className())=="QComboBox")
-             {
-                 connect(controls,SIGNAL(currentTextChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-             }
-             else if(QString(controls->metaObject()->className())=="QLineEdit")
-              {
-                 connect(controls,SIGNAL(textChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-               }
-             else if(QString(controls->metaObject()->className())=="QSpinBox")
-             {
-                 connect(controls,SIGNAL(valueChanged(QString)),this,SLOT(slot_treewidget_item_value_change(QString)));
-             }
-        }
-    }
-    //绑定treeview checkbox选中事件
-   // stateChanged
-
-    for(int i=0;i<ui.treeWidget_rviz->topLevelItemCount();i++)
-    {
-        //top 元素
-        QTreeWidgetItem *top=ui.treeWidget_rviz->topLevelItem(i);
-        QWidget *check=ui.treeWidget_rviz->itemWidget(top,1);
-        //记录父子关系
-        widget_to_parentItem_map[check]=top;
-        connect(check,SIGNAL(stateChanged(int)),this,SLOT(slot_treewidget_item_check_change(int)));
-
-
-    }
-    //connect(ui.treeWidget_rviz,SIGNAL(itemChanged(QTreeWidgetItem*,int)),this,SLOT(slot_treewidget_item_value_change(QTreeWidgetItem*,int)));
+    connect(&qnode,SIGNAL(updateMap(QImage)),m_roboMap,SLOT(paintMaps(QImage)));
+    connect(&qnode,SIGNAL(plannerPath(QPolygonF)),m_roboMap,SLOT(paintPlannerPath(QPolygonF)));
+    connect(&qnode,SIGNAL(updateRoboPose(QPointF,float)),m_roboMap,SLOT(paintRoboPos(QPointF,float)));
+    connect(&qnode,SIGNAL(updateLaserScan(QPolygonF)),m_roboMap,SLOT(paintLaserScan(QPolygonF)));
 }
 void MainWindow::slot_hide_table_widget(){
   if(ui.tabWidget->isHidden()){
@@ -558,8 +525,10 @@ void MainWindow::cmd_error_output()
 
 //析构函数
 MainWindow::~MainWindow() {
-
-
+    if(m_qgraphicsScene)
+    {
+        delete m_qgraphicsScene;
+    }
     if( base_cmd)
     {
         delete base_cmd;
@@ -596,7 +565,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
   connecting_dia.show();
     //如果使用环境变量
   if (m_useEnviorment) {
-		if ( !qnode.init() ) {
+    if ( !qnode.init() ) {
            connecting_dia.close();
             //showNoMasterMessage();
             QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
@@ -612,7 +581,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.tabWidget->setTabEnabled(1,true);
             ui.groupBox_3->setEnabled(true);
             ui.treeWidget_rviz->setEnabled(true);
-			ui.button_connect->setEnabled(false);
+            ui.button_connect->setEnabled(false);
               ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
               ui.label_statue_text->setStyleSheet("color:green;");
              ui.label_statue_text->setText("在线");

@@ -17,6 +17,7 @@
 #include "qnode.hpp"
 #include "settings.h"
 #include "joystick.h"
+#include "robomap.h"
 #include "QProcess"
 #include <QStandardItemModel>
 #include <QTreeWidgetItem>
@@ -124,6 +125,8 @@ private:
     QString m_hostUrl;
     double m_turnLightThre=0.1;
     JoyStick *rock_widget;
+    QGraphicsScene  *m_qgraphicsScene=NULL;
+    roboMap *m_roboMap=NULL;
 };
 }// namespace cyrobot_monitor
 

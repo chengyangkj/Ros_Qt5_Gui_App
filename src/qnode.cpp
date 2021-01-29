@@ -194,6 +194,7 @@ void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
       QPointF roboPos;
       roboPos.setX((pos.pose.pose.position.x-m_mapOriginX)/m_mapResolution);
       roboPos.setY((pos.pose.pose.position.y-m_mapOriginY)/m_mapResolution);
+      qDebug()<<"callback pose:"<<roboPos;
       //yaw
       tf::Quaternion quat;
       tf::quaternionMsgToTF(pos.pose.pose.orientation, quat);
@@ -256,7 +257,7 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
       }
       QImage imageMap=Mat2QImage(image);
       QSizeF size(mapWidth,mapHeight);
-      emit updateMap(imageMap,size);
+      emit updateMap(imageMap);
 }
 
 //速度回调函数

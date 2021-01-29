@@ -24,7 +24,9 @@ int main(int argc, char **argv) {
     ** Qt
     **********************/
     QApplication app(argc, argv);
-    QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+    //共享opengl上下文
+//    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts)
+//    QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
     cyrobot_monitor::MainWindow w(argc,argv);
     w.show();
     app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));

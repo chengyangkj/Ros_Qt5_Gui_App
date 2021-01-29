@@ -39,6 +39,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <tf/transform_listener.h>
 #include <actionlib/server/simple_action_server.h>
+#include <QtConcurrent/QtConcurrent>
 #include <map>
 #include <QLabel>
 #include <QImage>
@@ -95,7 +96,7 @@ Q_SIGNALS:
     void Master_shutdown();
     void Show_image(int,QImage);
     void updateRoboPose(QPointF pos,float yaw);
-    void updateMap(QImage map,QSizeF size);
+    void updateMap(QImage map);
     void plannerPath(QPolygonF path);
     void updateLaserScan(QPolygonF points);
 private:
