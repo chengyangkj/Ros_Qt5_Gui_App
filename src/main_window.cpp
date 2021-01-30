@@ -118,10 +118,10 @@ void MainWindow::initUis()
     //widget添加视图
     ui.mapViz->setScene(m_qgraphicsScene);
     ui.widget_velView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/linex.html"));
-    ui.widget_speed_x->load(QUrl("qrc:/html/gauge.html"));
+    ui.widget_speed_x->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge.html"));
     //关闭滚动条
-    ui.widget_velView->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
-    ui.widget_speed_x->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
+    //ui.widget_velView->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
+    //ui.widget_speed_x->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
     //ui.tab_manager->setTabEnabled(1,false);
