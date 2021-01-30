@@ -128,7 +128,7 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405153102508.png) 
 #### 4, 地图显示模块
-[![image.png](https://i.postimg.cc/wjWBFbVn/image.png)](https://postimg.cc/G4yrmK6j)
+![image.png](https://i.postimg.cc/wjWBFbVn/image.png)
 
 ## 开源协议
 **GNU GPL（GNU General Public License，GNU通用公共许可证）**
