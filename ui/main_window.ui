@@ -256,7 +256,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <property name="styleSheet">
@@ -555,6 +555,12 @@ QProgressBar {
                <layout class="QHBoxLayout" name="horizontalLayout_16">
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_11">
+                  <item>
+                   <widget class="QStackedWidget" name="stackedWidget">
+                    <widget class="QWidget" name="page"/>
+                    <widget class="QWidget" name="page_2"/>
+                   </widget>
+                  </item>
                   <item>
                    <widget class="QLabel" name="label_video2">
                     <property name="minimumSize">

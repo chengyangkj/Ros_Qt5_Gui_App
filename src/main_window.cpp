@@ -100,7 +100,7 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 //初始化UI
 void MainWindow::initUis()
 {
-
+    //ui.centralwidget->hide();
     //视图场景加载
     m_qgraphicsScene = new QGraphicsScene;//要用QGraphicsView就必须要有QGraphicsScene搭配着用
     m_qgraphicsScene->clear();
