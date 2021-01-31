@@ -130,5 +130,8 @@
         <file>images/up_2.png</file>
         <file>images/up_left_2.png</file>
         <file>images/up_right_2.png</file>
+        <file>images/close.png</file>
+        <file>images/min.png</file>
+        <file>images/max.png</file>
     </qresource>
 </RCC>

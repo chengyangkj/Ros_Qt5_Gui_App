@@ -33,7 +33,7 @@ QNode::QNode(int argc, char** argv ) :
     {
 //    读取topic的设置
     QSettings topic_setting("topic_setting","cyrobot_monitor");
-    odom_topic= topic_setting.value("topic_odom","raw_odom").toString();
+    odom_topic= topic_setting.value("odom","odom").toString();
     power_topic=topic_setting.value("topic_power","power").toString();
     laser_topic=topic_setting.value("topic_laser","scan").toString();
     pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
@@ -178,7 +178,7 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
       map_point.point.y += transform.getOrigin().y();
     }
     catch(tf::TransformException& ex){
-      ROS_ERROR("Received an exception trying to transform  %s", ex.what());
+      //ROS_ERROR("Received an exception trying to transform  %s", ex.what());
     }
     QPointF roboPos;
     roboPos.setX((map_point.point.x-m_mapOriginX)/m_mapResolution);
@@ -194,7 +194,7 @@ void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
       QPointF roboPos;
       roboPos.setX((pos.pose.pose.position.x-m_mapOriginX)/m_mapResolution);
       roboPos.setY((pos.pose.pose.position.y-m_mapOriginY)/m_mapResolution);
-      qDebug()<<"callback pose:"<<roboPos;
+      //qDebug()<<"callback pose:"<<roboPos;
       //yaw
       tf::Quaternion quat;
       tf::quaternionMsgToTF(pos.pose.pose.orientation, quat);
@@ -251,7 +251,7 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
               value = 255;    // white
           } else {
               ROS_WARN("Unsupported value in Occupancy Grid");
-              value == 125;
+              value = 125;
           }
           image.at<uchar>(row, col) = (uchar)value;
       }

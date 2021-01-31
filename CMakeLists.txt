@@ -59,14 +59,14 @@ add_executable(cyrobot_monitor ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP}
 target_link_libraries(cyrobot_monitor ${QT_LIBRARIES} ${catkin_LIBRARIES})
 install(TARGETS cyrobot_monitor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-
 #############################################################################
 #HTML 将html文件拷贝到可执行文件同级目录
 #############################################################################
-
+file(REMOVE_RECURSE ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}/html)
+file(REMOVE_RECURSE ${CMAKE_INSTALL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION}/html)
 file(COPY ${PROJECT_SOURCE_DIR}/html  DESTINATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_BIN_DESTINATION})
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/html DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-#message("PROJECT_SOURCE_DIR:${PROJECT_SOURCE_DIR}")
+#message("PROJECT_SOURCE_DIR:${CMAKE_INSTALL_PREFIX}")
 #如果要生成debug版本
 #SET(CMAKE_BUILD_TYPE "Debug")
 #如果要生成release版本

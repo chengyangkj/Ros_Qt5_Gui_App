@@ -37,6 +37,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     //读取配置文件
     ReadSettings();
     setWindowIcon(QIcon(":/images/robot.png"));
+    setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
     //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
 	/*********************
 	** Logging
@@ -60,13 +61,6 @@ void MainWindow::initVideos()
    QSettings video_topic_setting("video_topic","cyrobot_monitor");
    QStringList names=video_topic_setting.value("names").toStringList();
    QStringList topics=video_topic_setting.value("topics").toStringList();
-   if(names.size()==4)
-   {
-       ui.label_v_name0->setText(names[0]);
-       ui.label_v_name1->setText(names[1]);
-       ui.label_v_name2->setText(names[2]);
-       ui.label_v_name3->setText(names[3]);
-   }
    if(topics.size()==4)
    {
        if(topics[0]!="")
@@ -106,6 +100,7 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 //初始化UI
 void MainWindow::initUis()
 {
+
     //视图场景加载
     m_qgraphicsScene = new QGraphicsScene;//要用QGraphicsView就必须要有QGraphicsScene搭配着用
     m_qgraphicsScene->clear();
@@ -117,18 +112,16 @@ void MainWindow::initUis()
 //    m_roboMap->setPos(100,100);
     //widget添加视图
     ui.mapViz->setScene(m_qgraphicsScene);
-    ui.widget_velView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/linex.html"));
-    ui.widget_speed_x->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge.html"));
-    //关闭滚动条
-    //ui.widget_velView->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
-    //ui.widget_speed_x->settings()->setAttribute(QWebEngineSettings::ShowScrollBars,false);
+    ui.vel_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/linex.html"));
+    ui.speed_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge-stage.html"));
+
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
-    //ui.tab_manager->setTabEnabled(1,false);
-    //ui.tabWidget->setTabEnabled(1,false);
-   // ui.groupBox_3->setEnabled(false);
-   ui.tab_manager->setCurrentIndex(1);
-   ui.tabWidget->setCurrentIndex(1);
+    ui.tab_manager->setTabEnabled(1,false);
+    ui.tabWidget->setTabEnabled(1,false);
+    ui.groupBox_3->setEnabled(false);
+   ui.tab_manager->setCurrentIndex(0);
+   ui.tabWidget->setCurrentIndex(0);
 
     //qucik treewidget
     ui.treeWidget_quick_cmd->setHeaderLabels(QStringList()<<"key"<<"values");
@@ -138,7 +131,6 @@ void MainWindow::initUis()
 
     rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
-
 }
 
 void MainWindow::connections()
@@ -189,6 +181,9 @@ void MainWindow::connections()
     connect(ui.tabWidget,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_Widget_currentChanged(int)));
     //刷新话题列表
     connect(ui.refreash_topic_btn,SIGNAL(clicked()),this,SLOT(refreashTopicList()));
+    connect(ui.close_btn,SIGNAL(clicked()),this,SLOT(slot_closeWindows()));
+    connect(ui.min_btn,SIGNAL(clicked()),this,SLOT(slot_minWindows()));
+    connect(ui.max_btn,SIGNAL(clicked()),this,SLOT(slot_maxWindows()));
     //hide
     QObject::connect(ui.table_hide_btn,SIGNAL(clicked()),this,SLOT(slot_hide_table_widget()));
     connect(rock_widget,SIGNAL(keyNumchanged(int)),this,SLOT(slot_rockKeyChange(int)));
@@ -275,7 +270,6 @@ void MainWindow::slot_return_point()
 //设置导航当前位置按钮的槽函数
 void MainWindow::slot_set_2D_Pos()
 {
-
 // ui.label_map_msg->setText("请在地图中选择机器人的初始位置");
 }
 //设置导航目标位置按钮的槽函数
@@ -358,6 +352,21 @@ void MainWindow::slot_rockKeyChange(int key){
           qnode.move_base(is_all?'>':'.',liner,turn);
       break;
   }
+
+  QVariantMap map;
+  m_sendVelList << liner;
+  //m_recvVelList << (qrand() % 1000 );
+  m_timeList<<QDateTime::currentDateTime().toString();
+  map["series1"] = m_sendVelList;
+  map["xAxis"] = m_timeList;
+  qDebug()<<m_sendVelList<<" time "<<m_timeList;
+  QJsonDocument doc = QJsonDocument::fromVariant(map);
+  QString str = doc.toJson(QJsonDocument::Compact);
+  str.replace(QRegExp("\""), "\\\"");
+  QString strVal = QString("setDatas(\"%1\");").arg(str);
+
+  ui.vel_webView->page()->runJavaScript(strVal);
+
 }
 //速度控制相关按钮处理槽函数
 void MainWindow::slot_cmd_control()
@@ -395,6 +404,20 @@ void MainWindow::slot_cmd_control()
             qnode.move_base(is_all?'>':'.',liner,turn);
         break;
     }
+//    QVariantMap map;
+//    m_sendVelList << 1<<2<<3<<4<<5;
+//     m_timeList<<1<<2<<3<<4<<5;
+//    //m_recvVelList << (qrand() % 1000 );
+//    m_timeList<<QDateTime::currentDateTime().toString();
+//    map["series1"] = m_sendVelList;
+//    map["xAxis"] = m_timeList;
+//    qDebug()<<m_sendVelList<<" time "<<m_timeList;
+//    QJsonDocument doc = QJsonDocument::fromVariant(map);
+//    QString str = doc.toJson(QJsonDocument::Compact);
+//    str.replace(QRegExp("\""), "\\\"");
+//    QString strVal = QString("setDatas(\"%1\");").arg(str);
+
+//    ui.vel_webView->page()->runJavaScript(strVal);
 }
 //滑动条处理槽函数
 void MainWindow::Slider_raw_valueChanged(int v)
@@ -665,7 +688,8 @@ void MainWindow::slot_power(float p)
 }
 void MainWindow::slot_speed_x(double x)
 {
-
+    QString strVal = QString("setDatas(\"%1\");").arg(QString::number(abs(x*100)).mid(0,2));
+    ui.speed_webView->page()->runJavaScript(strVal);
 }
 void MainWindow::slot_speed_yaw(double yaw)
 {
@@ -737,7 +761,41 @@ void MainWindow::WriteSettings() {
         quick_setting.setValue(top->text(0),cmd_val->toPlainText());
     }
 }
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    m_lastPos = event->globalPos();
+    isPressedWidget = true; // 当前鼠标按下的即是QWidget而非界面上布局的其它控件
+}
 
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (isPressedWidget) {
+        this->move(this->x() + (event->globalX() - m_lastPos.x()),
+                   this->y() + (event->globalY() - m_lastPos.y()));
+        m_lastPos = event->globalPos();
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    // 其实这里的mouseReleaseEvent函数可以不用重写
+    m_lastPos = event->globalPos();
+    isPressedWidget = false; // 鼠标松开时，置为false
+}
+void MainWindow::slot_closeWindows(){
+  this->close();
+}
+void MainWindow::slot_minWindows(){
+    this->showMinimized();
+}
+void MainWindow::slot_maxWindows(){
+  if(this->isMaximized()){
+    this->showNormal();
+  }else{
+    this->showMaximized();
+  }
+
+}
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 

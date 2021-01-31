@@ -32,7 +32,7 @@ void roboMap::paintMaps(QImage map){
    update();
 }
 void roboMap::paintRoboPos(QPointF pos,float yaw){
-  qDebug()<<"pos:"<<pos;
+  //qDebug()<<"pos:"<<pos;
    RoboPostion=pos;
    //yaw弧度全转换为正值
    m_roboYaw=abs(yaw);

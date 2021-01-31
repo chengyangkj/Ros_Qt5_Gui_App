@@ -5,17 +5,18 @@
 </head>
 <body>
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-    <div id="main" style="height:400px"></div>
+    <div id="main" style="height:270px;"></div>
     <!-- ECharts单文件引入 -->
     <script src="build/dist/echarts.js"></script>
     <script type="text/javascript">
+
         // 路径配置
         require.config({
             paths: {
                 echarts: 'build/dist'
             }
         });
-        
+
         // 使用
         require(
             [
@@ -24,35 +25,22 @@
             ],
             function (ec) {
                 // 基于准备好的dom，初始化echarts图表
-                var myChart = ec.init(document.getElementById('main'),'macarons'); 
-                
+                var myChart = ec.init(document.getElementById('main'),'macarons');
+
                 var option = {
-    title : {
-        text: '某楼盘销售情况',
-        subtext: '纯属虚构'
-    },
+
     tooltip : {
         trigger: 'axis'
     },
     legend: {
-        data:['意向','预购','成交']
-    },
-    toolbox: {
-        show : true,
-        feature : {
-            mark : {show: true},
-            dataView : {show: true, readOnly: false},
-            magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
-            restore : {show: true},
-            saveAsImage : {show: true}
-        }
+        data:['发送线速度','反馈线速度','发送角速度','反馈角速度']
     },
     calculable : true,
     xAxis : [
         {
             type : 'category',
             boundaryGap : false,
-            data : ['周一','周二','周三','周四','周五','周六','周日']
+            data : [0,0,0,0,]
         }
     ],
     yAxis : [
@@ -62,33 +50,40 @@
     ],
     series : [
         {
-            name:'成交',
+            name:'send Linear',
             type:'line',
             smooth:true,
             itemStyle: {normal: {areaStyle: {type: 'default'}}},
-            data:[10, 12, 21, 54, 260, 830, 710]
+            data:[0,0,0,0,0]
         },
         {
-            name:'预购',
+            name:'Recv Linear',
             type:'line',
             smooth:true,
             itemStyle: {normal: {areaStyle: {type: 'default'}}},
-            data:[30, 182, 434, 791, 390, 30, 10]
+            data:[0,0,0,0,0]
         },
         {
-            name:'意向',
+            name:'Send Angular',
             type:'line',
             smooth:true,
             itemStyle: {normal: {areaStyle: {type: 'default'}}},
-            data:[1320, 1132, 601, 234, 120, 90, 20]
+            data:[0,0,0,0,0]
+        },
+        {
+            name:'Recv Angular',
+            type:'line',
+            smooth:true,
+            itemStyle: {normal: {areaStyle: {type: 'default'}}},
+            data:[0,0,0,0,0]
         }
     ]
 };
-                    
-                //窗体自适应    
- 				window.onresize = myChart.resize ;        
-                // 为echarts对象加载数据 
-                myChart.setOption(option); 
+
+                //窗体自适应
+                                window.onresize = myChart.resize ;
+                // 为echarts对象加载数据
+                myChart.setOption(option);
             }
         );
     </script>

@@ -98,12 +98,20 @@ public slots:
     void slot_dis_connect();
     void slot_hide_table_widget();
     void slot_rockKeyChange(int);
+    void slot_closeWindows();
+    void slot_minWindows();
+    void slot_maxWindows();
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
 
 private:
-	Ui::MainWindowDesign ui;
+  Ui::MainWindowDesign ui;
+    bool isPressedWidget;
+    QPoint m_lastPos;
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void connections();
     void add_quick_cmd(QString name,QString shell);
     QNode qnode;
@@ -127,6 +135,7 @@ private:
     JoyStick *rock_widget;
     QGraphicsScene  *m_qgraphicsScene=NULL;
     roboMap *m_roboMap=NULL;
+    QVariantList m_sendVelList,m_recvVelList,m_timeList;
 };
 }// namespace cyrobot_monitor
 
