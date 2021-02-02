@@ -112,7 +112,6 @@ void MainWindow::initUis()
 //    m_roboMap->setPos(100,100);
     //widget添加视图
     ui.mapViz->setScene(m_qgraphicsScene);
-    ui.vel_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/linex.html"));
     ui.speed_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge-stage.html"));
 
     ui.horizontalLayout_4->setSpacing(0);
@@ -128,7 +127,10 @@ void MainWindow::initUis()
     ui.treeWidget_quick_cmd->setHeaderHidden(true);
     ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
     ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
-
+    ui.settings_btn->setIcon(QIcon("://images/setting.png"));
+    ui.min_btn->setIcon(QIcon("://images/min.png"));
+    ui.max_btn->setIcon(QIcon("://images/max.png"));
+    ui.close_btn->setIcon(QIcon("://images/close.png"));
     rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
 }
@@ -321,7 +323,6 @@ void MainWindow::slot_tab_Widget_currentChanged(int index)
     }
 }
 void MainWindow::slot_rockKeyChange(int key){
-  qDebug()<<"key: "<<key;
   //速度
   float liner=ui.horizontalSlider_linear->value()*0.01;
   float turn=ui.horizontalSlider_raw->value()*0.01;
@@ -352,20 +353,6 @@ void MainWindow::slot_rockKeyChange(int key){
           qnode.move_base(is_all?'>':'.',liner,turn);
       break;
   }
-
-  QVariantMap map;
-  m_sendVelList << liner;
-  //m_recvVelList << (qrand() % 1000 );
-  m_timeList<<QDateTime::currentDateTime().toString();
-  map["series1"] = m_sendVelList;
-  map["xAxis"] = m_timeList;
-  qDebug()<<m_sendVelList<<" time "<<m_timeList;
-  QJsonDocument doc = QJsonDocument::fromVariant(map);
-  QString str = doc.toJson(QJsonDocument::Compact);
-  str.replace(QRegExp("\""), "\\\"");
-  QString strVal = QString("setDatas(\"%1\");").arg(str);
-
-  ui.vel_webView->page()->runJavaScript(strVal);
 
 }
 //速度控制相关按钮处理槽函数
@@ -404,20 +391,6 @@ void MainWindow::slot_cmd_control()
             qnode.move_base(is_all?'>':'.',liner,turn);
         break;
     }
-//    QVariantMap map;
-//    m_sendVelList << 1<<2<<3<<4<<5;
-//     m_timeList<<1<<2<<3<<4<<5;
-//    //m_recvVelList << (qrand() % 1000 );
-//    m_timeList<<QDateTime::currentDateTime().toString();
-//    map["series1"] = m_sendVelList;
-//    map["xAxis"] = m_timeList;
-//    qDebug()<<m_sendVelList<<" time "<<m_timeList;
-//    QJsonDocument doc = QJsonDocument::fromVariant(map);
-//    QString str = doc.toJson(QJsonDocument::Compact);
-//    str.replace(QRegExp("\""), "\\\"");
-//    QString strVal = QString("setDatas(\"%1\");").arg(str);
-
-//    ui.vel_webView->page()->runJavaScript(strVal);
 }
 //滑动条处理槽函数
 void MainWindow::Slider_raw_valueChanged(int v)

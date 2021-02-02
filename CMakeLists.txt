@@ -17,8 +17,8 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     image_transport
     )
 
-find_package(Qt5 REQUIRED Core Widgets Multimedia WebEngineWidgets Concurrent)
-set(QT_LIBRARIES Qt5::Widgets Qt5::Multimedia Qt5::WebEngineWidgets Qt5::Concurrent)
+find_package(Qt5 REQUIRED Core Widgets Multimedia WebEngineWidgets Charts)
+set(QT_LIBRARIES Qt5::Widgets Qt5::Multimedia Qt5::WebEngineWidgets Qt5::Charts)
 include_directories(${catkin_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
