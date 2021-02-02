@@ -33,7 +33,7 @@ QNode::QNode(int argc, char** argv ) :
     {
 //    读取topic的设置
     QSettings topic_setting("topic_setting","cyrobot_monitor");
-    odom_topic= topic_setting.value("odom","odom").toString();
+    odom_topic= topic_setting.value("topic_odom","odom").toString();
     power_topic=topic_setting.value("topic_power","power").toString();
     laser_topic=topic_setting.value("topic_laser","scan").toString();
     pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
@@ -229,7 +229,7 @@ void QNode::set_goal(QString frame,double x,double y,double z,double w)
 //地图信息订阅回调函数
 void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
       mapWidth=map->info.width;
-      mapHeight=map->info.width;
+      mapHeight=map->info.height;
       m_mapOriginX=map->info.origin.position.x;
       m_mapOriginY=map->info.origin.position.y;
       m_mapResolution=map->info.resolution;
@@ -253,10 +253,11 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
               ROS_WARN("Unsupported value in Occupancy Grid");
               value = 125;
           }
-          image.at<uchar>(row, col) = (uchar)value;
+          image.at<uchar>(row, col) = (uchar)curr_data;
       }
       QImage imageMap=Mat2QImage(image);
       QSizeF size(mapWidth,mapHeight);
+      qDebug()<<"size:"<<size;
       emit updateMap(imageMap);
 }
 

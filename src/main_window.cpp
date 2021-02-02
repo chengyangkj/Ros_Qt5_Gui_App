@@ -120,7 +120,7 @@ void MainWindow::initUis()
     ui.tab_manager->setTabEnabled(1,false);
     ui.tabWidget->setTabEnabled(1,false);
     ui.groupBox_3->setEnabled(false);
-   ui.tab_manager->setCurrentIndex(0);
+   ui.tab_manager->setCurrentIndex(1);
    ui.tabWidget->setCurrentIndex(0);
 
     //qucik treewidget
@@ -152,7 +152,7 @@ void MainWindow::connections()
    connect(ui.horizontalSlider_raw,SIGNAL(valueChanged(int)),this,SLOT(Slider_raw_valueChanged(int)));
    connect(ui.horizontalSlider_linear,SIGNAL(valueChanged(int)),this,SLOT(Slider_linear_valueChanged(int)));
    //设置界面
-   connect(ui.action_2,SIGNAL(triggered(bool)),this,SLOT(slot_setting_frame()));
+   connect(ui.settings_btn,SIGNAL(clicked()),this,SLOT(slot_setting_frame()));
    //绑定速度控制按钮
    connect(ui.pushButton_i,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));
    connect(ui.pushButton_u,SIGNAL(clicked()),this,SLOT(slot_cmd_control()));

@@ -91,6 +91,22 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="settings_btn">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">border:none</string>
+          </property>
+          <property name="text">
+           <string>设置</string>
+          </property>
+          <property name="icon">
+           <iconset theme="://images/setting.png"/>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -256,7 +272,7 @@ QProgressBar {
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <property name="styleSheet">
