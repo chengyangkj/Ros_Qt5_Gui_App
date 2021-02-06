@@ -135,5 +135,8 @@
         <file>images/max.png</file>
         <file>images/cursor_pos.png</file>
         <file>images/cursor_move.png</file>
+        <file>images/toolbar_dash.png</file>
+        <file>images/toolbar_map.png</file>
+        <file>images/toolbar_other.png</file>
     </qresource>
 </RCC>

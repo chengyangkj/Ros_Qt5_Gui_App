@@ -138,6 +138,15 @@ void MainWindow::connections()
     QObject::connect(&qnode, SIGNAL(loggingUpdated()), this, SLOT(updateLoggingView()));
     QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(slot_rosShutdown()));
     QObject::connect(&qnode, SIGNAL(Master_shutdown()), this, SLOT(slot_rosShutdown()));
+    QObject::connect(ui.btn_dash, &QPushButton::clicked, [=](){
+        ui.stackedWidget_main->setCurrentIndex(0);
+    });
+    QObject::connect(ui.btn_map, &QPushButton::clicked, [=](){
+        ui.stackedWidget_main->setCurrentIndex(1);
+    });
+    QObject::connect(ui.btn_other, &QPushButton::clicked, [=](){
+        ui.stackedWidget_main->setCurrentIndex(2);
+    });
     //connect速度的信号
     connect(&qnode,SIGNAL(speed_x(double)),this,SLOT(slot_speed_x(double)));
     connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_yaw(double)));
