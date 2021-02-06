@@ -27,6 +27,9 @@
 #include <QVariant>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QtCharts>
+#include <QTimer>
+#include <QQueue>
 #include <map>
 #include <QtWebEngineWidgets/QWebEngineSettings>
 #include "./include/cyrobot_monitor/animationstackedwidget.h"
@@ -56,6 +59,7 @@ public:
     void initUis();
     void initVideos();
     void initTopicList();
+    void initCharts();
 public slots:
     /******************************************
 	** Auto-connections (connectSlotsByName())
@@ -102,6 +106,7 @@ public slots:
     void slot_closeWindows();
     void slot_minWindows();
     void slot_maxWindows();
+    void slot_chartTimerTimeout();
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
@@ -140,6 +145,18 @@ private:
     QGraphicsScene  *m_qgraphicsScene=NULL;
     roboMap *m_roboMap=NULL;
     QVariantList m_sendVelList,m_recvVelList,m_timeList;
+    //曲线
+    QSplineSeries* line;
+    //曲线点的最大数量
+    int line_max = 10;
+    //绘图变量和坐标
+    QChart* chart;
+    QValueAxis *axisX;
+    QValueAxis *axisY;
+    QQueue<QPointF> data1;
+    QQueue<QPointF> data2;
+    QTimer *m_timerChart;
+    QChartView *chartView;
 };
 }// namespace cyrobot_monitor
 

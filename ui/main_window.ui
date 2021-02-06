@@ -31,12 +31,30 @@ padding:0</string>
    <layout class="QHBoxLayout" name="horizontalLayout_25">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_16">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QWidget" name="widget_3" native="true">
         <property name="styleSheet">
          <string notr="true"/>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_15">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
@@ -287,12 +305,26 @@ padding:0</string>
         <property name="styleSheet">
          <string notr="true">QWidget{
 background-color:rgb(67, 154, 246);
-padding:0;
 }</string>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_24">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_14">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QPushButton" name="btn_dash">
              <property name="minimumSize">
@@ -319,6 +351,8 @@ background-color:green
 QPushButton{
 background-color:rgb(67, 154, 246);
 border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
 }</string>
              </property>
              <property name="text">
@@ -361,6 +395,8 @@ background-color:green
 QPushButton{
 background-color:rgb(67, 154, 246);
 border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
 }</string>
              </property>
              <property name="text">
@@ -602,6 +638,19 @@ border:none;
                     </property>
                     <property name="text">
                      <string>No Video</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QWidget" name="widget_chart" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>400</width>
+                      <height>200</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">border:1px solid rgb(0, 0, 0)</string>
                     </property>
                    </widget>
                   </item>

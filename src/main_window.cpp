@@ -131,6 +131,7 @@ void MainWindow::initUis()
     ui.close_btn->setIcon(QIcon("://images/close.png"));
     rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
+    initCharts();
 }
 
 void MainWindow::connections()
@@ -212,6 +213,69 @@ void MainWindow::slot_hide_table_widget(){
     ui.tabWidget->hide();
     ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/show.png);border:none;}");
   }
+}
+void MainWindow::initCharts(){
+  line = new QSplineSeries(this);
+    chart = new QChart();
+    chart->addSeries(line);
+    axisX = new QValueAxis(this);
+    axisY = new QValueAxis(this);
+
+  chartView = new QChartView(ui.widget_chart);
+  chartView->setFixedWidth(ui.widget_chart->width());
+   chartView->setFixedHeight(ui.widget_chart->height());
+  chartView->setRenderHint(QPainter::Antialiasing);
+  m_timerChart=new QTimer;
+  m_timerChart->setInterval(100);
+  connect(m_timerChart,SIGNAL(timeout()),this,SLOT(slot_chartTimerTimeout()));
+  m_timerChart->start();
+}
+void MainWindow::slot_chartTimerTimeout(){
+  QVector<QPointF> list;
+     QVector<QPointF> newlist;
+     list = line->pointsVector();//获取现在图中列表
+     if (list.size() < line_max)
+     {
+         //保持原来
+         newlist = list;
+     }
+     else
+     {
+         //错位移动
+         for(int i =1 ; i< list.size();i++)
+         {
+             newlist.append(QPointF(i-1,list.at(i).y()));
+         }
+     }
+     newlist.append(QPointF(newlist.size(),rand()));//最后补上新的数据
+     line->replace(newlist);//替换更新
+
+
+     line->setName("send");//设置曲线名称
+     line->setPen(QColor(255, 0, 0));//设置曲线颜色
+     line->setUseOpenGL(true);//openGl 加速
+
+     chart->setTitle("Pressure Data");//设置图标标题
+     chart->removeSeries(line);
+     chart->addSeries(line);
+     chart->createDefaultAxes();//设置坐标轴
+
+ //    axisX->setRange(0,line_max);//范围
+ //    axisX->setTitleText("times(secs)");//标题
+      axisX->setTickCount(10);//分隔个数
+     axisX->setLineVisible(true);//可视化
+    axisX->setLinePenColor(Qt::blue);//颜色
+
+ //    axisY->setRange(-200,1200);
+ //    axisY->setTitleText("value");
+ //    axisY->setTickCount(6);
+ //    axisY->setLineVisible(true);
+ //    axisY->setLinePenColor(Qt::blue);
+
+ //    chart->setAxisX(axisX,line);
+ //    chart->setAxisY(axisY,line);
+
+     chartView->setChart(chart);
 }
 //设置界面
 void MainWindow::slot_setting_frame()
