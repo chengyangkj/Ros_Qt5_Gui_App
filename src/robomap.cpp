@@ -140,7 +140,16 @@ void roboMap::wheelEvent(QGraphicsSceneWheelEvent *event){
       }
   }
 }
-
+void roboMap::slot_set2DPos(){
+  m_isOtherCursor=true;
+  QCursor myCursor(QPixmap("://images/cursor_pos.png"),0,0);
+  this->setCursor(myCursor); //设置自定义的鼠标样式
+}
+void roboMap::slot_set2DGoal(){
+  m_isOtherCursor=true;
+  QCursor myCursor(QPixmap("://images/cursor_pos.png"),0,0);
+  this->setCursor(myCursor); //设置自定义的鼠标样式
+}
 void roboMap::mousePressEvent(QGraphicsSceneMouseEvent *event){
       if(event->button()== Qt::LeftButton)
       {
@@ -154,6 +163,10 @@ void roboMap::mousePressEvent(QGraphicsSceneMouseEvent *event){
 }
 
 void roboMap::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
+      if(!m_isOtherCursor){
+        QCursor myCursor(QPixmap("://images/cursor_move.png"),0,0);
+        this->setCursor(myCursor); //设置自定义的鼠标样式
+      }
       if(m_isPress)
       {
           QPointF point = (event->pos() - m_startPos)*m_scaleValue;

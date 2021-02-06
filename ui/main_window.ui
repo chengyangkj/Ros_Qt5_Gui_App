@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1674</width>
-    <height>1219</height>
+    <width>1385</width>
+    <height>743</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -260,32 +260,24 @@ QProgressBar {
        </layout>
       </item>
       <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::HLine</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
-         <widget class="QTabWidget" name="tab_manager">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color:rgb(255, 255, 255)</string>
-          </property>
-          <property name="locale">
-           <locale language="English" country="Australia"/>
-          </property>
+         <widget class="QStackedWidget" name="stackedWidget_2">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
-          <widget class="QWidget" name="tab_status">
-           <property name="styleSheet">
-            <string notr="true">background-color:rgb(255, 255, 255)</string>
-           </property>
-           <attribute name="title">
-            <string>基本</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
+          <widget class="QWidget" name="page_3">
+           <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
@@ -423,142 +415,124 @@ QProgressBar {
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_3">
-           <property name="styleSheet">
-            <string notr="true">background-color:rgb(255, 255, 255)</string>
-           </property>
-           <attribute name="title">
-            <string>rviz</string>
-           </attribute>
-           <widget class="QWidget" name="layoutWidget">
-            <property name="geometry">
-             <rect>
-              <x>8</x>
-              <y>8</y>
-              <width>1181</width>
-              <height>1061</height>
-             </rect>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_14">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_11">
-               <item>
-                <widget class="QPushButton" name="move_camera_btn">
-                 <property name="text">
-                  <string>Move Camera</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/images/rotate_cam.svg</normaloff>:/images/rotate_cam.svg</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="set_select_btn">
-                 <property name="text">
-                  <string>Select</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/images/classes/Select.png</normaloff>:/images/classes/Select.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="set_pos_btn">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>2D Pose Estimate</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/images/classes/SetInitialPose.png</normaloff>:/images/classes/SetInitialPose.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="set_goal_btn">
-                 <property name="text">
-                  <string>2D Nav Goal</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/images/classes/SetGoal.png</normaloff>:/images/classes/SetGoal.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="set_return_btn">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>设置返航点</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/images/set_return.png</normaloff>:/images/set_return.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="return_btn">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>返航</string>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>:/images/return.png</normaloff>:/images/return.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_build_map">
-               <item>
-                <widget class="QGraphicsView" name="mapViz"/>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
+          <widget class="QWidget" name="page_4">
+           <layout class="QVBoxLayout" name="verticalLayout_13">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_14">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <widget class="QPushButton" name="move_camera_btn">
+                  <property name="text">
+                   <string>Move Camera</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>:/images/rotate_cam.svg</normaloff>:/images/rotate_cam.svg</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="set_select_btn">
+                  <property name="text">
+                   <string>Select</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>:/images/classes/Select.png</normaloff>:/images/classes/Select.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="set_pos_btn">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>2D Pose Estimate</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>:/images/classes/SetInitialPose.png</normaloff>:/images/classes/SetInitialPose.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="set_goal_btn">
+                  <property name="text">
+                   <string>2D Nav Goal</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>:/images/classes/SetGoal.png</normaloff>:/images/classes/SetGoal.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="set_return_btn">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>设置返航点</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>:/images/set_return.png</normaloff>:/images/set_return.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="return_btn">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>返航</string>
+                  </property>
+                  <property name="icon">
+                   <iconset>
+                    <normaloff>:/images/return.png</normaloff>:/images/return.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_build_map">
+                <item>
+                 <widget class="QGraphicsView" name="mapViz"/>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </widget>
-          <widget class="QWidget" name="tab_7">
-           <property name="styleSheet">
-            <string notr="true">background-color:rgb(255, 255, 255)</string>
-           </property>
-           <attribute name="title">
-            <string>其他</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_21">
+          <widget class="QWidget" name="page_5">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_17">
               <item>
@@ -835,7 +809,7 @@ border:none;</string>
            <enum>Qt::DefaultContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="movable">
            <bool>false</bool>
@@ -1845,7 +1819,7 @@ color:rgb(238, 238, 236);</string>
   <customwidget>
    <class>QWebEngineView</class>
    <extends>QWidget</extends>
-   <header location="global">qwebengineview.h</header>
+   <header>qwebengineview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

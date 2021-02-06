@@ -133,5 +133,7 @@
         <file>images/close.png</file>
         <file>images/min.png</file>
         <file>images/max.png</file>
+        <file>images/cursor_pos.png</file>
+        <file>images/cursor_move.png</file>
     </qresource>
 </RCC>

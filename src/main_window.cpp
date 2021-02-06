@@ -116,10 +116,8 @@ void MainWindow::initUis()
 
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
-    ui.tab_manager->setTabEnabled(1,false);
     ui.tabWidget->setTabEnabled(1,false);
     ui.groupBox_3->setEnabled(false);
-   ui.tab_manager->setCurrentIndex(1);
    ui.tabWidget->setCurrentIndex(0);
 
     //qucik treewidget
@@ -177,8 +175,6 @@ void MainWindow::connections()
    connect(ui.set_return_btn,SIGNAL(clicked()),this,SLOT(slot_set_return_point()));
    //返航
    connect(ui.return_btn,SIGNAL(clicked()),this,SLOT(slot_return_point()));
-   //左工具栏tab索引改变
-   connect(ui.tab_manager,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_manage_currentChanged(int)));
    //右工具栏索引改变
     connect(ui.tabWidget,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_Widget_currentChanged(int)));
     //刷新话题列表
@@ -193,6 +189,10 @@ void MainWindow::connections()
     connect(&qnode,SIGNAL(plannerPath(QPolygonF)),m_roboMap,SLOT(paintPlannerPath(QPolygonF)));
     connect(&qnode,SIGNAL(updateRoboPose(QPointF,float)),m_roboMap,SLOT(paintRoboPos(QPointF,float)));
     connect(&qnode,SIGNAL(updateLaserScan(QPolygonF)),m_roboMap,SLOT(paintLaserScan(QPolygonF)));
+    //map
+    connect(this,SIGNAL(signalSet2DPose()),m_roboMap,SLOT(slot_set2DPos()));
+    connect(this,SIGNAL(signalSet2DGoal()),m_roboMap,SLOT(slot_set2DGoal()));
+//    connect(ui.stackedWidget_2,SIGNAL())
 }
 void MainWindow::slot_hide_table_widget(){
   if(ui.tabWidget->isHidden()){
@@ -272,12 +272,17 @@ void MainWindow::slot_return_point()
 //设置导航当前位置按钮的槽函数
 void MainWindow::slot_set_2D_Pos()
 {
+  QCursor myCursor(QPixmap("://images/cursor_pos.png"),0,0);
+  this->setCursor(myCursor); //设置自定义的鼠标样式
+  emit signalSet2DPose();
 // ui.label_map_msg->setText("请在地图中选择机器人的初始位置");
 }
 //设置导航目标位置按钮的槽函数
 void MainWindow::slot_set_2D_Goal()
 {
-
+  QCursor myCursor(QPixmap("://images/cursor_pos.png"),0,0);
+  this->setCursor(myCursor); //设置自定义的鼠标样式
+  emit signalSet2DGoal();
 //  ui.label_map_msg->setText("请在地图中选择机器人导航的目标位置");
 }
 void MainWindow::slot_move_camera_btn()
@@ -310,17 +315,6 @@ void MainWindow::slot_tab_manage_currentChanged(int index)
 //右工具栏索引改变
 void MainWindow::slot_tab_Widget_currentChanged(int index)
 {
-    switch (index) {
-    case 0:
-
-        break;
-    case 1:
-        ui.tab_manager->setCurrentIndex(1);
-        break;
-    case 2:
-        break;
-
-    }
 }
 void MainWindow::slot_rockKeyChange(int key){
   //速度
@@ -569,11 +563,9 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
              ui.treeWidget_rviz->setEnabled(false);
-            ui.tab_manager->setTabEnabled(1,false);
             ui.tabWidget->setTabEnabled(1,false);
               ui.groupBox_3->setEnabled(false);
 		} else {
-            ui.tab_manager->setTabEnabled(1,true);
             ui.tabWidget->setTabEnabled(1,true);
             ui.groupBox_3->setEnabled(true);
             ui.treeWidget_rviz->setEnabled(true);
@@ -593,22 +585,20 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             connecting_dia.close();
             QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-             ui.label_statue_text->setStyleSheet("color:red;");
+            ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
-                ui.treeWidget_rviz->setEnabled(false);
-                ui.tab_manager->setTabEnabled(1,false);
-                ui.tabWidget->setTabEnabled(1,false);
-                  ui.groupBox_3->setEnabled(false);
+            ui.treeWidget_rviz->setEnabled(false);
+            ui.tabWidget->setTabEnabled(1,false);
+            ui.groupBox_3->setEnabled(false);
             //showNoMasterMessage();
 		} else {
-            ui.tab_manager->setTabEnabled(1,true);
             ui.tabWidget->setTabEnabled(1,true);
             ui.treeWidget_rviz->setEnabled(true);
-			ui.button_connect->setEnabled(false);
+            ui.button_connect->setEnabled(false);
             ui.groupBox_3->setEnabled(true);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
             ui.label_statue_text->setStyleSheet("color:green;");
-           ui.label_statue_text->setText("在线");
+            ui.label_statue_text->setText("在线");
            //初始化视频订阅的显示
            initVideos();
            //显示话题列表
@@ -639,7 +629,6 @@ void MainWindow::slot_rosShutdown()
     ui.label_statue_text->setText("离线");
     ui.button_connect->setEnabled(true);
     ui.treeWidget_rviz->setEnabled(false);
-    ui.tab_manager->setTabEnabled(1,false);
     ui.tabWidget->setTabEnabled(1,false);
     ui.groupBox_3->setEnabled(false);
 }

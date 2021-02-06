@@ -49,9 +49,12 @@ public slots:
     void paintImage(int,QImage);
     void paintPlannerPath(QPolygonF);
     void paintLaserScan(QPolygonF);
+    void slot_set2DPos();
+    void slot_set2DGoal();
 private:
     int         m_zoomState;
     bool        m_isPress;
+    bool        m_isOtherCursor{false};
     QPointF     m_startPos;
     qreal       m_scaleValue=1;
     qreal       m_scaleDafault=1;

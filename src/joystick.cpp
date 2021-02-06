@@ -43,8 +43,8 @@ void JoyStick::paintEvent(QPaintEvent *){
     //自绘底盘
     painter.save();
     QRadialGradient RadialGradient(padR,padR,padR*3,padR,padR);//圆心2，半径1，焦点2
-    RadialGradient.setColorAt(0,QColor(255,204,51,127));//渐变
-    RadialGradient.setColorAt(1,QColor(245,184,0,190));//渐变
+    RadialGradient.setColorAt(0,QColor(255,240,245,255));//渐变
+    RadialGradient.setColorAt(1,QColor(255,240,245,190));//渐变
     painter.setBrush(RadialGradient);
     painter.setPen(Qt::NoPen);
     painter.drawEllipse(QPoint(padR,padR),side/2,side/2);//大圆盘

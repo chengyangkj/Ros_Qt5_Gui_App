@@ -29,6 +29,7 @@
 #include <QVBoxLayout>
 #include <map>
 #include <QtWebEngineWidgets/QWebEngineSettings>
+#include "./include/cyrobot_monitor/animationstackedwidget.h"
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
@@ -105,6 +106,9 @@ public slots:
 private slots:
 
 
+signals:
+    void signalSet2DPose();
+    void signalSet2DGoal();
 private:
   Ui::MainWindowDesign ui;
     bool isPressedWidget;
