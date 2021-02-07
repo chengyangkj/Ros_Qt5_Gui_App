@@ -243,7 +243,7 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
           //获取当前位置的像素值
           int curr_data=map->data[array_index];
           //计算值
-          if ( curr_data== -1) {
+          if ( curr_data== -1){
               value = 125;    // grey
           } else if (curr_data == 100) {
               value = 0;      // black
@@ -253,11 +253,10 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
               ROS_WARN("Unsupported value in Occupancy Grid");
               value = 125;
           }
-          image.at<uchar>(row, col) = (uchar)curr_data;
+          image.at<uchar>(row, col) = (uchar)value;
       }
       QImage imageMap=Mat2QImage(image);
       QSizeF size(mapWidth,mapHeight);
-      qDebug()<<"size:"<<size;
       emit updateMap(imageMap);
 }
 

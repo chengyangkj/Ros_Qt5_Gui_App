@@ -359,7 +359,8 @@ margin:0px 0px 0px 0px;
               <string/>
              </property>
              <property name="icon">
-              <iconset theme="://images/toolbar_dash.png"/>
+              <iconset theme="://images/toolbar_dash.png">
+               <normaloff>.</normaloff>.</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -403,7 +404,8 @@ margin:0px 0px 0px 0px;
               <string/>
              </property>
              <property name="icon">
-              <iconset theme="://images/toolbar_map.png"/>
+              <iconset theme="://images/toolbar_map.png">
+               <normaloff>.</normaloff>.</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -445,7 +447,8 @@ border:none;
               <string/>
              </property>
              <property name="icon">
-              <iconset theme="://images/toolbar_other.png"/>
+              <iconset theme="://images/toolbar_other.png">
+               <normaloff>.</normaloff>.</iconset>
              </property>
              <property name="iconSize">
               <size>
@@ -484,7 +487,7 @@ border:none;
 }</string>
              </property>
              <property name="text">
-              <string>设置</string>
+              <string/>
              </property>
              <property name="icon">
               <iconset theme="://images/setting.png">
@@ -508,7 +511,7 @@ border:none;
         <item>
          <widget class="QStackedWidget" name="stackedWidget_main">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="page_3">
            <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -543,7 +546,7 @@ border:none;
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QWebEngineView" name="speed_webView" native="true">
+                 <widget class="QWidget" name="widget_dashboard" native="true">
                   <property name="minimumSize">
                    <size>
                     <width>400</width>
@@ -2062,14 +2065,6 @@ color:rgb(238, 238, 236);</string>
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebEngineView</class>
-   <extends>QWidget</extends>
-   <header>qwebengineview.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

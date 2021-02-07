@@ -138,5 +138,6 @@
         <file>images/toolbar_dash.png</file>
         <file>images/toolbar_map.png</file>
         <file>images/toolbar_other.png</file>
+        <file>images/toolbar_settings.png</file>
     </qresource>
 </RCC>

@@ -38,6 +38,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ReadSettings();
     setWindowIcon(QIcon(":/images/robot.png"));
     setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
+    qDebug()<<"this size:"<<this->size();
+    this->resize(800,900);
+        qDebug()<<"this size:"<<this->size();
     //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
 	/*********************
 	** Logging
@@ -112,8 +115,7 @@ void MainWindow::initUis()
 //    m_roboMap->setPos(100,100);
     //widget添加视图
     ui.mapViz->setScene(m_qgraphicsScene);
-    ui.speed_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge-stage.html"));
-
+    //ui.speed_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge-stage.html"));
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
     ui.tabWidget->setTabEnabled(1,false);
@@ -125,13 +127,18 @@ void MainWindow::initUis()
     ui.treeWidget_quick_cmd->setHeaderHidden(true);
     ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
     ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
-    ui.settings_btn->setIcon(QIcon("://images/setting.png"));
+    ui.settings_btn->setIcon(QIcon("://images/toolbar_settings.png"));
     ui.min_btn->setIcon(QIcon("://images/min.png"));
     ui.max_btn->setIcon(QIcon("://images/max.png"));
     ui.close_btn->setIcon(QIcon("://images/close.png"));
+    ui.btn_dash->setIcon(QIcon("://images/toolbar_dash.png"));
+    ui.btn_map->setIcon(QIcon("://images/toolbar_map.png"));
+    ui.btn_other->setIcon(QIcon("://images/toolbar_other.png"));
     rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
     initCharts();
+    //dashboard
+    speedDashBoard =new DashBoard(ui.widget_dashboard);
 }
 
 void MainWindow::connections()
@@ -723,8 +730,9 @@ void MainWindow::slot_power(float p)
 }
 void MainWindow::slot_speed_x(double x)
 {
-    QString strVal = QString("setDatas(\"%1\");").arg(QString::number(abs(x*100)).mid(0,2));
-    ui.speed_webView->page()->runJavaScript(strVal);
+  speedDashBoard->set_speed(abs(x*100));
+//    QString strVal = QString("setDatas(\"%1\");").arg(QString::number(abs(x*100)).mid(0,2));
+//    ui.speed_webView->page()->runJavaScript(strVal);
 }
 void MainWindow::slot_speed_yaw(double yaw)
 {

@@ -44,9 +44,6 @@
 #include <QLabel>
 #include <QImage>
 #include <QSettings>
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQuick/QQuickItem>
-#include <QQmlContext>
 #include <QDebug>
 #include "robomap.h"
 /*****************************************************************************

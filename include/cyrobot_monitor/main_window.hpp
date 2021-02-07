@@ -31,8 +31,8 @@
 #include <QTimer>
 #include <QQueue>
 #include <map>
-#include <QtWebEngineWidgets/QWebEngineSettings>
-#include "./include/cyrobot_monitor/animationstackedwidget.h"
+#include "dashboard.h"
+
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
@@ -157,6 +157,7 @@ private:
     QQueue<QPointF> data2;
     QTimer *m_timerChart;
     QChartView *chartView;
+    DashBoard *speedDashBoard;
 };
 }// namespace cyrobot_monitor
 
