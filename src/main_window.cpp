@@ -206,10 +206,16 @@ void MainWindow::connections()
     connect(&qnode,SIGNAL(plannerPath(QPolygonF)),m_roboMap,SLOT(paintPlannerPath(QPolygonF)));
     connect(&qnode,SIGNAL(updateRoboPose(QPointF,float)),m_roboMap,SLOT(paintRoboPos(QPointF,float)));
     connect(&qnode,SIGNAL(updateLaserScan(QPolygonF)),m_roboMap,SLOT(paintLaserScan(QPolygonF)));
+    connect(m_roboMap,SIGNAL(cursorPos(QPointF)),this,SLOT(slot_updateCursorPos(QPointF)));
     //map
     connect(this,SIGNAL(signalSet2DPose()),m_roboMap,SLOT(slot_set2DPos()));
     connect(this,SIGNAL(signalSet2DGoal()),m_roboMap,SLOT(slot_set2DGoal()));
+    connect(this,SIGNAL(signalSetMoveCamera()),m_roboMap,SLOT(slot_setMoveCamera()));
 //    connect(ui.stackedWidget_2,SIGNAL())
+}
+void MainWindow::slot_updateCursorPos(QPointF pos){
+     ui.label_x->setText(QString::number(pos.x()));
+     ui.label_y->setText(QString::number(pos.y()));
 }
 void MainWindow::slot_hide_table_widget(){
   if(ui.tabWidget->isHidden()){
@@ -352,23 +358,18 @@ void MainWindow::slot_return_point()
 //设置导航当前位置按钮的槽函数
 void MainWindow::slot_set_2D_Pos()
 {
-  QCursor myCursor(QPixmap("://images/cursor_pos.png"),0,0);
-  this->setCursor(myCursor); //设置自定义的鼠标样式
   emit signalSet2DPose();
 // ui.label_map_msg->setText("请在地图中选择机器人的初始位置");
 }
 //设置导航目标位置按钮的槽函数
 void MainWindow::slot_set_2D_Goal()
 {
-  QCursor myCursor(QPixmap("://images/cursor_pos.png"),0,0);
-  this->setCursor(myCursor); //设置自定义的鼠标样式
   emit signalSet2DGoal();
 //  ui.label_map_msg->setText("请在地图中选择机器人导航的目标位置");
 }
 void MainWindow::slot_move_camera_btn()
 {
-
-    qDebug()<<"move camera";
+  emit signalSetMoveCamera();
 }
 void MainWindow::slot_set_select()
 {

@@ -139,5 +139,6 @@
         <file>images/toolbar_map.png</file>
         <file>images/toolbar_other.png</file>
         <file>images/toolbar_settings.png</file>
+        <file>images/get_pos.png</file>
     </qresource>
 </RCC>

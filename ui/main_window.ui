@@ -533,19 +533,6 @@ border:none;
                  </widget>
                 </item>
                 <item>
-                 <spacer name="horizontalSpacer_7">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
                  <widget class="QWidget" name="widget_dashboard" native="true">
                   <property name="minimumSize">
                    <size>
@@ -553,20 +540,10 @@ border:none;
                     <height>400</height>
                    </size>
                   </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_turnRight">
@@ -575,6 +552,9 @@ border:none;
                     <width>200</width>
                     <height>200</height>
                    </size>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
                   </property>
                   <property name="text">
                    <string/>
@@ -773,7 +753,11 @@ border:none;
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_build_map">
                 <item>
-                 <widget class="QGraphicsView" name="mapViz"/>
+                 <widget class="QGraphicsView" name="mapViz">
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>

@@ -107,6 +107,7 @@ public slots:
     void slot_minWindows();
     void slot_maxWindows();
     void slot_chartTimerTimeout();
+    void slot_updateCursorPos(QPointF pos);
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
@@ -114,6 +115,7 @@ private slots:
 signals:
     void signalSet2DPose();
     void signalSet2DGoal();
+    void signalSetMoveCamera();
 private:
   Ui::MainWindowDesign ui;
     bool isPressedWidget;
