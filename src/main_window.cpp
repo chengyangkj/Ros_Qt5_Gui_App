@@ -118,13 +118,6 @@ void MainWindow::initUis()
     //ui.speed_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge-stage.html"));
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
-    ui.tabWidget->setTabEnabled(1,false);
-    ui.groupBox_3->setEnabled(false);
-   ui.tabWidget->setCurrentIndex(0);
-
-    //qucik treewidget
-    ui.treeWidget_quick_cmd->setHeaderLabels(QStringList()<<"key"<<"values");
-    ui.treeWidget_quick_cmd->setHeaderHidden(true);
     ui.label_turnLeft->setPixmap(QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
     ui.label_turnRight->setPixmap(QPixmap::fromImage(QImage("://images/turnRight_l.png")));
     ui.settings_btn->setIcon(QIcon("://images/toolbar_settings.png"));
@@ -162,9 +155,6 @@ void MainWindow::connections()
     connect(&qnode,SIGNAL(power(float)),this,SLOT(slot_power(float)));
     //机器人位置信号
     connect(&qnode,SIGNAL(position(QString,double,double,double,double)),this,SLOT(slot_position_change(QString,double,double,double,double)));
-    //绑定快捷按钮相关函数
-    connect(ui.quick_cmd_add_btn,SIGNAL(clicked()),this,SLOT(quick_cmd_add()));
-    connect(ui.quick_cmd_remove_btn,SIGNAL(clicked()),this,SLOT(quick_cmd_remove()));
    //绑定slider的函数
    connect(ui.horizontalSlider_raw,SIGNAL(valueChanged(int)),this,SLOT(Slider_raw_valueChanged(int)));
    connect(ui.horizontalSlider_linear,SIGNAL(valueChanged(int)),this,SLOT(Slider_linear_valueChanged(int)));
@@ -192,8 +182,6 @@ void MainWindow::connections()
    connect(ui.set_return_btn,SIGNAL(clicked()),this,SLOT(slot_set_return_point()));
    //返航
    connect(ui.return_btn,SIGNAL(clicked()),this,SLOT(slot_return_point()));
-   //右工具栏索引改变
-    connect(ui.tabWidget,SIGNAL(currentChanged(int)),this,SLOT(slot_tab_Widget_currentChanged(int)));
     //刷新话题列表
     connect(ui.refreash_topic_btn,SIGNAL(clicked()),this,SLOT(refreashTopicList()));
     connect(ui.close_btn,SIGNAL(clicked()),this,SLOT(slot_closeWindows()));
@@ -214,16 +202,17 @@ void MainWindow::connections()
 //    connect(ui.stackedWidget_2,SIGNAL())
 }
 void MainWindow::slot_updateCursorPos(QPointF pos){
-     ui.label_x->setText(QString::number(pos.x()));
-     ui.label_y->setText(QString::number(pos.y()));
+      QPointF mapPos=qnode.transScenePoint2Map(pos);
+      ui.label_pos_map->setText("x:"+QString::number(mapPos.x()).mid(0,4)+"y:"+QString::number(mapPos.y()).mid(0,4));
+      ui.label_pos_scene->setText("x:"+QString::number(pos.x()).mid(0,4)+"y:"+QString::number(pos.y()).mid(0,4));
 }
 void MainWindow::slot_hide_table_widget(){
-  if(ui.tabWidget->isHidden()){
-    ui.tabWidget->show();
+  if(ui.stackedWidget_left->isHidden()){
+    ui.stackedWidget_left->show();
     ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/hide.png);border:none;}");
   }
   else{
-    ui.tabWidget->hide();
+    ui.stackedWidget_left->hide();
     ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/show.png);border:none;}");
   }
 }
@@ -311,26 +300,26 @@ void MainWindow::slot_setting_frame()
 void MainWindow::slot_position_change(QString frame,double x,double y,double z,double w)
 {
     //更新ui显示
-    ui.label_frame->setText(frame);
-    ui.label_x->setText(QString::number(x));
-    ui.label_y->setText(QString::number(y));
-    ui.label_z->setText(QString::number(z));
-    ui.label_w->setText(QString::number(w));
+//    ui.label_frame->setText(frame);
+//    ui.label_x->setText(QString::number(x));
+//    ui.label_y->setText(QString::number(y));
+//    ui.label_z->setText(QString::number(z));
+//    ui.label_w->setText(QString::number(w));
 }
 //刷新返航地点
 void MainWindow::slot_set_return_point()
 {
     //更新ui返航点显示
-    ui.label_return_x->setText(ui.label_x->text());
-    ui.label_return_y->setText(ui.label_y->text());
-    ui.label_return_z->setText(ui.label_z->text());
-    ui.label_return_w->setText(ui.label_w->text());
+//    ui.label_return_x->setText(ui.label_x->text());
+//    ui.label_return_y->setText(ui.label_y->text());
+//    ui.label_return_z->setText(ui.label_z->text());
+//    ui.label_return_w->setText(ui.label_w->text());
     //写入setting
-    QSettings settings("return-position", "cyrobot_monitor");
-    settings.setValue("x",ui.label_x->text());
-    settings.setValue("y",ui.label_y->text());
-    settings.setValue("z",ui.label_z->text());
-    settings.setValue("w",ui.label_w->text());
+//    QSettings settings("return-position", "cyrobot_monitor");
+//    settings.setValue("x",ui.label_x->text());
+//    settings.setValue("y",ui.label_y->text());
+//    settings.setValue("z",ui.label_z->text());
+//    settings.setValue("w",ui.label_w->text());
     //发出声音提醒
     if(media_player!=NULL)
      {
@@ -345,7 +334,7 @@ void MainWindow::slot_set_return_point()
 //返航
 void MainWindow::slot_return_point()
 {
-    qnode.set_goal(ui.label_frame->text(),ui.label_return_x->text().toDouble(),ui.label_return_y->text().toDouble(),ui.label_return_z->text().toDouble(),ui.label_return_w->text().toDouble());
+    //qnode.set_goal(ui.label_frame->text(),ui.label_return_x->text().toDouble(),ui.label_return_y->text().toDouble(),ui.label_return_z->text().toDouble(),ui.label_return_w->text().toDouble());
     if(media_player!=NULL)
        {
            delete media_player;
@@ -385,8 +374,6 @@ void MainWindow::slot_tab_manage_currentChanged(int index)
 
         break;
     case 1:
-
-        ui.tabWidget->setCurrentIndex(1);
         break;
     case 2:
         break;
@@ -480,22 +467,6 @@ void MainWindow::Slider_linear_valueChanged(int v)
 //快捷指令删除按钮
 void MainWindow::quick_cmd_remove()
 {
-    QTreeWidgetItem *curr=ui.treeWidget_quick_cmd->currentItem();
-    //没有选择节点
-    if(curr==NULL) return;
-    //获取父节点
-    QTreeWidgetItem* parent=curr->parent();
-    //如果当前节点就为父节点
-    if(parent==NULL)
-    {
-        ui.treeWidget_quick_cmd->takeTopLevelItem(ui.treeWidget_quick_cmd->indexOfTopLevelItem(curr));
-        delete curr;
-    }
-    else{
-        ui.treeWidget_quick_cmd->takeTopLevelItem(ui.treeWidget_quick_cmd->indexOfTopLevelItem(parent));
-        delete parent;
-    }
-
 
 }
 //快捷指令添加按钮
@@ -544,20 +515,17 @@ void MainWindow::add_quick_cmd(QString name,QString val)
 {
     if(name=="") return;
     QTreeWidgetItem *head=new QTreeWidgetItem(QStringList()<<name);
-    this->ui.treeWidget_quick_cmd->addTopLevelItem(head);
     QCheckBox *check=new QCheckBox;
     //记录父子关系
     this->widget_to_parentItem_map[check]=head;
     //连接checkbox选中的槽函数
     connect(check,SIGNAL(stateChanged(int)),this,SLOT(quick_cmds_check_change(int)));
-    this->ui.treeWidget_quick_cmd->setItemWidget(head,1,check);
     QTreeWidgetItem *shell_content=new QTreeWidgetItem(QStringList()<<"shell");
     QTextEdit *shell_val=new QTextEdit;
     shell_val->setMaximumWidth(150);
     shell_val->setMaximumHeight(40);
     head->addChild(shell_content);
     shell_val->setText(val);
-    this->ui.treeWidget_quick_cmd->setItemWidget(shell_content,1,shell_val);
 }
 //快捷指令按钮处理的函数
 void MainWindow::quick_cmds_check_change(int state)
@@ -565,14 +533,11 @@ void MainWindow::quick_cmds_check_change(int state)
 
     QCheckBox* check = qobject_cast<QCheckBox*>(sender());
     QTreeWidgetItem *parent=widget_to_parentItem_map[check];
-    QString bash=((QTextEdit *)ui.treeWidget_quick_cmd->itemWidget(parent->child(0),1))->toPlainText();
     bool is_checked=state>1?true:false;
     if(is_checked)
     {
         quick_cmd=new QProcess;
         quick_cmd->start("bash");
-        qDebug()<<bash;
-        quick_cmd->write(bash.toLocal8Bit()+'\n');
         connect(quick_cmd,SIGNAL(readyReadStandardOutput()),this,SLOT(cmd_output()));
          connect(quick_cmd,SIGNAL(readyReadStandardError()),this,SLOT(cmd_error_output()));
     }
@@ -586,12 +551,12 @@ void MainWindow::quick_cmds_check_change(int state)
 void MainWindow::cmd_output()
 {
 
-    ui.cmd_output->append(quick_cmd->readAllStandardOutput());
+//    ui.cmd_output->append(quick_cmd->readAllStandardOutput());
 }
 //执行一些命令的错误回显
 void MainWindow::cmd_error_output()
 {
-    ui.cmd_output->append("<font color=\"#FF0000\">"+quick_cmd->readAllStandardError()+"</font> ");
+//    ui.cmd_output->append("<font color=\"#FF0000\">"+quick_cmd->readAllStandardError()+"</font> ");
 }
 
 //析构函数
@@ -643,13 +608,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
              ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
-             ui.treeWidget_rviz->setEnabled(false);
-            ui.tabWidget->setTabEnabled(1,false);
-              ui.groupBox_3->setEnabled(false);
 		} else {
-            ui.tabWidget->setTabEnabled(1,true);
-            ui.groupBox_3->setEnabled(true);
-            ui.treeWidget_rviz->setEnabled(true);
             ui.button_connect->setEnabled(false);
               ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
               ui.label_statue_text->setStyleSheet("color:green;");
@@ -668,15 +627,9 @@ void MainWindow::on_button_connect_clicked(bool check ) {
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
             ui.label_statue_text->setStyleSheet("color:red;");
             ui.label_statue_text->setText("离线");
-            ui.treeWidget_rviz->setEnabled(false);
-            ui.tabWidget->setTabEnabled(1,false);
-            ui.groupBox_3->setEnabled(false);
             //showNoMasterMessage();
 		} else {
-            ui.tabWidget->setTabEnabled(1,true);
-            ui.treeWidget_rviz->setEnabled(true);
             ui.button_connect->setEnabled(false);
-            ui.groupBox_3->setEnabled(true);
             ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
             ui.label_statue_text->setStyleSheet("color:green;");
             ui.label_statue_text->setText("在线");
@@ -709,9 +662,6 @@ void MainWindow::slot_rosShutdown()
     ui.label_statue_text->setStyleSheet("color:red;");
     ui.label_statue_text->setText("离线");
     ui.button_connect->setEnabled(true);
-    ui.treeWidget_rviz->setEnabled(false);
-    ui.tabWidget->setTabEnabled(1,false);
-    ui.groupBox_3->setEnabled(false);
 }
 void MainWindow::slot_power(float p)
 {
@@ -786,24 +736,16 @@ void MainWindow::ReadSettings() {
     //QString topic_name = settings.value("topic_name", QString("/chatter")).toString();
     //ui.line_edit_topic->setText(topic_name);
     QSettings return_pos("return-position","cyrobot_monitor");
-    ui.label_return_x->setText(return_pos.value("x",QString("0")).toString());
-    ui.label_return_y->setText(return_pos.value("y",QString("0")).toString());
-    ui.label_return_z->setText(return_pos.value("z",QString("0")).toString());
-    ui.label_return_w->setText(return_pos.value("w",QString("0")).toString());
+//    ui.label_return_x->setText(return_pos.value("x",QString("0")).toString());
+//    ui.label_return_y->setText(return_pos.value("y",QString("0")).toString());
+//    ui.label_return_z->setText(return_pos.value("z",QString("0")).toString());
+//    ui.label_return_w->setText(return_pos.value("w",QString("0")).toString());
 
 
 }
 
 void MainWindow::WriteSettings() {
     //存下快捷指令的setting
-    QSettings quick_setting("quick_setting","cyrobot_monitor");
-    quick_setting.clear();
-    for(int i=0;i<ui.treeWidget_quick_cmd->topLevelItemCount();i++)
-    {
-        QTreeWidgetItem *top=ui.treeWidget_quick_cmd->topLevelItem(i);
-        QTextEdit *cmd_val=(QTextEdit *)ui.treeWidget_quick_cmd->itemWidget(top->child(0),1);
-        quick_setting.setValue(top->text(0),cmd_val->toPlainText());
-    }
 }
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {

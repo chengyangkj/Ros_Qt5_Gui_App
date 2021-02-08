@@ -256,6 +256,7 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
           image.at<uchar>(row, col) = (uchar)value;
       }
       QImage imageMap=Mat2QImage(image);
+      imageMap.save("/home/chengyangkj/map.png","png",100);
       QSizeF size(mapWidth,mapHeight);
       emit updateMap(imageMap);
 }
@@ -338,7 +339,20 @@ void QNode::run() {
        image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
        ros::spinOnce();
  }
-
+ //图元坐标系转换为map坐标系
+QPointF QNode::transScenePoint2Map(QPointF pos){
+  QPointF roboPos;
+  roboPos.setX(pos.x()*m_mapResolution+m_mapOriginX);
+  roboPos.setY(pos.y()*m_mapResolution+m_mapOriginY);
+  return roboPos;
+}
+//map坐标系转换为图元坐标系
+QPointF QNode::transMapPoint2Scene(QPointF pos){
+ QPointF roboPos;
+ roboPos.setX((pos.x()-m_mapOriginX)/m_mapResolution);
+ roboPos.setY((pos.y()-m_mapOriginY)/m_mapResolution);
+ return roboPos;
+}
  //图像话题的回调函数
  void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
  {
