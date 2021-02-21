@@ -96,6 +96,8 @@ void QNode::SubAndPubTopic(){
    //m_rosTimer=n.createTimer(ros::Duration(1.0),boost::bind(&QNode::transformPoint,boost::ref(m_tfListener)));
    //全局规划Path
    m_plannerPathSub=n.subscribe("/move_base/NavfnROS/plan",1000,&QNode::plannerPathCallback,this);
+   image_transport::ImageTransport it(n);
+   m_imageMapPub = it.advertise("image/map",10);
 }
 
 void QNode::transformPoint(const tf::TransformListener& listener){
@@ -254,8 +256,6 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
       //沿x轴翻转地图
       cv::Mat rotaedMap=RotaMap(image);
       QImage imageMap=Mat2QImage(rotaedMap);
-//      QImage imageMap=Mat2QImage(image);
-      //imageMap.save("/home/chengyangkj/map.png","png",100);
       emit updateMap(imageMap);
       //计算map坐标系地图中心点坐标
       //scene(0,0) ^
@@ -366,6 +366,11 @@ QPointF QNode::transMapPoint2Scene(QPointF pos){
   roboPos.setY(-1*(pos.y()-m_mapCenterPoint.y())/m_mapResolution+m_sceneCenterPoint.y());
   return roboPos;
 }
+void QNode::pub_imageMap(QImage map){
+     cv::Mat image = QImage2Mat(map);
+     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", image).toImageMsg();
+     m_imageMapPub.publish(msg);
+}
  //图像话题的回调函数
  void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
  {
@@ -439,6 +444,26 @@ QPointF QNode::transMapPoint2Scene(QPointF pos){
    }
 
    return dest;
+ }
+ cv::Mat QNode::QImage2Mat(QImage &image)
+ {
+   cv::Mat mat;
+      switch(image.format())
+      {
+      case QImage::Format_ARGB32:
+      case QImage::Format_RGB32:
+      case QImage::Format_ARGB32_Premultiplied:
+          mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
+          break;
+      case QImage::Format_RGB888:
+          mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
+          cv::cvtColor(mat, mat, CV_BGR2RGB);
+          break;
+      case QImage::Format_Indexed8:
+          mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
+          break;
+      }
+      return mat;
  }
 void QNode::log( const LogLevel &level, const std::string &msg) {
 	logging_model.insertRows(logging_model.rowCount(),1);

@@ -48,6 +48,7 @@ void roboMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
   drawPlannerPath(painter);
   drawLaserScan(painter);
   drawTools(painter);
+
 }
 void roboMap::drawTools(QPainter *painter){
   if(currCursor == set2DPoseCursor){

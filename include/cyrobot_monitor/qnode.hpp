@@ -66,9 +66,12 @@ public:
   void move_base(char k,float speed_linear,float speed_trun);
   void set_goal(QString frame,double x,double y,double z,double w);
   void Sub_Image(QString topic,int frame_id);
+  void pub_imageMap(QImage map);
   QPointF transScenePoint2Map(QPointF pos);
   QPointF transMapPoint2Scene(QPointF pos);
   QMap<QString,QString> get_topic_list();
+  int mapWidth{0};
+  int mapHeight{0};
 	void run();
 
 	/*********************
@@ -110,6 +113,7 @@ private:
     ros::Subscriber m_plannerPathSub;
     ros::Publisher goal_pub;
     ros::Publisher cmd_pub;
+    image_transport::Publisher m_imageMapPub;
     QStringListModel logging_model;
     //图像订阅
     image_transport::Subscriber image_sub0;
@@ -126,8 +130,6 @@ private:
     QPolygon mapPonits;
     QPolygonF plannerPoints;
     QPolygonF laserPoints;
-    int mapWidth;
-    int mapHeight;
     //地图 0 0点坐标对应世界坐标系的坐标
     int m_mapOriginX;
     int m_mapOriginY;
@@ -142,6 +144,7 @@ private:
     //tf::TransformListener m_tfListener(ros::Duration(10));
     //ros::Timer m_rosTimer;
     QImage Mat2QImage(cv::Mat const& src);
+    cv::Mat QImage2Mat(QImage &image);
     cv::Mat RotaMap(cv::Mat const& map);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);

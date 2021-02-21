@@ -59,7 +59,7 @@ public:
     void initUis();
     void initVideos();
     void initTopicList();
-    void initCharts();
+    void initOthers();
 public slots:
     /******************************************
 	** Auto-connections (connectSlotsByName())
@@ -107,6 +107,7 @@ public slots:
     void slot_minWindows();
     void slot_maxWindows();
     void slot_chartTimerTimeout();
+    void slot_pubImageMapTimeOut();
     void slot_updateCursorPos(QPointF pos);
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
@@ -158,6 +159,7 @@ private:
     QQueue<QPointF> data1;
     QQueue<QPointF> data2;
     QTimer *m_timerChart;
+    QTimer *m_timerPubImageMap;
     QChartView *chartView;
     DashBoard *speedDashBoard;
 };

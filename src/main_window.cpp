@@ -112,6 +112,7 @@ void MainWindow::initUis()
 //    m_roboMap->setPos(100,100);
     //widget添加视图
     ui.mapViz->setScene(m_qgraphicsScene);
+
     //ui.speed_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge-stage.html"));
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
@@ -126,7 +127,6 @@ void MainWindow::initUis()
     ui.btn_other->setIcon(QIcon("://images/toolbar_other.png"));
     rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
-    initCharts();
     //dashboard
     speedDashBoard =new DashBoard(ui.widget_dashboard);
 }
@@ -211,7 +211,7 @@ void MainWindow::slot_hide_table_widget(){
     ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/show.png);border:none;}");
   }
 }
-void MainWindow::initCharts(){
+void MainWindow::initOthers(){
   line = new QSplineSeries(this);
     chart = new QChart();
     chart->addSeries(line);
@@ -223,8 +223,12 @@ void MainWindow::initCharts(){
    chartView->setFixedHeight(ui.widget_chart->height());
   chartView->setRenderHint(QPainter::Antialiasing);
   m_timerChart=new QTimer;
+  m_timerPubImageMap=new QTimer;
+  m_timerPubImageMap->setInterval(100);
   m_timerChart->setInterval(100);
   connect(m_timerChart,SIGNAL(timeout()),this,SLOT(slot_chartTimerTimeout()));
+  connect(m_timerPubImageMap,SIGNAL(timeout()),this,SLOT(slot_pubImageMapTimeOut()));
+  m_timerPubImageMap->start();
   m_timerChart->start();
 }
 void MainWindow::slot_chartTimerTimeout(){
@@ -273,6 +277,13 @@ void MainWindow::slot_chartTimerTimeout(){
  //    chart->setAxisY(axisY,line);
 
      chartView->setChart(chart);
+}
+void MainWindow::slot_pubImageMapTimeOut(){
+ QImage image(600,600,QImage::Format_RGB888);
+ QPainter painter(&image);
+ painter.setRenderHint(QPainter::Antialiasing);
+ m_qgraphicsScene->render(&painter);
+ qnode.pub_imageMap(image);
 }
 //设置界面
 void MainWindow::slot_setting_frame()
@@ -612,6 +623,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
              initVideos();
              //显示话题列表
              initTopicList();
+             initOthers();
 		}
     }
     //如果不使用环境变量
@@ -632,6 +644,7 @@ void MainWindow::on_button_connect_clicked(bool check ) {
            initVideos();
            //显示话题列表
            initTopicList();
+           initOthers();
 		}
 	}
 
