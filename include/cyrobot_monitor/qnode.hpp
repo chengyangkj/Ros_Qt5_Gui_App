@@ -131,6 +131,10 @@ private:
     //地图 0 0点坐标对应世界坐标系的坐标
     int m_mapOriginX;
     int m_mapOriginY;
+    //地图坐标系中心点坐标
+    QPointF m_mapCenterPoint;
+    //图元坐标系中心点坐标
+    QPointF m_sceneCenterPoint;
     //地图一个像素对应真实世界的距离
     float m_mapResolution;
     //地图是否被初始化
@@ -138,6 +142,7 @@ private:
     //tf::TransformListener m_tfListener(ros::Duration(10));
     //ros::Timer m_rosTimer;
     QImage Mat2QImage(cv::Mat const& src);
+    cv::Mat RotaMap(cv::Mat const& map);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void powerCallback(const std_msgs::Float32& message_holder);

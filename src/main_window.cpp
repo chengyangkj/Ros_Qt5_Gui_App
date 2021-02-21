@@ -38,9 +38,6 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ReadSettings();
     setWindowIcon(QIcon(":/images/robot.png"));
     setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
-    qDebug()<<"this size:"<<this->size();
-    this->resize(800,900);
-        qDebug()<<"this size:"<<this->size();
     //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
 	/*********************
 	** Logging
@@ -153,8 +150,6 @@ void MainWindow::connections()
     connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_yaw(double)));
     //电源的信号
     connect(&qnode,SIGNAL(power(float)),this,SLOT(slot_power(float)));
-    //机器人位置信号
-    connect(&qnode,SIGNAL(position(QString,double,double,double,double)),this,SLOT(slot_position_change(QString,double,double,double,double)));
    //绑定slider的函数
    connect(ui.horizontalSlider_raw,SIGNAL(valueChanged(int)),this,SLOT(Slider_raw_valueChanged(int)));
    connect(ui.horizontalSlider_linear,SIGNAL(valueChanged(int)),this,SLOT(Slider_linear_valueChanged(int)));

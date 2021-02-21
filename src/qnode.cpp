@@ -139,9 +139,7 @@ QMap<QString,QString> QNode::get_topic_list()
 void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path){
      plannerPoints.clear();
      for(int i=0;i<path->poses.size();i++){
-       QPointF roboPos;
-       roboPos.setX((path->poses[i].pose.position.x-m_mapOriginX)/m_mapResolution);
-       roboPos.setY((path->poses[i].pose.position.y-m_mapOriginY)/m_mapResolution);
+       QPointF roboPos=transMapPoint2Scene(QPointF(path->poses[i].pose.position.x,path->poses[i].pose.position.y));
        plannerPoints.append(roboPos);
      }
      emit plannerPath(plannerPoints);
@@ -180,9 +178,8 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
     catch(tf::TransformException& ex){
       //ROS_ERROR("Received an exception trying to transform  %s", ex.what());
     }
-    QPointF roboPos;
-    roboPos.setX((map_point.point.x-m_mapOriginX)/m_mapResolution);
-    roboPos.setY((map_point.point.y-m_mapOriginY)/m_mapResolution);
+    //转化为图元坐标系
+    QPointF roboPos = transMapPoint2Scene(QPointF(map_point.point.x,map_point.point.y));
     laserPoints.append(roboPos);
   }
   updateLaserScan(laserPoints);
@@ -191,9 +188,8 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
 //机器人位置话题的回调函数
 void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
 {
-      QPointF roboPos;
-      roboPos.setX((pos.pose.pose.position.x-m_mapOriginX)/m_mapResolution);
-      roboPos.setY((pos.pose.pose.position.y-m_mapOriginY)/m_mapResolution);
+      //坐标转化为图元坐标系
+      QPointF roboPos=transMapPoint2Scene(QPointF(pos.pose.pose.position.x,pos.pose.pose.position.y));
       //qDebug()<<"callback pose:"<<roboPos;
       //yaw
       tf::Quaternion quat;
@@ -255,10 +251,26 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
           }
           image.at<uchar>(row, col) = (uchar)value;
       }
-      QImage imageMap=Mat2QImage(image);
-      imageMap.save("/home/chengyangkj/map.png","png",100);
-      QSizeF size(mapWidth,mapHeight);
+      //沿x轴翻转地图
+      cv::Mat rotaedMap=RotaMap(image);
+      QImage imageMap=Mat2QImage(rotaedMap);
+//      QImage imageMap=Mat2QImage(image);
+      //imageMap.save("/home/chengyangkj/map.png","png",100);
       emit updateMap(imageMap);
+      //计算map坐标系地图中心点坐标
+      //scene(0,0) ^
+      //           **********|************
+      //           **********|************
+      //           ----------o-map(0,0)---
+      //           **********|************
+      //           **********|************
+      //origin(x,y)^
+      //地图中心点map坐标系坐标
+      m_mapCenterPoint.setX(m_mapOriginX+m_mapResolution*mapWidth*0.5);
+      m_mapCenterPoint.setY(m_mapOriginY+m_mapResolution*mapHeight*0.5);
+      //地图中心点图元坐标系坐标
+      m_sceneCenterPoint.setX(mapWidth/2.0);
+      m_sceneCenterPoint.setY(mapHeight/2.0);
 }
 
 //速度回调函数
@@ -341,17 +353,18 @@ void QNode::run() {
  }
  //图元坐标系转换为map坐标系
 QPointF QNode::transScenePoint2Map(QPointF pos){
+
   QPointF roboPos;
-  roboPos.setX(pos.x()*m_mapResolution+m_mapOriginX);
-  roboPos.setY(pos.y()*m_mapResolution+m_mapOriginY);
+  roboPos.setX((pos.x()-m_sceneCenterPoint.x())*m_mapResolution+m_mapCenterPoint.x());
+  roboPos.setY(-1*(pos.y()-m_sceneCenterPoint.y())*m_mapResolution+m_mapCenterPoint.y());
   return roboPos;
 }
 //map坐标系转换为图元坐标系
 QPointF QNode::transMapPoint2Scene(QPointF pos){
- QPointF roboPos;
- roboPos.setX((pos.x()-m_mapOriginX)/m_mapResolution);
- roboPos.setY((pos.y()-m_mapOriginY)/m_mapResolution);
- return roboPos;
+  QPointF roboPos;
+  roboPos.setX((pos.x()-m_mapCenterPoint.x())/m_mapResolution+m_sceneCenterPoint.x());
+  roboPos.setY(-1*(pos.y()-m_mapCenterPoint.y())/m_mapResolution+m_sceneCenterPoint.y());
+  return roboPos;
 }
  //图像话题的回调函数
  void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
@@ -372,7 +385,19 @@ QPointF QNode::transMapPoint2Scene(QPointF pos){
          return;
        }
  }
-
+ //沿x轴翻转地图
+ cv::Mat QNode::RotaMap(cv::Mat const& map){
+    cv::Mat result;
+    result.create(map.size(),map.type());
+    int height = map.rows;
+    int width = map.cols;
+    for(int i=0; i< height; i++){
+      for (int j=0;j< width;j++) {
+        result.at<uchar>(height-i-1,j) = map.at<uchar>(i,j);
+      }
+    }
+    return result;
+ }
  QImage QNode::Mat2QImage(cv::Mat const& src)
  {
    QImage dest(src.cols, src.rows, QImage::Format_ARGB32);

@@ -332,7 +332,7 @@ border:1px solid rgb(186, 189, 182)
 </string>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page_6">
            <layout class="QVBoxLayout" name="verticalLayout_9">
