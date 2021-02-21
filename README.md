@@ -33,14 +33,19 @@ sudo apt-get install ros-melodic-qt-create
 ```cpp
 sudo apt-get install ros-melodic-qt-build
 ```
-#### 2,安装Qtmultimedia5依赖
+·
+#### 2,安装Qt相关依赖
 
-程序依赖Qtmultimedia实现音频功能，因此需要安装依赖
+程序依赖Qtmultimedia实现音频功能，因此需要安装音频依赖
 
 ```cpp
 sudo apt-get install qtmultimedia5-dev
 ```
+QChart绘图依赖：
 
+```cpp
+sudo apt-get install libqt5charts5-dev
+```
 #### 3，编译
 
 将软件包放入ros src软件包目录下：
