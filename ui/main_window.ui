@@ -68,7 +68,7 @@ padding:0</string>
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>10</number>
+          <number>0</number>
          </property>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -319,6 +319,12 @@ padding:0</string>
        <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
          <widget class="QStackedWidget" name="stackedWidget_left">
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="maximumSize">
            <size>
             <width>400</width>
@@ -327,12 +333,12 @@ padding:0</string>
           </property>
           <property name="styleSheet">
            <string notr="true">QStackedWidget{
-border:1px solid rgb(186, 189, 182)
+border-right:1px solid rgb(186, 189, 182);
 }
 </string>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page_6">
            <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -1025,6 +1031,12 @@ border:none;</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
+                  </property>
+                  <property name="verticalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
+                  </property>
+                  <property name="horizontalScrollBarPolicy">
+                   <enum>Qt::ScrollBarAlwaysOff</enum>
                   </property>
                  </widget>
                 </item>
