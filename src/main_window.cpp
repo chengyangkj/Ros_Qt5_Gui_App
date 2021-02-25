@@ -160,6 +160,7 @@ void MainWindow::connections()
     QObject::connect(m_timerCurrentTime,&QTimer::timeout,[=](){
         ui.label_time->setText(QDateTime::currentDateTime().toString("  hh:mm:ss  "));
     });
+    QObject::connect(ui.comboBox_mapType,SIGNAL(currentIndexChanged(int)),this,SLOT(slot_changeMapType(int)));
     //connect速度的信号
     connect(&qnode,SIGNAL(speed_x(double)),this,SLOT(slot_speed_x(double)));
     connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_yaw(double)));
@@ -208,6 +209,23 @@ void MainWindow::connections()
     connect(this,SIGNAL(signalSet2DGoal()),m_roboMap,SLOT(slot_set2DGoal()));
     connect(this,SIGNAL(signalSetMoveCamera()),m_roboMap,SLOT(slot_setMoveCamera()));
 //    connect(ui.stackedWidget_2,SIGNAL())
+}
+void MainWindow::slot_changeMapType(int index){
+  switch (index){
+     case 0:
+       ui.mapViz->show();
+       if(map_rviz!=NULL){
+         map_rviz->hide();
+       }
+       break;
+     case 1:
+       ui.mapViz->hide();
+       if(map_rviz==NULL){
+         map_rviz=new QRviz(ui.verticalLayout_build_map,"qrviz");
+       }
+       map_rviz->show();
+       break;
+  }
 }
 void MainWindow::slot_updateCursorPos(QPointF pos){
       QPointF mapPos=qnode.transScenePoint2Map(pos);

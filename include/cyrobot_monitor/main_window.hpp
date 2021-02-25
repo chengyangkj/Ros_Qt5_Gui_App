@@ -16,6 +16,7 @@
 #include "ui_main_window.h"
 #include "qnode.hpp"
 #include "settings.h"
+#include "qrviz.hpp"
 #include "joystick.h"
 #include "robomap.h"
 #include "QProcess"
@@ -109,6 +110,7 @@ public slots:
     void slot_chartTimerTimeout();
     void slot_pubImageMapTimeOut();
     void slot_updateCursorPos(QPointF pos);
+    void slot_changeMapType(int);
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
@@ -147,6 +149,7 @@ private:
     JoyStick *rock_widget;
     QGraphicsScene  *m_qgraphicsScene=NULL;
     roboMap *m_roboMap=NULL;
+    QRviz *map_rviz=NULL;
     QVariantList m_sendVelList,m_recvVelList,m_timeList;
     //曲线
     QSplineSeries* line;

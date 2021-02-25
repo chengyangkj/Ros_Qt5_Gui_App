@@ -12,7 +12,6 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <QCursor>
 #include <QtMath>
-#define PI 3.1415926
 class roboMap  : public QObject, public QGraphicsItem
 {
     Q_OBJECT
@@ -40,6 +39,7 @@ public:
   double m_roboR=5;
   double map_size=1;
   double defaultScale=2;
+  double PI=3.1415926;
   void get_version(){
       qDebug()<<"1.0.0";
   }
