@@ -160,6 +160,7 @@ private:
     QQueue<QPointF> data2;
     QTimer *m_timerChart;
     QTimer *m_timerPubImageMap;
+    QTimer *m_timerCurrentTime;
     QChartView *chartView;
     DashBoard *speedDashBoard;
 };

@@ -100,6 +100,10 @@ void MainWindow::slot_show_image(int frame_id, QImage image)
 //初始化UI
 void MainWindow::initUis()
 {
+    //时间动态显示
+    m_timerCurrentTime = new QTimer;
+    m_timerCurrentTime->setInterval(100);
+    m_timerCurrentTime->start();
     //ui.centralwidget->hide();
     //视图场景加载
     m_qgraphicsScene = new QGraphicsScene;//要用QGraphicsView就必须要有QGraphicsScene搭配着用
@@ -153,6 +157,9 @@ void MainWindow::connections()
     QObject::connect(ui.btn_other, &QPushButton::clicked, [=](){
         ui.stackedWidget_main->setCurrentIndex(2);
     });
+    QObject::connect(m_timerCurrentTime,&QTimer::timeout,[=](){
+        ui.label_time->setText(QDateTime::currentDateTime().toString("  hh:mm:ss  "));
+    });
     //connect速度的信号
     connect(&qnode,SIGNAL(speed_x(double)),this,SLOT(slot_speed_x(double)));
     connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_yaw(double)));
@@ -204,8 +211,8 @@ void MainWindow::connections()
 }
 void MainWindow::slot_updateCursorPos(QPointF pos){
       QPointF mapPos=qnode.transScenePoint2Map(pos);
-      ui.label_pos_map->setText("x:"+QString::number(mapPos.x()).mid(0,4)+"y:"+QString::number(mapPos.y()).mid(0,4));
-      ui.label_pos_scene->setText("x:"+QString::number(pos.x()).mid(0,4)+"y:"+QString::number(pos.y()).mid(0,4));
+      ui.label_pos_map->setText("x: "+QString::number(mapPos.x()).mid(0,4)+"  y: "+QString::number(mapPos.y()).mid(0,4));
+      ui.label_pos_scene->setText("x: "+QString::number(pos.x()).mid(0,4)+"  y: "+QString::number(pos.y()).mid(0,4));
 }
 void MainWindow::slot_hide_table_widget(){
   if(ui.stackedWidget_left->isHidden()){
@@ -695,6 +702,7 @@ void MainWindow::slot_power(float p)
 void MainWindow::slot_speed_x(double x)
 {
   speedDashBoard->set_speed(abs(x*100));
+  ui.label_speed->setText(QString::number(abs(x*100)));
 //    QString strVal = QString("setDatas(\"%1\");").arg(QString::number(abs(x*100)).mid(0,2));
 //    ui.speed_webView->page()->runJavaScript(strVal);
 }
@@ -758,7 +766,12 @@ void MainWindow::ReadSettings() {
 }
 
 void MainWindow::WriteSettings() {
-    //存下快捷指令的setting
+  QSettings windows_setting("cyrobot_monitor","windows");
+ windows_setting.clear();//清空当前配置文件中的内容
+ windows_setting.setValue("WindowGeometry/x",this->x());
+ windows_setting.setValue("WindowGeometry/y",this->y());
+ windows_setting.setValue("WindowGeometry/width",this->width());
+ windows_setting.setValue("WindowGeometry/height",this->height());
 }
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
