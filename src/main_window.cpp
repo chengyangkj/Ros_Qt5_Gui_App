@@ -124,6 +124,8 @@ void MainWindow::initUis()
     ui.close_btn->setIcon(QIcon("://images/close.png"));
     ui.btn_dash->setIcon(QIcon("://images/toolbar_dash.png"));
     ui.btn_map->setIcon(QIcon("://images/toolbar_map.png"));
+    ui.btn_control->setIcon(QIcon("://images/control.png"));
+    ui.btn_status->setIcon(QIcon("://images/status.png"));
     ui.btn_other->setIcon(QIcon("://images/toolbar_other.png"));
     rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
@@ -138,6 +140,12 @@ void MainWindow::connections()
     QObject::connect(&qnode, SIGNAL(Master_shutdown()), this, SLOT(slot_rosShutdown()));
     QObject::connect(ui.btn_dash, &QPushButton::clicked, [=](){
         ui.stackedWidget_main->setCurrentIndex(0);
+    });
+    QObject::connect(ui.btn_control,&QPushButton::clicked,[=](){
+      ui.stackedWidget_left->setCurrentIndex(1);
+    });
+    QObject::connect(ui.btn_status,&QPushButton::clicked,[=](){
+      ui.stackedWidget_left->setCurrentIndex(0);
     });
     QObject::connect(ui.btn_map, &QPushButton::clicked, [=](){
         ui.stackedWidget_main->setCurrentIndex(1);
@@ -182,8 +190,6 @@ void MainWindow::connections()
     connect(ui.close_btn,SIGNAL(clicked()),this,SLOT(slot_closeWindows()));
     connect(ui.min_btn,SIGNAL(clicked()),this,SLOT(slot_minWindows()));
     connect(ui.max_btn,SIGNAL(clicked()),this,SLOT(slot_maxWindows()));
-    //hide
-    QObject::connect(ui.table_hide_btn,SIGNAL(clicked()),this,SLOT(slot_hide_table_widget()));
     connect(rock_widget,SIGNAL(keyNumchanged(int)),this,SLOT(slot_rockKeyChange(int)));
     connect(&qnode,SIGNAL(updateMap(QImage)),m_roboMap,SLOT(paintMaps(QImage)));
     connect(&qnode,SIGNAL(plannerPath(QPolygonF)),m_roboMap,SLOT(paintPlannerPath(QPolygonF)));
@@ -204,11 +210,10 @@ void MainWindow::slot_updateCursorPos(QPointF pos){
 void MainWindow::slot_hide_table_widget(){
   if(ui.stackedWidget_left->isHidden()){
     ui.stackedWidget_left->show();
-    ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/hide.png);border:none;}");
   }
   else{
     ui.stackedWidget_left->hide();
-    ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/show.png);border:none;}");
+    //ui.table_hide_btn->setStyleSheet("QPushButton{background-image: url(://images/show.png);border:none;}");
   }
 }
 void MainWindow::initOthers(){

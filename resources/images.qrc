@@ -140,5 +140,7 @@
         <file>images/toolbar_other.png</file>
         <file>images/toolbar_settings.png</file>
         <file>images/get_pos.png</file>
+        <file>images/control.png</file>
+        <file>images/status.png</file>
     </qresource>
 </RCC>
