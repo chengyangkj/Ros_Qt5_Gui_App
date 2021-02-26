@@ -33,19 +33,14 @@ sudo apt-get install ros-melodic-qt-create
 ```cpp
 sudo apt-get install ros-melodic-qt-build
 ```
-·
-#### 2,安装Qt相关依赖
+#### 2,安装Qtmultimedia5依赖
 
-程序依赖Qtmultimedia实现音频功能，因此需要安装音频依赖
+程序依赖Qtmultimedia实现音频功能，因此需要安装依赖
 
 ```cpp
 sudo apt-get install qtmultimedia5-dev
 ```
-QChart绘图依赖：
 
-```cpp
-sudo apt-get install libqt5charts5-dev
-```
 #### 3，编译
 
 将软件包放入ros src软件包目录下：
@@ -132,8 +127,48 @@ rosrun cyrobot_monitor cyrobot_monitor
 - 使用前须在菜单->设置->话题设置中设置电量话题(Std_msg/Float32)
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405153102508.png) 
-#### 4, 地图显示模块
-![image.png](https://i.postimg.cc/wjWBFbVn/image.png)
+#### 4, rviz模块
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405151916473.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+##### 4.1 订阅map话题
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408122253344.gif)
+
+##### 4.2 激光雷达图层显示
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408194648822.gif)
+
+##### 4.3 设置导航初始点
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201723417.gif)
+
+##### 4.4 设置导航目标点
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201804722.gif)
+
+##### 4.5 定点返航
+
+- 使用前须在菜单->设置->话题设置中设置amcl话题
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200413204212739.gif)
+
+##### 4.6 订阅图像话题
+
+- 提供四个图像显示窗体，可以同时显示四个图像 解决卡顿问题，在video0订阅（image_raw/compressed）即compressed后的图像即可不卡顿，且video0只能订阅压缩后的图像
+
+![加粗样式](https://img-blog.csdnimg.cn/20200507093831130.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+
+
+
+##### 4.7 快捷指令
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200429204153916.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200429204233788.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+
+##### 4.8 显示机器人模型
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200501165154149.gif)
+
+##### 4.9 提供六种rviz工具
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515184545845.png)
+
+##### 4.10 显示话题列表
+[![image.png](https://i.postimg.cc/Z5bGBfgk/image.png)](https://postimg.cc/svL6bJsK)
+.
+##### 4.11 待完善....
+
 
 ## 开源协议
 **GNU GPL（GNU General Public License，GNU通用公共许可证）**
