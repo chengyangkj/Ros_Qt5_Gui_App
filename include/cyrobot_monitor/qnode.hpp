@@ -67,6 +67,7 @@ public:
   void set_goal(QString frame,double x,double y,double z,double w);
   void Sub_Image(QString topic,int frame_id);
   void pub_imageMap(QImage map);
+  double getRealTheta(QPointF start,QPointF end);
   QPointF transScenePoint2Map(QPointF pos);
   QPointF transMapPoint2Scene(QPointF pos);
   QMap<QString,QString> get_topic_list();

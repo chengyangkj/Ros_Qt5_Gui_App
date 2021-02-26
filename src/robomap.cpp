@@ -1,5 +1,8 @@
 #include "../include/cyrobot_monitor/robomap.h"
 #include <QDebug>
+
+namespace cyrobot_monitor {
+
 roboMap::roboMap()
 {
   setAcceptHoverEvents(true);
@@ -9,6 +12,7 @@ roboMap::roboMap()
   moveBy(0,0);
   moveCursor=new QCursor(QPixmap("://images/cursor_move"),0,0);
   set2DPoseCursor=new QCursor(QPixmap("://images/cursor_pos.png"),0,0);
+  set2DGoalCursor=new QCursor(QPixmap("://images/cursor_pos.png"),0,0);
   setDefault();
 }
 int roboMap::QColorToInt(const QColor& color) {
@@ -51,7 +55,7 @@ void roboMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
 }
 void roboMap::drawTools(QPainter *painter){
-  if(currCursor == set2DPoseCursor){
+  if(currCursor == set2DPoseCursor || currCursor == set2DGoalCursor){
     //绘制箭头
     if(m_pressedPoint.x()!=0 && m_pressedPoint.y()!=0 &&m_pressingPoint.x()!=0 && m_pressingPoint.y()!=0){
       painter->setPen(QPen(QColor(0, 255, 0, 255), 2));
@@ -205,8 +209,8 @@ void roboMap::slot_set2DPos(){
   currCursor=set2DPoseCursor;
 }
 void roboMap::slot_set2DGoal(){
-  this->setCursor(*set2DPoseCursor); //设置自定义的鼠标样式
-  currCursor=set2DPoseCursor;
+  this->setCursor(*set2DGoalCursor); //设置自定义的鼠标样式
+  currCursor=set2DGoalCursor;
 }
 void roboMap::slot_setMoveCamera(){
   this->setCursor(*moveCursor); //设置自定义的鼠标样式
@@ -244,15 +248,25 @@ void roboMap::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
 void roboMap::hoverMoveEvent(QGraphicsSceneHoverEvent *event){
      emit cursorPos(event->pos());
 }
+
 void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
      m_isPress = false;//标记鼠标左键已经抬起
-     m_pressedPoint=QPointF(0,0);
      //如果是选择点位模式 重置
      if(currCursor == set2DPoseCursor){
        m_isOtherCursor=false;
+       emit set2DPos(m_pressedPoint,m_pressingPoint);
+       m_pressedPoint=QPointF(0,0);
+       m_pressingPoint=QPointF(0,0);
+       this->setCursor(*moveCursor); //设置自定义的鼠标样式
+       currCursor=moveCursor;
+     }else if(currCursor == set2DGoalCursor){
+       m_isOtherCursor=false;
+       emit set2DGoal(m_pressedPoint,m_pressingPoint);
        m_pressedPoint=QPointF(0,0);
        m_pressingPoint=QPointF(0,0);
        this->setCursor(*moveCursor); //设置自定义的鼠标样式
        currCursor=moveCursor;
      }
+}
+
 }

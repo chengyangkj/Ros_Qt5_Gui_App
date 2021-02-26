@@ -12,10 +12,17 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <QCursor>
 #include <QtMath>
+
+namespace cyrobot_monitor {
+
 class roboMap  : public QObject, public QGraphicsItem
 {
     Q_OBJECT
+//角度转弧度
+#define degreesToradian(x) (M_PI*x/180.0)
 
+//弧度转角度
+#define radiansToDegrees(x) (180.0*x/M_PI)
 public:
   roboMap();
   QRectF  boundingRect() const;
@@ -49,9 +56,12 @@ public:
   void move(double x,double y);
   QCursor *moveCursor=NULL;
   QCursor *set2DPoseCursor=NULL;
+  QCursor *set2DGoalCursor=NULL;
   QCursor *currCursor=NULL;
 signals:
   void cursorPos(QPointF);
+  void set2DPos(QPointF start,QPointF end);
+  void set2DGoal(QPointF point,QPointF end);
 public slots:
     void paintMaps(QImage map);
     void paintRoboPos(QPointF pos,float yaw);
@@ -78,5 +88,5 @@ private:
     qreal       m_scaleDafault=1;
 
 };
-
+}
 #endif // ROBOMAP_H

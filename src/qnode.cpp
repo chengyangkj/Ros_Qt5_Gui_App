@@ -280,7 +280,7 @@ void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
     emit speed_y(msg->twist.twist.linear.y);
 }
 void QNode::run() {
-        ros::Rate loop_rate(30);
+        ros::Rate loop_rate(20);
         //当当前节点没有关闭时
         while ( ros::ok() ) {
             //调用消息处理回调函数
@@ -365,6 +365,35 @@ QPointF QNode::transMapPoint2Scene(QPointF pos){
   roboPos.setX((pos.x()-m_mapCenterPoint.x())/m_mapResolution+m_sceneCenterPoint.x());
   roboPos.setY(-1*(pos.y()-m_mapCenterPoint.y())/m_mapResolution+m_sceneCenterPoint.y());
   return roboPos;
+}
+double QNode::getRealTheta(QPointF start,QPointF end){
+  double y=end.y()-start.y();
+  double x=end.x()-start.x();
+  double theta=radiansToDegrees(atan(y/x));
+  qDebug()<<start<<" "<<end<<" "<<theta;
+  // 1 4
+  if(end.x()>start.x()){
+
+     // 1
+    if(end.y()>start.y()){
+      theta = -theta;
+    }
+    // 4
+    else {
+       theta = 270 - theta;
+    }
+  }else {
+  // 2 3
+     theta = 180- theta;
+//    if(end.y()>start.y()){
+//      //2
+//      theta = 180- theta;
+//    }
+//    else {
+
+//    }
+  }
+  return theta;
 }
 void QNode::pub_imageMap(QImage map){
      cv::Mat image = QImage2Mat(map);

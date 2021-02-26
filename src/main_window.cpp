@@ -416,22 +416,40 @@ void MainWindow::slot_return_point()
 //设置导航当前位置按钮的槽函数
 void MainWindow::slot_set_2D_Pos()
 {
-  emit signalSet2DPose();
+  if(ui.comboBox_mapType->currentIndex()){
+    map_rviz->Set_Pos();
+  }
+  else{
+      emit signalSet2DPose();
+  }
+
 // ui.label_map_msg->setText("请在地图中选择机器人的初始位置");
 }
 //设置导航目标位置按钮的槽函数
 void MainWindow::slot_set_2D_Goal()
 {
-  emit signalSet2DGoal();
+  if(ui.comboBox_mapType->currentIndex()){
+     map_rviz->Set_Goal();
+  }else{
+     emit signalSet2DGoal();
+  }
+
 //  ui.label_map_msg->setText("请在地图中选择机器人导航的目标位置");
 }
 void MainWindow::slot_move_camera_btn()
 {
-  emit signalSetMoveCamera();
+    if(ui.comboBox_mapType->currentIndex()){
+       map_rviz->Set_MoveCamera();
+    }else{
+       emit signalSetMoveCamera();
+    }
+
 }
 void MainWindow::slot_set_select()
 {
-
+  if(ui.comboBox_mapType->currentIndex()){
+   map_rviz->Set_Select();
+  }
 }
 
 
