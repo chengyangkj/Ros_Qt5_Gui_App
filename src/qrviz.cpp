@@ -9,9 +9,7 @@ QRviz::QRviz(QVBoxLayout *layout,QString node_name)
 
     //创建rviz容器
     render_panel_=new rviz::RenderPanel;
-    qDebug()<<layout->sizeHint();
-    render_panel_->resize(layout->sizeHint());
-    render_panel_->setStyleSheet("border:solid 3px red");
+    render_panel_->resize(900,900);
     //向layout添加widget
     layout->addWidget(render_panel_);
     //初始化rviz控制对象
@@ -106,6 +104,23 @@ void QRviz::Display_Map(bool enable,QString topic,double Alpha,QString Color_Sch
     map_->setEnabled(enable);
     manager_->startUpdate();
 }
+void QRviz::Display_Polygon(bool enable,QString topic){
+
+      if(polygon_==NULL)
+      {
+          polygon_=manager_->createDisplay("rviz/Polygon","QPolygon",enable);
+          ROS_ASSERT(polygon_);
+          polygon_->subProp("Topic")->setValue(topic);
+      }
+      else{
+          delete polygon_;
+          polygon_=manager_->createDisplay("rviz/Polygon","QPolygon",enable);
+          ROS_ASSERT(polygon_);
+          polygon_->subProp("Topic")->setValue(topic);
+      }
+      polygon_->setEnabled(enable);
+      manager_->startUpdate();
+}
 //显示激光雷达
 void QRviz::Display_LaserScan(bool enable,QString topic)
 {
@@ -121,7 +136,6 @@ void QRviz::Display_LaserScan(bool enable,QString topic)
         ROS_ASSERT(laser_);
         laser_->subProp("Topic")->setValue(topic);
     }
-    qDebug()<<"topic:"<<topic;
     laser_->setEnabled(enable);
     manager_->startUpdate();
 }

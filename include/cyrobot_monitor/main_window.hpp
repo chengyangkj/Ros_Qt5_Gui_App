@@ -128,6 +128,7 @@ private:
     void mouseReleaseEvent(QMouseEvent *event);
     void connections();
     void add_quick_cmd(QString name,QString shell);
+    void display_rviz();
     QNode qnode;
     QProcess *quick_cmd=NULL;
     QProcess *close_remote_cmd=NULL;

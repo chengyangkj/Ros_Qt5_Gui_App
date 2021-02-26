@@ -33,7 +33,7 @@ void JoyStick::paintEvent(QPaintEvent *){
     JoyStickR=padR/4;//摇杆圆半径
     int JoyStickMaxR=padR-JoyStickR;
     QColor JoyStickColor;
-    JoyStickColor.setNamedColor("orangered");
+    JoyStickColor.setRgb(85, 87, 83);
     //加载底盘图像
 //    painter.save();
 
@@ -43,7 +43,7 @@ void JoyStick::paintEvent(QPaintEvent *){
     //自绘底盘
     painter.save();
     QRadialGradient RadialGradient(padR,padR,padR*3,padR,padR);//圆心2，半径1，焦点2
-    RadialGradient.setColorAt(0,QColor(255,240,245,255));//渐变
+    RadialGradient.setColorAt(0,QColor(255,253,253,255));//渐变
     RadialGradient.setColorAt(1,QColor(255,240,245,190));//渐变
     painter.setBrush(RadialGradient);
     painter.setPen(Qt::NoPen);

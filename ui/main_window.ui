@@ -117,8 +117,11 @@ background-color: transparent;
                       <pointsize>66</pointsize>
                      </font>
                     </property>
+                    <property name="styleSheet">
+                     <string notr="true">QLabel{qproperty-alignment:AlignHCenter;}</string>
+                    </property>
                     <property name="text">
-                     <string>00</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -1046,8 +1049,36 @@ background-color: rgb(255,255,255);
                <layout class="QVBoxLayout" name="verticalLayout_13">
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
                   <item>
                    <widget class="QPushButton" name="move_camera_btn">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>25</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton:hover{
+background-color:rgb(186, 189, 182);
+border-bottom:2px solid rgb(67, 154, 246);
+}
+QPushButton:checked{
+background-color:cyan;
+border-bottom:2px solid white 
+}
+QPushButton:pressed{
+background-color:rgb(67, 154, 246)
+}
+QPushButton{
+background-color:rgb(238, 238, 236);
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
+                    </property>
                     <property name="text">
                      <string>Move Camera</string>
                     </property>
@@ -1059,6 +1090,31 @@ background-color: rgb(255,255,255);
                   </item>
                   <item>
                    <widget class="QPushButton" name="set_select_btn">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>25</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton:hover{
+background-color:rgb(186, 189, 182);
+border-bottom:2px solid rgb(67, 154, 246);
+}
+QPushButton:checked{
+background-color:cyan;
+border-bottom:2px solid white 
+}
+QPushButton:pressed{
+background-color:rgb(67, 154, 246)
+}
+QPushButton{
+background-color:rgb(238, 238, 236);
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
+                    </property>
                     <property name="text">
                      <string>Select</string>
                     </property>
@@ -1070,11 +1126,36 @@ background-color: rgb(255,255,255);
                   </item>
                   <item>
                    <widget class="QPushButton" name="set_pos_btn">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>25</height>
+                     </size>
+                    </property>
                     <property name="maximumSize">
                      <size>
                       <width>16777215</width>
                       <height>16777215</height>
                      </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton:hover{
+background-color:rgb(186, 189, 182);
+border-bottom:2px solid rgb(67, 154, 246);
+}
+QPushButton:checked{
+background-color:cyan;
+border-bottom:2px solid white 
+}
+QPushButton:pressed{
+background-color:rgb(67, 154, 246)
+}
+QPushButton{
+background-color:rgb(238, 238, 236);
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
                     </property>
                     <property name="text">
                      <string>2D Pose Estimate</string>
@@ -1087,6 +1168,31 @@ background-color: rgb(255,255,255);
                   </item>
                   <item>
                    <widget class="QPushButton" name="set_goal_btn">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>25</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton:hover{
+background-color:rgb(186, 189, 182);
+border-bottom:2px solid rgb(67, 154, 246);
+}
+QPushButton:checked{
+background-color:cyan;
+border-bottom:2px solid white 
+}
+QPushButton:pressed{
+background-color:rgb(67, 154, 246)
+}
+QPushButton{
+background-color:rgb(238, 238, 236);
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
+                    </property>
                     <property name="text">
                      <string>2D Nav Goal</string>
                     </property>
@@ -1104,6 +1210,25 @@ background-color: rgb(255,255,255);
                       <height>25</height>
                      </size>
                     </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton:hover{
+background-color:rgb(186, 189, 182);
+border-bottom:2px solid rgb(67, 154, 246);
+}
+QPushButton:checked{
+background-color:cyan;
+border-bottom:2px solid white 
+}
+QPushButton:pressed{
+background-color:rgb(67, 154, 246)
+}
+QPushButton{
+background-color:rgb(238, 238, 236);
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
+                    </property>
                     <property name="text">
                      <string>设置返航点</string>
                     </property>
@@ -1120,6 +1245,25 @@ background-color: rgb(255,255,255);
                       <width>16777215</width>
                       <height>25</height>
                      </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton:hover{
+background-color:rgb(186, 189, 182);
+border-bottom:2px solid rgb(67, 154, 246);
+}
+QPushButton:checked{
+background-color:cyan;
+border-bottom:2px solid white 
+}
+QPushButton:pressed{
+background-color:rgb(67, 154, 246)
+}
+QPushButton{
+background-color:rgb(238, 238, 236);
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
                     </property>
                     <property name="text">
                      <string>返航</string>
@@ -1180,7 +1324,14 @@ background-color: rgb(255,255,255);
                      <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true"/>
+                     <string notr="true">QGraphicsView{
+border-top: 5px solid qlineargradient(y0:0, y1:1,stop: 0 #ececef, stop: 1 white);
+border-left: 5px solid qlineargradient(x0:0, x1:1,stop: 0 #ececef, stop: 1 white);
+ border-bottom: 5px solid qlineargradient(y0:0, y1:1,stop: 0 white, stop: 1  #ececef);
+border-right: 5px solid qlineargradient(x0:0, x1:1,stop:  0 white, stop: 1 #ececef);
+background-color: rgb(255,255,255);
+}
+</string>
                     </property>
                     <property name="verticalScrollBarPolicy">
                      <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1188,6 +1339,31 @@ background-color: rgb(255,255,255);
                     <property name="horizontalScrollBarPolicy">
                      <enum>Qt::ScrollBarAlwaysOff</enum>
                     </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QWidget" name="widget_rviz" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QWidget{
+border-top: 5px solid qlineargradient(y0:0, y1:1,stop: 0 #ececef, stop: 1 white);
+border-left: 5px solid qlineargradient(x0:0, x1:1,stop: 0 #ececef, stop: 1 white);
+ border-bottom: 5px solid qlineargradient(y0:0, y1:1,stop: 0 white, stop: 1  #ececef);
+border-right: 5px solid qlineargradient(x0:0, x1:1,stop:  0 white, stop: 1 #ececef);
+background-color: rgb(255,255,255);
+}
+</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_16">
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_rviz"/>
+                     </item>
+                    </layout>
                    </widget>
                   </item>
                  </layout>
@@ -1199,13 +1375,13 @@ background-color: rgb(255,255,255);
                     <property name="minimumSize">
                      <size>
                       <width>40</width>
-                      <height>0</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>40</width>
-                      <height>16777215</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="text">
@@ -1218,14 +1394,17 @@ background-color: rgb(255,255,255);
                     <property name="minimumSize">
                      <size>
                       <width>200</width>
-                      <height>0</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>200</width>
-                      <height>16777215</height>
+                      <height>20</height>
                      </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
                     </property>
                     <property name="text">
                      <string/>
@@ -1237,13 +1416,13 @@ background-color: rgb(255,255,255);
                     <property name="minimumSize">
                      <size>
                       <width>40</width>
-                      <height>0</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>40</width>
-                      <height>16777215</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="text">
@@ -1256,13 +1435,13 @@ background-color: rgb(255,255,255);
                     <property name="minimumSize">
                      <size>
                       <width>200</width>
-                      <height>0</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
                       <width>200</width>
-                      <height>16777215</height>
+                      <height>20</height>
                      </size>
                     </property>
                     <property name="text">
@@ -1638,7 +1817,7 @@ margin:0px 0px 0px 0px;
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton:hover{
-background-color:rgb(186, 189, 182);
+background-color:rgb(186, 189, 182); 
 border-bottom:2px solid rgb(67, 154, 246);
 }
 QPushButton:checked{

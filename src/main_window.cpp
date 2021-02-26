@@ -79,6 +79,38 @@ void MainWindow::initVideos()
 
 
 }
+void MainWindow::display_rviz(){
+    QSettings settings("cyrobot_monitor","Displays");
+    bool Grid_enable = settings.value("Grid/enable",bool(true)).toBool();
+    double Grid_count = settings.value("Grid/count",double(20)).toDouble();
+
+    bool Map_enable = settings.value("Map/enable",bool(true)).toBool();
+    QString Map_topic = settings.value("Map/topic",QString("/map")).toString();
+    double Map_alpha = settings.value("Map/alpha",double(0.7)).toDouble();
+    QString Map_scheme = settings.value("Map/scheme",QString("map")).toString();
+
+    bool Laser_enable = settings.value("Laser/enable",bool(true)).toBool();
+    QString Laser_topic = settings.value("Laser/topic",QString("/scan")).toString();
+
+    bool Polygon_enable = settings.value("Polygon/enable",bool(true)).toBool();
+    QString Polygon_topic = settings.value("Polygon/topic",QString("/move_base/local_costmap/footprint")).toString();
+
+    bool RobotModel_enable = settings.value("RobotModel/enable",bool(true)).toBool();
+    bool Navigation_enable= settings.value("Navigation/enable",bool(true)).toBool();
+    QString GlobalMap_topic = settings.value("Navigation/GlobalMap/topic",QString("/move_base/global_costmap/costmap")).toString();
+    QString GlobalMap_paln = settings.value("Navigation/GlobalPlan/topic",QString("/move_base/NavfnROS/plan")).toString();
+    QString LocalMap_topic = settings.value("Navigation/LocalMap/topic",QString("/move_base/local_costmap/costmap")).toString();
+    QString LocalMap_plan = settings.value("Navigation/LocalPlan/topic",QString("/move_base/DWAPlannerROS/local_plan")).toString();
+
+
+
+    map_rviz->Display_Grid(Grid_enable,"QGrid",Grid_count,QColor(160,160,160));
+     map_rviz->Display_Map(Map_enable,Map_topic,Map_alpha,Map_scheme);
+     map_rviz->Display_LaserScan(Laser_enable,Laser_topic);
+     map_rviz->Display_RobotModel(RobotModel_enable);
+     map_rviz->Display_Polygon(Polygon_enable,Polygon_topic);
+     map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
+}
 void MainWindow::slot_show_image(int frame_id, QImage image)
 {
     switch (frame_id)
@@ -131,6 +163,7 @@ void MainWindow::initUis()
     ui.btn_control->setIcon(QIcon("://images/control.png"));
     ui.btn_status->setIcon(QIcon("://images/status.png"));
     ui.btn_other->setIcon(QIcon("://images/toolbar_other.png"));
+    ui.widget_rviz->hide();
     rock_widget =new JoyStick(ui.JoyStick_widget);
     rock_widget->show();
     //dashboard
@@ -213,17 +246,17 @@ void MainWindow::connections()
 void MainWindow::slot_changeMapType(int index){
   switch (index){
      case 0:
+       ui.widget_rviz->hide();
        ui.mapViz->show();
-       if(map_rviz!=NULL){
-         map_rviz->hide();
-       }
        break;
      case 1:
        ui.mapViz->hide();
+       ui.widget_rviz->show();
        if(map_rviz==NULL){
-         map_rviz=new QRviz(ui.verticalLayout_build_map,"qrviz");
+         map_rviz=new QRviz(ui.verticalLayout_rviz,"qrviz");
+         display_rviz();
        }
-       map_rviz->show();
+
        break;
   }
 }

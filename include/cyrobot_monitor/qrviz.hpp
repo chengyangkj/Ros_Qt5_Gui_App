@@ -32,6 +32,7 @@ public:
     void Display_LaserScan(bool enable,QString topic);
     //显示导航相关控件
     void Display_Navigate(bool enable,QString Global_topic,QString Global_planner,QString Local_topic,QString Local_planner);
+    void Display_Polygon(bool enable,QString topic);
     //显示tf坐标变换
     void Display_TF(bool enable);
     void Set_Pos();
@@ -54,6 +55,7 @@ private:
     rviz::Display* TF_=NULL ;
     rviz::Display* map_=NULL ;
     rviz::Display* laser_=NULL ;
+    rviz::Display* polygon_=NULL ;
     rviz::Display* Navigate_localmap=NULL;
     rviz::Display* Navigate_localplanner=NULL;
     rviz::Display* Navigate_globalmap=NULL;
