@@ -275,16 +275,16 @@ void MainWindow::slot_hide_table_widget(){
   }
 }
 void MainWindow::initOthers(){
-  line = new QSplineSeries(this);
-    chart = new QChart();
-    chart->addSeries(line);
-    axisX = new QValueAxis(this);
-    axisY = new QValueAxis(this);
+//  line = new QSplineSeries(this);
+//    chart = new QChart();
+//    chart->addSeries(line);
+//    axisX = new QValueAxis(this);
+//    axisY = new QValueAxis(this);
 
-  chartView = new QChartView(ui.widget_chart);
-  chartView->setFixedWidth(ui.widget_chart->width());
-   chartView->setFixedHeight(ui.widget_chart->height());
-  chartView->setRenderHint(QPainter::Antialiasing);
+//  chartView = new QChartView(ui.widget_chart);
+//  chartView->setFixedWidth(ui.widget_chart->width());
+//   chartView->setFixedHeight(ui.widget_chart->height());
+//  chartView->setRenderHint(QPainter::Antialiasing);
   m_timerChart=new QTimer;
   m_timerPubImageMap=new QTimer;
   m_timerPubImageMap->setInterval(100);
@@ -295,51 +295,51 @@ void MainWindow::initOthers(){
   m_timerChart->start();
 }
 void MainWindow::slot_chartTimerTimeout(){
-  QVector<QPointF> list;
-     QVector<QPointF> newlist;
-     list = line->pointsVector();//获取现在图中列表
-     if (list.size() < line_max)
-     {
-         //保持原来
-         newlist = list;
-     }
-     else
-     {
-         //错位移动
-         for(int i =1 ; i< list.size();i++)
-         {
-             newlist.append(QPointF(i-1,list.at(i).y()));
-         }
-     }
-     newlist.append(QPointF(newlist.size(),rand()));//最后补上新的数据
-     line->replace(newlist);//替换更新
+//  QVector<QPointF> list;
+//     QVector<QPointF> newlist;
+//     list = line->pointsVector();//获取现在图中列表
+//     if (list.size() < line_max)
+//     {
+//         //保持原来
+//         newlist = list;
+//     }
+//     else
+//     {
+//         //错位移动
+//         for(int i =1 ; i< list.size();i++)
+//         {
+//             newlist.append(QPointF(i-1,list.at(i).y()));
+//         }
+//     }
+//     newlist.append(QPointF(newlist.size(),rand()));//最后补上新的数据
+//     line->replace(newlist);//替换更新
 
 
-     line->setName("send");//设置曲线名称
-     line->setPen(QColor(255, 0, 0));//设置曲线颜色
-     line->setUseOpenGL(true);//openGl 加速
+//     line->setName("send");//设置曲线名称
+//     line->setPen(QColor(255, 0, 0));//设置曲线颜色
+//     line->setUseOpenGL(true);//openGl 加速
 
-     chart->setTitle("Pressure Data");//设置图标标题
-     chart->removeSeries(line);
-     chart->addSeries(line);
-     chart->createDefaultAxes();//设置坐标轴
+//     chart->setTitle("Pressure Data");//设置图标标题
+//     chart->removeSeries(line);
+//     chart->addSeries(line);
+//     chart->createDefaultAxes();//设置坐标轴
 
- //    axisX->setRange(0,line_max);//范围
- //    axisX->setTitleText("times(secs)");//标题
-      axisX->setTickCount(10);//分隔个数
-     axisX->setLineVisible(true);//可视化
-    axisX->setLinePenColor(Qt::blue);//颜色
+// //    axisX->setRange(0,line_max);//范围
+// //    axisX->setTitleText("times(secs)");//标题
+//      axisX->setTickCount(10);//分隔个数
+//     axisX->setLineVisible(true);//可视化
+//    axisX->setLinePenColor(Qt::blue);//颜色
 
- //    axisY->setRange(-200,1200);
- //    axisY->setTitleText("value");
- //    axisY->setTickCount(6);
- //    axisY->setLineVisible(true);
- //    axisY->setLinePenColor(Qt::blue);
+// //    axisY->setRange(-200,1200);
+// //    axisY->setTitleText("value");
+// //    axisY->setTickCount(6);
+// //    axisY->setLineVisible(true);
+// //    axisY->setLinePenColor(Qt::blue);
 
- //    chart->setAxisX(axisX,line);
- //    chart->setAxisY(axisY,line);
+// //    chart->setAxisX(axisX,line);
+// //    chart->setAxisY(axisY,line);
 
-     chartView->setChart(chart);
+//     chartView->setChart(chart);
 }
 void MainWindow::slot_pubImageMapTimeOut(){
  QImage image(600,600,QImage::Format_RGB888);
@@ -559,60 +559,60 @@ void MainWindow::quick_cmd_remove()
 //快捷指令添加按钮
 void MainWindow::quick_cmd_add()
 {
-    QWidget *w=new QWidget;
-    //阻塞其他窗体
-    w->setWindowModality(Qt::ApplicationModal);
-    QLabel *name=new QLabel;
-    name->setText("名称:");
-    QLabel *content=new QLabel;
-    content->setText("脚本:");
-    QLineEdit *name_val=new QLineEdit;
-    QTextEdit *shell_val=new QTextEdit;
-    QPushButton *ok_btn=new QPushButton;
-    ok_btn->setText("ok");
-    ok_btn->setIcon(QIcon("://images/ok.png"));
-    QPushButton *cancel_btn=new QPushButton;
-    cancel_btn->setText("cancel");
-    cancel_btn->setIcon(QIcon("://images/false.png"));
-    QHBoxLayout *lay1=new QHBoxLayout;
-    lay1->addWidget(name);
-    lay1->addWidget(name_val);
-    QHBoxLayout *lay2=new QHBoxLayout;
-    lay2->addWidget(content);
-    lay2->addWidget(shell_val);
-    QHBoxLayout *lay3=new QHBoxLayout;
-    lay3->addWidget(ok_btn);
-    lay3->addWidget(cancel_btn);
-    QVBoxLayout *v1=new QVBoxLayout;
-    v1->addLayout(lay1);
-    v1->addLayout(lay2);
-    v1->addLayout(lay3);
+//    QWidget *w=new QWidget;
+//    //阻塞其他窗体
+//    w->setWindowModality(Qt::ApplicationModal);
+//    QLabel *name=new QLabel;
+//    name->setText("名称:");
+//    QLabel *content=new QLabel;
+//    content->setText("脚本:");
+//    QLineEdit *name_val=new QLineEdit;
+//    QTextEdit *shell_val=new QTextEdit;
+//    QPushButton *ok_btn=new QPushButton;
+//    ok_btn->setText("ok");
+//    ok_btn->setIcon(QIcon("://images/ok.png"));
+//    QPushButton *cancel_btn=new QPushButton;
+//    cancel_btn->setText("cancel");
+//    cancel_btn->setIcon(QIcon("://images/false.png"));
+//    QHBoxLayout *lay1=new QHBoxLayout;
+//    lay1->addWidget(name);
+//    lay1->addWidget(name_val);
+//    QHBoxLayout *lay2=new QHBoxLayout;
+//    lay2->addWidget(content);
+//    lay2->addWidget(shell_val);
+//    QHBoxLayout *lay3=new QHBoxLayout;
+//    lay3->addWidget(ok_btn);
+//    lay3->addWidget(cancel_btn);
+//    QVBoxLayout *v1=new QVBoxLayout;
+//    v1->addLayout(lay1);
+//    v1->addLayout(lay2);
+//    v1->addLayout(lay3);
 
-    w->setLayout(v1);
-    w->show();
+//    w->setLayout(v1);
+//    w->show();
 
-    connect(ok_btn,&QPushButton::clicked,[this,w,name_val,shell_val]
-    {
-        this->add_quick_cmd(name_val->text(),shell_val->toPlainText());
-        w->close();
-    });
+//    connect(ok_btn,&QPushButton::clicked,[this,w,name_val,shell_val]
+//    {
+//        this->add_quick_cmd(name_val->text(),shell_val->toPlainText());
+//        w->close();
+//    });
 }
 //向treeWidget添加快捷指令
 void MainWindow::add_quick_cmd(QString name,QString val)
 {
-    if(name=="") return;
-    QTreeWidgetItem *head=new QTreeWidgetItem(QStringList()<<name);
-    QCheckBox *check=new QCheckBox;
-    //记录父子关系
-    this->widget_to_parentItem_map[check]=head;
-    //连接checkbox选中的槽函数
-    connect(check,SIGNAL(stateChanged(int)),this,SLOT(quick_cmds_check_change(int)));
-    QTreeWidgetItem *shell_content=new QTreeWidgetItem(QStringList()<<"shell");
-    QTextEdit *shell_val=new QTextEdit;
-    shell_val->setMaximumWidth(150);
-    shell_val->setMaximumHeight(40);
-    head->addChild(shell_content);
-    shell_val->setText(val);
+//    if(name=="") return;
+//    QTreeWidgetItem *head=new QTreeWidgetItem(QStringList()<<name);
+//    QCheckBox *check=new QCheckBox;
+//    //记录父子关系
+//    this->widget_to_parentItem_map[check]=head;
+//    //连接checkbox选中的槽函数
+//    connect(check,SIGNAL(stateChanged(int)),this,SLOT(quick_cmds_check_change(int)));
+//    QTreeWidgetItem *shell_content=new QTreeWidgetItem(QStringList()<<"shell");
+//    QTextEdit *shell_val=new QTextEdit;
+//    shell_val->setMaximumWidth(150);
+//    shell_val->setMaximumHeight(40);
+//    head->addChild(shell_content);
+//    shell_val->setText(val);
 }
 //快捷指令按钮处理的函数
 void MainWindow::quick_cmds_check_change(int state)

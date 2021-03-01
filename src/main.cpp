@@ -11,6 +11,7 @@
 
 #include <QtGui>
 #include <QApplication>
+#include <QDesktopWidget>
 #include "../include/cyrobot_monitor/main_window.hpp"
 
 

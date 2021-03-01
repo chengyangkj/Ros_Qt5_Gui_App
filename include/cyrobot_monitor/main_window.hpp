@@ -28,7 +28,6 @@
 #include <QVariant>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QtCharts>
 #include <QTimer>
 #include <QQueue>
 #include <map>
@@ -153,19 +152,19 @@ private:
     QRviz *map_rviz=NULL;
     QVariantList m_sendVelList,m_recvVelList,m_timeList;
     //曲线
-    QSplineSeries* line;
+//    QSplineSeries* line;
     //曲线点的最大数量
     int line_max = 10;
     //绘图变量和坐标
-    QChart* chart;
-    QValueAxis *axisX;
-    QValueAxis *axisY;
-    QQueue<QPointF> data1;
-    QQueue<QPointF> data2;
+//    QChart* chart;
+//    QValueAxis *axisX;
+//    QValueAxis *axisY;
+//    QQueue<QPointF> data1;
+//    QQueue<QPointF> data2;
     QTimer *m_timerChart;
     QTimer *m_timerPubImageMap;
     QTimer *m_timerCurrentTime;
-    QChartView *chartView;
+//    QChartView *chartView;
     DashBoard *speedDashBoard;
 };
 }// namespace cyrobot_monitor
