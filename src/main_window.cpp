@@ -771,7 +771,11 @@ void MainWindow::slot_power(float p)
 void MainWindow::slot_speed_x(double x)
 {
   speedDashBoard->set_speed(abs(x*100));
-  ui.label_speed->setText(QString::number(abs(x*100)));
+  QString number=QString::number(abs(x*100)).mid(0,2);
+  if(number[1]=="."){
+    number=number.mid(0,1);
+  }
+  ui.label_speed->setText(number);
 //    QString strVal = QString("setDatas(\"%1\");").arg(QString::number(abs(x*100)).mid(0,2));
 //    ui.speed_webView->page()->runJavaScript(strVal);
 }
