@@ -16,6 +16,10 @@
 - 欢迎在issues提交bug
 
 ***
+### 运行方式
+
+rosrun robot_hmi robot_hmi
+
 ### The interface overview
 ### 界面大致介绍
 ![image.png](https://i.postimg.cc/vT13FgnG/image.png)
