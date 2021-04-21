@@ -28,7 +28,7 @@ using namespace Qt;
 *****************************************************************************/
 
 MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
-	: QMainWindow(parent)
+  : QMainWindow(parent)
 	, qnode(argc,argv)
 {
 	ui.setupUi(this); // Calling this incidentally connects all ui's triggers to on_...() callbacks in this class.
@@ -37,20 +37,23 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     //读取配置文件
     ReadSettings();
     setWindowIcon(QIcon(":/images/robot.png"));
-    setWindowFlags(Qt::FramelessWindowHint);//去掉标题栏
+    setWindowFlags(Qt::CustomizeWindowHint);//去掉标题栏
     //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
-	/*********************
-	** Logging
-	**********************/
-	ui.view_logging->setModel(qnode.loggingModel());
-
-    /*********************
-    ** 自动连接master
-    **********************/
-    if (m_autoConnect) {
-        on_button_connect_clicked(true);
-    }
-    //链接connect
+    QSettings windows_setting("cyrobot_monitor","windows");
+   int x = windows_setting.value("WindowGeometry/x").toInt();
+   int y = windows_setting.value("WindowGeometry/y").toInt();
+   int width = windows_setting.value("WindowGeometry/width").toInt();
+   int height = windows_setting.value("WindowGeometry/height").toInt();
+   QDesktopWidget* desktopWidget = QApplication::desktop();
+   QRect clientRect = desktopWidget->availableGeometry();
+   QRect targRect0 = QRect(clientRect.width()/4,clientRect.height()/4,clientRect.width()/2,clientRect.height()/2);
+   QRect targRect = QRect(x,y,width,height);
+   if(width == 0|| height == 0 || x<0 || x>clientRect.width() || y<0 || y>clientRect.height())//如果上一次关闭软件的时候，窗口位置不正常，则本次显示在显示器的正中央
+   {
+       targRect = targRect0;
+   }
+   this->setGeometry(targRect);//设置主窗口的大小
+  ui.view_logging->setModel(qnode.loggingModel());
     connections();
 
 }
@@ -145,10 +148,16 @@ void MainWindow::initUis()
     //视图添加item
     m_qgraphicsScene->addItem(m_roboMap);
     //设置item的坐标原点与视图的原点重合（默认为视图中心）
-//    m_roboMap->setPos(100,100);
     //widget添加视图
     ui.mapViz->setScene(m_qgraphicsScene);
-
+    QImage Image;
+    Image.load("://images/car/car_background.JPG");
+    QPixmap pixmap(QPixmap::fromImage(Image));
+    ui.label_carback->setMinimumSize(ui.label_carback->size());
+    pixmap.scaled(ui.label_carback->size(), Qt::KeepAspectRatio);
+    //ui->label->setScaledContents(true);
+    ui.label_carback->setAlignment(Qt::AlignCenter);
+    ui.label_carback->setPixmap(pixmap);
     //ui.speed_webView->load(QUrl("file://"+qApp->applicationDirPath()+"/html/gauge-stage.html"));
     ui.horizontalLayout_4->setSpacing(0);
     ui.horizontalLayout_4->setMargin(0);
@@ -180,6 +189,7 @@ void MainWindow::connections()
     });
     QObject::connect(ui.btn_control,&QPushButton::clicked,[=](){
       ui.stackedWidget_left->setCurrentIndex(1);
+
     });
     QObject::connect(ui.btn_status,&QPushButton::clicked,[=](){
       ui.stackedWidget_left->setCurrentIndex(0);
@@ -351,19 +361,7 @@ void MainWindow::slot_pubImageMapTimeOut(){
 //设置界面
 void MainWindow::slot_setting_frame()
 {
-    if(set!=NULL)
-    {
-        delete set;
-        set=new Settings();
-        set->setWindowModality(Qt::ApplicationModal);
-        set->show();
-    }
-    else{
-        set=new Settings();
-        set->setWindowModality(Qt::ApplicationModal);
-        set->show();
-    }
-    //绑定set确认按钮点击事件
+
 }
 //刷新当前坐标
 void MainWindow::slot_position_change(QString frame,double x,double y,double z,double w)
@@ -677,58 +675,43 @@ void MainWindow::showNoMasterMessage() {
 void MainWindow::slot_dis_connect(){
   ros::shutdown();
   slot_rosShutdown();
+  emit signalDisconnect();
+  this->close();
 }
-void MainWindow::on_button_connect_clicked(bool check ) {
-  ReadSettings();
-  QDialog connecting_dia;
-  QLabel text_info;
-  text_info.setText("连接master中/n "+m_masterUrl+"\n"+m_hostUrl+"\n请稍后.............");
-  text_info.setParent(&connecting_dia);
-  connecting_dia.resize(300,100);
-  connecting_dia.show();
-    //如果使用环境变量
-  if (m_useEnviorment) {
-    if ( !qnode.init() ) {
-           connecting_dia.close();
-            //showNoMasterMessage();
-            QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
-            ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-             ui.label_statue_text->setStyleSheet("color:red;");
-            ui.label_statue_text->setText("离线");
-		} else {
-            ui.button_connect->setEnabled(false);
+bool MainWindow::connectMaster(QString master_ip,QString ros_ip,bool use_envirment){
+      //如果使用环境变量
+    if (use_envirment) {
+      if ( !qnode.init() ) {
+              return false;
+      } else {
+                ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
+                ui.label_statue_text->setStyleSheet("color:green;");
+               ui.label_statue_text->setText("在线");
+               //初始化视频订阅的显示
+               initVideos();
+               //显示话题列表
+               initTopicList();
+               initOthers();
+
+      }
+      }
+      //如果不使用环境变量
+      else {
+      if ( ! qnode.init(master_ip.toStdString(),ros_ip.toStdString())) {
+              return false;
+      } else {
               ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
               ui.label_statue_text->setStyleSheet("color:green;");
-             ui.label_statue_text->setText("在线");
+              ui.label_statue_text->setText("在线");
              //初始化视频订阅的显示
              initVideos();
              //显示话题列表
              initTopicList();
              initOthers();
-		}
+      }
     }
-    //如果不使用环境变量
-    else {
-    if ( ! qnode.init(m_masterUrl.toStdString(),m_hostUrl.toStdString())) {
-            connecting_dia.close();
-            QMessageBox::warning(NULL, "失败", "连接ROS Master失败！请检查你的网络或连接字符串！", QMessageBox::Yes , QMessageBox::Yes);
-            ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-            ui.label_statue_text->setStyleSheet("color:red;");
-            ui.label_statue_text->setText("离线");
-            //showNoMasterMessage();
-		} else {
-            ui.button_connect->setEnabled(false);
-            ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/online.png")));
-            ui.label_statue_text->setStyleSheet("color:green;");
-            ui.label_statue_text->setText("在线");
-           //初始化视频订阅的显示
-           initVideos();
-           //显示话题列表
-           initTopicList();
-           initOthers();
-		}
-	}
-
+    ReadSettings();
+      return true;
 }
 void MainWindow::initTopicList()
 {
@@ -747,10 +730,9 @@ void MainWindow::refreashTopicList()
 //当ros与master的连接断开时
 void MainWindow::slot_rosShutdown()
 {
-    ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
-    ui.label_statue_text->setStyleSheet("color:red;");
-    ui.label_statue_text->setText("离线");
-    ui.button_connect->setEnabled(true);
+  ui.label_robot_staue_img->setPixmap(QPixmap::fromImage(QImage("://images/offline.png")));
+  ui.label_statue_text->setStyleSheet("color:red;");
+  ui.label_statue_text->setText("离线");
 }
 void MainWindow::slot_power(float p)
 {

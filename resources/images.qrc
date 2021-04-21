@@ -142,5 +142,8 @@
         <file>images/get_pos.png</file>
         <file>images/control.png</file>
         <file>images/status.png</file>
+        <file>background/background.gif</file>
+        <file>images/car/car_background.JPG</file>
+        <file>images/car/car.JPG</file>
     </qresource>
 </RCC>

@@ -63,23 +63,22 @@ bool QNode::init() {
 
 //初始化的函数*********************************
 bool QNode::init(const std::string &master_url, const std::string &host_url) {
-	std::map<std::string,std::string> remappings;
-	remappings["__master"] = master_url;
-	remappings["__hostname"] = host_url;
-	ros::init(remappings,"cyrobot_monitor");
-	if ( ! ros::master::check() ) {
-		return false;
-	}
-	ros::start(); // explicitly needed since our nodehandle is going out of scope.
+  std::map<std::string,std::string> remappings;
+  remappings["__master"] = master_url;
+  remappings["__hostname"] = host_url;
+  ros::init(remappings,"cyrobot_monitor");
+  if ( ! ros::master::check() ) {
+    return false;
+  }
+  ros::start(); // explicitly needed since our nodehandle is going out of scope.
   SubAndPubTopic();
-	start();
+  start();
 	return true;
 }
 //创建订阅者与发布者
 void QNode::SubAndPubTopic(){
   ros::NodeHandle n;
    // Add your ros communications here.
-
    //创建速度话题的订阅者
    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
    power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
@@ -232,7 +231,7 @@ void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map){
       m_mapOriginY=map->info.origin.position.y;
       m_mapResolution=map->info.resolution;
       int row, col, value;
-      cv::Mat image(map->info.width, map->info.height, CV_8UC1);
+      cv::Mat image(map->info.height, map->info.width, CV_8UC1);
       for(int array_index=0; array_index < map->data.size(); array_index++) {
           //计算当前所在行
           row = (int)array_index/image.cols;

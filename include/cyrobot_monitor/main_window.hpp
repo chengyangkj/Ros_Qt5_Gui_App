@@ -15,7 +15,6 @@
 //#include <QtGui/QMainWindow>
 #include "ui_main_window.h"
 #include "qnode.hpp"
-#include "settings.h"
 #include "qrviz.hpp"
 #include "joystick.h"
 #include "robomap.h"
@@ -28,6 +27,7 @@
 #include <QVariant>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QDesktopWidget>
 #include <QTimer>
 #include <QQueue>
 #include <map>
@@ -48,7 +48,7 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
-	MainWindow(int argc, char** argv, QWidget *parent = 0);
+  MainWindow(int argc, char** argv, QWidget *parent = 0);
 	~MainWindow();
   enum {upleft=0,up,upright,left,stop,right,downleft,down,downright};
 	void ReadSettings(); // Load up qt program settings at startup
@@ -60,12 +60,12 @@ public:
     void initVideos();
     void initTopicList();
     void initOthers();
+    bool connectMaster(QString master_ip,QString ros_ip,bool use_envirment);
 public slots:
     /******************************************
 	** Auto-connections (connectSlotsByName())
 	*******************************************/
     void on_actionAbout_triggered();
-    void on_button_connect_clicked(bool check );
     void slot_speed_x(double x);
     void slot_speed_yaw(double yaw);
     void slot_power(float p);
@@ -118,16 +118,18 @@ signals:
     void signalSet2DPose();
     void signalSet2DGoal();
     void signalSetMoveCamera();
+    void signalDisconnect();
 private:
-  Ui::MainWindowDesign ui;
-    bool isPressedWidget;
-    QPoint m_lastPos;
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void connections();
     void add_quick_cmd(QString name,QString shell);
     void display_rviz();
+private:
+    Ui::MainWindowDesign ui;
+    bool isPressedWidget;
+    QPoint m_lastPos;
     QNode qnode;
     QProcess *quick_cmd=NULL;
     QProcess *close_remote_cmd=NULL;
@@ -139,7 +141,6 @@ private:
     QMap <QString,QTreeWidgetItem *> tree_rviz_stues;
     //存放display的当前值 item名，参数名称和值
     QMap <QTreeWidgetItem*,QMap<QString,QString>> tree_rviz_values;
-    Settings *set=NULL;
     QSoundEffect *media_player=NULL;
     bool m_useEnviorment=false;
     bool m_autoConnect=false;

@@ -10,6 +10,9 @@
     <height>656</height>
    </rect>
   </property>
+  <property name="acceptDrops">
+   <bool>false</bool>
+  </property>
   <property name="windowTitle">
    <string>ROS人机交互软件</string>
   </property>
@@ -202,17 +205,20 @@ background-color: transparent;
                </widget>
               </item>
               <item>
-               <spacer name="verticalSpacer_5">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
+               <widget class="QLabel" name="label_carback">
+                <property name="minimumSize">
                  <size>
-                  <width>20</width>
-                  <height>40</height>
+                  <width>300</width>
+                  <height>400</height>
                  </size>
                 </property>
-               </spacer>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -586,32 +592,6 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="button_connect">
-                <property name="enabled">
-                 <bool>true</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="toolTip">
-                 <string>Set the target to the current joint trajectory state.</string>
-                </property>
-                <property name="statusTip">
-                 <string>Clear all waypoints and set the target to the current joint trajectory state.</string>
-                </property>
-                <property name="text">
-                 <string>连接</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>:/images/line.png</normaloff>:/images/line.png</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
                <widget class="QPushButton" name="pushButton">
                 <property name="text">
                  <string>🔗断开</string>
@@ -786,7 +766,7 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
 }</string>
                  </property>
                  <property name="value">
-                  <number>0</number>
+                  <number>70</number>
                  </property>
                 </widget>
                </item>
@@ -893,7 +873,7 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
           <item>
            <widget class="QStackedWidget" name="stackedWidget_main">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -905,8 +885,8 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                    <widget class="QLabel" name="label_turnLeft">
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
-                      <height>0</height>
+                      <width>250</width>
+                      <height>250</height>
                      </size>
                     </property>
                     <property name="text">
@@ -918,8 +898,8 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                    <widget class="QWidget" name="widget_dashboard" native="true">
                     <property name="minimumSize">
                      <size>
-                      <width>250</width>
-                      <height>250</height>
+                      <width>300</width>
+                      <height>300</height>
                      </size>
                     </property>
                     <property name="styleSheet">
@@ -931,8 +911,8 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                    <widget class="QLabel" name="label_turnRight">
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
-                      <height>0</height>
+                      <width>250</width>
+                      <height>250</height>
                      </size>
                     </property>
                     <property name="layoutDirection">
@@ -972,8 +952,8 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>200</width>
-                        <height>200</height>
+                        <width>99999</width>
+                        <height>99999</height>
                        </size>
                       </property>
                       <property name="styleSheet">
@@ -1001,8 +981,8 @@ background-color: rgb(255,255,255);
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>200</width>
-                        <height>200</height>
+                        <width>99999</width>
+                        <height>99999</height>
                        </size>
                       </property>
                       <property name="styleSheet">
