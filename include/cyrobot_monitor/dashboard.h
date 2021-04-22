@@ -42,7 +42,7 @@ private:
   void draw_oil_meter(QPainter& painter);  // 油表
 
 private:
-  Gear _gear;
+  Gear _gear{kGear_N};
   int _rpm;
   int _speed;
   double _temperature;

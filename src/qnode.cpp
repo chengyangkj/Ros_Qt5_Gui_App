@@ -32,14 +32,13 @@ QNode::QNode(int argc, char** argv ) :
 	init_argv(argv)
     {
 //    读取topic的设置
-    QSettings topic_setting("topic_setting","cyrobot_monitor");
-    odom_topic= topic_setting.value("topic_odom","odom").toString();
-    power_topic=topic_setting.value("topic_power","power").toString();
-    laser_topic=topic_setting.value("topic_laser","scan").toString();
-    pose_topic=topic_setting.value("topic_amcl","amcl_pose").toString();
-    power_min=topic_setting.value("power_min","10").toString();
-    power_max=topic_setting.value("power_max","12").toString();
-
+    QSettings topic_setting("cyrobot_monitor","settings");
+    odom_topic= topic_setting.value("topic/topic_odom","odom").toString();
+    batteryState_topic=topic_setting.value("topic/topic_power","battery_state").toString();
+    laser_topic=topic_setting.value("topic/topic_laser","scan").toString();
+    pose_topic=topic_setting.value("topic/topic_amcl","amcl_pose").toString();
+    show_mode=topic_setting.value("main/show_mode","control").toString();
+     qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
     }
 
 QNode::~QNode() {
@@ -51,7 +50,8 @@ QNode::~QNode() {
 }
 
 bool QNode::init() {
-	ros::init(init_argc,init_argv,"cyrobot_monitor");
+
+  ros::init(init_argc,init_argv,"cyrobot_monitor_"+show_mode.toStdString());
 	if ( ! ros::master::check() ) {
 		return false;
 	}
@@ -81,7 +81,7 @@ void QNode::SubAndPubTopic(){
    // Add your ros communications here.
    //创建速度话题的订阅者
    cmdVel_sub =n.subscribe<nav_msgs::Odometry>(odom_topic.toStdString(),200,&QNode::speedCallback,this);
-   power_sub=n.subscribe(power_topic.toStdString(),1000,&QNode::powerCallback,this);
+   battery_sub=n.subscribe(batteryState_topic.toStdString(),1000,&QNode::batteryCallback,this);
    //地图订阅
    map_sub = n.subscribe("map",1000,&QNode::mapCallback,this);
    //机器人位置话题
@@ -199,9 +199,9 @@ void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
       tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);//进行转换
       emit updateRoboPose(roboPos,yaw);
 }
-void QNode::powerCallback(const std_msgs::Float32 &message_holder)
+void QNode::batteryCallback(const sensor_msgs::BatteryState &message)
 {
-    emit power(message_holder.data);
+   emit batteryState(message);
 }
 void QNode::myCallback(const std_msgs::Float64 &message_holder)
 {
@@ -347,7 +347,11 @@ void QNode::run() {
  {
       ros::NodeHandle n;
       image_transport::ImageTransport it_(n);
-       image_sub0=it_.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
+       if(frame_id==0){
+         m_compressedImgSub0=n.subscribe(topic.toStdString(),100,&QNode::imageCallback0,this);
+       }else if(frame_id==1){
+         m_compressedImgSub1=n.subscribe(topic.toStdString(),100,&QNode::imageCallback1,this);
+       }
        ros::spinOnce();
  }
  //图元坐标系转换为map坐标系
@@ -400,16 +404,34 @@ void QNode::pub_imageMap(QImage map){
      m_imageMapPub.publish(msg);
 }
  //图像话题的回调函数
- void QNode::imageCallback0(const sensor_msgs::ImageConstPtr& msg)
+ void QNode::imageCallback0(const sensor_msgs::CompressedImageConstPtr &msg)
  {
      cv_bridge::CvImagePtr cv_ptr;
 
      try
        {
          //深拷贝转换为opencv类型
-         cv_ptr = cv_bridge::toCvCopy(msg, msg->encoding);
-         QImage im=Mat2QImage(cv_ptr->image);
-         emit Show_image(0,im);
+       cv_bridge::CvImagePtr cv_ptr_compressed = cv_bridge::toCvCopy(msg,sensor_msgs::image_encodings::BGR8);
+       QImage im=Mat2QImage(cv_ptr_compressed->image);
+       emit Show_image(0,im);
+       }
+       catch (cv_bridge::Exception& e)
+       {
+
+         log(Error,("video frame0 exception: "+QString(e.what())).toStdString());
+         return;
+       }
+ }
+ void QNode::imageCallback1(const sensor_msgs::CompressedImageConstPtr &msg)
+ {
+     cv_bridge::CvImagePtr cv_ptr;
+
+     try
+       {
+         //深拷贝转换为opencv类型
+       cv_bridge::CvImagePtr cv_ptr_compressed = cv_bridge::toCvCopy(msg,sensor_msgs::image_encodings::BGR8);
+       QImage im=Mat2QImage(cv_ptr_compressed->image);
+       emit Show_image(1,im);
        }
        catch (cv_bridge::Exception& e)
        {

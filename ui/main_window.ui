@@ -77,7 +77,7 @@ background-color: transparent;
 </string>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page_6">
            <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -952,8 +952,8 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>99999</width>
-                        <height>99999</height>
+                        <width>400</width>
+                        <height>400</height>
                        </size>
                       </property>
                       <property name="styleSheet">
@@ -981,8 +981,8 @@ background-color: rgb(255,255,255);
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>99999</width>
-                        <height>99999</height>
+                        <width>400</width>
+                        <height>400</height>
                        </size>
                       </property>
                       <property name="styleSheet">

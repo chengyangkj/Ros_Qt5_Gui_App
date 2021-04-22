@@ -46,6 +46,9 @@ LoginWidget::LoginWidget(QWidget *parent) :
            if(addre.split(".")[0]=="192"){
              m_qRosIp = addre;
              m_qMasterIp = "http://"+addre+":11311";
+           }else if(addre.split(".")[0]=="10"){
+             m_qRosIp = addre;
+             m_qMasterIp = "http://"+addre+":11311";
            }
        }
     }
@@ -58,7 +61,18 @@ LoginWidget::LoginWidget(QWidget *parent) :
         ui->stackedWidget->setCurrentIndex(1);
     });
     connect(ui->pushButton_return,&QPushButton::clicked,[=](){
-        ui->stackedWidget->setCurrentIndex(0);
+      QMessageBox msg(this);//对话框设置父组件
+      msg.setWindowTitle("返回主界面");//对话框标题
+      msg.setText("是否保存设置");//对话框提示文本
+      msg.setIcon(QMessageBox::Information);//设置图标类型
+      msg.setStandardButtons(QMessageBox::Yes | QMessageBox:: No);//对话框上包含的按钮
+
+      if(msg.exec() == QMessageBox::Yes)//模态调用
+      {
+         slot_writeSettings();
+      }
+
+       ui->stackedWidget->setCurrentIndex(0);
     });
     connect(ui->btnWinClose,&QPushButton::clicked,[=](){
         this->close();
@@ -86,14 +100,13 @@ void LoginWidget::slot_autoLoad(){
   }
 }
 void LoginWidget::slot_writeSettings(){
-  QSettings main_setting("cyrobot_monitor","topic_settings");
-  main_setting.setValue("topic_odom",ui->lineEdit_odm->text());
-  main_setting.setValue("topic_power",ui->lineEdit_power->text());
-  main_setting.setValue("power_min",ui->lineEdit_power_min->text());
-  main_setting.setValue("power_max",ui->lineEdit_power_max->text());
-  main_setting.setValue("turn_thre",ui->lineEdit_turnLightThre->text());
+  QSettings main_setting("cyrobot_monitor","settings");
+  main_setting.setValue("topic/topic_odom",ui->lineEdit_odm->text());
+  main_setting.setValue("topic/topic_power",ui->lineEdit_power->text());
+  main_setting.setValue("main/turn_thre",ui->lineEdit_turnLightThre->text());
+  main_setting.setValue("main/show_mode",ui->radioButton_robot->isChecked()?"robot":"control");
+  main_setting.setValue("main/robotpic",ui->lineEdit_robotPic->text());
 //    main_setting.setValue("odom_topic",ui->lineEdit_odom->text());
-  QSettings video_topic_setting("cyrobot_monitor","video_settings");
   QStringList name_data;
   QStringList topic_data;
   QStringList format_data;
@@ -105,13 +118,10 @@ void LoginWidget::slot_writeSettings(){
   topic_data.append(ui->video0_topic_set_2->text());
   topic_data.append(ui->video0_topic_set_3->text());
   topic_data.append(ui->video0_topic_set_4->text());
-  video_topic_setting.setValue("names",name_data);
-  video_topic_setting.setValue("topics",topic_data);
-  QSettings connect_settings("cyrobot_monitor", "connect_info");
-  connect_settings.setValue("master_url",ui->lineEditMasterIp->text());
-  connect_settings.setValue("host_url",ui->lineEditRosIp->text());
-  connect_settings.setValue("use_enviorment",ui->checkBoxEnvirment->isChecked());
-  connect_settings.setValue("auto_connect",ui->checkBoxAutoLogin->isChecked());
+  main_setting.setValue("video/names",name_data);
+  main_setting.setValue("video/topics",topic_data);
+
+
 
   QSettings settings("cyrobot_monitor","Displays");
    settings.setValue("Grid/enable",Grid_Check->isChecked());
@@ -134,7 +144,8 @@ void LoginWidget::slot_writeSettings(){
   settings.setValue("LocalMap/topic",Local_CostMap_Topic_box->currentText());
   settings.setValue("LocalPlan/topic",Local_Planner_Topic_box->currentText());
   settings.setValue("LocalPlan/color",Local_Planner_Color_box->currentText());
-  QMessageBox::critical(NULL, "保存成功！", "保存成功", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+  QMessageBox::information(NULL, "成功", "保存成功",
+                           QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 }
 void LoginWidget::changeEvent(QEvent *e)
 {
@@ -191,9 +202,11 @@ void LoginWidget::readSettings(){
   Polygon_Check->setChecked(Polygon_enable);
   Polygon_Topic_box->setCurrentText(Polygon_topic);
   fixed_box->setCurrentText(FixedFrame);
-  QSettings video_topic_setting("cyrobot_monitor","video_settings");
-  QStringList names=video_topic_setting.value("names").toStringList();
-  QStringList topics=video_topic_setting.value("topics").toStringList();
+
+
+  QSettings main_setting("cyrobot_monitor","settings");
+  QStringList names=main_setting.value("video/names").toStringList();
+  QStringList topics=main_setting.value("video/topics").toStringList();
   if(names.size()==4)
   {
       ui->video0_name_set->setText(names[0]);
@@ -209,28 +222,22 @@ void LoginWidget::readSettings(){
       ui->video0_topic_set_4->setText(topics[3]);
   }
 
-  QSettings main_setting("cyrobot_monitor","topic_settings");
-  ui->lineEdit_odm->setText(main_setting.value("topic_odom","raw_odom").toString());
-  ui->lineEdit_power->setText(main_setting.value("topic_power","power").toString());
-  ui->lineEdit_power_min->setText(main_setting.value("power_min","10").toString());
-  ui->lineEdit_power_max->setText(main_setting.value("power_max","12").toString());
-  ui->lineEdit_turnLightThre->setText(main_setting.value("turn_thre","0.2").toString());
-  QSettings connect_info("cyrobot_monitor", "connect_info");
-  if(!connect_info.contains("master_url")){
-     ui->lineEditMasterIp->setText(m_qMasterIp);
-  }
-  else{
-    ui->lineEditMasterIp->setText(connect_info.value("master_url",QString("http://127.0.0.1:11311/")).toString());
-  }
-  if(!connect_info.contains("host_url")){
-     ui->lineEditRosIp->setText(m_qRosIp);
-  }
-  else{
-    ui->lineEditRosIp->setText(connect_info.value("host_url",QString("192.168.1.3")).toString());
-  }
+  ui->lineEdit_odm->setText(main_setting.value("topic/topic_odom","raw_odom").toString());
+  ui->lineEdit_power->setText(main_setting.value("topic/topic_power","power").toString());
+  ui->lineEdit_turnLightThre->setText(main_setting.value("main/turn_thre","0.2").toString());
+  QSettings connect_info("cyrobot_monitor","connect_info");
+  ui->lineEditMasterIp->setText(connect_info.value("master_url",m_qMasterIp).toString());
+
+  ui->lineEditRosIp->setText(connect_info.value("host_url",m_qRosIp).toString());
 
   ui->checkBoxEnvirment->setChecked(connect_info.value("use_enviorment",bool(false)).toBool());
   ui->checkBoxAutoLogin->setChecked(connect_info.value("auto_connect",bool(false)).toBool());
+  if(main_setting.value("main/show_mode","control").toString()=="control"){
+     ui->radioButton_control->setChecked(true);
+  }else{
+     ui->radioButton_robot->setChecked(true);
+  }
+
 }
 /**
  * @brief LoginWidget::on_btnLogin_clicked
@@ -250,11 +257,11 @@ void LoginWidget::on_btnLogin_clicked()
     ui->btnLogin->setStyleSheet("border:0px;background-color:rgb(211, 215, 207);color:WHITE；");
     bool isConnect = mainWindow->connectMaster(ui->lineEditMasterIp->text(),ui->lineEditRosIp->text(),ui->checkBoxEnvirment->isChecked());
     if(isConnect){
-      QSettings settings("cyrobot_monitor", "connect_info");
-      settings.setValue("master_url",ui->lineEditMasterIp->text());
-      settings.setValue("host_url",ui->lineEditRosIp->text());
-      settings.setValue("use_enviorment",ui->checkBoxEnvirment->isChecked());
-      settings.setValue("auto_connect",ui->checkBoxAutoLogin->isChecked());
+      QSettings connect_info("cyrobot_monitor","connect_info");
+      connect_info.setValue("master_url",ui->lineEditMasterIp->text());
+      connect_info.setValue("host_url",ui->lineEditRosIp->text());
+      connect_info.setValue("use_enviorment",ui->checkBoxEnvirment->isChecked());
+      connect_info.setValue("auto_connect",ui->checkBoxAutoLogin->isChecked());
       this->hide();
       mainWindow->show();
     }else {
@@ -298,6 +305,7 @@ void LoginWidget::SltEditFinished()
  */
 void LoginWidget::InitWidget()
 {
+      ui->stackedWidget->setCurrentIndex(0);
   //header
       ui->treeWidget->setHeaderLabels(QStringList()<<"key"<<"value");
      // ui->treeWidget->setHeaderHidden(true);

@@ -37,6 +37,7 @@
 #include <cv_bridge/cv_bridge.h>              //cv_bridge
 #include <sensor_msgs/image_encodings.h>    //图像编码格式
 #include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/BatteryState.h>
 #include <tf/transform_listener.h>
 #include <actionlib/server/simple_action_server.h>
 #include <QtConcurrent/QtConcurrent>
@@ -95,7 +96,7 @@ Q_SIGNALS:
     void rosShutdown();
     void speed_x(double x);
     void speed_y(double y);
-    void power(float p);
+    void batteryState(sensor_msgs::BatteryState);
     void Master_shutdown();
     void Show_image(int,QImage);
     void updateRoboPose(QPointF pos,float yaw);
@@ -110,12 +111,15 @@ private:
     ros::Subscriber chatter_subscriber;
     ros::Subscriber pos_sub;
     ros::Subscriber m_laserSub;
-    ros::Subscriber power_sub;
+    ros::Subscriber battery_sub;
     ros::Subscriber m_plannerPathSub;
+    ros::Subscriber m_compressedImgSub0;
+    ros::Subscriber m_compressedImgSub1;
     ros::Publisher goal_pub;
     ros::Publisher cmd_pub;
     image_transport::Publisher m_imageMapPub;
     QStringListModel logging_model;
+    QString show_mode="control";
     //图像订阅
     image_transport::Subscriber image_sub0;
     //地图订阅
@@ -123,11 +127,9 @@ private:
     //图像format
     QString video0_format;
     QString odom_topic;
-    QString power_topic;
+    QString batteryState_topic;
     QString pose_topic;
     QString laser_topic;
-    QString power_max;
-    QString power_min;
     QPolygon mapPonits;
     QPolygonF plannerPoints;
     QPolygonF laserPoints;
@@ -149,8 +151,9 @@ private:
     cv::Mat RotaMap(cv::Mat const& map);
     void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
-    void powerCallback(const std_msgs::Float32& message_holder);
-    void imageCallback0(const sensor_msgs::ImageConstPtr& msg);
+    void batteryCallback(const sensor_msgs::BatteryState &message);
+    void imageCallback0(const sensor_msgs::CompressedImageConstPtr &msg);
+    void imageCallback1(const sensor_msgs::CompressedImageConstPtr &msg);
     void myCallback(const std_msgs::Float64& message_holder);
     void mapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
     void laserScanCallback(sensor_msgs::LaserScanConstPtr scan);

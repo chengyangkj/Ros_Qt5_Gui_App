@@ -162,7 +162,7 @@ void DashBoard::draw_speedometer(QPainter& painter) {
 
   painter.setPen(QColor(26, 245, 245));
   painter.setFont(QFont("DejaVu Sans", 8, 63, true));
-  painter.drawText(QRect(145, 75, 40, 20), Qt::AlignBottom | Qt::AlignLeft, "km/h");
+  painter.drawText(QRect(145, 75, 40, 20), Qt::AlignBottom | Qt::AlignLeft, "cm/s");
 
   painter.restore();
 }

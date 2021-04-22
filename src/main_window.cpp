@@ -33,9 +33,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 {
 	ui.setupUi(this); // Calling this incidentally connects all ui's triggers to on_...() callbacks in this class.
     //QObject::connect(ui.actionAbout_Qt, SIGNAL(triggered(bool)), qApp, SLOT(aboutQt())); // qApp is a global variable for the application
-    initUis();
     //读取配置文件
     ReadSettings();
+    initUis();
     setWindowIcon(QIcon(":/images/robot.png"));
     setWindowFlags(Qt::CustomizeWindowHint);//去掉标题栏
     //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
@@ -61,9 +61,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 void MainWindow::initVideos()
 {
 
-   QSettings video_topic_setting("video_topic","cyrobot_monitor");
-   QStringList names=video_topic_setting.value("names").toStringList();
-   QStringList topics=video_topic_setting.value("topics").toStringList();
+   QSettings video_topic_setting("cyrobot_monitor","settings");
+   QStringList names=video_topic_setting.value("video/names").toStringList();
+   QStringList topics=video_topic_setting.value("video/topics").toStringList();
    if(topics.size()==4)
    {
        if(topics[0]!="")
@@ -177,6 +177,13 @@ void MainWindow::initUis()
     rock_widget->show();
     //dashboard
     speedDashBoard =new DashBoard(ui.widget_dashboard);
+    if(m_showMode==SHOWMODE::robot){
+      ui.stackedWidget_left->hide();
+      ui.btn_status->hide();
+      ui.btn_control->hide();
+      ui.settings_btn->hide();
+      this->showFullScreen();
+    }
 }
 
 void MainWindow::connections()
@@ -208,7 +215,7 @@ void MainWindow::connections()
     connect(&qnode,SIGNAL(speed_x(double)),this,SLOT(slot_speed_x(double)));
     connect(&qnode,SIGNAL(speed_y(double)),this,SLOT(slot_speed_yaw(double)));
     //电源的信号
-    connect(&qnode,SIGNAL(power(float)),this,SLOT(slot_power(float)));
+    connect(&qnode,SIGNAL(batteryState(sensor_msgs::BatteryState)),this,SLOT(slot_batteryState(sensor_msgs::BatteryState)));
    //绑定slider的函数
    connect(ui.horizontalSlider_raw,SIGNAL(valueChanged(int)),this,SLOT(Slider_raw_valueChanged(int)));
    connect(ui.horizontalSlider_linear,SIGNAL(valueChanged(int)),this,SLOT(Slider_linear_valueChanged(int)));
@@ -734,14 +741,14 @@ void MainWindow::slot_rosShutdown()
   ui.label_statue_text->setStyleSheet("color:red;");
   ui.label_statue_text->setText("离线");
 }
-void MainWindow::slot_power(float p)
+void MainWindow::slot_batteryState(sensor_msgs::BatteryState msg)
 {
-    ui.label_power->setText(QString::number(p).mid(0,5)+"V");
-    double n=(p-10)/1.5;
-    int value=n*100;
-    ui.progressBar->setValue(value>100?100:value);
+    ui.label_power->setText(QString::number(msg.voltage).mid(0,5)+"V");
+    double percentage=msg.percentage;
+    speedDashBoard->set_oil(percentage);
+    ui.progressBar->setValue(percentage>100?100:percentage);
     //当电量过低时发出提示
-    if(n*100<=20)
+    if(percentage<=20)
     {
          ui.progressBar->setStyleSheet("QProgressBar::chunk {background-color: red;width: 20px;} QProgressBar {border: 2px solid grey;border-radius: 5px;text-align: center;}");
           // QMessageBox::warning(NULL, "电量不足", "电量不足，请及时充电！", QMessageBox::Yes , QMessageBox::Yes);
@@ -753,13 +760,19 @@ void MainWindow::slot_power(float p)
 void MainWindow::slot_speed_x(double x)
 {
   speedDashBoard->set_speed(abs(x*100));
+  if(x>0.001){
+    speedDashBoard->set_gear(DashBoard::kGear_D);
+  }else if(x<-0.001){
+    speedDashBoard->set_gear(DashBoard::kGear_R);
+  }else{
+    speedDashBoard->set_gear(DashBoard::kGear_N);
+  }
   QString number=QString::number(abs(x*100)).mid(0,2);
   if(number[1]=="."){
     number=number.mid(0,1);
   }
   ui.label_speed->setText(number);
-//    QString strVal = QString("setDatas(\"%1\");").arg(QString::number(abs(x*100)).mid(0,2));
-//    ui.speed_webView->page()->runJavaScript(strVal);
+
 }
 void MainWindow::slot_speed_yaw(double yaw)
 {
@@ -801,21 +814,19 @@ void MainWindow::on_actionAbout_triggered() {
 *****************************************************************************/
 
 void MainWindow::ReadSettings() {
-    QSettings settings("Qt-Ros Package", "cyrobot_monitor");
+    QSettings settings("cyrobot_monitor", "settings");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
-    m_masterUrl = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
-    m_hostUrl = settings.value("host_url", QString("192.168.1.3")).toString();
-    m_useEnviorment=settings.value("use_enviorment",bool(false)).toBool();
-    m_autoConnect=settings.value("auto_connect",bool(false)).toBool();
-    m_turnLightThre=settings.value("lineEdit_turnLightThre",double(0.1)).toDouble();
-    //QString topic_name = settings.value("topic_name", QString("/chatter")).toString();
-    //ui.line_edit_topic->setText(topic_name);
-    QSettings return_pos("return-position","cyrobot_monitor");
-//    ui.label_return_x->setText(return_pos.value("x",QString("0")).toString());
-//    ui.label_return_y->setText(return_pos.value("y",QString("0")).toString());
-//    ui.label_return_z->setText(return_pos.value("z",QString("0")).toString());
-//    ui.label_return_w->setText(return_pos.value("w",QString("0")).toString());
+    m_masterUrl = settings.value("connect/master_url",QString("http://192.168.1.2:11311/")).toString();
+    m_hostUrl = settings.value("connect/host_url", QString("192.168.1.3")).toString();
+    m_useEnviorment=settings.value("connect/use_enviorment",bool(false)).toBool();
+    m_autoConnect=settings.value("connect/auto_connect",bool(false)).toBool();
+    m_turnLightThre=settings.value("connect/lineEdit_turnLightThre",double(0.1)).toDouble();
+    if(settings.value("main/show_mode","control").toString()=="control"){
+      m_showMode=SHOWMODE::control;
+    }else{
+      m_showMode=SHOWMODE::robot;
+    }
 
 
 }

@@ -32,7 +32,7 @@
 #include <QQueue>
 #include <map>
 #include "dashboard.h"
-
+#include <sensor_msgs/BatteryState.h>
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
@@ -61,6 +61,11 @@ public:
     void initTopicList();
     void initOthers();
     bool connectMaster(QString master_ip,QString ros_ip,bool use_envirment);
+    enum SHOWMODE{
+        robot,
+        control,
+    };
+
 public slots:
     /******************************************
 	** Auto-connections (connectSlotsByName())
@@ -68,7 +73,7 @@ public slots:
     void on_actionAbout_triggered();
     void slot_speed_x(double x);
     void slot_speed_yaw(double yaw);
-    void slot_power(float p);
+    void slot_batteryState(sensor_msgs::BatteryState);
     void slot_rosShutdown();
     void quick_cmds_check_change(int);
     void cmd_output();
@@ -144,6 +149,7 @@ private:
     QSoundEffect *media_player=NULL;
     bool m_useEnviorment=false;
     bool m_autoConnect=false;
+    SHOWMODE m_showMode;
     QString m_masterUrl;
     QString m_hostUrl;
     double m_turnLightThre=0.1;
