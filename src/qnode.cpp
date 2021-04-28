@@ -38,6 +38,8 @@ QNode::QNode(int argc, char** argv ) :
     laser_topic=topic_setting.value("topic/topic_laser","scan").toString();
     pose_topic=topic_setting.value("topic/topic_amcl","amcl_pose").toString();
     show_mode=topic_setting.value("main/show_mode","control").toString();
+    m_frameRate=topic_setting.value("main/framerate",40).toInt();
+    m_threadNum=topic_setting.value("main/thread_num",6).toInt();
      qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
     }
 
@@ -50,7 +52,6 @@ QNode::~QNode() {
 }
 
 bool QNode::init() {
-
   ros::init(init_argc,init_argv,"cyrobot_monitor_"+show_mode.toStdString());
 	if ( ! ros::master::check() ) {
 		return false;
@@ -66,7 +67,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
   std::map<std::string,std::string> remappings;
   remappings["__master"] = master_url;
   remappings["__hostname"] = host_url;
-  ros::init(remappings,"cyrobot_monitor");
+  ros::init(remappings,"cyrobot_monitor_"+show_mode.toStdString());
   if ( ! ros::master::check() ) {
     return false;
   }
@@ -92,7 +93,6 @@ void QNode::SubAndPubTopic(){
    cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
    //激光雷达点云话题订阅
    m_laserSub=n.subscribe(laser_topic.toStdString(),1000,&QNode::laserScanCallback,this);
-   //m_rosTimer=n.createTimer(ros::Duration(1.0),boost::bind(&QNode::transformPoint,boost::ref(m_tfListener)));
    //全局规划Path
    m_plannerPathSub=n.subscribe("/move_base/NavfnROS/plan",1000,&QNode::plannerPathCallback,this);
    image_transport::ImageTransport it(n);
@@ -279,12 +279,11 @@ void QNode::speedCallback(const nav_msgs::Odometry::ConstPtr& msg)
     emit speed_y(msg->twist.twist.linear.y);
 }
 void QNode::run() {
-        ros::Rate loop_rate(20);
+        ros::Rate loop_rate(m_frameRate);
+        ros::AsyncSpinner spinner(m_threadNum);
+        spinner.start();
         //当当前节点没有关闭时
         while ( ros::ok() ) {
-            //调用消息处理回调函数
-            ros::spinOnce();
-
             loop_rate.sleep();
         }
         //如果当前节点关闭

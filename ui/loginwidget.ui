@@ -1245,7 +1245,7 @@ background-color:none</string>
              </rect>
             </property>
             <attribute name="label">
-             <string>显示设置</string>
+             <string>通用设置</string>
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_16">
              <item>
@@ -1334,6 +1334,30 @@ background-color:none</string>
                   </item>
                  </layout>
                 </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_32">
+               <item>
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>话题订阅线程数:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="spinBox_thread_num"/>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_13">
+                 <property name="text">
+                  <string>FrameRate:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="spinBox_frameRate"/>
                </item>
               </layout>
              </item>

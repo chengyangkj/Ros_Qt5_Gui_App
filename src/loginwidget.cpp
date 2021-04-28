@@ -106,7 +106,8 @@ void LoginWidget::slot_writeSettings(){
   main_setting.setValue("main/turn_thre",ui->lineEdit_turnLightThre->text());
   main_setting.setValue("main/show_mode",ui->radioButton_robot->isChecked()?"robot":"control");
   main_setting.setValue("main/robotpic",ui->lineEdit_robotPic->text());
-//    main_setting.setValue("odom_topic",ui->lineEdit_odom->text());
+  main_setting.setValue("main/thread_num",ui->spinBox_thread_num->value());
+  main_setting.setValue("main/framerate",ui->spinBox_frameRate->value());
   QStringList name_data;
   QStringList topic_data;
   QStringList format_data;
@@ -225,6 +226,8 @@ void LoginWidget::readSettings(){
   ui->lineEdit_odm->setText(main_setting.value("topic/topic_odom","raw_odom").toString());
   ui->lineEdit_power->setText(main_setting.value("topic/topic_power","power").toString());
   ui->lineEdit_turnLightThre->setText(main_setting.value("main/turn_thre","0.2").toString());
+  ui->spinBox_frameRate->setValue(main_setting.value("main/framerate",40).toInt());
+  ui->spinBox_thread_num->setValue(main_setting.value("main/thread_num",6).toInt());
   QSettings connect_info("cyrobot_monitor","connect_info");
   ui->lineEditMasterIp->setText(connect_info.value("master_url",m_qMasterIp).toString());
 

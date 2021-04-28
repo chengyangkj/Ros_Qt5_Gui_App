@@ -133,6 +133,8 @@ private:
     QPolygon mapPonits;
     QPolygonF plannerPoints;
     QPolygonF laserPoints;
+    int m_threadNum=4;
+    int m_frameRate=40;
     //地图 0 0点坐标对应世界坐标系的坐标
     int m_mapOriginX;
     int m_mapOriginY;

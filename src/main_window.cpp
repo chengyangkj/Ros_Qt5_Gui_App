@@ -39,23 +39,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     setWindowIcon(QIcon(":/images/robot.png"));
     setWindowFlags(Qt::CustomizeWindowHint);//去掉标题栏
     //QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
-    QSettings windows_setting("cyrobot_monitor","windows");
-   int x = windows_setting.value("WindowGeometry/x").toInt();
-   int y = windows_setting.value("WindowGeometry/y").toInt();
-   int width = windows_setting.value("WindowGeometry/width").toInt();
-   int height = windows_setting.value("WindowGeometry/height").toInt();
-   QDesktopWidget* desktopWidget = QApplication::desktop();
-   QRect clientRect = desktopWidget->availableGeometry();
-   QRect targRect0 = QRect(clientRect.width()/4,clientRect.height()/4,clientRect.width()/2,clientRect.height()/2);
-   QRect targRect = QRect(x,y,width,height);
-   if(width == 0|| height == 0 || x<0 || x>clientRect.width() || y<0 || y>clientRect.height())//如果上一次关闭软件的时候，窗口位置不正常，则本次显示在显示器的正中央
-   {
-       targRect = targRect0;
-   }
-   this->setGeometry(targRect);//设置主窗口的大小
+
   ui.view_logging->setModel(qnode.loggingModel());
     connections();
-
 }
 //订阅video话题
 void MainWindow::initVideos()
@@ -183,6 +169,21 @@ void MainWindow::initUis()
       ui.btn_control->hide();
       ui.settings_btn->hide();
       this->showFullScreen();
+    }else{
+        QSettings windows_setting("cyrobot_monitor","windows");
+       int x = windows_setting.value("WindowGeometry/x").toInt();
+       int y = windows_setting.value("WindowGeometry/y").toInt();
+       int width = windows_setting.value("WindowGeometry/width").toInt();
+       int height = windows_setting.value("WindowGeometry/height").toInt();
+       QDesktopWidget* desktopWidget = QApplication::desktop();
+       QRect clientRect = desktopWidget->availableGeometry();
+       QRect targRect0 = QRect(clientRect.width()/4,clientRect.height()/4,clientRect.width()/2,clientRect.height()/2);
+       QRect targRect = QRect(x,y,width,height);
+       if(width == 0|| height == 0 || x<0 || x>clientRect.width() || y<0 || y>clientRect.height())//如果上一次关闭软件的时候，窗口位置不正常，则本次显示在显示器的正中央
+       {
+           targRect = targRect0;
+       }
+       this->setGeometry(targRect);//设置主窗口的大小
     }
 }
 
@@ -867,10 +868,10 @@ void MainWindow::slot_minWindows(){
     this->showMinimized();
 }
 void MainWindow::slot_maxWindows(){
-  if(this->isMaximized()){
+  if(this->isFullScreen()){
     this->showNormal();
   }else{
-    this->showMaximized();
+    this->showFullScreen();
   }
 
 }

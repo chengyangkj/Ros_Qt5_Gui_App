@@ -6,21 +6,23 @@
 
 - 注意！未经作者的许可，此代码仅用于学习，不能用于其他用途。
 
-
-- 本仓库以分支的形式，长期维护各种有趣的ROS Qt项目，持续更新中.....
+- 本仓库以分支的形式，长期维护各种有趣的ROS 可视化项目，持续更新中.....
 
 - 欢迎在issues提交bug
+  
+[![image.png](https://i.postimg.cc/htDgpxDc/image.png)](https://postimg.cc/N5zW0K2z)
 
-## 菜单
 
-- [安装教程](#安装教程)
-- [分支](#分支)
-- [使用说明](#使用说明)
-- [功能介绍](#功能介绍)
-- [开源协议](#开源协议)
-- [相关教程及交流群](#相关教程及交流群)
+## 一，菜单
 
-## 安装教程
+- [安装教程](#二，安装教程)
+- [分支](#三，分支)
+- [使用说明](#四，使用说明)
+- [功能介绍](#五，功能介绍)
+- [开源协议](#六，开源协议)
+- [相关教程及交流群](#七，相关教程及交流群)
+
+## 二，安装教程
 
 #### 1，首先安装ros对qt pkg的支持（非必须）
 
@@ -57,9 +59,9 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 - 借助 ROS windows版本，编译后可在win10平板使用，安装教程[古月学院 如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
 
-## 分支
+## 三，分支
 
-#### 1. Qml版本分支（开发中）
+#### 1. Qml版本demo
 
 - ROS + QML + C++混合编程，使用qml自绘制地图，激光雷达点云等
 - [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
@@ -87,19 +89,24 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 #### 7，web版本分支 敬请期待
 
-## 使用说明
+## 四，使用说明
 
-- 使用前需要在菜单->设置 中进行必要设置
+### 1，连接主节点
+- 使用前需要在连接界面连接rosore主节点
 
-![image.png](https://i.postimg.cc/9XYJ7s0m/image.png)
+[![024.png](https://i.postimg.cc/9QrgmF1y/024.png)](https://postimg.cc/Xr6kxWRv)
 
 - ROS_MASTER_URI: ROS多机通讯主节点地址，如果只是单机通讯填127.0.0.1即可
 - ROS_IP: 软件运行的机器的IP 如果是单机通讯填127.0.0.1即可
 - 勾选使用环境变量连接就不使用界面设置的ROS_IP与ROS_MASTER_URI,需要在环境变量文件（~/.bashrc）配置好多机通讯环境变量，否则会导致连接失败，配置多机通讯教程[csdn 博客](https://blog.csdn.net/qq_38441692/article/details/98205852)
 - 其他一些话题设置
 - 勾选自动连接会在打开软件时进行自动连接
-- 注意！保存设置后需要重启软件生效
-- 重启软件后点击连接按钮即可连接master
+- 点击检测IP会自动检测本机IP并填入ros ip与ros master ip 
+
+### 2,设置
+
+点击连接界面右下角，进行相关必要设置
+
 ## 功能介绍
 
 #### 1,速度仪表盘
