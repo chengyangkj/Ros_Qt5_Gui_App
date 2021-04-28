@@ -96,8 +96,8 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 [![024.png](https://i.postimg.cc/9QrgmF1y/024.png)](https://postimg.cc/Xr6kxWRv)
 
-- ROS_MASTER_URI: ROS多机通讯主节点地址，如果只是单机通讯填127.0.0.1即可
-- ROS_IP: 软件运行的机器的IP 如果是单机通讯填127.0.0.1即可
+- 主节点地址：即ROS_MASTER_URI  ROS多机通讯主节点地址，如果只是单机通讯填127.0.0.1即可
+- 本机IP：即ROS_IP 软件运行的机器的IP 如果是单机通讯填127.0.0.1即可 注意 此ip填错 会导致只能单向通讯 导致收不到远程小车的话题信息 却有话题列表的现象
 - 勾选使用环境变量连接就不使用界面设置的ROS_IP与ROS_MASTER_URI,需要在环境变量文件（~/.bashrc）配置好多机通讯环境变量，否则会导致连接失败，配置多机通讯教程[csdn 博客](https://blog.csdn.net/qq_38441692/article/details/98205852)
 - 其他一些话题设置
 - 勾选自动连接会在打开软件时进行自动连接
@@ -106,77 +106,80 @@ rosrun cyrobot_monitor cyrobot_monitor
 ### 2,设置
 
 点击连接界面右下角，进行相关必要设置
+#### 2.1 话题设置
 
+可视化相关的订阅与发布话题的设置
+
+- [![025.png](https://i.postimg.cc/C1GnbkMk/025.png)](https://postimg.cc/PpqqjLw5)
+
+- 速度控制话题：界面上的速度控制按钮，发布出去的话题名称
+- 导航目标点话题：导航时界面上发布导航目标点的话题
+- 导航初始点话题：导航时界面上选点发布的导航初始点话题
+- 转向灯亮起阈值：主界面速度仪表盘旁的转向灯，收到的角速度大于这个阈值时开始亮
+- 里程计话题：订阅里程计话题，以实现速度仪表盘与转向灯功能
+- 电池电量话题：电池电量显示的依据，订阅此话题，注意此话题的消息类型为sensor_msgs/BatteryState
+- 机器人的坐标话题：订阅此话题，以实现在自绘制地图上动态显示机器人实时坐标
+  
+#### 2.2 图层设置
+
+在使用librviz与自绘制地图等进行可视化显示时的一些图层属性信息
+
+[![026.png](https://i.postimg.cc/BvMn3pvh/026.png)](https://postimg.cc/4KHgbzVt)
+
+#### 2.3 video设置
+
+界面上进行视频话题进行可视化显示时订阅的话题，其中video0订阅为compressed后的图像话题，以减轻卡顿问题
+
+[![image.png](https://i.postimg.cc/wxJ3yh4B/image.png)](https://postimg.cc/NLsQZrch)
+
+#### 2.4 通用设置
+
+[![image.png](https://i.postimg.cc/rsC8hN7C/image.png)](https://postimg.cc/rRsXsxVK)
+
+- 机器人模型图：主界面左侧显示的机器人图片
+- 显示模式：机器人端（只保留主要功能，简化显示） 控制端：所有功能均显示
+- 话题订阅线程数：话题订阅时所用的线程数，如遇到话题卡顿，提高此参数
+- FrameRate：循环Rate
 ## 功能介绍
 
 #### 1,速度仪表盘
 
-- 使用前须在菜单->设置->话题设置中设置odom话题：
+- 使用前须在连接界面->设置->话题设置中设置odom话题：
 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200507124144542.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405102549333.gif)
+[![image.png](https://i.postimg.cc/Kj4Nf01C/image.png)](https://postimg.cc/wR8LTcck)
 
 #### 2, 机器人速度控制
 
-控制方式：
+- 使用前需在连接界面->设置->话题设置中设置速度控制话题：
 
-- 键盘热键控制
+- 控制方式：
 
-- 鼠标点击控制
+  - 键盘热键控制
 
-- 虚拟摇杆控制
+  - 鼠标点击控制
 
+  - 虚拟摇杆控制
 
-![在这里插入图片描述](https://i.postimg.cc/nrjgHkKj/image.png)
+[![002.png](https://i.postimg.cc/yxJmcW5H/002.png)](https://postimg.cc/XBbB0N4H)
+
 
 #### 3, 电量显示
 
-- 使用前须在菜单->设置->话题设置中设置电量话题(Std_msg/Float32)
+- 使用前须在在连接界面->设置->话题设置中设置电池电量话题：
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405153102508.png) 
-#### 4, rviz模块
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200405151916473.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-##### 4.1 订阅map话题
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408122253344.gif)
+#### 4, 地图等信息可视化显示
 
-##### 4.2 激光雷达图层显示
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408194648822.gif)
+ 使用前需在连接界面->设置->图层设置中进行启用与停用等必要图层设置：
+ 
+ [![026.png](https://i.postimg.cc/BvMn3pvh/026.png)](https://postimg.cc/4KHgbzVt)
+#### 4.1 qt自绘制显示
 
-##### 4.3 设置导航初始点
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201723417.gif)
+[![022.png](https://i.postimg.cc/ydnKc8Rv/022.png)](https://postimg.cc/LYqGMRN1)
 
-##### 4.4 设置导航目标点
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200411201804722.gif)
+#### 4.2 librviz显示
 
-##### 4.5 定点返航
-
-- 使用前须在菜单->设置->话题设置中设置amcl话题
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200413204212739.gif)
-
-##### 4.6 订阅图像话题
-
-- 提供四个图像显示窗体，可以同时显示四个图像 解决卡顿问题，在video0订阅（image_raw/compressed）即compressed后的图像即可不卡顿，且video0只能订阅压缩后的图像
-
-![加粗样式](https://img-blog.csdnimg.cn/20200507093831130.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-
-
-
-##### 4.7 快捷指令
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200429204153916.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200429204233788.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-
-##### 4.8 显示机器人模型
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200501165154149.gif)
-
-##### 4.9 提供六种rviz工具
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200515184545845.png)
-
-##### 4.10 显示话题列表
-[![image.png](https://i.postimg.cc/Z5bGBfgk/image.png)](https://postimg.cc/svL6bJsK)
-.
-##### 4.11 待完善....
-
-
+目前librviz显示待优化，闪退问题严重
 ## 开源协议
 **GNU GPL（GNU General Public License，GNU通用公共许可证）**
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20200408135643929.png)

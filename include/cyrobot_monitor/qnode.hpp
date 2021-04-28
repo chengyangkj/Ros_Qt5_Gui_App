@@ -130,6 +130,7 @@ private:
     QString batteryState_topic;
     QString pose_topic;
     QString laser_topic;
+    QString map_topic;
     QPolygon mapPonits;
     QPolygonF plannerPoints;
     QPolygonF laserPoints;
