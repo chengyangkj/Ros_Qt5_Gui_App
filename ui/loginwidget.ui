@@ -32,7 +32,7 @@ padding:0;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page">
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -309,7 +309,7 @@ padding:0;
 color:GRAY；</string>
                     </property>
                     <property name="text">
-                     <string>主节点IP:</string>
+                     <string>主节点地址:</string>
                     </property>
                    </widget>
                   </item>
@@ -347,7 +347,7 @@ color:GRAY；</string>
 color:GRAY；</string>
                     </property>
                     <property name="text">
-                     <string>本机IP:    </string>
+                     <string>本机IP:         </string>
                     </property>
                    </widget>
                   </item>

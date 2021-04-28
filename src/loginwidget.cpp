@@ -60,6 +60,9 @@ LoginWidget::LoginWidget(QWidget *parent) :
     connect(ui->pushButton_setting,&QPushButton::clicked,[=](){
         ui->stackedWidget->setCurrentIndex(1);
     });
+    connect(ui->pushButton_hellp,&QPushButton::clicked,[=](){
+       QDesktopServices::openUrl(QUrl(QString("https://github.com/chengyangkj/Ros_Qt5_Gui_App/blob/master/README.md")));
+    });
     connect(ui->pushButton_return,&QPushButton::clicked,[=](){
       QMessageBox msg(this);//对话框设置父组件
       msg.setWindowTitle("返回主界面");//对话框标题
@@ -279,6 +282,7 @@ void LoginWidget::slot_ShowWindow()
 {
   this->show();
    ui->btnLogin->setEnabled(true);
+   ui->btnLogin->setStyleSheet("border:0px;background-color:#F81243;color:WHITE；");
 }
 
 void LoginWidget::SltAnimationFinished()

@@ -15,6 +15,7 @@
 #include "./basewidget/customwidget.h"
 #include <QComboBox>
 #include <QSpinBox>
+#include <QDesktopServices>
 namespace Ui {
 class LoginWidget;
 }
