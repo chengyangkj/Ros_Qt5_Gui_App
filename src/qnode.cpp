@@ -36,7 +36,6 @@ QNode::QNode(int argc, char** argv ) :
     odom_topic= topic_setting.value("topic/topic_odom","odom").toString();
     batteryState_topic=topic_setting.value("topic/topic_power","battery_state").toString();
     pose_topic=topic_setting.value("topic/topic_amcl","amcl_pose").toString();
-    show_mode=topic_setting.value("main/show_mode","control").toString();
     m_frameRate=topic_setting.value("main/framerate",40).toInt();
     m_threadNum=topic_setting.value("main/thread_num",6).toInt();
     QSettings settings("cyrobot_monitor","Displays");
@@ -54,7 +53,7 @@ QNode::~QNode() {
 }
 
 bool QNode::init() {
-  ros::init(init_argc,init_argv,"cyrobot_monitor_"+show_mode.toStdString());
+  ros::init(init_argc,init_argv,"cyrobot_monitor",ros::init_options::AnonymousName);
 	if ( ! ros::master::check() ) {
 		return false;
 	}
@@ -69,7 +68,7 @@ bool QNode::init(const std::string &master_url, const std::string &host_url) {
   std::map<std::string,std::string> remappings;
   remappings["__master"] = master_url;
   remappings["__hostname"] = host_url;
-  ros::init(remappings,"cyrobot_monitor_"+show_mode.toStdString());
+  ros::init(remappings,"cyrobot_monitor",ros::init_options::AnonymousName);
   if ( ! ros::master::check() ) {
     return false;
   }
