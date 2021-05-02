@@ -149,6 +149,7 @@ void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path){
 
 //激光雷达点云话题回调
 void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
+  qDebug()<<"recv :"<<QTime::currentTime();
   //获取tf变换 机器人坐标系变换到map坐标系
   tf::TransformListener listener;
   tf::StampedTransform transform;
@@ -158,6 +159,23 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
   laser_point.header.frame_id = laser_msg->header.frame_id;
   std::vector<float> ranges = laser_msg->ranges;
   laserPoints.clear();
+  listener.waitForTransform("map","odom",ros::Time(0),ros::Duration(0.4));
+  listener.lookupTransform("map","odom",ros::Time(0), transform);
+
+  double cc,ss;
+  try{
+    tf::Quaternion q=transform.getRotation();
+    tf::Matrix3x3 mat(q);
+    double roll,pitch,yaw;
+    mat.getRPY(roll,pitch,yaw);
+    cc=cos(yaw);
+    ss=sin(yaw);
+  }
+  catch(tf::TransformException& ex){
+    //ROS_ERROR("Received an exception trying to transform  %s", ex.what());
+  }
+
+
   //转换到二维XY平面坐标系下;
   for(int i=0; i< ranges.size(); i++)
   {
@@ -172,19 +190,21 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
     try{
       listener.waitForTransform("odom",laser_point.header.frame_id,ros::Time(0),ros::Duration(0.4));
       listener.transformPoint("odom", laser_point, map_point);
-      listener.waitForTransform("map","odom",ros::Time(0),ros::Duration(0.4));
-      listener.lookupTransform("map","odom",ros::Time(0), transform);
-      map_point.point.x += transform.getOrigin().x();
-      map_point.point.y += transform.getOrigin().y();
+//      map_point.point.x += transform.getOrigin().x();
+//      map_point.point.y += transform.getOrigin().y();
+      map_point.point.x =  cc*map_point.point.x-ss*map_point.point.y+transform.getOrigin().x();
+      map_point.point.y =  ss*map_point.point.x+cc*map_point.point.y+transform.getOrigin().y();
+
     }
     catch(tf::TransformException& ex){
-      //ROS_ERROR("Received an exception trying to transform  %s", ex.what());
+      ROS_ERROR("Received an exception trying to transform  %s", ex.what());
     }
     //转化为图元坐标系
     QPointF roboPos = transMapPoint2Scene(QPointF(map_point.point.x,map_point.point.y));
     laserPoints.append(roboPos);
   }
-  updateLaserScan(laserPoints);
+   qDebug()<<"send :"<<QTime::currentTime();
+  emit updateLaserScan(laserPoints);
 }
 
 //机器人位置话题的回调函数
