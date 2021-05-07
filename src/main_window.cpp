@@ -96,9 +96,7 @@ void MainWindow::display_rviz(){
     map_rviz->Display_Grid(Grid_enable,"QGrid",Grid_count,QColor(160,160,160));
      map_rviz->Display_Map(Map_enable,Map_topic,Map_alpha,Map_scheme);
      map_rviz->Display_LaserScan(Laser_enable,Laser_topic);
-     map_rviz->Display_RobotModel(RobotModel_enable);
-     map_rviz->Display_Polygon(Polygon_enable,Polygon_topic);
-     map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
+   //  map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
 }
 void MainWindow::slot_show_image(int frame_id, QImage image)
 {

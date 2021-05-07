@@ -41,6 +41,9 @@ QNode::QNode(int argc, char** argv ) :
     QSettings settings("cyrobot_monitor","Displays");
     map_topic=settings.value("Map/topic",QString("/map")).toString();
     laser_topic=settings.value("Laser/topic",QString("/scan")).toString();
+    laser_frame = settings.value("frame/laserFrame","/base_scan").toString().toStdString();
+    map_frame = settings.value("frame/mapFrame","/map").toString().toStdString();
+    base_frame = settings.value("frame/baseFrame","/base_link").toString().toStdString();
      qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
     }
 
@@ -86,8 +89,6 @@ void QNode::SubAndPubTopic(){
    battery_sub=n.subscribe(batteryState_topic.toStdString(),1000,&QNode::batteryCallback,this);
    //地图订阅
    map_sub = n.subscribe("map",1000,&QNode::mapCallback,this);
-   //机器人位置话题
-  pos_sub=n.subscribe(pose_topic.toStdString(),1000,&QNode::poseCallback,this);
    //导航目标点发送话题
    goal_pub=n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal",1000);
    //速度控制话题
@@ -98,32 +99,14 @@ void QNode::SubAndPubTopic(){
    m_plannerPathSub=n.subscribe("/move_base/NavfnROS/plan",1000,&QNode::plannerPathCallback,this);
    image_transport::ImageTransport it(n);
    m_imageMapPub = it.advertise("image/map",10);
-}
-
-void QNode::transformPoint(const tf::TransformListener& listener){
-  //we'll create a point in the base_laser frame that we'd like to transform to the base_link frame
-  geometry_msgs::PointStamped laser_point;
-  laser_point.header.frame_id = "base_laser";
-
-  //we'll just use the most recent transform available for our simple example
-  laser_point.header.stamp = ros::Time();
-
-  //just an arbitrary point in space
-  laser_point.point.x = 1.0;
-  laser_point.point.y = 0.2;
-  laser_point.point.z = 0.0;
-
-  try{
-    geometry_msgs::PointStamped base_point;
-    listener.transformPoint("base_link", laser_point, base_point);
-
-    ROS_INFO("base_laser: (%.2f, %.2f. %.2f) -----> base_link: (%.2f, %.2f, %.2f) at time %.2f",
-        laser_point.point.x, laser_point.point.y, laser_point.point.z,
-        base_point.point.x, base_point.point.y, base_point.point.z, base_point.header.stamp.toSec());
-  }
-  catch(tf::TransformException& ex){
-    ROS_ERROR("Received an exception trying to transform a point from \"base_laser\" to \"base_link\": %s", ex.what());
-  }
+   m_robotPoselistener =new tf::TransformListener;
+   m_Laserlistener = new tf::TransformListener;
+   try {
+     m_robotPoselistener->waitForTransform(map_frame,base_frame,ros::Time(0),ros::Duration(0.4));
+     m_Laserlistener->waitForTransform(map_frame,laser_frame,ros::Time(0),ros::Duration(0.4));
+   } catch (tf::TransformException& ex) {
+      ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
+   }
 }
 
 QMap<QString,QString> QNode::get_topic_list()
@@ -149,33 +132,11 @@ void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path){
 
 //激光雷达点云话题回调
 void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
-  qDebug()<<"recv :"<<QTime::currentTime();
-  //获取tf变换 机器人坐标系变换到map坐标系
-  tf::TransformListener listener;
-  tf::StampedTransform transform;
-  static float qx=0,qy=0;
   geometry_msgs::PointStamped laser_point;
   geometry_msgs::PointStamped map_point;
   laser_point.header.frame_id = laser_msg->header.frame_id;
   std::vector<float> ranges = laser_msg->ranges;
   laserPoints.clear();
-  listener.waitForTransform("map","odom",ros::Time(0),ros::Duration(0.4));
-  listener.lookupTransform("map","odom",ros::Time(0), transform);
-
-  double cc,ss;
-  try{
-    tf::Quaternion q=transform.getRotation();
-    tf::Matrix3x3 mat(q);
-    double roll,pitch,yaw;
-    mat.getRPY(roll,pitch,yaw);
-    cc=cos(yaw);
-    ss=sin(yaw);
-  }
-  catch(tf::TransformException& ex){
-    //ROS_ERROR("Received an exception trying to transform  %s", ex.what());
-  }
-
-
   //转换到二维XY平面坐标系下;
   for(int i=0; i< ranges.size(); i++)
   {
@@ -188,13 +149,7 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
     laser_point.point.z = 0.0;
     //change to map frame
     try{
-      listener.waitForTransform("odom",laser_point.header.frame_id,ros::Time(0),ros::Duration(0.4));
-      listener.transformPoint("odom", laser_point, map_point);
-//      map_point.point.x += transform.getOrigin().x();
-//      map_point.point.y += transform.getOrigin().y();
-      map_point.point.x =  cc*map_point.point.x-ss*map_point.point.y+transform.getOrigin().x();
-      map_point.point.y =  ss*map_point.point.x+cc*map_point.point.y+transform.getOrigin().y();
-
+      m_Laserlistener->transformPoint(map_frame, laser_point, map_point);
     }
     catch(tf::TransformException& ex){
       ROS_ERROR("Received an exception trying to transform  %s", ex.what());
@@ -203,22 +158,25 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
     QPointF roboPos = transMapPoint2Scene(QPointF(map_point.point.x,map_point.point.y));
     laserPoints.append(roboPos);
   }
-   qDebug()<<"send :"<<QTime::currentTime();
   emit updateLaserScan(laserPoints);
 }
 
-//机器人位置话题的回调函数
-void QNode::poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos)
-{
+void QNode::updateRobotPose(){
+  try {
+      tf::StampedTransform transform;
+      m_robotPoselistener->lookupTransform(map_frame,base_frame,ros::Time(0), transform);
+      tf::Quaternion q=transform.getRotation();
+      double x=transform.getOrigin().getX();
+      double y=transform.getOrigin().getY();
+      tf::Matrix3x3 mat(q);
+      double roll,pitch,yaw;
+      mat.getRPY(roll,pitch,yaw);
       //坐标转化为图元坐标系
-      QPointF roboPos=transMapPoint2Scene(QPointF(pos.pose.pose.position.x,pos.pose.pose.position.y));
-      //qDebug()<<"callback pose:"<<roboPos;
-      //yaw
-      tf::Quaternion quat;
-      tf::quaternionMsgToTF(pos.pose.pose.orientation, quat);
-      double roll, pitch, yaw;//定义存储r\p\y的容器
-      tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);//进行转换
+      QPointF roboPos=transMapPoint2Scene(QPointF(x,y));
       emit updateRoboPose(roboPos,yaw);
+  } catch (tf::TransformException& ex) {
+     ROS_ERROR("Received an exception trying to updateRobotPose transform a point from \"map\" to \"base_link\": %s", ex.what());
+  }
 }
 void QNode::batteryCallback(const sensor_msgs::BatteryState &message)
 {
@@ -305,6 +263,7 @@ void QNode::run() {
         spinner.start();
         //当当前节点没有关闭时
         while ( ros::ok() ) {
+            updateRobotPose();
             loop_rate.sleep();
         }
         //如果当前节点关闭

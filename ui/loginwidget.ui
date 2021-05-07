@@ -32,7 +32,7 @@ padding:0;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="page">
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -454,7 +454,7 @@ color:GRAY；</string>
                  <enum>Qt::NoFocus</enum>
                 </property>
                 <property name="toolTip">
-                 <string>登录</string>
+                 <string>连接</string>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">border:0px;
@@ -463,7 +463,7 @@ color:WHITE；
 </string>
                 </property>
                 <property name="text">
-                 <string>连接</string>
+                 <string>CONNECT</string>
                 </property>
                </widget>
               </item>
@@ -729,7 +729,7 @@ background-color:none</string>
          <item>
           <widget class="QToolBox" name="toolBox">
            <property name="currentIndex">
-            <number>3</number>
+            <number>1</number>
            </property>
            <widget class="QWidget" name="page_3">
             <property name="geometry">
@@ -886,13 +886,66 @@ background-color:none</string>
              </item>
             </layout>
            </widget>
+           <widget class="QWidget" name="page_7">
+            <attribute name="label">
+             <string>坐标系设置</string>
+            </attribute>
+            <layout class="QVBoxLayout" name="verticalLayout_19">
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_18">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_33">
+                 <item>
+                  <widget class="QLabel" name="label_17">
+                   <property name="text">
+                    <string>激光雷达Frame：</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_laserFrame"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_34">
+                 <item>
+                  <widget class="QLabel" name="label_18">
+                   <property name="text">
+                    <string>地图Frame：</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_mapFrame"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_35">
+                 <item>
+                  <widget class="QLabel" name="label_19">
+                   <property name="text">
+                    <string>底盘坐标Frame：</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="lineEdit_baseFrame"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
            <widget class="QWidget" name="page_6">
             <property name="geometry">
              <rect>
               <x>0</x>
               <y>0</y>
               <width>579</width>
-              <height>228</height>
+              <height>191</height>
              </rect>
             </property>
             <attribute name="label">
@@ -1241,7 +1294,7 @@ background-color:none</string>
               <x>0</x>
               <y>0</y>
               <width>579</width>
-              <height>228</height>
+              <height>191</height>
              </rect>
             </property>
             <attribute name="label">

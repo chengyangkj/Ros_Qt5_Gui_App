@@ -152,7 +152,10 @@ private:
     QImage Mat2QImage(cv::Mat const& src);
     cv::Mat QImage2Mat(QImage &image);
     cv::Mat RotaMap(cv::Mat const& map);
-    void poseCallback(const geometry_msgs::PoseWithCovarianceStamped& pos);
+    tf::TransformListener *m_robotPoselistener;
+    tf::TransformListener *m_Laserlistener;
+    std::string base_frame,laser_frame,map_frame;
+private:
     void speedCallback(const nav_msgs::Odometry::ConstPtr& msg);
     void batteryCallback(const sensor_msgs::BatteryState &message);
     void imageCallback0(const sensor_msgs::CompressedImageConstPtr &msg);
@@ -160,9 +163,9 @@ private:
     void myCallback(const std_msgs::Float64& message_holder);
     void mapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
     void laserScanCallback(sensor_msgs::LaserScanConstPtr scan);
-    void transformPoint(const tf::TransformListener& listener);
     void plannerPathCallback(nav_msgs::Path::ConstPtr path);
     void SubAndPubTopic();
+    void updateRobotPose();
 };
 
 }  // namespace cyrobot_monitor

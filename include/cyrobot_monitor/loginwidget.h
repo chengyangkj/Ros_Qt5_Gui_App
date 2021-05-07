@@ -84,9 +84,11 @@ private:
     QCheckBox* Polygon_Check;
     QCheckBox* RobotModel_Check;
     QCheckBox* Map_Check;
+    bool m_bIsConnect=true;
 private:
     void InitWidget();
     void readSettings();
+    void ConnectMaster();
 protected:
     void paintEvent(QPaintEvent *);
 };

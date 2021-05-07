@@ -140,6 +140,19 @@ rosrun cyrobot_monitor cyrobot_monitor
 - 显示模式：机器人端（只保留主要功能，简化显示） 控制端：所有功能均显示
 - 话题订阅线程数：话题订阅时所用的线程数，如遇到话题卡顿，提高此参数
 - FrameRate：循环Rate
+
+#### 2.5 坐标系设置
+
+此设置是自绘制地图坐标系能否正常显示的必要设置，通过设置的坐标系Frame进行tf坐标变换：
+
+[![image.png](https://i.postimg.cc/TPTbGyp7/image.png)](https://postimg.cc/Jsd05z3Z)
+
+查看坐标系的Frame方法：
+
+rosrun rqt_tf_tree rqt_tf_tree:
+
+[![image.png](https://i.postimg.cc/59z8BMdm/image.png)](https://postimg.cc/3WKyhVwy)
+
 ## 功能介绍
 
 #### 1,速度仪表盘
@@ -175,7 +188,11 @@ rosrun cyrobot_monitor cyrobot_monitor
  [![026.png](https://i.postimg.cc/BvMn3pvh/026.png)](https://postimg.cc/4KHgbzVt)
 #### 4.1 qt自绘制显示
 
+注意使用前需要在连接界面->设置->坐标系设置中进行图层Frame设置：
+
 [![022.png](https://i.postimg.cc/ydnKc8Rv/022.png)](https://postimg.cc/LYqGMRN1)
+
+[![image.png](https://i.postimg.cc/jdJd1sdD/image.png)](https://postimg.cc/nCpJjfmx)
 
 #### 4.2 librviz显示
 

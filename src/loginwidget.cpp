@@ -90,7 +90,11 @@ LoginWidget::LoginWidget(QWidget *parent) :
         this->showMinimized();
     });
     connect(ui->pushButton_save,SIGNAL(clicked()),this,SLOT(slot_writeSettings()));
-    QTimer::singleShot(2000,this,SLOT(slot_autoLoad()));
+    if(ui->checkBoxAutoLogin->isChecked()){
+      ui->btnLogin->setText("CANCEL");
+      ui->btnLogin->setStyleSheet("border:0px;background-color:rgb(211, 215, 207);color:WHITE；");
+      QTimer::singleShot(2000,this,SLOT(slot_autoLoad()));
+    }
 }
 
 LoginWidget::~LoginWidget()
@@ -98,8 +102,8 @@ LoginWidget::~LoginWidget()
     delete ui;
 }
 void LoginWidget::slot_autoLoad(){
-  if(ui->checkBoxAutoLogin->isChecked()){
-    on_btnLogin_clicked();
+  if(m_bIsConnect){
+    ConnectMaster();
   }
 }
 void LoginWidget::slot_writeSettings(){
@@ -111,6 +115,9 @@ void LoginWidget::slot_writeSettings(){
   main_setting.setValue("main/robotpic",ui->lineEdit_robotPic->text());
   main_setting.setValue("main/thread_num",ui->spinBox_thread_num->value());
   main_setting.setValue("main/framerate",ui->spinBox_frameRate->value());
+  main_setting.setValue("frame/laserFrame",ui->lineEdit_laserFrame->text());
+  main_setting.setValue("frame/mapFrame",ui->lineEdit_mapFrame->text());
+  main_setting.setValue("frame/baseFrame",ui->lineEdit_baseFrame->text());
   QStringList name_data;
   QStringList topic_data;
   QStringList format_data;
@@ -148,8 +155,6 @@ void LoginWidget::slot_writeSettings(){
   settings.setValue("LocalMap/topic",Local_CostMap_Topic_box->currentText());
   settings.setValue("LocalPlan/topic",Local_Planner_Topic_box->currentText());
   settings.setValue("LocalPlan/color",Local_Planner_Color_box->currentText());
-  QMessageBox::information(NULL, "成功", "保存成功",
-                           QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 }
 void LoginWidget::changeEvent(QEvent *e)
 {
@@ -211,6 +216,9 @@ void LoginWidget::readSettings(){
   QSettings main_setting("cyrobot_monitor","settings");
   QStringList names=main_setting.value("video/names").toStringList();
   QStringList topics=main_setting.value("video/topics").toStringList();
+  ui->lineEdit_laserFrame->setText(main_setting.value("frame/laserFrame","/base_scan").toString());
+  ui->lineEdit_mapFrame->setText(main_setting.value("frame/mapFrame","/map").toString());
+  ui->lineEdit_baseFrame->setText(main_setting.value("frame/baseFrame","/base_link").toString());
   if(names.size()==4)
   {
       ui->video0_name_set->setText(names[0]);
@@ -251,33 +259,45 @@ void LoginWidget::readSettings(){
  */
 void LoginWidget::on_btnLogin_clicked()
 {
-    int argc;
-    char **argv;
-    if(mainWindow!=NULL){
-         mainWindow->close();
-    }
-    mainWindow = new cyrobot_monitor::MainWindow(argc,argv);
-    connect(mainWindow,SIGNAL(signalDisconnect()),this,SLOT(slot_ShowWindow()));
-    QCoreApplication::processEvents();
-    ui->btnLogin->setEnabled(false);
-    ui->btnLogin->setStyleSheet("border:0px;background-color:rgb(211, 215, 207);color:WHITE；");
-    bool isConnect = mainWindow->connectMaster(ui->lineEditMasterIp->text(),ui->lineEditRosIp->text(),ui->checkBoxEnvirment->isChecked());
-    if(isConnect){
-      QSettings connect_info("cyrobot_monitor","connect_info");
-      connect_info.setValue("master_url",ui->lineEditMasterIp->text());
-      connect_info.setValue("host_url",ui->lineEditRosIp->text());
-      connect_info.setValue("use_enviorment",ui->checkBoxEnvirment->isChecked());
-      connect_info.setValue("auto_connect",ui->checkBoxAutoLogin->isChecked());
-      this->hide();
-      mainWindow->show();
-    }else {
-      ui->checkBoxEnvirment->setChecked(false);
-      ui->checkBoxAutoLogin->setChecked(false);
-      ui->btnLogin->setEnabled(true);
-      ui->btnLogin->setStyleSheet("border:0px;background-color:#F81243;color:WHITE；");
-    }
+  if(ui->btnLogin->text()!="CANCEL"){
+    ConnectMaster();
+  }else{
+    ui->btnLogin->setText("CONNECT");
+    ui->btnLogin->setStyleSheet("border:0px;background-color:#F81243;color:WHITE；");
+    m_bIsConnect=false;
+  }
 }
-
+void LoginWidget::ConnectMaster(){
+  int argc;
+  char **argv;
+  if(mainWindow!=NULL){
+       mainWindow->close();
+  }
+  mainWindow = new cyrobot_monitor::MainWindow(argc,argv);
+  connect(mainWindow,SIGNAL(signalDisconnect()),this,SLOT(slot_ShowWindow()));
+  QCoreApplication::processEvents();
+  ui->btnLogin->setText("CANCEL");
+  ui->btnLogin->setStyleSheet("border:0px;background-color:rgb(211, 215, 207);color:WHITE；");
+  bool isConnect = mainWindow->connectMaster(ui->lineEditMasterIp->text(),ui->lineEditRosIp->text(),ui->checkBoxEnvirment->isChecked());
+  if(isConnect){
+    QSettings connect_info("cyrobot_monitor","connect_info");
+    connect_info.setValue("master_url",ui->lineEditMasterIp->text());
+    connect_info.setValue("host_url",ui->lineEditRosIp->text());
+    connect_info.setValue("use_enviorment",ui->checkBoxEnvirment->isChecked());
+    connect_info.setValue("auto_connect",ui->checkBoxAutoLogin->isChecked());
+    ui->btnLogin->setText("CONNECT");
+    ui->btnLogin->setStyleSheet("border:0px;background-color:#F81243;color:WHITE；");
+    this->hide();
+    mainWindow->show();
+  }else {
+    ui->checkBoxEnvirment->setChecked(false);
+    ui->checkBoxAutoLogin->setChecked(false);
+    ui->btnLogin->setText("CONNECT");
+    ui->btnLogin->setStyleSheet("border:0px;background-color:#F81243;color:WHITE；");
+    QMessageBox::information(NULL, "连接失败", "连接失败！请检查你的连接配置或重启重试！",
+                             QMessageBox::Yes);
+  }
+}
 void LoginWidget::slot_ShowWindow()
 {
   this->show();
