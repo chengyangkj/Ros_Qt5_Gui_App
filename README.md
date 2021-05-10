@@ -1,4 +1,4 @@
-## ROS Qt Deskotp GUI App
+## ROS Qt Deskotp GUI App(librviz分支 使用librviz的菜单栏实现图层管理功能)
 - Use qt5 to implement the ros robot human-machine interface
 - 使用qt5实现ros机器人人机界面
 
