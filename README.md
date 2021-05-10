@@ -12,6 +12,8 @@
   
 [![image.png](https://i.postimg.cc/htDgpxDc/image.png)](https://postimg.cc/N5zW0K2z)
 
+$\color{#FF3030}{red}$
+注意！主分支（master）已不再维护librviz功能，使用Qt自行绘制实现一些图层显示，如需librviz功能请切换分支[!rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)或[!CSDN及古月居课程例程版本](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
 
 ## 一，菜单
 
