@@ -1,4 +1,4 @@
-## ROS Qt Deskotp GUI App(simple）
+## ROS Qt Deskotp GUI App(librviz分支 CSDN博客例程版本及古月居课程实现版本）
 - Use qt5 to implement the ros robot human-machine interface
 
 - 使用qt5实现ros机器人人机界面(精简版)
