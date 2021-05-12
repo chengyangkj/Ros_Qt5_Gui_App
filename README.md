@@ -1,4 +1,4 @@
-![release.png](https://img.shields.io/badge/Release-Ver1.0.0-blue.svg) ![APM](https://img.shields.io/apm/dm/ros)
+![release.png](https://img.shields.io/badge/Release-Ver1.0.0-blue.svg) ![APM](https://img.shields.io/apm/dm/Ros_Qt5_Gui_App) ![Eclipse Marketplace](https://img.shields.io/eclipse-marketplace/l/GPL)
 ## ROS Qt Deskotp GUI App
 ***
  简体中文 | [English](./README_en.md)
