@@ -1,5 +1,15 @@
-![release.png](https://img.shields.io/badge/Release-Ver1.0.0-blue.svg) ![APM](https://img.shields.io/apm/dm/Ros_Qt5_Gui_App) ![Eclipse Marketplace](https://img.shields.io/eclipse-marketplace/l/GPL)
 ## ROS Qt Deskotp GUI App
+
+![GitHub release](https://img.shields.io/github/v/release/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub release date](https://img.shields.io/github/release-date/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub download latest](https://img.shields.io/github/downloads/chengyangkj/Ros_Qt5_Gui_App/latest/total?style=flat-square)
+![GitHub download total](https://img.shields.io/github/downloads/chengyangkj/Ros_Qt5_Gui_App/total?style=flat-square)  
+![GitHub stars](https://img.shields.io/github/stars/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub forks](https://img.shields.io/github/forks/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+
 ***
  简体中文 | [English](./README_en.md)
 
