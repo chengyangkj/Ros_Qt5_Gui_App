@@ -70,33 +70,14 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 ## 三，分支
 
-#### 1. Qml版本demo
-
-- ROS + QML + C++混合编程，使用qml自绘制地图，激光雷达点云等
-- [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)
-
-#### 3. Lite branch
-
-- 此版本为《ROS人机交互软件开发》系列课程中实现的版本，CSDN例程版本 
-- [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)
-
-#### 4,rviz菜单树分支
-
-- 使用rviz自带的菜单树，去实现添加显示图层。master分支所有的图层及菜单均需要手动去写代码实现（并且目前仅支持部分图层显示），此分支调用librviz现成api，所有图层均可以实现,不用去手动创建图层菜单和display
-
-- [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)
-
-- [![image.png](https://i.postimg.cc/KY0XyzKD/image.png)](https://postimg.cc/2qL9QC71)
-
-
-#### 5,ROS Qt Demo
-- cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行
-
-- [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo)
-
-#### 6，android版本分支 敬请期待
-
-#### 7，web版本分支 敬请期待
+| 分支名         | 支持平台         | 功能           | 
+| ------------- | --------------- |  ------------ | 
+| [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master)      | Win10 Ubuntu |ROS + QWidget + QGraphicsview自绘制可视化界面显示    | 
+| [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)    | Win10 Ubuntu |ROS + QML + C++混合编程，qml自绘制地图，激光雷达可视化显示等demo| 
+| [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)      | Win10 Ubuntu |ROS + QWidget + Librviz进行可视化显示，为《ROS人机交互软件开发》系列课程中实现的版本，CSDN博客例程版本|
+| [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)| Win10 Ubuntu |ROS + QWidget + Librviz原生图层Api实现图层管理，不需手动创建图层|
+| [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)| Win10 Ubuntu |cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行|
+| [web版本](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_web_gui_app)| Win10 Ubuntu Android Mac .... |暂未实现 敬请期待.....|
 
 ## 四，使用说明
 
