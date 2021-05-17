@@ -90,7 +90,9 @@ public:
 	QStringListModel* loggingModel() { return &logging_model; }
 	void log( const LogLevel &level, const std::string &msg);
 
-
+public slots:
+    void slot_pub2DPos(algo::RobotPose pose);
+    void slot_pub2DGoal(algo::RobotPose pose);
 Q_SIGNALS:
 	void loggingUpdated();
     void rosShutdown();
@@ -131,6 +133,7 @@ private:
     QString pose_topic;
     QString laser_topic;
     QString map_topic;
+    std::string path_topic;
     QPolygon mapPonits;
     QPolygonF plannerPoints;
     QPolygonF laserPoints;

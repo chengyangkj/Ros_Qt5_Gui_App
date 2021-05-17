@@ -254,14 +254,22 @@ void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
      //如果是选择点位模式 重置
      if(currCursor == set2DPoseCursor){
        m_isOtherCursor=false;
-       emit set2DPos(m_pressedPoint,m_pressingPoint);
+       algo::RobotPose target_pos;
+       target_pos.x=m_pressedPoint.x();
+       target_pos.y=m_pressedPoint.y();
+       target_pos.theta=asin((m_pressingPoint.y()-m_pressedPoint.y())/(m_pressingPoint.x()-m_pressedPoint.x()));
+       emit signalPub2DPos(target_pos);
        m_pressedPoint=QPointF(0,0);
        m_pressingPoint=QPointF(0,0);
        this->setCursor(*moveCursor); //设置自定义的鼠标样式
        currCursor=moveCursor;
      }else if(currCursor == set2DGoalCursor){
        m_isOtherCursor=false;
-       emit set2DGoal(m_pressedPoint,m_pressingPoint);
+       algo::RobotPose init_pos;
+       init_pos.x=m_pressedPoint.x();
+       init_pos.y=m_pressedPoint.y();
+       init_pos.theta=asin((m_pressingPoint.y()-m_pressedPoint.y())/(m_pressingPoint.x()-m_pressedPoint.x()));
+       emit signalPub2DGoal(init_pos);
        m_pressedPoint=QPointF(0,0);
        m_pressingPoint=QPointF(0,0);
        this->setCursor(*moveCursor); //设置自定义的鼠标样式

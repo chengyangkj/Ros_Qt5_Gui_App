@@ -254,6 +254,8 @@ void MainWindow::connections()
     connect(&qnode,SIGNAL(updateLaserScan(QPolygonF)),m_roboMap,SLOT(paintLaserScan(QPolygonF)));
     connect(m_roboMap,SIGNAL(cursorPos(QPointF)),this,SLOT(slot_updateCursorPos(QPointF)));
     //map
+    connect(m_roboMap,SIGNAL(signalPub2DPos(algo::RobotPose)),&qnode,SLOT(slot_pub2DPos(algo::RobotPose)));
+    connect(m_roboMap,SIGNAL(signalPub2DGoal(algo::RobotPose)),&qnode,SLOT(slot_pub2DGoal(algo::RobotPose)));
     connect(this,SIGNAL(signalSet2DPose()),m_roboMap,SLOT(slot_set2DPos()));
     connect(this,SIGNAL(signalSet2DGoal()),m_roboMap,SLOT(slot_set2DGoal()));
     connect(this,SIGNAL(signalSetMoveCamera()),m_roboMap,SLOT(slot_setMoveCamera()));

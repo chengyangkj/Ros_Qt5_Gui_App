@@ -33,6 +33,7 @@
 #include <map>
 #include "dashboard.h"
 #include <sensor_msgs/BatteryState.h>
+#include "RobotAlgorithm.h"
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/

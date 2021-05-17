@@ -49,7 +49,10 @@ LoginWidget::LoginWidget(QWidget *parent) :
            }else if(addre.split(".")[0]=="10"){
              m_qRosIp = addre;
              m_qMasterIp = "http://"+addre+":11311";
-           }
+           }else if(addre.split(".")[0]=="172"){
+               m_qRosIp = addre;
+               m_qMasterIp = "http://"+addre+":11311";
+             }
        }
     }
 

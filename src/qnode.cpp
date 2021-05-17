@@ -44,6 +44,7 @@ QNode::QNode(int argc, char** argv ) :
     laser_frame = settings.value("frame/laserFrame","/base_scan").toString().toStdString();
     map_frame = settings.value("frame/mapFrame","/map").toString().toStdString();
     base_frame = settings.value("frame/baseFrame","/base_link").toString().toStdString();
+    path_topic = settings.value("GlobalPlan/topic","/movebase").toString().toStdString();
      qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
     }
 
@@ -96,7 +97,7 @@ void QNode::SubAndPubTopic(){
    //激光雷达点云话题订阅
    m_laserSub=n.subscribe(laser_topic.toStdString(),1000,&QNode::laserScanCallback,this);
    //全局规划Path
-   m_plannerPathSub=n.subscribe("/move_base/NavfnROS/plan",1000,&QNode::plannerPathCallback,this);
+   m_plannerPathSub=n.subscribe(path_topic,1000,&QNode::plannerPathCallback,this);
    image_transport::ImageTransport it(n);
    m_imageMapPub = it.advertise("image/map",10);
    m_robotPoselistener =new tf::TransformListener;
@@ -333,6 +334,29 @@ void QNode::run() {
        }
        ros::spinOnce();
  }
+ void QNode::slot_pub2DPos(algo::RobotPose pose){
+     QPointF tmp = transScenePoint2Map(QPointF(pose.x,pose.y));
+     pose.x= tmp.x();
+     pose.y=tmp.y();
+            qDebug()<<"target pose:"<<pose.x<<" "<<pose.y<<" "<<pose.theta;
+ }
+ void QNode::slot_pub2DGoal(algo::RobotPose pose){
+     QPointF tmp = transScenePoint2Map(QPointF(pose.x,pose.y));
+     pose.x= tmp.x();
+     pose.y=tmp.y();
+            qDebug()<<"int pose:"<<pose.x<<" "<<pose.y<<" "<<pose.theta;
+    geometry_msgs::PoseStamped goal;
+    //设置frame
+    goal.header.frame_id="map";
+    //设置时刻
+    goal.header.stamp=ros::Time::now();
+    goal.pose.position.x=pose.x;
+    goal.pose.position.y=pose.y;
+    goal.pose.position.z=0;
+    goal.pose.orientation =tf::createQuaternionMsgFromRollPitchYaw(0,0,60);
+    goal_pub.publish(goal);
+    ros::spinOnce();
+ }
  //图元坐标系转换为map坐标系
 QPointF QNode::transScenePoint2Map(QPointF pos){
 
@@ -351,7 +375,7 @@ QPointF QNode::transMapPoint2Scene(QPointF pos){
 double QNode::getRealTheta(QPointF start,QPointF end){
   double y=end.y()-start.y();
   double x=end.x()-start.x();
-  double theta=radiansToDegrees(atan(y/x));
+  double theta=algo::rad2deg(atan(y/x));
   qDebug()<<start<<" "<<end<<" "<<theta;
   // 1 4
   if(end.x()>start.x()){
