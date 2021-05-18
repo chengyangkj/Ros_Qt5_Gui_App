@@ -35,15 +35,10 @@ void roboMap::paintMaps(QImage map){
    m_imageMap=map;
    update();
 }
-void roboMap::paintRoboPos(QPointF pos,float yaw){
-  //qDebug()<<"pos:"<<pos;
-   RoboPostion=pos;
-   //yaw弧度全转换为正值
-   m_roboYaw=abs(yaw);
-   if(yaw>=0){
-     m_roboYaw=PI*2-yaw;
-   }
-
+void roboMap::paintRoboPos(algo::RobotPose pos){
+//  qDebug()<<"pos:"<<pos.x<<" "<<pos.y<<" "<<pos.theta;
+   RoboPostion=QPointF(pos.x,pos.y);
+   m_roboYaw=pos.theta;
    update();
 }
 void roboMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
@@ -257,7 +252,7 @@ void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
        algo::RobotPose target_pos;
        target_pos.x=m_pressedPoint.x();
        target_pos.y=m_pressedPoint.y();
-       target_pos.theta=asin((m_pressingPoint.y()-m_pressedPoint.y())/(m_pressingPoint.x()-m_pressedPoint.x()));
+       target_pos.theta = algo::getAngle(m_pressedPoint.x(),m_pressedPoint.y(),m_pressingPoint.x(),m_pressingPoint.y());
        emit signalPub2DPos(target_pos);
        m_pressedPoint=QPointF(0,0);
        m_pressingPoint=QPointF(0,0);
@@ -268,7 +263,7 @@ void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
        algo::RobotPose init_pos;
        init_pos.x=m_pressedPoint.x();
        init_pos.y=m_pressedPoint.y();
-       init_pos.theta=asin((m_pressingPoint.y()-m_pressedPoint.y())/(m_pressingPoint.x()-m_pressedPoint.x()));
+       init_pos.theta=algo::getAngle(m_pressedPoint.x(),m_pressedPoint.y(),m_pressingPoint.x(),m_pressingPoint.y());
        emit signalPub2DGoal(init_pos);
        m_pressedPoint=QPointF(0,0);
        m_pressingPoint=QPointF(0,0);
@@ -276,5 +271,6 @@ void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
        currCursor=moveCursor;
      }
 }
+
 
 }

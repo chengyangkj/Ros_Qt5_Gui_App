@@ -60,7 +60,7 @@ signals:
   void signalPub2DGoal(algo::RobotPose pose);
 public slots:
     void paintMaps(QImage map);
-    void paintRoboPos(QPointF pos,float yaw);
+    void paintRoboPos(algo::RobotPose pos);
     void paintImage(int,QImage);
     void paintPlannerPath(QPolygonF);
     void paintLaserScan(QPolygonF);

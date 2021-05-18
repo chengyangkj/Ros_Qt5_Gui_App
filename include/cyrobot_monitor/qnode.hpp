@@ -101,7 +101,7 @@ Q_SIGNALS:
     void batteryState(sensor_msgs::BatteryState);
     void Master_shutdown();
     void Show_image(int,QImage);
-    void updateRoboPose(QPointF pos,float yaw);
+    void updateRoboPose(algo::RobotPose pos);
     void updateMap(QImage map);
     void plannerPath(QPolygonF path);
     void updateLaserScan(QPolygonF points);
@@ -119,6 +119,7 @@ private:
     ros::Subscriber m_compressedImgSub1;
     ros::Publisher goal_pub;
     ros::Publisher cmd_pub;
+    ros::Publisher m_initialposePub;
     image_transport::Publisher m_imageMapPub;
     QStringListModel logging_model;
     QString show_mode="control";

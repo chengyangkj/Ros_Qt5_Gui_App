@@ -250,7 +250,7 @@ void MainWindow::connections()
     connect(rock_widget,SIGNAL(keyNumchanged(int)),this,SLOT(slot_rockKeyChange(int)));
     connect(&qnode,SIGNAL(updateMap(QImage)),m_roboMap,SLOT(paintMaps(QImage)));
     connect(&qnode,SIGNAL(plannerPath(QPolygonF)),m_roboMap,SLOT(paintPlannerPath(QPolygonF)));
-    connect(&qnode,SIGNAL(updateRoboPose(QPointF,float)),m_roboMap,SLOT(paintRoboPos(QPointF,float)));
+    connect(&qnode,SIGNAL(updateRoboPose(algo::RobotPose)),m_roboMap,SLOT(paintRoboPos(algo::RobotPose)));
     connect(&qnode,SIGNAL(updateLaserScan(QPolygonF)),m_roboMap,SLOT(paintLaserScan(QPolygonF)));
     connect(m_roboMap,SIGNAL(cursorPos(QPointF)),this,SLOT(slot_updateCursorPos(QPointF)));
     //map

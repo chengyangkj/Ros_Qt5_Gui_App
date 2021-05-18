@@ -46,6 +46,7 @@ QNode::QNode(int argc, char** argv ) :
     base_frame = settings.value("frame/baseFrame","/base_link").toString().toStdString();
     path_topic = settings.value("GlobalPlan/topic","/movebase").toString().toStdString();
      qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
+     qRegisterMetaType<algo::RobotPose>("algo::RobotPose");
     }
 
 QNode::~QNode() {
@@ -98,6 +99,7 @@ void QNode::SubAndPubTopic(){
    m_laserSub=n.subscribe(laser_topic.toStdString(),1000,&QNode::laserScanCallback,this);
    //全局规划Path
    m_plannerPathSub=n.subscribe(path_topic,1000,&QNode::plannerPathCallback,this);
+   m_initialposePub = n.advertise<geometry_msgs::PoseStamped>("/initialpose", 10);
    image_transport::ImageTransport it(n);
    m_imageMapPub = it.advertise("image/map",10);
    m_robotPoselistener =new tf::TransformListener;
@@ -154,6 +156,12 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
     }
     catch(tf::TransformException& ex){
       ROS_ERROR("Received an exception trying to transform  %s", ex.what());
+      try {
+        m_robotPoselistener->waitForTransform(map_frame,base_frame,ros::Time(0),ros::Duration(0.4));
+        m_Laserlistener->waitForTransform(map_frame,laser_frame,ros::Time(0),ros::Duration(0.4));
+      } catch (tf::TransformException& ex) {
+         ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
+      }
     }
     //转化为图元坐标系
     QPointF roboPos = transMapPoint2Scene(QPointF(map_point.point.x,map_point.point.y));
@@ -174,9 +182,16 @@ void QNode::updateRobotPose(){
       mat.getRPY(roll,pitch,yaw);
       //坐标转化为图元坐标系
       QPointF roboPos=transMapPoint2Scene(QPointF(x,y));
-      emit updateRoboPose(roboPos,yaw);
+      algo::RobotPose pos{roboPos.x(),roboPos.y(),yaw};
+      emit updateRoboPose(pos);
   } catch (tf::TransformException& ex) {
      ROS_ERROR("Received an exception trying to updateRobotPose transform a point from \"map\" to \"base_link\": %s", ex.what());
+     try {
+       m_robotPoselistener->waitForTransform(map_frame,base_frame,ros::Time(0),ros::Duration(0.4));
+       m_Laserlistener->waitForTransform(map_frame,laser_frame,ros::Time(0),ros::Duration(0.4));
+     } catch (tf::TransformException& ex) {
+        ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
+     }
   }
 }
 void QNode::batteryCallback(const sensor_msgs::BatteryState &message)
@@ -338,13 +353,7 @@ void QNode::run() {
      QPointF tmp = transScenePoint2Map(QPointF(pose.x,pose.y));
      pose.x= tmp.x();
      pose.y=tmp.y();
-            qDebug()<<"target pose:"<<pose.x<<" "<<pose.y<<" "<<pose.theta;
- }
- void QNode::slot_pub2DGoal(algo::RobotPose pose){
-     QPointF tmp = transScenePoint2Map(QPointF(pose.x,pose.y));
-     pose.x= tmp.x();
-     pose.y=tmp.y();
-            qDebug()<<"int pose:"<<pose.x<<" "<<pose.y<<" "<<pose.theta;
+            qDebug()<<"init pose:"<<pose.x<<" "<<pose.y<<" "<<pose.theta;
     geometry_msgs::PoseStamped goal;
     //设置frame
     goal.header.frame_id="map";
@@ -353,7 +362,24 @@ void QNode::run() {
     goal.pose.position.x=pose.x;
     goal.pose.position.y=pose.y;
     goal.pose.position.z=0;
-    goal.pose.orientation =tf::createQuaternionMsgFromRollPitchYaw(0,0,60);
+    goal.pose.orientation =tf::createQuaternionMsgFromRollPitchYaw(0,0,pose.theta);
+    goal_pub.publish(goal);
+    m_initialposePub.publish(goal);
+ }
+ void QNode::slot_pub2DGoal(algo::RobotPose pose){
+     QPointF tmp = transScenePoint2Map(QPointF(pose.x,pose.y));
+     pose.x= tmp.x();
+     pose.y=tmp.y();
+            qDebug()<<"target pose:"<<pose.x<<" "<<pose.y<<" "<<pose.theta;
+    geometry_msgs::PoseStamped goal;
+    //设置frame
+    goal.header.frame_id="map";
+    //设置时刻
+    goal.header.stamp=ros::Time::now();
+    goal.pose.position.x=pose.x;
+    goal.pose.position.y=pose.y;
+    goal.pose.position.z=0;
+    goal.pose.orientation =tf::createQuaternionMsgFromRollPitchYaw(0,0,pose.theta);
     goal_pub.publish(goal);
     ros::spinOnce();
  }
