@@ -756,11 +756,21 @@ margin:0px 0px 0px 0px;
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-   border: 2px solid grey;
-   border-radius: 5px;
-   text-align: center;
-}</string>
+                  <string notr="true">QProgressBar#progressBar
+{
+      border:none;   /*无边框*/
+      background:rgb(211, 215, 207);
+      border-radius:5px;
+      text-align:center;   /*文本的位置*/
+      color: rgb(229, 229, 229);  /*文本颜色*/
+}
+ 
+QProgressBar::chunk 
+{
+      background-color:rgb(115, 210, 22);
+      border-radius:4px;
+}
+</string>
                  </property>
                  <property name="value">
                   <number>70</number>
@@ -1469,11 +1479,11 @@ background-color: rgb(255,255,255);
              </layout>
             </widget>
             <widget class="QWidget" name="page_5">
-             <layout class="QVBoxLayout" name="verticalLayout_4">
+             <layout class="QVBoxLayout" name="verticalLayout_9">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_17">
+               <layout class="QVBoxLayout" name="verticalLayout_4">
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_16">
+                 <layout class="QHBoxLayout" name="horizontalLayout_9">
                   <item>
                    <layout class="QVBoxLayout" name="verticalLayout_11">
                     <item>
@@ -1504,19 +1514,6 @@ background-color: rgb(255,255,255);
                        <string>No Video</string>
                       </property>
                      </widget>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
                     </item>
                    </layout>
                   </item>
@@ -1550,19 +1547,6 @@ background-color: rgb(255,255,255);
                        <string>No Video</string>
                       </property>
                      </widget>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
                     </item>
                    </layout>
                   </item>
@@ -1641,22 +1625,26 @@ background-color: rgb(255,255,255);
                       </property>
                      </widget>
                     </item>
-                    <item>
-                     <widget class="QListView" name="view_logging">
-                      <property name="minimumSize">
-                       <size>
-                        <width>300</width>
-                        <height>0</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>12312312</width>
-                        <height>12312312</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QListView{
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QListView" name="view_logging">
+                  <property name="minimumSize">
+                   <size>
+                    <width>300</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>12312312</width>
+                    <height>12312312</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">QListView{
 border-top: 5px solid qlineargradient(y0:0, y1:1,stop: 0 #ececef, stop: 1 white);
 border-left: 5px solid qlineargradient(x0:0, x1:1,stop: 0 #ececef, stop: 1 white);
  border-bottom: 5px solid qlineargradient(y0:0, y1:1,stop: 0 white, stop: 1  #ececef);
@@ -1664,25 +1652,8 @@ border-right: 5px solid qlineargradient(x0:0, x1:1,stop:  0 white, stop: 1 #ecec
 background-color: rgb(255,255,255);
 }
 </string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer_3">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
