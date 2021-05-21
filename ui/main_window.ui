@@ -886,6 +886,15 @@ margin:0px 0px 0px 0px;
                       <height>250</height>
                      </size>
                     </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>250</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
+                    </property>
                     <property name="text">
                      <string/>
                     </property>
@@ -912,8 +921,17 @@ margin:0px 0px 0px 0px;
                       <height>250</height>
                      </size>
                     </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>250</width>
+                      <height>456546</height>
+                     </size>
+                    </property>
                     <property name="layoutDirection">
                      <enum>Qt::RightToLeft</enum>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true"/>
                     </property>
                     <property name="text">
                      <string/>

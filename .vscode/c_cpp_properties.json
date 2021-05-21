@@ -12,6 +12,7 @@
         "/home/chengyangkj/catkin_ws/src/bthere_map_to_jpeg/include/**",
         "/home/chengyangkj/catkin_ws/src/bw_auto_dock/include/**",
         "/home/chengyangkj/catkin_ws/src/Ros_Qt5_Gui_App/include/**",
+        "/home/chengyangkj/catkin_ws/src/Ros_Qt5_Gui_App/build/**",
         "/home/chengyangkj/catkin_ws/src/map_to_jpeg/include/**",
         "/usr/include/**"
       ],

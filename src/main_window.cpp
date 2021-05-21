@@ -68,11 +68,9 @@ void MainWindow::display_rviz() {
   QString Map_topic = settings.value("Map/topic", QString("/map")).toString();
   double Map_alpha = settings.value("Map/alpha", double(0.7)).toDouble();
   QString Map_scheme = settings.value("Map/scheme", QString("map")).toString();
-
   bool Laser_enable = settings.value("Laser/enable", bool(true)).toBool();
   QString Laser_topic =
       settings.value("Laser/topic", QString("/scan")).toString();
-
   bool Polygon_enable = settings.value("Polygon/enable", bool(true)).toBool();
   QString Polygon_topic =
       settings
@@ -172,6 +170,7 @@ void MainWindow::initUis() {
   ui.btn_control->setIcon(QIcon("://images/control.png"));
   ui.btn_status->setIcon(QIcon("://images/status.png"));
   ui.btn_other->setIcon(QIcon("://images/toolbar_other.png"));
+  
   ui.widget_rviz->hide();
   rock_widget = new JoyStick(ui.JoyStick_widget);
   rock_widget->show();
