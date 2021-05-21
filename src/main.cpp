@@ -1,3 +1,4 @@
+
 /**
  * @file /src/main.cpp
  *
@@ -9,30 +10,29 @@
 ** Includes
 *****************************************************************************/
 
-#include <QtGui>
 #include <QApplication>
 #include <QDesktopWidget>
-#include "../include/cyrobot_monitor/loginwidget.h"
+#include <QtGui>
 
+#include "../include/cyrobot_monitor/loginwidget.h"
 
 /*****************************************************************************
 ** Main
 *****************************************************************************/
 
 int main(int argc, char **argv) {
+  /*********************
+  ** Qt
+  **********************/
+  QApplication app(argc, argv);
+  //共享opengl上下文
+  //    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts)
+  //    QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+  //记住上一次的窗体大小和位置
+  LoginWidget w;
+  w.show();
+  app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+  int result = app.exec();
 
-    /*********************
-    ** Qt
-    **********************/
-    QApplication app(argc, argv);
-    //共享opengl上下文
-//    QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts)
-//    QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
-   //记住上一次的窗体大小和位置
-    LoginWidget w;
-    w.show();
-    app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
-    int result = app.exec();
-
-	return result;
+  return result;
 }
