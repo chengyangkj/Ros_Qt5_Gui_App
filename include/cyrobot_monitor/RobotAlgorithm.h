@@ -4,6 +4,12 @@
 namespace algo {
 
 //#define M_PI 3.1415
+enum RobotStatus{
+    none,
+    normal,
+    warn,
+    error
+};
 
 struct RobotPose{
     double x;

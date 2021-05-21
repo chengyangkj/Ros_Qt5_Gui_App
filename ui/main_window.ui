@@ -675,39 +675,36 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                   <string notr="true"/>
                  </property>
                  <property name="text">
-                  <string>机器人状态：</string>
+                  <string>系统状态：</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_statue_text">
-                 <property name="styleSheet">
-                  <string notr="true"/>
-                 </property>
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#cc0000;&quot;&gt;离线&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_robot_staue_img">
+                <widget class="QPushButton" name="pushButton_status">
                  <property name="minimumSize">
                   <size>
-                   <width>32</width>
-                   <height>32</height>
+                   <width>20</width>
+                   <height>20</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>32</width>
-                   <height>32</height>
+                   <width>20</width>
+                   <height>20</height>
                   </size>
+                 </property>
+                 <property name="cursor">
+                  <cursorShape>PointingHandCursor</cursorShape>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton{
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
                  </property>
                  <property name="text">
                   <string/>
-                 </property>
-                 <property name="pixmap">
-                  <pixmap>:/images/offline.png</pixmap>
                  </property>
                 </widget>
                </item>
@@ -730,7 +727,7 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                   <string notr="true"/>
                  </property>
                  <property name="text">
-                  <string>电池电量</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -1709,7 +1706,7 @@ background-color:rgb(211, 215, 207);
           <number>0</number>
          </property>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_14">
+          <layout class="QHBoxLayout" name="horizontalLayout_menu">
            <property name="spacing">
             <number>0</number>
            </property>

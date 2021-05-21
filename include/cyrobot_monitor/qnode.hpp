@@ -105,6 +105,7 @@ Q_SIGNALS:
     void updateMap(QImage map);
     void plannerPath(QPolygonF path);
     void updateLaserScan(QPolygonF points);
+    void updateRobotStatus(algo::RobotStatus status);
 private:
 	int init_argc;
 	char** init_argv;

@@ -47,6 +47,9 @@ QNode::QNode(int argc, char** argv ) :
     path_topic = settings.value("GlobalPlan/topic","/movebase").toString().toStdString();
      qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
      qRegisterMetaType<algo::RobotPose>("algo::RobotPose");
+     qRegisterMetaType<algo::RobotStatus>("algo::RobotStatus");
+     qRegisterMetaType<QVector<int>>("QVector<int>");
+
     }
 
 QNode::~QNode() {
@@ -108,7 +111,7 @@ void QNode::SubAndPubTopic(){
      m_robotPoselistener->waitForTransform(map_frame,base_frame,ros::Time(0),ros::Duration(0.4));
      m_Laserlistener->waitForTransform(map_frame,laser_frame,ros::Time(0),ros::Duration(0.4));
    } catch (tf::TransformException& ex) {
-      ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
+     log(Error,("laser and robot pose tf listener: "+QString(ex.what())).toStdString());
    }
 }
 
@@ -155,12 +158,12 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg){
       m_Laserlistener->transformPoint(map_frame, laser_point, map_point);
     }
     catch(tf::TransformException& ex){
-      ROS_ERROR("Received an exception trying to transform  %s", ex.what());
+      log(Error,("laser tf transform: "+QString(ex.what())).toStdString());
       try {
         m_robotPoselistener->waitForTransform(map_frame,base_frame,ros::Time(0),ros::Duration(0.4));
         m_Laserlistener->waitForTransform(map_frame,laser_frame,ros::Time(0),ros::Duration(0.4));
       } catch (tf::TransformException& ex) {
-         ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
+        log(Error,("laser tf transform: "+QString(ex.what())).toStdString());
       }
     }
     //转化为图元坐标系
@@ -185,12 +188,12 @@ void QNode::updateRobotPose(){
       algo::RobotPose pos{roboPos.x(),roboPos.y(),yaw};
       emit updateRoboPose(pos);
   } catch (tf::TransformException& ex) {
-     ROS_ERROR("Received an exception trying to updateRobotPose transform a point from \"map\" to \"base_link\": %s", ex.what());
+             log(Error,("robot pose tf transform: "+QString(ex.what())).toStdString());
      try {
        m_robotPoselistener->waitForTransform(map_frame,base_frame,ros::Time(0),ros::Duration(0.4));
        m_Laserlistener->waitForTransform(map_frame,laser_frame,ros::Time(0),ros::Duration(0.4));
      } catch (tf::TransformException& ex) {
-        ROS_ERROR("Received an exception trying to transform a point from \"map\" to \"base_link\": %s", ex.what());
+              log(Error,("robot pose tf transform: "+QString(ex.what())).toStdString());
      }
   }
 }
@@ -280,6 +283,7 @@ void QNode::run() {
         //当当前节点没有关闭时
         while ( ros::ok() ) {
             updateRobotPose();
+             emit updateRobotStatus(algo::RobotStatus::normal);
             loop_rate.sleep();
         }
         //如果当前节点关闭
@@ -549,27 +553,24 @@ void QNode::log( const LogLevel &level, const std::string &msg) {
 	std::stringstream logging_model_msg;
 	switch ( level ) {
 		case(Debug) : {
-				ROS_DEBUG_STREAM(msg);
 				logging_model_msg << "[DEBUG] [" << ros::Time::now() << "]: " << msg;
 				break;
 		}
 		case(Info) : {
-				ROS_INFO_STREAM(msg);
 				logging_model_msg << "[INFO] [" << ros::Time::now() << "]: " << msg;
 				break;
 		}
 		case(Warn) : {
-				ROS_WARN_STREAM(msg);
+                emit updateRobotStatus(algo::RobotStatus::warn);
 				logging_model_msg << "[INFO] [" << ros::Time::now() << "]: " << msg;
 				break;
 		}
 		case(Error) : {
-				ROS_ERROR_STREAM(msg);
+                emit updateRobotStatus(algo::RobotStatus::error);
 				logging_model_msg << "[ERROR] [" << ros::Time::now() << "]: " << msg;
 				break;
 		}
 		case(Fatal) : {
-				ROS_FATAL_STREAM(msg);
 				logging_model_msg << "[FATAL] [" << ros::Time::now() << "]: " << msg;
 				break;
 		}

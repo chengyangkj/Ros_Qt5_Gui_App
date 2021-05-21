@@ -116,6 +116,7 @@ public slots:
     void slot_pubImageMapTimeOut();
     void slot_updateCursorPos(QPointF pos);
     void slot_changeMapType(int);
+    void slot_updateRobotStatus(algo::RobotStatus);
 //    void on_horizontalSlider_raw_valueChanged(int value);
 private slots:
 
@@ -132,6 +133,7 @@ private:
     void connections();
     void add_quick_cmd(QString name,QString shell);
     void display_rviz();
+    void setCurrentMenu(QPushButton* btn);
 private:
     Ui::MainWindowDesign ui;
     bool isPressedWidget;

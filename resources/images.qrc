@@ -145,5 +145,9 @@
         <file>background/background.gif</file>
         <file>images/car/car_background.JPG</file>
         <file>images/car/car.JPG</file>
+        <file>images/status/status_none.png</file>
+        <file>images/status/status_warn.png</file>
+        <file>images/status/status_normal.png</file>
+        <file>images/status/status_error.png</file>
     </qresource>
 </RCC>
