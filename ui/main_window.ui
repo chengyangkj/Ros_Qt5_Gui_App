@@ -880,7 +880,7 @@ QProgressBar::chunk
           <item>
            <widget class="QStackedWidget" name="stackedWidget_main">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -1063,78 +1063,6 @@ background-color: rgb(255,255,255);
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="QPushButton" name="move_camera_btn">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>25</height>
-                     </size>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">QPushButton:hover{
-background-color:rgb(186, 189, 182);
-border-bottom:2px solid rgb(67, 154, 246);
-}
-QPushButton:checked{
-background-color:cyan;
-border-bottom:2px solid white 
-}
-QPushButton:pressed{
-background-color:rgb(67, 154, 246)
-}
-QPushButton{
-background-color:rgb(238, 238, 236);
-border:none; 
-padding:0px 0px 0px 0px;
-margin:0px 0px 0px 0px;
-}</string>
-                    </property>
-                    <property name="text">
-                     <string>Move Camera</string>
-                    </property>
-                    <property name="icon">
-                     <iconset>
-                      <normaloff>:/images/rotate_cam.svg</normaloff>:/images/rotate_cam.svg</iconset>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="set_select_btn">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>25</height>
-                     </size>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">QPushButton:hover{
-background-color:rgb(186, 189, 182);
-border-bottom:2px solid rgb(67, 154, 246);
-}
-QPushButton:checked{
-background-color:cyan;
-border-bottom:2px solid white 
-}
-QPushButton:pressed{
-background-color:rgb(67, 154, 246)
-}
-QPushButton{
-background-color:rgb(238, 238, 236);
-border:none; 
-padding:0px 0px 0px 0px;
-margin:0px 0px 0px 0px;
-}</string>
-                    </property>
-                    <property name="text">
-                     <string>Select</string>
-                    </property>
-                    <property name="icon">
-                     <iconset>
-                      <normaloff>:/images/classes/Select.png</normaloff>:/images/classes/Select.png</iconset>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <widget class="QPushButton" name="set_pos_btn">
                     <property name="minimumSize">
                      <size>
@@ -1168,7 +1096,7 @@ margin:0px 0px 0px 0px;
 }</string>
                     </property>
                     <property name="text">
-                     <string>2D Pose Estimate</string>
+                     <string>设置导航初始点</string>
                     </property>
                     <property name="icon">
                      <iconset>
@@ -1204,7 +1132,7 @@ margin:0px 0px 0px 0px;
 }</string>
                     </property>
                     <property name="text">
-                     <string>2D Nav Goal</string>
+                     <string>设置单点导航</string>
                     </property>
                     <property name="icon">
                      <iconset>
@@ -1213,13 +1141,7 @@ margin:0px 0px 0px 0px;
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPushButton" name="set_return_btn">
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>25</height>
-                     </size>
-                    </property>
+                   <widget class="QPushButton" name="set_mutil_goal_btn">
                     <property name="styleSheet">
                      <string notr="true">QPushButton:hover{
 background-color:rgb(186, 189, 182);
@@ -1240,11 +1162,10 @@ margin:0px 0px 0px 0px;
 }</string>
                     </property>
                     <property name="text">
-                     <string>设置返航点</string>
+                     <string>设置多点导航</string>
                     </property>
                     <property name="icon">
-                     <iconset>
-                      <normaloff>:/images/set_return.png</normaloff>:/images/set_return.png</iconset>
+                     <iconset theme="://images/mutil_pose.png"/>
                     </property>
                    </widget>
                   </item>
@@ -1276,7 +1197,7 @@ margin:0px 0px 0px 0px;
 }</string>
                     </property>
                     <property name="text">
-                     <string>返航</string>
+                     <string>返回休息点</string>
                     </property>
                     <property name="icon">
                      <iconset>

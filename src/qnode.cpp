@@ -35,6 +35,10 @@ QNode::QNode(int argc, char** argv) : init_argc(argc), init_argv(argv) {
   odom_topic = topic_setting.value("topic/topic_odom", "odom").toString();
   batteryState_topic =
       topic_setting.value("topic/topic_power", "battery_state").toString();
+  initPose_topic =
+      topic_setting.value("topic/topic_init_pose", "move_base_simple/goal").toString();
+  naviGoal_topic =
+      topic_setting.value("topic/topic_goal", "initialpose").toString();
   pose_topic = topic_setting.value("topic/topic_amcl", "amcl_pose").toString();
   m_frameRate = topic_setting.value("main/framerate", 40).toInt();
   m_threadNum = topic_setting.value("main/thread_num", 6).toInt();
@@ -103,7 +107,7 @@ void QNode::SubAndPubTopic() {
   map_sub = n.subscribe("map", 1000, &QNode::mapCallback, this);
   //导航目标点发送话题
   goal_pub =
-      n.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal", 1000);
+      n.advertise<geometry_msgs::PoseStamped>(naviGoal_topic.toStdString(), 1000);
   //速度控制话题
   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
   //激光雷达点云话题订阅
@@ -113,7 +117,7 @@ void QNode::SubAndPubTopic() {
   m_plannerPathSub =
       n.subscribe(path_topic, 1000, &QNode::plannerPathCallback, this);
   m_initialposePub =
-      n.advertise<geometry_msgs::PoseStamped>("/initialpose", 10);
+      n.advertise<geometry_msgs::PoseStamped>(initPose_topic.toStdString(), 10);
   image_transport::ImageTransport it(n);
   m_imageMapPub = it.advertise("image/map", 10);
   m_robotPoselistener = new tf::TransformListener;
@@ -356,7 +360,7 @@ void QNode::slot_pub2DPos(algo::RobotPose pose) {
   QPointF tmp = transScenePoint2Map(QPointF(pose.x, pose.y));
   pose.x = tmp.x();
   pose.y = tmp.y();
-  qDebug() << "init pose:" << pose.x << " " << pose.y << " " << pose.theta;
+  //qDebug() << "init pose:" << pose.x << " " << pose.y << " " << pose.theta;
   geometry_msgs::PoseStamped goal;
   //设置frame
   goal.header.frame_id = "map";
@@ -367,14 +371,13 @@ void QNode::slot_pub2DPos(algo::RobotPose pose) {
   goal.pose.position.z = 0;
   goal.pose.orientation =
       tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
-  goal_pub.publish(goal);
   m_initialposePub.publish(goal);
 }
 void QNode::slot_pub2DGoal(algo::RobotPose pose) {
   QPointF tmp = transScenePoint2Map(QPointF(pose.x, pose.y));
   pose.x = tmp.x();
   pose.y = tmp.y();
-  qDebug() << "target pose:" << pose.x << " " << pose.y << " " << pose.theta;
+  //qDebug() << "target pose:" << pose.x << " " << pose.y << " " << pose.theta;
   geometry_msgs::PoseStamped goal;
   //设置frame
   goal.header.frame_id = "map";
@@ -386,7 +389,6 @@ void QNode::slot_pub2DGoal(algo::RobotPose pose) {
   goal.pose.orientation =
       tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
   goal_pub.publish(goal);
-  ros::spinOnce();
 }
 //图元坐标系转换为map坐标系
 QPointF QNode::transScenePoint2Map(QPointF pos) {

@@ -107,8 +107,7 @@ class MainWindow : public QMainWindow {
   void slot_move_camera_btn();
   //设置界面
   void slot_setting_frame();
-  //设置返航点
-  void slot_set_return_point();
+  void slot_set_mutil_goal_btn();
   //返航
   void slot_return_point();
   //机器人位置

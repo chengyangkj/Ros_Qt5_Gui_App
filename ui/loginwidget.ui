@@ -729,7 +729,7 @@ background-color:none</string>
          <item>
           <widget class="QToolBox" name="toolBox">
            <property name="currentIndex">
-            <number>1</number>
+            <number>0</number>
            </property>
            <widget class="QWidget" name="page_3">
             <property name="geometry">
@@ -794,7 +794,7 @@ background-color:none</string>
                  <item>
                   <widget class="QLineEdit" name="lineEdit_start_postopic">
                    <property name="text">
-                    <string>amcl_pose</string>
+                    <string>initialpose</string>
                    </property>
                   </widget>
                  </item>
@@ -887,6 +887,14 @@ background-color:none</string>
             </layout>
            </widget>
            <widget class="QWidget" name="page_7">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>579</width>
+              <height>191</height>
+             </rect>
+            </property>
             <attribute name="label">
              <string>坐标系设置</string>
             </attribute>

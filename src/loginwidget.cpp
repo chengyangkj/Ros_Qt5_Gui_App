@@ -107,6 +107,8 @@ void LoginWidget::slot_writeSettings() {
   QSettings main_setting("cyrobot_monitor", "settings");
   main_setting.setValue("topic/topic_odom", ui->lineEdit_odm->text());
   main_setting.setValue("topic/topic_power", ui->lineEdit_power->text());
+  main_setting.setValue("topic/topic_goal", ui->lineEdit_goal_topic->text());
+  main_setting.setValue("topic/topic_init_pose", ui->lineEdit_start_postopic->text());
   main_setting.setValue("main/turn_thre", ui->lineEdit_turnLightThre->text());
   main_setting.setValue("main/show_mode", ui->radioButton_robot->isChecked()
                                               ? "robot"
@@ -258,6 +260,10 @@ void LoginWidget::readSettings() {
       main_setting.value("topic/topic_odom", "raw_odom").toString());
   ui->lineEdit_power->setText(
       main_setting.value("topic/topic_power", "power").toString());
+  ui->lineEdit_goal_topic->setText(
+      main_setting.value("topic/topic_goal", "move_base_simple/goal").toString());
+  ui->lineEdit_start_postopic->setText(
+      main_setting.value("topic/topic_init_pose", "initialpose").toString());
   ui->lineEdit_turnLightThre->setText(
       main_setting.value("main/turn_thre", "0.2").toString());
   ui->spinBox_frameRate->setValue(

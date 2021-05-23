@@ -131,6 +131,8 @@ class QNode : public QThread {
   QString pose_topic;
   QString laser_topic;
   QString map_topic;
+  QString initPose_topic;
+  QString naviGoal_topic;
   std::string path_topic;
   QPolygon mapPonits;
   QPolygonF plannerPoints;

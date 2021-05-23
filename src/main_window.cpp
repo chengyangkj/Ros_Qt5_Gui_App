@@ -270,14 +270,9 @@ void MainWindow::connections() {
   connect(ui.set_pos_btn, SIGNAL(clicked()), this, SLOT(slot_set_2D_Pos()));
   //设置2D goal
   connect(ui.set_goal_btn, SIGNAL(clicked()), this, SLOT(slot_set_2D_Goal()));
-  //设置MoveCamera
-  connect(ui.move_camera_btn, SIGNAL(clicked()), this,
-          SLOT(slot_move_camera_btn()));
-  //设置Select
-  connect(ui.set_select_btn, SIGNAL(clicked()), this, SLOT(slot_set_select()));
   //设置返航点
-  connect(ui.set_return_btn, SIGNAL(clicked()), this,
-          SLOT(slot_set_return_point()));
+  connect(ui.set_mutil_goal_btn, SIGNAL(clicked()), this,
+          SLOT(slot_set_mutil_goal_btn()));
   //返航
   connect(ui.return_btn, SIGNAL(clicked()), this, SLOT(slot_return_point()));
   //刷新话题列表
@@ -315,24 +310,28 @@ void MainWindow::slot_updateRobotStatus(algo::RobotStatus status) {
       QTimer::singleShot(100, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_none.png"));
+        m_roboMap->setRobotColor(eRobotColor::blue);
       });
     } break;
     case algo::RobotStatus::normal: {
       QTimer::singleShot(200, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_normal.png"));
+        m_roboMap->setRobotColor(eRobotColor::blue);
       });
     } break;
     case algo::RobotStatus::error: {
       QTimer::singleShot(300, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_error.png"));
+        m_roboMap->setRobotColor(eRobotColor::red);
       });
     } break;
     case algo::RobotStatus::warn: {
       QTimer::singleShot(400, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_warn.png"));
+        m_roboMap->setRobotColor(eRobotColor::yellow);
       });
     } break;
   }
@@ -478,26 +477,8 @@ void MainWindow::slot_position_change(QString frame, double x, double y,
   //    ui.label_w->setText(QString::number(w));
 }
 //刷新返航地点
-void MainWindow::slot_set_return_point() {
-  //更新ui返航点显示
-  //    ui.label_return_x->setText(ui.label_x->text());
-  //    ui.label_return_y->setText(ui.label_y->text());
-  //    ui.label_return_z->setText(ui.label_z->text());
-  //    ui.label_return_w->setText(ui.label_w->text());
-  //写入setting
-  //    QSettings settings("return-position", "cyrobot_monitor");
-  //    settings.setValue("x",ui.label_x->text());
-  //    settings.setValue("y",ui.label_y->text());
-  //    settings.setValue("z",ui.label_z->text());
-  //    settings.setValue("w",ui.label_w->text());
-  //发出声音提醒
-  if (media_player != NULL) {
-    delete media_player;
-    media_player = NULL;
-  }
-  media_player = new QSoundEffect;
-  media_player->setSource(QUrl::fromLocalFile("://media/refresh_return.wav"));
-  media_player->play();
+void MainWindow::slot_set_mutil_goal_btn() {
+
 }
 //返航
 void MainWindow::slot_return_point() {

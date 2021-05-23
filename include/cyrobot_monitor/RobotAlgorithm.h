@@ -1,7 +1,7 @@
 
 #ifndef ROBOTALGORITHM_H
 #define ROBOTALGORITHM_H
-
+#include <QSizeF>
 namespace algo {
 
 //#define M_PI 3.1415
@@ -49,6 +49,7 @@ inline double getAngle(float x1, float y1, float x2, float y2)
         angle_temp = M_PI * 2.0 - angle_temp;
     return (angle_temp);
 }
+
 
 }
 

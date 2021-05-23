@@ -16,6 +16,12 @@
 #include "RobotAlgorithm.h"
 namespace cyrobot_monitor {
 
+enum eRobotColor{
+    blue,
+    red,
+    yellow
+};
+
 class roboMap : public QObject, public QGraphicsItem {
   Q_OBJECT
 
@@ -30,6 +36,8 @@ class roboMap : public QObject, public QGraphicsItem {
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget);
   int QColorToInt(const QColor &color);
+  void setRobotColor(eRobotColor color);
+  void setRobotSize(QSize size);
   QPolygon MapPoints;
   QPolygonF plannerPath;
   QPolygonF laserPoints;
@@ -78,6 +86,7 @@ class roboMap : public QObject, public QGraphicsItem {
   int m_zoomState;
   bool m_isPress;
   bool m_isOtherCursor{false};
+  QPixmap robotImg;
   QPointF m_startPos;
   QPointF m_pressedPoint = QPointF(0, 0);
   QPointF m_pressingPoint = QPointF(0, 0);

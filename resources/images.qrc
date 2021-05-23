@@ -149,5 +149,10 @@
         <file>images/status/status_warn.png</file>
         <file>images/status/status_normal.png</file>
         <file>images/status/status_error.png</file>
+        <file>images/robot_blue.png</file>
+        <file>images/mutil_pose.png</file>
+        <file>images/robot_red.png</file>
+        <file>images/robot_yellow.png</file>
+        <file>images/cursor_mutile_pose.png</file>
     </qresource>
 </RCC>

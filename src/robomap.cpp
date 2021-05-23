@@ -13,7 +13,30 @@ roboMap::roboMap() {
   moveCursor = new QCursor(QPixmap("://images/cursor_move"), 0, 0);
   set2DPoseCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   set2DGoalCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
+  setRobotColor(eRobotColor::blue);
   setDefault();
+}
+void roboMap::setRobotColor(eRobotColor color){
+    switch (color) {
+    case eRobotColor::blue :{
+       robotImg.load("://images/robot_blue.png");
+    }
+    break;
+    case eRobotColor::red :{
+       robotImg.load("://images/robot_red.png");
+    }
+    break;
+    case eRobotColor::yellow :{
+       robotImg.load("://images/robot_yellow.png");
+    }
+    break;
+    }
+    QMatrix matrix;
+    matrix.rotate(90);
+    robotImg = robotImg.transformed(matrix, Qt::SmoothTransformation);
+}
+void roboMap::setRobotSize(QSize size){
+    robotImg =robotImg.scaled(size);
 }
 int roboMap::QColorToInt(const QColor &color) {
   //将Color 从QColor 转换成 int
@@ -107,35 +130,15 @@ void roboMap::drawMap(QPainter *painter) {
   painter->drawImage(0, 0, m_imageMap);
 }
 void roboMap::drawRoboPos(QPainter *painter) {
-  painter->setPen(QPen(QColor(255, 0, 0, 255), 3, Qt::SolidLine, Qt::RoundCap,
-                       Qt::RoundJoin));
-  painter->drawPoint(RoboPostion);
-  //画等边三角形 以小车位置为中心 m_roboR为半径的外接圆
-  // x+r*cos(yaw)
-  // y-r*sin(yaw)
-  QPointF head;
-  head.setX(RoboPostion.x() + m_roboR * cos(m_roboYaw));
-  head.setY(RoboPostion.y() - m_roboR * sin(m_roboYaw));
-  // qDebug()<<"m_roboYaw:"<<m_roboYaw<<"robo pos:"<<RoboPostion<<"robo
-  // head:"<<head<<"cos: "<<cos(m_roboYaw)<<"sin:"<<sin(m_roboYaw);
-  QPointF backR;
-  backR.setX(RoboPostion.x() + m_roboR * cos(m_roboYaw + 2.094));
-  backR.setY(RoboPostion.y() - m_roboR * sin(m_roboYaw + 2.094));
-  QPointF backL;
-  backL.setX(RoboPostion.x() + m_roboR * cos(m_roboYaw + 4.188));
-  backL.setY(RoboPostion.y() - m_roboR * sin(m_roboYaw + 4.188));
+    painter->setPen(QPen(QColor(255, 0, 0, 255), 1, Qt::SolidLine, Qt::RoundCap,
+                           Qt::RoundJoin));
+    painter->save();
+    painter->translate(RoboPostion.x(),RoboPostion.y());
+    painter->rotate(algo::rad2deg(-m_roboYaw));
+    painter->drawPoint(QPoint(0,0));
+    painter->drawPixmap(QPoint(-robotImg.width()/2,-robotImg.height()/2),robotImg);
+    painter->restore();
 
-  painter->setPen(QPen(QColor(0, 0, 255, 255), 2, Qt::SolidLine, Qt::RoundCap,
-                       Qt::RoundJoin));
-  //   painter->drawLine(QLineF(RoboPostion,head));
-  //三角形
-  QPainterPath path;
-  path.moveTo(head);
-  path.lineTo(backR);
-  path.lineTo(backL);
-  path.lineTo(head);
-
-  painter->fillPath(path, QBrush(QColor("blue")));
 }
 void roboMap::drawLaserScan(QPainter *painter) {
   //绘制laser
@@ -211,9 +214,11 @@ void roboMap::slot_setMoveCamera() {
 }
 void roboMap::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
+      if(currCursor!=moveCursor){
+        m_pressedPoint = event->pos();
+      }
     m_startPos = event->pos();  //鼠标左击时，获取当前鼠标在图片中的坐标，
     m_isPress = true;  //标记鼠标左键被按下
-    m_pressedPoint = event->pos();
   } else if (event->button() == Qt::RightButton) {
     // ResetItemPos();//右击鼠标重置大小
   }
