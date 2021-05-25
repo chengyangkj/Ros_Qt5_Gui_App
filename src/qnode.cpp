@@ -117,7 +117,7 @@ void QNode::SubAndPubTopic() {
   m_plannerPathSub =
       n.subscribe(path_topic, 1000, &QNode::plannerPathCallback, this);
   m_initialposePub =
-      n.advertise<geometry_msgs::PoseStamped>(initPose_topic.toStdString(), 10);
+      n.advertise<geometry_msgs::PoseWithCovarianceStamped>(initPose_topic.toStdString(), 10);
   image_transport::ImageTransport it(n);
   m_imageMapPub = it.advertise("image/map", 10);
   m_robotPoselistener = new tf::TransformListener;
@@ -361,15 +361,15 @@ void QNode::slot_pub2DPos(algo::RobotPose pose) {
   pose.x = tmp.x();
   pose.y = tmp.y();
   //qDebug() << "init pose:" << pose.x << " " << pose.y << " " << pose.theta;
-  geometry_msgs::PoseStamped goal;
+  geometry_msgs::PoseWithCovarianceStamped goal;
   //设置frame
   goal.header.frame_id = "map";
   //设置时刻
   goal.header.stamp = ros::Time::now();
-  goal.pose.position.x = pose.x;
-  goal.pose.position.y = pose.y;
-  goal.pose.position.z = 0;
-  goal.pose.orientation =
+  goal.pose.pose.position.x=pose.x;
+  goal.pose.pose.position.y = pose.y;
+  goal.pose.pose.position.z = 0;
+  goal.pose.pose.orientation =
       tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
   m_initialposePub.publish(goal);
 }

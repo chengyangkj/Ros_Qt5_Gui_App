@@ -100,12 +100,19 @@ void MainWindow::display_rviz() {
           .value("Navigation/LocalPlan/topic",
                  QString("/move_base/DWAPlannerROS/local_plan"))
           .toString();
-
-  map_rviz->Display_Grid(Grid_enable, "QGrid", Grid_count,
-                         QColor(160, 160, 160));
-  map_rviz->Display_Map(Map_enable, Map_topic, Map_alpha, Map_scheme);
-  map_rviz->Display_LaserScan(Laser_enable, Laser_topic);
-  //  map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
+  QTimer::singleShot(500,[=](){
+      map_rviz->Display_Grid(Grid_enable, "QGrid", Grid_count,
+                             QColor(160, 160, 160));
+  });
+  QTimer::singleShot(1000,[=](){
+      map_rviz->Display_Map(Map_enable, Map_topic, Map_alpha, Map_scheme);
+    });
+  QTimer::singleShot(3000,[=](){
+      map_rviz->Display_LaserScan(Laser_enable, Laser_topic);
+  });
+//  QTimer::singleShot(2000,[=](){
+//      map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
+//  });
 }
 void MainWindow::slot_show_image(int frame_id, QImage image) {
   switch (frame_id) {
