@@ -21,6 +21,11 @@
 #include <QComboBox>
 #include <QSpinBox>
 #include "qrviz.hpp"
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QHttpPart>
+#include <QHttpMultiPart>
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
@@ -81,6 +86,8 @@ public Q_SLOTS:
     void slot_update_pos(double,double,double);
     void slot_set_return_pos();
     void slot_return();
+    void slot_add_point();
+    void slot_get_pose();
 private:
 	Ui::MainWindowDesign ui;
 	QNode qnode;
@@ -105,6 +112,9 @@ private:
     QComboBox* Global_Planner_Color_box;
     QComboBox* Local_Planner_Topic_box;
     QComboBox* Local_Planner_Color_box;
+
+    QNetworkAccessManager *networkManager;
+    QNetworkRequest request;
 
     double return_x;
     double return_y;

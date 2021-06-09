@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>1251</width>
-    <height>934</height>
+    <height>876</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QRosApp</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resources/images.qrc">
+   <iconset resource="../../Ros_Qt5_Gui_App/resources/images.qrc">
     <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
   </property>
   <property name="locale">
@@ -79,7 +79,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../resources/images.qrc">:/images/power.png</pixmap>
+             <pixmap resource="../../Ros_Qt5_Gui_App/resources/images.qrc">:/images/power.png</pixmap>
             </property>
            </widget>
           </item>
@@ -120,7 +120,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../resources/images.qrc">:/images/power-v.png</pixmap>
+             <pixmap resource="../../Ros_Qt5_Gui_App/resources/images.qrc">:/images/power-v.png</pixmap>
             </property>
            </widget>
           </item>
@@ -149,7 +149,7 @@
            <locale language="English" country="Australia"/>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_status">
            <attribute name="title">
@@ -348,7 +348,7 @@
                    <string>2D Pose Estimate</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="../resources/images.qrc">
+                   <iconset resource="../../Ros_Qt5_Gui_App/resources/images.qrc">
                     <normaloff>:/images/classes/SetInitialPose.png</normaloff>:/images/classes/SetInitialPose.png</iconset>
                   </property>
                  </widget>
@@ -371,7 +371,7 @@
                    <string>2D Nav Goal</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="../resources/images.qrc">
+                   <iconset resource="../../Ros_Qt5_Gui_App/resources/images.qrc">
                     <normaloff>:/images/classes/SetGoal.png</normaloff>:/images/classes/SetGoal.png</iconset>
                   </property>
                  </widget>
@@ -394,7 +394,7 @@
                    <string>设置返航点</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="../resources/images.qrc">
+                   <iconset resource="../../Ros_Qt5_Gui_App/resources/images.qrc">
                     <normaloff>:/images/set_return.png</normaloff>:/images/set_return.png</iconset>
                   </property>
                  </widget>
@@ -417,7 +417,7 @@
                    <string>返航</string>
                   </property>
                   <property name="icon">
-                   <iconset resource="../resources/images.qrc">
+                   <iconset resource="../../Ros_Qt5_Gui_App/resources/images.qrc">
                     <normaloff>:/images/return.png</normaloff>:/images/return.png</iconset>
                   </property>
                  </widget>
@@ -442,7 +442,7 @@
            </size>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab">
            <attribute name="title">
@@ -895,7 +895,7 @@
                    <string/>
                   </property>
                   <property name="pixmap">
-                   <pixmap resource="../resources/images.qrc">:/images/classes/Displays.svg</pixmap>
+                   <pixmap resource="../../Ros_Qt5_Gui_App/resources/images.qrc">:/images/classes/Displays.svg</pixmap>
                   </property>
                  </widget>
                 </item>
@@ -910,10 +910,10 @@
               </item>
               <item>
                <widget class="QTreeWidget" name="treeWidget">
-                <attribute name="headerDefaultSectionSize">
+                <attribute name="headerMinimumSectionSize">
                  <number>150</number>
                 </attribute>
-                <attribute name="headerMinimumSectionSize">
+                <attribute name="headerDefaultSectionSize">
                  <number>150</number>
                 </attribute>
                 <column>
@@ -926,203 +926,6 @@
              </layout>
             </item>
            </layout>
-          </widget>
-          <widget class="QWidget" name="tab_opentcs">
-           <attribute name="title">
-            <string>opentcs</string>
-           </attribute>
-           <widget class="QFrame" name="frame_3">
-            <property name="geometry">
-             <rect>
-              <x>-1</x>
-              <y>-1</y>
-              <width>401</width>
-              <height>641</height>
-             </rect>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <widget class="QGroupBox" name="groupBox_3">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>10</y>
-               <width>371</width>
-               <height>581</height>
-              </rect>
-             </property>
-             <property name="title">
-              <string>GroupBox</string>
-             </property>
-             <widget class="QLineEdit" name="tcs_x_pose">
-              <property name="geometry">
-               <rect>
-                <x>80</x>
-                <y>90</y>
-                <width>113</width>
-                <height>21</height>
-               </rect>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="tcs_y_pose">
-              <property name="geometry">
-               <rect>
-                <x>80</x>
-                <y>130</y>
-                <width>113</width>
-                <height>21</height>
-               </rect>
-              </property>
-             </widget>
-             <widget class="QLabel" name="label_22">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>30</y>
-                <width>81</width>
-                <height>16</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>添加坐标点</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="label_23">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>90</y>
-                <width>41</width>
-                <height>16</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>X:</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="label_24">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>130</y>
-                <width>59</width>
-                <height>16</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Y:</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="label_25">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>60</y>
-                <width>91</width>
-                <height>16</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>TCS Address:</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="tcs_ip_edit">
-              <property name="geometry">
-               <rect>
-                <x>110</x>
-                <y>60</y>
-                <width>113</width>
-                <height>21</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>192.168.0.89</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="addPointButton">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>250</y>
-                <width>113</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Add Point</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="label_26">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>170</y>
-                <width>59</width>
-                <height>16</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Name:</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="tcs_point_name">
-              <property name="geometry">
-               <rect>
-                <x>80</x>
-                <y>170</y>
-                <width>113</width>
-                <height>21</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Point1</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="getPoseButton">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>200</y>
-                <width>111</width>
-                <height>31</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Get Pose</string>
-              </property>
-             </widget>
-             <widget class="QLineEdit" name="tcs_port_edit">
-              <property name="geometry">
-               <rect>
-                <x>282</x>
-                <y>60</y>
-                <width>81</width>
-                <height>21</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>8080</string>
-              </property>
-             </widget>
-             <widget class="QLabel" name="label_27">
-              <property name="geometry">
-               <rect>
-                <x>240</x>
-                <y>60</y>
-                <width>31</width>
-                <height>17</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>port</string>
-              </property>
-             </widget>
-            </widget>
-           </widget>
           </widget>
          </widget>
         </item>
@@ -1312,7 +1115,7 @@
      <x>0</x>
      <y>0</y>
      <width>1251</width>
-     <height>25</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -1357,7 +1160,7 @@
   </action>
  </widget>
  <resources>
-  <include location="../resources/images.qrc"/>
+  <include location="../../Ros_Qt5_Gui_App/resources/images.qrc"/>
  </resources>
  <connections>
   <connection>

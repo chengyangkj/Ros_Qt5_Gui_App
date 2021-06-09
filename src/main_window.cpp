@@ -348,6 +348,17 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     Local_Planner->addChild(Local_Planner_Color_Scheme);
     ui.treeWidget->setItemWidget(Local_Planner_Color_Scheme,1,Local_Planner_Color_box);
 
+    // opentcs tab
+    networkManager = new QNetworkAccessManager();
+    connect(networkManager, &QNetworkAccessManager::finished, this, [=] (QNetworkReply * reply) {
+        if (reply->error()) {
+            qDebug() << reply->errorString();
+        }
+
+        QString ret = reply->readAll();
+        qDebug() << ret;
+    });
+
     //connect
     connect(&qnode,SIGNAL(speed_vel(float,float)),this,SLOT(slot_update_dashboard(float,float)));
     connect(&qnode,SIGNAL(power_vel(float)),this,SLOT(slot_update_power(float)));
@@ -361,6 +372,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     connect(ui.set_return_pos_btn,SIGNAL(clicked()),this,SLOT(slot_set_return_pos()));
     connect(ui.return_btn,SIGNAL(clicked()),this,SLOT(slot_return()));
 
+    connect(ui.addPointButton, SIGNAL(clicked()), this, SLOT(slot_add_point()));
+    connect(ui.getPoseButton, SIGNAL(clicked()), this, SLOT(slot_get_pose()));
 
 }
 void MainWindow::slot_set_return_pos()
@@ -518,6 +531,39 @@ void MainWindow::slot_linera_value_change(int value)
 void MainWindow::slot_raw_value_change(int value)
 {
     ui.label_raw->setText(QString::number(value));
+}
+
+void MainWindow::slot_add_point() {
+    // QString str;
+    // str.sprintf("http://%s:%s/v1/Point/");
+    QUrlQuery query;
+    query.addQueryItem("name", ui.tcs_point_name->text());
+    query.addQueryItem("X", ui.tcs_x_pose->text());
+    query.addQueryItem("Y", ui.tcs_y_pose->text());
+    // QUrl("http://192.168.0.149:8082/v1/Point")
+    QUrl url("");
+    url.setScheme("http");
+    url.setHost(ui.tcs_ip_edit->text());
+    url.setPort(ui.tcs_port_edit->text().toInt());
+    url.setPath("/v1/Point");
+    url.setQuery(query);
+    request.setUrl(url);
+    qDebug() << url;
+    // networkManager->get(request);
+    QHttpMultiPart *http;
+
+    QHttpPart receiptPart;
+    receiptPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"data\""));
+    // receiptPart.setBody(postData);
+
+    // http->append(receiptPart);
+    networkManager->get(request);
+    // networkManager->post(request, http);
+}
+
+void MainWindow::slot_get_pose() {
+    ui.tcs_x_pose->setText(ui.pos_x->text());
+    ui.tcs_y_pose->setText(ui.pos_y->text());
 }
 MainWindow::~MainWindow() {}
 
