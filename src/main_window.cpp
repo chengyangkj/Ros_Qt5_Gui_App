@@ -21,7 +21,7 @@
 
 namespace cyrobot_monitor {
 
-using namespace Qt;
+using namespace Qt;;
 
 /*****************************************************************************
 ** Implementation [MainWindow]
