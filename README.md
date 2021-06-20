@@ -7,6 +7,13 @@
 ![GitHub issues](https://img.shields.io/github/issues/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 
+
+### Contributors
+
+This project exists thanks to all the people who contribute. 
+<a href="https://github.com/chengyangkj/Ros_Qt5_Gui_App/graphs/contributors"><img src="https://opencollective.com/Ros_Qt5_Gui_App/contributors.svg?width=890&button=false" /></a>
+
+
 ***
  简体中文 | [English](./README_en.md)
 
