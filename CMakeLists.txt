@@ -17,8 +17,6 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     image_transport
     )
 
-find_package(Qt5 REQUIRED Core Widgets Multimedia Network)
-set(QT_LIBRARIES Qt5::Widgets Qt5::Multimedia Qt5::Network)
 include_directories(${catkin_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
@@ -32,6 +30,28 @@ catkin_package()
 # this comes from qt_build's qt-ros.cmake which is automatically 
 # included via the dependency call in package.xml
 #rosbuild_prepare_qt4(QtCore QtGui) # Add the appropriate components to the component list here
+
+#######
+## 安装多个 Qt 版本时, 可能会导致无法使用特定的 Qt 版本. 需要设置 CMAKE_PREFIX_PATH 为所用 Qt 的安装路径, 但是还需要设置 Qt[Module]_DIR(例如: QtCore_DIR) 等变量. 下面这一段代码自动会修改 ModuleList 中的所有模块, 并自动设置 Qt[Module]_DIR变量; 同时 target_link_libraries.
+set(CMAKE_PREFIX_PATH "/opt/Qt5.12.6/5.12.6/gcc_64")
+set(ModuleList 
+    Core
+    Gui
+    Widgets
+    Multimedia
+    Network
+)
+
+foreach(QtModule ${ModuleList})
+    set(Qt5${QtModule}_DIR ${CMAKE_PREFIX_PATH}/lib/cmake/Qt5${QtModule})
+    message("foreach-> Qt5${QtModule}_DIR : ${Qt5${QtModule}_DIR}")
+
+    set(QT_LIBRARIES ${QT_LIBRARIES} Qt5::${QtModule})
+endforeach()
+message("${QT_LIBRARIES}")
+
+find_package(Qt5 REQUIRED ${ModuleList})
+#######
 
 ##############################################################################
 # Sections
