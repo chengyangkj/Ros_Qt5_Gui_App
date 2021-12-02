@@ -19,9 +19,7 @@
 #include <QDebug>
 #include <sstream>
 #include <string>
-/*****************************************************************************
-** Namespaces
-*****************************************************************************/
+
 
 namespace cyrobot_monitor {
 
@@ -131,6 +129,8 @@ void QNode::SubAndPubTopic() {
     log(Error, ("laser and robot pose tf listener: " + QString(ex.what()))
                    .toStdString());
   }
+  movebase_client = new MoveBaseClient("move_base",true);
+  movebase_client->waitForServer(ros::Duration(1.0));
 }
 
 QMap<QString, QString> QNode::get_topic_list() {
@@ -377,18 +377,15 @@ void QNode::slot_pub2DGoal(algo::RobotPose pose) {
   QPointF tmp = transScenePoint2Map(QPointF(pose.x, pose.y));
   pose.x = tmp.x();
   pose.y = tmp.y();
-  //qDebug() << "target pose:" << pose.x << " " << pose.y << " " << pose.theta;
-  geometry_msgs::PoseStamped goal;
-  //设置frame
-  goal.header.frame_id = "map";
-  //设置时刻
-  goal.header.stamp = ros::Time::now();
-  goal.pose.position.x = pose.x;
-  goal.pose.position.y = pose.y;
-  goal.pose.position.z = 0;
-  goal.pose.orientation =
-      tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
-  goal_pub.publish(goal);
+   move_base_msgs::MoveBaseGoal goal;
+  goal.target_pose.header.frame_id = "map";
+  goal.target_pose.header.stamp = ros::Time::now();
+ 
+  goal.target_pose.pose.position.x = pose.x;
+  goal.target_pose.pose.position.y = pose.y;
+ goal.target_pose.pose.position.z = 0;
+ goal.target_pose.pose.orientation=tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
+movebase_client->sendGoal(goal);
 }
 //图元坐标系转换为map坐标系
 QPointF QNode::transScenePoint2Map(QPointF pos) {

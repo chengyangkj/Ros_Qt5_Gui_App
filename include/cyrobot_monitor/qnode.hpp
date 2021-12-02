@@ -48,6 +48,10 @@
 #include <string>
 
 #include "robomap.h"
+#include <move_base_msgs/MoveBaseAction.h>
+#include <actionlib/client/simple_action_client.h>
+ 
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
@@ -118,6 +122,7 @@ class QNode : public QThread {
   ros::Publisher cmd_pub;
   ros::Publisher m_initialposePub;
   image_transport::Publisher m_imageMapPub;
+  MoveBaseClient *movebase_client;
   QStringListModel logging_model;
   QString show_mode = "control";
   //图像订阅
