@@ -145,8 +145,8 @@ class QNode : public QThread {
   int m_threadNum = 4;
   int m_frameRate = 40;
   //地图 0 0点坐标对应世界坐标系的坐标
-  int m_mapOriginX;
-  int m_mapOriginY;
+  float m_mapOriginX;
+  float m_mapOriginY;
   //地图坐标系中心点坐标
   QPointF m_mapCenterPoint;
   //图元坐标系中心点坐标
