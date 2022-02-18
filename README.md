@@ -8,10 +8,9 @@
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 
 
-### Contributors
+### How To Contribute
 
-This project exists thanks to all the people who contribute. 
-<a href="https://github.com/chengyangkj/Ros_Qt5_Gui_App/graphs/contributors"><img src="https://opencollective.com/Ros_Qt5_Gui_App/contributors.svg?width=890&button=false" /></a>
+欢迎提交Issues与bug的pull resquest
 
 
 ***
@@ -84,7 +83,8 @@ rosrun cyrobot_monitor cyrobot_monitor
 | [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)      | Win10 Ubuntu |ROS + QWidget + Librviz进行可视化显示，为《ROS人机交互软件开发》系列课程中实现的版本，CSDN博客例程版本|
 | [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)| Win10 Ubuntu |ROS + QWidget + Librviz原生图层Api实现图层管理，不需手动创建图层|
 | [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)| Win10 Ubuntu |cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行|
-| [web版本](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_web_gui_app)| Win10 Ubuntu Android Mac .... |暂未实现 敬请期待.....|
+| [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app)| 基于flutter实现多平台运行|逐步推进.....|
+
 
 ## 四，使用说明
 
