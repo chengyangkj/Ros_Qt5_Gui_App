@@ -74,6 +74,9 @@ rosrun cyrobot_monitor cyrobot_monitor
 
 - 借助 ROS windows版本，编译后可在win10平板使用，安装教程[古月学院 如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
 
+
+常见问题及解决方法见[wiki](https://github.com/chengyangkj/Ros_Qt5_Gui_App/wiki)
+
 ## 三，分支
 
 | 分支名         | 支持平台         | 功能           | 
