@@ -61,13 +61,16 @@ sudo apt-get install qtmultimedia5-dev
 
 #### 3，编译
 
-将软件包放入ros src软件包目录下：
-
-```cpp
+```shell
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App
+cd ~/catkin_ws
 catkin_make
 ```
 #### 4,运行
 ```cpp
+source  ~/catkin_ws/devel/setup.bash
 rosrun cyrobot_monitor cyrobot_monitor
 ```
 ***
