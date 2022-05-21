@@ -8,7 +8,7 @@
             "name": "g++ - 生成和调试活动文件",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/devel/lib/cyrobot_monitor/cyrobot_monitor",
+            "program": "${workspaceFolder}/build/devel/lib/ros_qt5_gui_app/ros_qt5_gui_app",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

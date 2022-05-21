@@ -1,8 +1,8 @@
-#include "../include/cyrobot_monitor/robomap.h"
+#include "../include/ros_qt5_gui_app/robomap.h"
 
 #include <QDebug>
 
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
 roboMap::roboMap() {
   setAcceptHoverEvents(true);
@@ -16,28 +16,23 @@ roboMap::roboMap() {
   setRobotColor(eRobotColor::blue);
   setDefault();
 }
-void roboMap::setRobotColor(eRobotColor color){
-    switch (color) {
-    case eRobotColor::blue :{
-       robotImg.load("://images/robot_blue.png");
-    }
-    break;
-    case eRobotColor::red :{
-       robotImg.load("://images/robot_red.png");
-    }
-    break;
-    case eRobotColor::yellow :{
-       robotImg.load("://images/robot_yellow.png");
-    }
-    break;
-    }
-    QMatrix matrix;
-    matrix.rotate(90);
-    robotImg = robotImg.transformed(matrix, Qt::SmoothTransformation);
+void roboMap::setRobotColor(eRobotColor color) {
+  switch (color) {
+    case eRobotColor::blue: {
+      robotImg.load("://images/robot_blue.png");
+    } break;
+    case eRobotColor::red: {
+      robotImg.load("://images/robot_red.png");
+    } break;
+    case eRobotColor::yellow: {
+      robotImg.load("://images/robot_yellow.png");
+    } break;
+  }
+  QMatrix matrix;
+  matrix.rotate(90);
+  robotImg = robotImg.transformed(matrix, Qt::SmoothTransformation);
 }
-void roboMap::setRobotSize(QSize size){
-    robotImg =robotImg.scaled(size);
-}
+void roboMap::setRobotSize(QSize size) { robotImg = robotImg.scaled(size); }
 int roboMap::QColorToInt(const QColor &color) {
   //将Color 从QColor 转换成 int
   return (int)(((unsigned int)color.blue() << 16) |
@@ -130,15 +125,15 @@ void roboMap::drawMap(QPainter *painter) {
   painter->drawImage(0, 0, m_imageMap);
 }
 void roboMap::drawRoboPos(QPainter *painter) {
-    painter->setPen(QPen(QColor(255, 0, 0, 255), 1, Qt::SolidLine, Qt::RoundCap,
-                           Qt::RoundJoin));
-    painter->save();
-    painter->translate(RoboPostion.x(),RoboPostion.y());
-    painter->rotate(algo::rad2deg(-m_roboYaw));
-    painter->drawPoint(QPoint(0,0));
-    painter->drawPixmap(QPoint(-robotImg.width()/2,-robotImg.height()/2),robotImg);
-    painter->restore();
-
+  painter->setPen(QPen(QColor(255, 0, 0, 255), 1, Qt::SolidLine, Qt::RoundCap,
+                       Qt::RoundJoin));
+  painter->save();
+  painter->translate(RoboPostion.x(), RoboPostion.y());
+  painter->rotate(algo::rad2deg(-m_roboYaw));
+  painter->drawPoint(QPoint(0, 0));
+  painter->drawPixmap(QPoint(-robotImg.width() / 2, -robotImg.height() / 2),
+                      robotImg);
+  painter->restore();
 }
 void roboMap::drawLaserScan(QPainter *painter) {
   //绘制laser
@@ -214,9 +209,9 @@ void roboMap::slot_setMoveCamera() {
 }
 void roboMap::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
-      if(currCursor!=moveCursor){
-        m_pressedPoint = event->pos();
-      }
+    if (currCursor != moveCursor) {
+      m_pressedPoint = event->pos();
+    }
     m_startPos = event->pos();  //鼠标左击时，获取当前鼠标在图片中的坐标，
     m_isPress = true;  //标记鼠标左键被按下
   } else if (event->button() == Qt::RightButton) {
@@ -273,4 +268,4 @@ void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   }
 }
 
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app

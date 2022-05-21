@@ -14,13 +14,9 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "RobotAlgorithm.h"
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
-enum eRobotColor{
-    blue,
-    red,
-    yellow
-};
+enum eRobotColor { blue, red, yellow };
 
 class roboMap : public QObject, public QGraphicsItem {
   Q_OBJECT
@@ -93,5 +89,5 @@ class roboMap : public QObject, public QGraphicsItem {
   qreal m_scaleValue = 1;
   qreal m_scaleDafault = 1;
 };
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app
 #endif  // ROBOMAP_H

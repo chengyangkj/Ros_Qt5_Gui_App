@@ -14,7 +14,7 @@
 #include <QDesktopWidget>
 #include <QtGui>
 
-#include "../include/cyrobot_monitor/loginwidget.h"
+#include "../include/ros_qt5_gui_app/loginwidget.h"
 
 /*****************************************************************************
 ** Main

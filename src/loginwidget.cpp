@@ -8,7 +8,7 @@
  <作者>    <日期>        <版本>        <内容>
 
 *******************************************************************/
-#include "../include/cyrobot_monitor/loginwidget.h"
+#include "../include/ros_qt5_gui_app/loginwidget.h"
 
 #include <QCompleter>
 #include <QDebug>
@@ -20,7 +20,7 @@
 #include <QPropertyAnimation>
 #include <QStringListModel>
 
-#include "../include/cyrobot_monitor/main_window.hpp"
+#include "../include/ros_qt5_gui_app/main_window.hpp"
 #include "ui_loginwidget.h"
 LoginWidget::LoginWidget(QWidget* parent)
     : CustomMoveWidget(parent), ui(new Ui::LoginWidget) {
@@ -104,11 +104,12 @@ void LoginWidget::slot_autoLoad() {
   }
 }
 void LoginWidget::slot_writeSettings() {
-  QSettings main_setting("cyrobot_monitor", "settings");
+  QSettings main_setting("ros_qt5_gui_app", "settings");
   main_setting.setValue("topic/topic_odom", ui->lineEdit_odm->text());
   main_setting.setValue("topic/topic_power", ui->lineEdit_power->text());
   main_setting.setValue("topic/topic_goal", ui->lineEdit_goal_topic->text());
-  main_setting.setValue("topic/topic_init_pose", ui->lineEdit_start_postopic->text());
+  main_setting.setValue("topic/topic_init_pose",
+                        ui->lineEdit_start_postopic->text());
   main_setting.setValue("main/turn_thre", ui->lineEdit_turnLightThre->text());
   main_setting.setValue("main/show_mode", ui->radioButton_robot->isChecked()
                                               ? "robot"
@@ -133,7 +134,7 @@ void LoginWidget::slot_writeSettings() {
   main_setting.setValue("video/names", name_data);
   main_setting.setValue("video/topics", topic_data);
 
-  QSettings settings("cyrobot_monitor", "Displays");
+  QSettings settings("ros_qt5_gui_app", "Displays");
   settings.setValue("Grid/enable", Grid_Check->isChecked());
   settings.setValue("GlobalOption/FixedFrame", fixed_box->currentText());
   settings.setValue("Grid/count", Cell_Count_Box->text());
@@ -168,7 +169,7 @@ void LoginWidget::changeEvent(QEvent* e) {
   }
 }
 void LoginWidget::readSettings() {
-  QSettings settings("cyrobot_monitor", "Displays");
+  QSettings settings("ros_qt5_gui_app", "Displays");
   bool Grid_enable = settings.value("Grid/enable", bool(true)).toBool();
   double Grid_count = settings.value("Grid/count", double(20)).toDouble();
   QString FixedFrame =
@@ -234,7 +235,7 @@ void LoginWidget::readSettings() {
   Polygon_Topic_box->setCurrentText(Polygon_topic);
   fixed_box->setCurrentText(FixedFrame);
 
-  QSettings main_setting("cyrobot_monitor", "settings");
+  QSettings main_setting("ros_qt5_gui_app", "settings");
   QStringList names = main_setting.value("video/names").toStringList();
   QStringList topics = main_setting.value("video/topics").toStringList();
   ui->lineEdit_laserFrame->setText(
@@ -261,7 +262,8 @@ void LoginWidget::readSettings() {
   ui->lineEdit_power->setText(
       main_setting.value("topic/topic_power", "power").toString());
   ui->lineEdit_goal_topic->setText(
-      main_setting.value("topic/topic_goal", "move_base_simple/goal").toString());
+      main_setting.value("topic/topic_goal", "move_base_simple/goal")
+          .toString());
   ui->lineEdit_start_postopic->setText(
       main_setting.value("topic/topic_init_pose", "initialpose").toString());
   ui->lineEdit_turnLightThre->setText(
@@ -270,7 +272,7 @@ void LoginWidget::readSettings() {
       main_setting.value("main/framerate", 40).toInt());
   ui->spinBox_thread_num->setValue(
       main_setting.value("main/thread_num", 6).toInt());
-  QSettings connect_info("cyrobot_monitor", "connect_info");
+  QSettings connect_info("ros_qt5_gui_app", "connect_info");
   ui->lineEditMasterIp->setText(
       connect_info.value("master_url", m_qMasterIp).toString());
 
@@ -307,7 +309,7 @@ void LoginWidget::ConnectMaster() {
   if (mainWindow != NULL) {
     mainWindow->close();
   }
-  mainWindow = new cyrobot_monitor::MainWindow(argc, argv);
+  mainWindow = new ros_qt5_gui_app::MainWindow(argc, argv);
   connect(mainWindow, SIGNAL(signalDisconnect()), this,
           SLOT(slot_ShowWindow()));
   QCoreApplication::processEvents();
@@ -318,7 +320,7 @@ void LoginWidget::ConnectMaster() {
       ui->lineEditMasterIp->text(), ui->lineEditRosIp->text(),
       ui->checkBoxEnvirment->isChecked());
   if (isConnect) {
-    QSettings connect_info("cyrobot_monitor", "connect_info");
+    QSettings connect_info("ros_qt5_gui_app", "connect_info");
     connect_info.setValue("master_url", ui->lineEditMasterIp->text());
     connect_info.setValue("host_url", ui->lineEditRosIp->text());
     connect_info.setValue("use_enviorment", ui->checkBoxEnvirment->isChecked());

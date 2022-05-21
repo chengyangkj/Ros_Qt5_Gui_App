@@ -9,7 +9,7 @@
 ** Includes
 *****************************************************************************/
 
-#include "../include/cyrobot_monitor/main_window.hpp"
+#include "../include/ros_qt5_gui_app/main_window.hpp"
 
 #include <QMessageBox>
 #include <QtGui>
@@ -19,7 +19,7 @@
 ** Namespaces
 *****************************************************************************/
 
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
 using namespace Qt;
 
@@ -45,7 +45,7 @@ MainWindow::MainWindow(int argc, char **argv, QWidget *parent)
 }
 //订阅video话题
 void MainWindow::initVideos() {
-  QSettings video_topic_setting("cyrobot_monitor", "settings");
+  QSettings video_topic_setting("ros_qt5_gui_app", "settings");
   QStringList names = video_topic_setting.value("video/names").toStringList();
   QStringList topics = video_topic_setting.value("video/topics").toStringList();
   if (topics.size() == 4) {
@@ -60,7 +60,7 @@ void MainWindow::initVideos() {
           SLOT(slot_show_image(int, QImage)));
 }
 void MainWindow::display_rviz() {
-  QSettings settings("cyrobot_monitor", "Displays");
+  QSettings settings("ros_qt5_gui_app", "Displays");
   bool Grid_enable = settings.value("Grid/enable", bool(true)).toBool();
   double Grid_count = settings.value("Grid/count", double(20)).toDouble();
 
@@ -100,19 +100,18 @@ void MainWindow::display_rviz() {
           .value("Navigation/LocalPlan/topic",
                  QString("/move_base/DWAPlannerROS/local_plan"))
           .toString();
-  QTimer::singleShot(500,[=](){
-      map_rviz->Display_Grid(Grid_enable, "QGrid", Grid_count,
-                             QColor(160, 160, 160));
+  QTimer::singleShot(500, [=]() {
+    map_rviz->Display_Grid(Grid_enable, "QGrid", Grid_count,
+                           QColor(160, 160, 160));
   });
-  QTimer::singleShot(1000,[=](){
-      map_rviz->Display_Map(Map_enable, Map_topic, Map_alpha, Map_scheme);
-    });
-  QTimer::singleShot(3000,[=](){
-      map_rviz->Display_LaserScan(Laser_enable, Laser_topic);
+  QTimer::singleShot(1000, [=]() {
+    map_rviz->Display_Map(Map_enable, Map_topic, Map_alpha, Map_scheme);
   });
-//  QTimer::singleShot(2000,[=](){
-//      map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
-//  });
+  QTimer::singleShot(
+      3000, [=]() { map_rviz->Display_LaserScan(Laser_enable, Laser_topic); });
+  //  QTimer::singleShot(2000,[=](){
+  //      map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
+  //  });
 }
 void MainWindow::slot_show_image(int frame_id, QImage image) {
   switch (frame_id) {
@@ -177,7 +176,7 @@ void MainWindow::initUis() {
   ui.btn_control->setIcon(QIcon("://images/control.png"));
   ui.btn_status->setIcon(QIcon("://images/status.png"));
   ui.btn_other->setIcon(QIcon("://images/toolbar_other.png"));
-  
+
   ui.widget_rviz->hide();
   rock_widget = new JoyStick(ui.JoyStick_widget);
   rock_widget->show();
@@ -190,7 +189,7 @@ void MainWindow::initUis() {
     ui.settings_btn->hide();
     this->showFullScreen();
   } else {
-    QSettings windows_setting("cyrobot_monitor", "windows");
+    QSettings windows_setting("ros_qt5_gui_app", "windows");
     int x = windows_setting.value("WindowGeometry/x").toInt();
     int y = windows_setting.value("WindowGeometry/y").toInt();
     int width = windows_setting.value("WindowGeometry/width").toInt();
@@ -484,9 +483,7 @@ void MainWindow::slot_position_change(QString frame, double x, double y,
   //    ui.label_w->setText(QString::number(w));
 }
 //刷新返航地点
-void MainWindow::slot_set_mutil_goal_btn() {
-
-}
+void MainWindow::slot_set_mutil_goal_btn() {}
 //返航
 void MainWindow::slot_return_point() {
   // qnode.set_goal(ui.label_frame->text(),ui.label_return_x->text().toDouble(),ui.label_return_y->text().toDouble(),ui.label_return_z->text().toDouble(),ui.label_return_w->text().toDouble());
@@ -853,7 +850,7 @@ void MainWindow::on_actionAbout_triggered() {
 *****************************************************************************/
 
 void MainWindow::ReadSettings() {
-  QSettings settings("cyrobot_monitor", "settings");
+  QSettings settings("ros_qt5_gui_app", "settings");
   restoreGeometry(settings.value("geometry").toByteArray());
   restoreState(settings.value("windowState").toByteArray());
   m_masterUrl =
@@ -874,7 +871,7 @@ void MainWindow::ReadSettings() {
 }
 
 void MainWindow::WriteSettings() {
-  QSettings windows_setting("cyrobot_monitor", "windows");
+  QSettings windows_setting("ros_qt5_gui_app", "windows");
   windows_setting.clear();  //清空当前配置文件中的内容
   windows_setting.setValue("WindowGeometry/x", this->x());
   windows_setting.setValue("WindowGeometry/y", this->y());
@@ -913,4 +910,4 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   QMainWindow::closeEvent(event);
 }
 
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app

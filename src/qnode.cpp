@@ -10,7 +10,7 @@
 ** Includes
 *****************************************************************************/
 
-#include "../include/cyrobot_monitor/qnode.hpp"
+#include "../include/ros_qt5_gui_app/qnode.hpp"
 
 #include <ros/network.h>
 #include <ros/ros.h>
@@ -20,7 +20,7 @@
 #include <sstream>
 #include <string>
 
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
 /*****************************************************************************
 ** Implementation
@@ -28,7 +28,7 @@ namespace cyrobot_monitor {
 
 QNode::QNode(int argc, char** argv) : init_argc(argc), init_argv(argv) {
   //    读取topic的设置
-  QSettings topic_setting("cyrobot_monitor", "settings");
+  QSettings topic_setting("ros_qt5_gui_app", "settings");
   odom_topic = topic_setting.value("topic/topic_odom", "odom").toString();
   batteryState_topic =
       topic_setting.value("topic/topic_power", "battery_state").toString();
@@ -40,7 +40,7 @@ QNode::QNode(int argc, char** argv) : init_argc(argc), init_argv(argv) {
   pose_topic = topic_setting.value("topic/topic_amcl", "amcl_pose").toString();
   m_frameRate = topic_setting.value("main/framerate", 40).toInt();
   m_threadNum = topic_setting.value("main/thread_num", 6).toInt();
-  QSettings settings("cyrobot_monitor", "Displays");
+  QSettings settings("ros_qt5_gui_app", "Displays");
   map_topic = settings.value("Map/topic", QString("/map")).toString();
   laser_topic = settings.value("Laser/topic", QString("/scan")).toString();
   laser_frame =
@@ -65,7 +65,7 @@ QNode::~QNode() {
 }
 
 bool QNode::init() {
-  ros::init(init_argc, init_argv, "cyrobot_monitor",
+  ros::init(init_argc, init_argv, "ros_qt5_gui_app",
             ros::init_options::AnonymousName);
   if (!ros::master::check()) {
     return false;
@@ -82,7 +82,7 @@ bool QNode::init(const std::string& master_url, const std::string& host_url) {
   std::map<std::string, std::string> remappings;
   remappings["__master"] = master_url;
   remappings["__hostname"] = host_url;
-  ros::init(remappings, "cyrobot_monitor", ros::init_options::AnonymousName);
+  ros::init(remappings, "ros_qt5_gui_app", ros::init_options::AnonymousName);
   if (!ros::master::check()) {
     return false;
   }
@@ -555,4 +555,4 @@ void QNode::log(const LogLevel& level, const std::string& msg) {
   Q_EMIT loggingUpdated();  // used to readjust the scrollbar
 }
 
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app

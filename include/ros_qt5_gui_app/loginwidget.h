@@ -56,7 +56,7 @@ class LoginWidget : public CustomMoveWidget {
  private:
   Ui::LoginWidget* ui;
   bool m_bConnected;
-  cyrobot_monitor::MainWindow* mainWindow = NULL;
+  ros_qt5_gui_app::MainWindow* mainWindow = NULL;
   QString m_qRosIp;
   QString m_qMasterIp;
   QComboBox* fixed_box;

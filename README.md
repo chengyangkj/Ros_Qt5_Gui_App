@@ -71,7 +71,7 @@ catkin_make
 #### 4,运行
 ```cpp
 source  ~/catkin_ws/devel/setup.bash
-rosrun cyrobot_monitor cyrobot_monitor
+rosrun ros_qt5_gui_app ros_qt5_gui_app
 ```
 ***
 #### 5，windows编译

@@ -1,5 +1,5 @@
 /**
- * @file /include/cyrobot_monitor/qnode.hpp
+ * @file /include/ros_qt5_gui_app/qnode.hpp
  *
  * @brief Communications central!
  *
@@ -9,8 +9,8 @@
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef cyrobot_monitor_QNODE_HPP_
-#define cyrobot_monitor_QNODE_HPP_
+#ifndef ros_qt5_gui_app_QNODE_HPP_
+#define ros_qt5_gui_app_QNODE_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -57,7 +57,7 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
 ** Namespaces
 *****************************************************************************/
 
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
 /*****************************************************************************
 ** Class
@@ -176,6 +176,6 @@ class QNode : public QThread {
   void updateRobotPose();
 };
 
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app
 
-#endif /* cyrobot_monitor_QNODE_HPP_ */
+#endif /* ros_qt5_gui_app_QNODE_HPP_ */

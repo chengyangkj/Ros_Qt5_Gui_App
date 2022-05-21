@@ -1,12 +1,12 @@
 /**
- * @file /include/cyrobot_monitor/main_window.hpp
+ * @file /include/ros_qt5_gui_app/main_window.hpp
  *
- * @brief Qt based gui for cyrobot_monitor.
+ * @brief Qt based gui for ros_qt5_gui_app.
  *
  * @date November 2010
  **/
-#ifndef cyrobot_monitor_MAIN_WINDOW_H
-#define cyrobot_monitor_MAIN_WINDOW_H
+#ifndef ros_qt5_gui_app_MAIN_WINDOW_H
+#define ros_qt5_gui_app_MAIN_WINDOW_H
 
 /*****************************************************************************
 ** Includes
@@ -39,7 +39,7 @@
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
 /*****************************************************************************
 ** Interface [MainWindow]
@@ -189,6 +189,6 @@ class MainWindow : public QMainWindow {
   //    QChartView *chartView;
   DashBoard *speedDashBoard;
 };
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app
 
-#endif  // cyrobot_monitor_MAIN_WINDOW_H
+#endif  // ros_qt5_gui_app_MAIN_WINDOW_H

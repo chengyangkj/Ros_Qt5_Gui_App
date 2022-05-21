@@ -1,4 +1,5 @@
-#include "../include/cyrobot_monitor/qrviz.hpp"
+#include "../include/ros_qt5_gui_app/qrviz.hpp"
+
 #include <QTimer>
 QRviz::QRviz(QVBoxLayout* layout, QString node_name) {
   this->layout = layout;
@@ -204,31 +205,32 @@ void QRviz::Display_Navigate(bool enable, QString Global_topic,
     delete Navigate_globalplanner;
     Navigate_globalplanner = NULL;
   }
-    QTimer::singleShot(1000,[=](){
-        // local map
-        Navigate_localmap = manager_->createDisplay("rviz/Map", "Qlocalmap", enable);
-        Navigate_localmap->subProp("Topic")->setValue(Local_topic);
-        Navigate_localmap->subProp("Color Scheme")->setValue("costmap");
-    });
-    QTimer::singleShot(2000,[=](){
-        Navigate_localplanner =
-            manager_->createDisplay("rviz/Path", "QlocalPath", enable);
-        Navigate_localplanner->subProp("Topic")->setValue(Local_planner);
-        Navigate_localplanner->subProp("Color")->setValue(QColor(0, 12, 255));
-    });
-    QTimer::singleShot(3000,[=](){
-        // global map
-        Navigate_globalmap =
-            manager_->createDisplay("rviz/Map", "QGlobalmap", enable);
-        Navigate_globalmap->subProp("Topic")->setValue(Global_topic);
-        Navigate_globalmap->subProp("Color Scheme")->setValue("costmap");
-    });
-    QTimer::singleShot(4000,[=](){
-        Navigate_globalplanner =
-            manager_->createDisplay("rviz/Path", "QGlobalpath", enable);
-        Navigate_globalplanner->subProp("Topic")->setValue(Global_planner);
-        Navigate_globalplanner->subProp("Color")->setValue(QColor(255, 0, 0));
-    });
+  QTimer::singleShot(1000, [=]() {
+    // local map
+    Navigate_localmap =
+        manager_->createDisplay("rviz/Map", "Qlocalmap", enable);
+    Navigate_localmap->subProp("Topic")->setValue(Local_topic);
+    Navigate_localmap->subProp("Color Scheme")->setValue("costmap");
+  });
+  QTimer::singleShot(2000, [=]() {
+    Navigate_localplanner =
+        manager_->createDisplay("rviz/Path", "QlocalPath", enable);
+    Navigate_localplanner->subProp("Topic")->setValue(Local_planner);
+    Navigate_localplanner->subProp("Color")->setValue(QColor(0, 12, 255));
+  });
+  QTimer::singleShot(3000, [=]() {
+    // global map
+    Navigate_globalmap =
+        manager_->createDisplay("rviz/Map", "QGlobalmap", enable);
+    Navigate_globalmap->subProp("Topic")->setValue(Global_topic);
+    Navigate_globalmap->subProp("Color Scheme")->setValue("costmap");
+  });
+  QTimer::singleShot(4000, [=]() {
+    Navigate_globalplanner =
+        manager_->createDisplay("rviz/Path", "QGlobalpath", enable);
+    Navigate_globalplanner->subProp("Topic")->setValue(Global_planner);
+    Navigate_globalplanner->subProp("Color")->setValue(QColor(255, 0, 0));
+  });
   //更新画面显示
   manager_->startUpdate();
 }
