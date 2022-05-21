@@ -126,7 +126,7 @@ class MainWindow : public QMainWindow {
   void slot_pubImageMapTimeOut();
   void slot_updateCursorPos(QPointF pos);
   void slot_changeMapType(int);
-  void slot_updateRobotStatus(algo::RobotStatus);
+  void slot_updateRobotStatus(RobotStatus);
   //    void on_horizontalSlider_raw_valueChanged(int value);
  private slots:
 

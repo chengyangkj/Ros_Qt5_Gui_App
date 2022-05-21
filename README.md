@@ -61,6 +61,7 @@ sudo apt-get install qtmultimedia5-dev
 
 #### 3，编译
 
+将软件包放入ros src软件包目录下：
 ```shell
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/src

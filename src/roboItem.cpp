@@ -1,6 +1,6 @@
-#include <QDebug>
-
 #include "roboItem.h"
+
+#include <QDebug>
 
 namespace ros_qt5_gui_app {
 
@@ -53,7 +53,7 @@ void roboItem::paintMaps(QImage map) {
   m_imageMap = map;
   update();
 }
-void roboItem::paintRoboPos(algo::RobotPose pos) {
+void roboItem::paintRoboPos(RobotPose pos) {
   //  qDebug()<<"pos:"<<pos.x<<" "<<pos.y<<" "<<pos.theta;
   RoboPostion = QPointF(pos.x, pos.y);
   m_roboYaw = pos.theta;
@@ -129,7 +129,7 @@ void roboItem::drawRoboPos(QPainter *painter) {
                        Qt::RoundJoin));
   painter->save();
   painter->translate(RoboPostion.x(), RoboPostion.y());
-  painter->rotate(algo::rad2deg(-m_roboYaw));
+  painter->rotate(rad2deg(-m_roboYaw));
   painter->drawPoint(QPoint(0, 0));
   painter->drawPixmap(QPoint(-robotImg.width() / 2, -robotImg.height() / 2),
                       robotImg);
@@ -243,11 +243,11 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   //如果是选择点位模式 重置
   if (currCursor == set2DPoseCursor) {
     m_isOtherCursor = false;
-    algo::RobotPose target_pos;
+    ::RobotPose target_pos;
     target_pos.x = m_pressedPoint.x();
     target_pos.y = m_pressedPoint.y();
-    target_pos.theta = algo::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
-                                      m_pressingPoint.x(), m_pressingPoint.y());
+    target_pos.theta = ::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
+                                  m_pressingPoint.x(), m_pressingPoint.y());
     emit signalPub2DPos(target_pos);
     m_pressedPoint = QPointF(0, 0);
     m_pressingPoint = QPointF(0, 0);
@@ -255,11 +255,11 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     currCursor = moveCursor;
   } else if (currCursor == set2DGoalCursor) {
     m_isOtherCursor = false;
-    algo::RobotPose init_pos;
+    ::RobotPose init_pos;
     init_pos.x = m_pressedPoint.x();
     init_pos.y = m_pressedPoint.y();
-    init_pos.theta = algo::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
-                                    m_pressingPoint.x(), m_pressingPoint.y());
+    init_pos.theta = ::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
+                                m_pressingPoint.x(), m_pressingPoint.y());
     emit signalPub2DGoal(init_pos);
     m_pressedPoint = QPointF(0, 0);
     m_pressingPoint = QPointF(0, 0);

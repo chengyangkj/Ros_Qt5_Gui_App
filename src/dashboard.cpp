@@ -7,7 +7,7 @@
 #include <QtGui/QFontDatabase>
 
 #include "QDebug"
-DashBoard::DashBoard(QWidget* parent)
+DashBoard::DashBoard(QWidget *parent)
     : QWidget(parent),
       _gear(kGear_4),
       _rpm(0),
@@ -45,7 +45,7 @@ void DashBoard::set_oil(const int oil) {
   update();
 }
 
-void DashBoard::paintEvent(QPaintEvent* event) {
+void DashBoard::paintEvent(QPaintEvent *event) {
   this->resize(parent->size());
   QWidget::paintEvent(event);
 
@@ -65,7 +65,7 @@ void DashBoard::paintEvent(QPaintEvent* event) {
   draw_oil_meter(painter);
 }
 
-void DashBoard::draw_tachometer(QPainter& painter) {
+void DashBoard::draw_tachometer(QPainter &painter) {
   static QColor normal_color(26, 245, 245, 245);
   static QColor overrun_color(245, 64, 64, 225);
 
@@ -147,7 +147,7 @@ void DashBoard::draw_tachometer(QPainter& painter) {
   painter.restore();
 }
 
-void DashBoard::draw_speedometer(QPainter& painter) {
+void DashBoard::draw_speedometer(QPainter &painter) {
   painter.save();
 
   painter.setPen(QColor(64, 64, 245));
@@ -167,7 +167,7 @@ void DashBoard::draw_speedometer(QPainter& painter) {
   painter.restore();
 }
 
-void DashBoard::draw_gear(QPainter& painter) {
+void DashBoard::draw_gear(QPainter &painter) {
   static QRect gear_rect(0, 0, 80, 80);
   static QRect suffix_rect(48, 48, 32, 32);
   static QFont suffix_font("DejaVu Sans", 16, 63, true);
@@ -220,7 +220,7 @@ void DashBoard::draw_gear(QPainter& painter) {
   painter.restore();
 }
 
-void DashBoard::draw_thermometer(QPainter& painter) {
+void DashBoard::draw_thermometer(QPainter &painter) {
   painter.save();
 
   painter.drawImage(QRect(115, -60, 8, 16),
@@ -301,7 +301,7 @@ void DashBoard::draw_thermometer(QPainter& painter) {
   painter.restore();
 }
 
-void DashBoard::draw_oil_meter(QPainter& painter) {
+void DashBoard::draw_oil_meter(QPainter &painter) {
   painter.save();
 
   painter.drawImage(QRect(-130, -60, 16, 16),

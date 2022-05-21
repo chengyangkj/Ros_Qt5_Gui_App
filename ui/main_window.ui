@@ -17,7 +17,7 @@
    <string>ROS人机交互软件</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../resources/images.qrc">
     <normaloff>:/images/robot.png</normaloff>:/images/robot.png</iconset>
   </property>
   <property name="styleSheet">
@@ -77,7 +77,7 @@ background-color: transparent;
 </string>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="page_6">
            <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -602,6 +602,19 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="page">
+           <layout class="QVBoxLayout" name="verticalLayout_15">
+            <item>
+             <widget class="QTreeWidget" name="treeWidget">
+              <column>
+               <property name="text">
+                <string notr="true">1</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
         <item>
@@ -665,7 +678,7 @@ QPushButton:pressed{border-image: url(://images/down_right_2.png);}</string>
                   <string/>
                  </property>
                  <property name="pixmap">
-                  <pixmap>:/images/robot2.png</pixmap>
+                  <pixmap resource="../resources/images.qrc">:/images/robot2.png</pixmap>
                  </property>
                 </widget>
                </item>
@@ -743,7 +756,7 @@ margin:0px 0px 0px 0px;
                   <string/>
                  </property>
                  <property name="pixmap">
-                  <pixmap>:/images/power.png</pixmap>
+                  <pixmap resource="../resources/images.qrc">:/images/power.png</pixmap>
                  </property>
                 </widget>
                </item>
@@ -795,7 +808,7 @@ QProgressBar::chunk
                   <string/>
                  </property>
                  <property name="pixmap">
-                  <pixmap>:/images/power-v.png</pixmap>
+                  <pixmap resource="../resources/images.qrc">:/images/power-v.png</pixmap>
                  </property>
                 </widget>
                </item>
@@ -1099,7 +1112,7 @@ margin:0px 0px 0px 0px;
                      <string>设置导航初始点</string>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/images.qrc">
                       <normaloff>:/images/classes/SetInitialPose.png</normaloff>:/images/classes/SetInitialPose.png</iconset>
                     </property>
                    </widget>
@@ -1135,37 +1148,8 @@ margin:0px 0px 0px 0px;
                      <string>设置单点导航</string>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/images.qrc">
                       <normaloff>:/images/classes/SetGoal.png</normaloff>:/images/classes/SetGoal.png</iconset>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="set_mutil_goal_btn">
-                    <property name="styleSheet">
-                     <string notr="true">QPushButton:hover{
-background-color:rgb(186, 189, 182);
-border-bottom:2px solid rgb(67, 154, 246);
-}
-QPushButton:checked{
-background-color:cyan;
-border-bottom:2px solid white 
-}
-QPushButton:pressed{
-background-color:rgb(67, 154, 246)
-}
-QPushButton{
-background-color:rgb(238, 238, 236);
-border:none; 
-padding:0px 0px 0px 0px;
-margin:0px 0px 0px 0px;
-}</string>
-                    </property>
-                    <property name="text">
-                     <string>设置多点导航</string>
-                    </property>
-                    <property name="icon">
-                     <iconset theme="://images/mutil_pose.png"/>
                     </property>
                    </widget>
                   </item>
@@ -1200,8 +1184,38 @@ margin:0px 0px 0px 0px;
                      <string>返回休息点</string>
                     </property>
                     <property name="icon">
-                     <iconset>
+                     <iconset resource="../resources/images.qrc">
                       <normaloff>:/images/return.png</normaloff>:/images/return.png</iconset>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="set_mutil_goal_btn">
+                    <property name="styleSheet">
+                     <string notr="true">QPushButton:hover{
+background-color:rgb(186, 189, 182);
+border-bottom:2px solid rgb(67, 154, 246);
+}
+QPushButton:checked{
+background-color:cyan;
+border-bottom:2px solid white 
+}
+QPushButton:pressed{
+background-color:rgb(67, 154, 246)
+}
+QPushButton{
+background-color:rgb(238, 238, 236);
+border:none; 
+padding:0px 0px 0px 0px;
+margin:0px 0px 0px 0px;
+}</string>
+                    </property>
+                    <property name="text">
+                     <string>Map edit</string>
+                    </property>
+                    <property name="icon">
+                     <iconset theme="://images/mutil_pose.png">
+                      <normaloff>.</normaloff>.</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1512,7 +1526,7 @@ background-color: rgb(255,255,255);
                          <string>刷新</string>
                         </property>
                         <property name="icon">
-                         <iconset>
+                         <iconset resource="../resources/images.qrc">
                           <normaloff>:/images/refreash.png</normaloff>:/images/refreash.png</iconset>
                         </property>
                        </widget>
@@ -1917,7 +1931,9 @@ margin:0px 0px 0px 0px;
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/images.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>action_Quit</sender>

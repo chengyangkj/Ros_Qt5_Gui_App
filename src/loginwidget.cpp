@@ -22,7 +22,7 @@
 
 #include "main_window.hpp"
 #include "ui_loginwidget.h"
-LoginWidget::LoginWidget(QWidget* parent)
+LoginWidget::LoginWidget(QWidget *parent)
     : CustomMoveWidget(parent), ui(new Ui::LoginWidget) {
   ui->setupUi(this);
   ui->btnWinClose->setIcon(QIcon("://images/close.png"));
@@ -35,7 +35,7 @@ LoginWidget::LoginWidget(QWidget* parent)
   this->setWindowFlags(Qt::FramelessWindowHint);  //去掉标题栏
   InitWidget();
   readSettings();
-  QMovie* movie = new QMovie("://background/background.gif");
+  QMovie *movie = new QMovie("://background/background.gif");
   ui->label_video->setMovie(movie);
   movie->start();
   // ip
@@ -158,7 +158,7 @@ void LoginWidget::slot_writeSettings() {
   settings.setValue("LocalPlan/topic", Local_Planner_Topic_box->currentText());
   settings.setValue("LocalPlan/color", Local_Planner_Color_box->currentText());
 }
-void LoginWidget::changeEvent(QEvent* e) {
+void LoginWidget::changeEvent(QEvent *e) {
   QWidget::changeEvent(e);
   switch (e->type()) {
     case QEvent::LanguageChange:
@@ -305,7 +305,7 @@ void LoginWidget::on_btnLogin_clicked() {
 }
 void LoginWidget::ConnectMaster() {
   int argc;
-  char** argv;
+  char **argv;
   if (mainWindow != NULL) {
     mainWindow->close();
   }
@@ -377,14 +377,14 @@ void LoginWidget::InitWidget() {
   // ui->treeWidget->setHeaderHidden(true);
 
   // GLobal Options
-  QTreeWidgetItem* Global =
+  QTreeWidgetItem *Global =
       new QTreeWidgetItem(QStringList() << "Global Options");
   Global->setIcon(0, QIcon("://images/options.png"));
 
   ui->treeWidget->addTopLevelItem(Global);
   Global->setExpanded(true);
   // FixFrame
-  QTreeWidgetItem* Fixed_frame =
+  QTreeWidgetItem *Fixed_frame =
       new QTreeWidgetItem(QStringList() << "Fixed Frame");
   fixed_box = new QComboBox();
   fixed_box->addItem("map");
@@ -395,7 +395,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(Fixed_frame, 1, fixed_box);
 
   // Grid
-  QTreeWidgetItem* Grid = new QTreeWidgetItem(QStringList() << "Grid");
+  QTreeWidgetItem *Grid = new QTreeWidgetItem(QStringList() << "Grid");
   //设置图标
   Grid->setIcon(0, QIcon("://images/classes/Grid.png"));
   // checkbox
@@ -408,7 +408,7 @@ void LoginWidget::InitWidget() {
   Grid->setExpanded(true);
 
   //添加Cell Count子节点
-  QTreeWidgetItem* Cell_Count =
+  QTreeWidgetItem *Cell_Count =
       new QTreeWidgetItem(QStringList() << "Plane Cell Count");
   Grid->addChild(Cell_Count);
   // CellCount添加SpinBox
@@ -419,7 +419,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(Cell_Count, 1, Cell_Count_Box);
 
   //添加color子节点
-  QTreeWidgetItem* Grid_Color = new QTreeWidgetItem(QStringList() << "Color");
+  QTreeWidgetItem *Grid_Color = new QTreeWidgetItem(QStringList() << "Color");
   Grid->addChild(Grid_Color);
   // Color添加ComboBox
   Grid_Color_Box = new QComboBox();
@@ -431,7 +431,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(Grid_Color, 1, Grid_Color_Box);
 
   // TF ui
-  QTreeWidgetItem* TF = new QTreeWidgetItem(QStringList() << "TF");
+  QTreeWidgetItem *TF = new QTreeWidgetItem(QStringList() << "TF");
   //设置图标
   TF->setIcon(0, QIcon("://images/classes/TF.png"));
   // checkbox
@@ -442,7 +442,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(TF, 1, TF_Check);
 
   // LaserScan
-  QTreeWidgetItem* LaserScan =
+  QTreeWidgetItem *LaserScan =
       new QTreeWidgetItem(QStringList() << "LaserScan");
   //设置图标
   LaserScan->setIcon(0, QIcon("://images/classes/LaserScan.png"));
@@ -453,7 +453,7 @@ void LoginWidget::InitWidget() {
   //向TF添加checkbox
   ui->treeWidget->setItemWidget(LaserScan, 1, Laser_Check);
   // laser topic
-  QTreeWidgetItem* LaserTopic = new QTreeWidgetItem(QStringList() << "Topic");
+  QTreeWidgetItem *LaserTopic = new QTreeWidgetItem(QStringList() << "Topic");
   Laser_Topic_box = new QComboBox();
   Laser_Topic_box->addItem("/scan");
   Laser_Topic_box->setEditable(true);
@@ -462,7 +462,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(LaserTopic, 1, Laser_Topic_box);
   // polygon
   // checkbox
-  QTreeWidgetItem* Polygon = new QTreeWidgetItem(QStringList() << "Polygon");
+  QTreeWidgetItem *Polygon = new QTreeWidgetItem(QStringList() << "Polygon");
   //设置图标
   Polygon->setIcon(0, QIcon("://images/classes/Polygon.png"));
   Polygon_Check = new QCheckBox();
@@ -471,7 +471,7 @@ void LoginWidget::InitWidget() {
   //向TF添加checkbox
   ui->treeWidget->setItemWidget(Polygon, 1, Polygon_Check);
   // laser topic
-  QTreeWidgetItem* PolygonTopic = new QTreeWidgetItem(QStringList() << "Topic");
+  QTreeWidgetItem *PolygonTopic = new QTreeWidgetItem(QStringList() << "Topic");
   Polygon_Topic_box = new QComboBox();
   Polygon_Topic_box->addItem("/move_base/local_costmap/footprint");
   Polygon_Topic_box->setEditable(true);
@@ -480,7 +480,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(PolygonTopic, 1, Polygon_Topic_box);
 
   // RobotModel
-  QTreeWidgetItem* RobotModel =
+  QTreeWidgetItem *RobotModel =
       new QTreeWidgetItem(QStringList() << "RobotModel");
   //设置图标
   RobotModel->setIcon(0, QIcon("://images/classes/RobotModel.png"));
@@ -492,7 +492,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(RobotModel, 1, RobotModel_Check);
 
   // Map
-  QTreeWidgetItem* Map = new QTreeWidgetItem(QStringList() << "Map");
+  QTreeWidgetItem *Map = new QTreeWidgetItem(QStringList() << "Map");
   //设置图标
   Map->setIcon(0, QIcon("://images/classes/Map.png"));
   // checkbox
@@ -502,7 +502,7 @@ void LoginWidget::InitWidget() {
   //向Map添加checkbox
   ui->treeWidget->setItemWidget(Map, 1, Map_Check);
   // Map topic
-  QTreeWidgetItem* MapTopic = new QTreeWidgetItem(QStringList() << "Topic");
+  QTreeWidgetItem *MapTopic = new QTreeWidgetItem(QStringList() << "Topic");
   Map_Topic_box = new QComboBox();
   Map_Topic_box->addItem("/map");
   Map_Topic_box->setEditable(true);
@@ -510,7 +510,7 @@ void LoginWidget::InitWidget() {
   Map->addChild(MapTopic);
   ui->treeWidget->setItemWidget(MapTopic, 1, Map_Topic_box);
   // Map color scheme
-  QTreeWidgetItem* MapColorScheme =
+  QTreeWidgetItem *MapColorScheme =
       new QTreeWidgetItem(QStringList() << "Color Scheme");
   Map_Color_Scheme_box = new QComboBox();
   Map_Color_Scheme_box->addItem("map");
@@ -521,7 +521,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(MapColorScheme, 1, Map_Color_Scheme_box);
 
   // Path
-  QTreeWidgetItem* Path = new QTreeWidgetItem(QStringList() << "Path");
+  QTreeWidgetItem *Path = new QTreeWidgetItem(QStringList() << "Path");
   //设置图标
   Path->setIcon(0, QIcon("://images/classes/Path.png"));
   // checkbox
@@ -531,7 +531,7 @@ void LoginWidget::InitWidget() {
   //向Path添加checkbox
   ui->treeWidget->setItemWidget(Path, 1, Path_Check);
   // Path topic
-  QTreeWidgetItem* PathTopic = new QTreeWidgetItem(QStringList() << "Topic");
+  QTreeWidgetItem *PathTopic = new QTreeWidgetItem(QStringList() << "Topic");
   Path_Topic_box = new QComboBox();
   Path_Topic_box->addItem("/move_base/DWAPlannerROS/local_plan");
   Path_Topic_box->setEditable(true);
@@ -539,7 +539,7 @@ void LoginWidget::InitWidget() {
   Path->addChild(PathTopic);
   ui->treeWidget->setItemWidget(PathTopic, 1, Path_Topic_box);
   // Path color scheme
-  QTreeWidgetItem* PathColorScheme =
+  QTreeWidgetItem *PathColorScheme =
       new QTreeWidgetItem(QStringList() << "Color");
   Path_Color_box = new QComboBox();
   Path_Color_box->addItem("0;12;255");
@@ -550,7 +550,7 @@ void LoginWidget::InitWidget() {
 
   //机器人Navigate 相关UI********************************
   // Golabal Map***************************************
-  QTreeWidgetItem* GlobalMap =
+  QTreeWidgetItem *GlobalMap =
       new QTreeWidgetItem(QStringList() << "Global Map");
   GlobalMap->setIcon(0, QIcon("://images/default_package_icon.png"));
   GlobalMap_Check = new QCheckBox();
@@ -558,14 +558,14 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(GlobalMap, 1, GlobalMap_Check);
 
   // Global CostMap
-  QTreeWidgetItem* Global_CostMap =
+  QTreeWidgetItem *Global_CostMap =
       new QTreeWidgetItem(QStringList() << "Costmap");
   //设置图标
   Global_CostMap->setIcon(0, QIcon("://images/classes/Map.png"));
   // Global Map添加子节点
   GlobalMap->addChild(Global_CostMap);
   // Map topic
-  QTreeWidgetItem* Global_CostMap_Topic =
+  QTreeWidgetItem *Global_CostMap_Topic =
       new QTreeWidgetItem(QStringList() << "Topic");
   Global_CostMap_Topic_box = new QComboBox();
   Global_CostMap_Topic_box->addItem("/move_base/global_costmap/costmap");
@@ -575,7 +575,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(Global_CostMap_Topic, 1,
                                 Global_CostMap_Topic_box);
   // Map color scheme
-  QTreeWidgetItem* GlobalMapColorScheme =
+  QTreeWidgetItem *GlobalMapColorScheme =
       new QTreeWidgetItem(QStringList() << "Color Scheme");
   GlobalMapColorScheme_box = new QComboBox();
   GlobalMapColorScheme_box->addItem("costmap");
@@ -587,7 +587,7 @@ void LoginWidget::InitWidget() {
                                 GlobalMapColorScheme_box);
 
   // Global Planner
-  QTreeWidgetItem* Global_Planner =
+  QTreeWidgetItem *Global_Planner =
       new QTreeWidgetItem(QStringList() << "Planner");
   //设置图标
   Global_Planner->setIcon(0, QIcon("://images/classes/Path.png"));
@@ -595,7 +595,7 @@ void LoginWidget::InitWidget() {
   GlobalMap->addChild(Global_Planner);
 
   // Path topic
-  QTreeWidgetItem* Global_Planner_Topic =
+  QTreeWidgetItem *Global_Planner_Topic =
       new QTreeWidgetItem(QStringList() << "Topic");
   Global_Planner_Topic_box = new QComboBox();
   Global_Planner_Topic_box->addItem("/move_base/DWAPlannerROS/global_plan");
@@ -605,7 +605,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(Global_Planner_Topic, 1,
                                 Global_Planner_Topic_box);
   // Path color scheme
-  QTreeWidgetItem* Global_Planner_Color_Scheme =
+  QTreeWidgetItem *Global_Planner_Color_Scheme =
       new QTreeWidgetItem(QStringList() << "Color");
   Global_Planner_Color_box = new QComboBox();
   Global_Planner_Color_box->addItem("255;0;0");
@@ -616,21 +616,21 @@ void LoginWidget::InitWidget() {
                                 Global_Planner_Color_box);
 
   // Local Map***********************************************
-  QTreeWidgetItem* LocalMap = new QTreeWidgetItem(QStringList() << "Local Map");
+  QTreeWidgetItem *LocalMap = new QTreeWidgetItem(QStringList() << "Local Map");
   LocalMap->setIcon(0, QIcon("://images/default_package_icon.png"));
   LocalMap_Check = new QCheckBox();
   ui->treeWidget->addTopLevelItem(LocalMap);
   ui->treeWidget->setItemWidget(LocalMap, 1, LocalMap_Check);
 
   // Local CostMap
-  QTreeWidgetItem* Local_CostMap =
+  QTreeWidgetItem *Local_CostMap =
       new QTreeWidgetItem(QStringList() << "Costmap");
   //设置图标
   Local_CostMap->setIcon(0, QIcon("://images/classes/Map.png"));
   // Local Map添加子节点
   LocalMap->addChild(Local_CostMap);
   // Map topic
-  QTreeWidgetItem* Local_CostMap_Topic =
+  QTreeWidgetItem *Local_CostMap_Topic =
       new QTreeWidgetItem(QStringList() << "Topic");
   Local_CostMap_Topic_box = new QComboBox();
   Local_CostMap_Topic_box->addItem("/move_base/local_costmap/costmap");
@@ -640,7 +640,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(Local_CostMap_Topic, 1,
                                 Local_CostMap_Topic_box);
   // Map color scheme
-  QTreeWidgetItem* LocalMapColorScheme =
+  QTreeWidgetItem *LocalMapColorScheme =
       new QTreeWidgetItem(QStringList() << "Color Scheme");
   LocalMapColorScheme_box = new QComboBox();
   LocalMapColorScheme_box->addItem("costmap");
@@ -652,7 +652,7 @@ void LoginWidget::InitWidget() {
                                 LocalMapColorScheme_box);
 
   // Local Planner
-  QTreeWidgetItem* Local_Planner =
+  QTreeWidgetItem *Local_Planner =
       new QTreeWidgetItem(QStringList() << "Planner");
   //设置图标
   Local_Planner->setIcon(0, QIcon("://images/classes/Path.png"));
@@ -660,7 +660,7 @@ void LoginWidget::InitWidget() {
   LocalMap->addChild(Local_Planner);
 
   // Path topic
-  QTreeWidgetItem* Local_Planner_Topic =
+  QTreeWidgetItem *Local_Planner_Topic =
       new QTreeWidgetItem(QStringList() << "Topic");
   Local_Planner_Topic_box = new QComboBox();
   Local_Planner_Topic_box->addItem("/move_base/DWAPlannerROS/local_plan");
@@ -670,7 +670,7 @@ void LoginWidget::InitWidget() {
   ui->treeWidget->setItemWidget(Local_Planner_Topic, 1,
                                 Local_Planner_Topic_box);
   // Path color scheme
-  QTreeWidgetItem* Local_Planner_Color_Scheme =
+  QTreeWidgetItem *Local_Planner_Color_Scheme =
       new QTreeWidgetItem(QStringList() << "Color");
   Local_Planner_Color_box = new QComboBox();
   Local_Planner_Color_box->addItem("0;12;255");
@@ -688,7 +688,7 @@ void LoginWidget::InitWidget() {
           SLOT(on_btnLogin_clicked()));
 }
 
-void LoginWidget::paintEvent(QPaintEvent*) {
+void LoginWidget::paintEvent(QPaintEvent *) {
   QPainter painter;
   painter.fillRect(this->rect(), Qt::transparent);
 }

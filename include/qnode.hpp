@@ -91,8 +91,8 @@ class QNode : public QThread {
   void log(const LogLevel &level, const std::string &msg);
 
  public slots:
-  void slot_pub2DPos(algo::RobotPose pose);
-  void slot_pub2DGoal(algo::RobotPose pose);
+  void slot_pub2DPos(::RobotPose pose);
+  void slot_pub2DGoal(::RobotPose pose);
  Q_SIGNALS:
   void loggingUpdated();
   void rosShutdown();
@@ -101,11 +101,11 @@ class QNode : public QThread {
   void batteryState(sensor_msgs::BatteryState);
   void Master_shutdown();
   void Show_image(int, QImage);
-  void updateRoboPose(algo::RobotPose pos);
+  void updateRoboPose(::RobotPose pos);
   void updateMap(QImage map);
   void plannerPath(QPolygonF path);
   void updateLaserScan(QPolygonF points);
-  void updateRobotStatus(algo::RobotStatus status);
+  void updateRobotStatus(::RobotStatus status);
 
  private:
   int init_argc;
