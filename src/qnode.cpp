@@ -20,7 +20,6 @@
 #include <sstream>
 #include <string>
 
-
 namespace cyrobot_monitor {
 
 /*****************************************************************************
@@ -34,7 +33,8 @@ QNode::QNode(int argc, char** argv) : init_argc(argc), init_argv(argv) {
   batteryState_topic =
       topic_setting.value("topic/topic_power", "battery_state").toString();
   initPose_topic =
-      topic_setting.value("topic/topic_init_pose", "move_base_simple/goal").toString();
+      topic_setting.value("topic/topic_init_pose", "move_base_simple/goal")
+          .toString();
   naviGoal_topic =
       topic_setting.value("topic/topic_goal", "initialpose").toString();
   pose_topic = topic_setting.value("topic/topic_amcl", "amcl_pose").toString();
@@ -51,8 +51,8 @@ QNode::QNode(int argc, char** argv) : init_argc(argc), init_argv(argv) {
   path_topic =
       settings.value("GlobalPlan/topic", "/movebase").toString().toStdString();
   qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
-  qRegisterMetaType<algo::RobotPose>("algo::RobotPose");
-  qRegisterMetaType<algo::RobotStatus>("algo::RobotStatus");
+  qRegisterMetaType<algo::RobotPose>(" algo::RobotPose");
+  qRegisterMetaType<algo::RobotStatus>(" algo::RobotStatus");
   qRegisterMetaType<QVector<int>>("QVector<int>");
 }
 
@@ -104,8 +104,8 @@ void QNode::SubAndPubTopic() {
   //地图订阅
   map_sub = n.subscribe("map", 1000, &QNode::mapCallback, this);
   //导航目标点发送话题
-  goal_pub =
-      n.advertise<geometry_msgs::PoseStamped>(naviGoal_topic.toStdString(), 1000);
+  goal_pub = n.advertise<geometry_msgs::PoseStamped>(
+      naviGoal_topic.toStdString(), 1000);
   //速度控制话题
   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
   //激光雷达点云话题订阅
@@ -114,8 +114,8 @@ void QNode::SubAndPubTopic() {
   //全局规划Path
   m_plannerPathSub =
       n.subscribe(path_topic, 1000, &QNode::plannerPathCallback, this);
-  m_initialposePub =
-      n.advertise<geometry_msgs::PoseWithCovarianceStamped>(initPose_topic.toStdString(), 10);
+  m_initialposePub = n.advertise<geometry_msgs::PoseWithCovarianceStamped>(
+      initPose_topic.toStdString(), 10);
   image_transport::ImageTransport it(n);
   m_imageMapPub = it.advertise("image/map", 10);
   m_robotPoselistener = new tf::TransformListener;
@@ -129,7 +129,7 @@ void QNode::SubAndPubTopic() {
     log(Error, ("laser and robot pose tf listener: " + QString(ex.what()))
                    .toStdString());
   }
-  movebase_client = new MoveBaseClient("move_base",true);
+  movebase_client = new MoveBaseClient("move_base", true);
   movebase_client->waitForServer(ros::Duration(1.0));
 }
 
@@ -147,7 +147,7 @@ QMap<QString, QString> QNode::get_topic_list() {
 void QNode::plannerPathCallback(nav_msgs::Path::ConstPtr path) {
   plannerPoints.clear();
   for (int i = 0; i < path->poses.size(); i++) {
-    QPointF roboPos = transMapPoint2Scene(QPointF(
+    QPointF roboPos = transWordPoint2Scene(QPointF(
         path->poses[i].pose.position.x, path->poses[i].pose.position.y));
     plannerPoints.append(roboPos);
   }
@@ -186,7 +186,7 @@ void QNode::laserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg) {
     }
     //转化为图元坐标系
     QPointF roboPos =
-        transMapPoint2Scene(QPointF(map_point.point.x, map_point.point.y));
+        transWordPoint2Scene(QPointF(map_point.point.x, map_point.point.y));
     laserPoints.append(roboPos);
   }
   emit updateLaserScan(laserPoints);
@@ -204,7 +204,7 @@ void QNode::updateRobotPose() {
     double roll, pitch, yaw;
     mat.getRPY(roll, pitch, yaw);
     //坐标转化为图元坐标系
-    QPointF roboPos = transMapPoint2Scene(QPointF(x, y));
+    QPointF roboPos = transWordPoint2Scene(QPointF(x, y));
     algo::RobotPose pos{roboPos.x(), roboPos.y(), yaw};
     emit updateRoboPose(pos);
   } catch (tf::TransformException& ex) {
@@ -243,52 +243,38 @@ void QNode::set_goal(QString frame, double x, double y, double z, double w) {
   ros::spinOnce();
 }
 //地图信息订阅回调函数
-void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr map) {
-  mapWidth = map->info.width;
-  mapHeight = map->info.height;
-  m_mapOriginX = map->info.origin.position.x;
-  m_mapOriginY = map->info.origin.position.y;
-  m_mapResolution = map->info.resolution;
-  int row, col, value;
-  cv::Mat image(map->info.height, map->info.width, CV_8UC1);
-  for (int array_index = 0; array_index < map->data.size(); array_index++) {
-    //计算当前所在行
-    row = (int)array_index / image.cols;
-    //计算当前所在列
-    col = array_index % image.cols;
-    //获取当前位置的像素值
-    int curr_data = map->data[array_index];
-    //计算值
-    if (curr_data == -1) {
-      value = 125;  // grey
-    } else if (curr_data == 100) {
-      value = 0;  // black
-    } else if (curr_data == 0) {
-      value = 255;  // white
-    } else {
-      ROS_WARN("Unsupported value in Occupancy Grid");
-      value = 125;
+void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
+  int width = msg->info.width;
+  int height = msg->info.height;
+
+  m_mapResolution = msg->info.resolution;
+  double origin_x = msg->info.origin.position.x;
+  double origin_y = msg->info.origin.position.y;
+  QImage map_image(width, height, QImage::Format_RGB32);
+  for (int i = 0; i < msg->data.size(); i++) {
+    int x = i % width;
+    int y = (int)i / width;
+    //计算像素值
+    QColor color;
+    if (msg->data[i] == 100) {
+      color = Qt::black;  // black
+    } else if (msg->data[i] == 0) {
+      color = Qt::white;  // white
+    } else if (msg->data[i] == -1) {
+      color = Qt::gray;  // gray
     }
-    image.at<uchar>(row, col) = (uchar)value;
+    map_image.setPixel(x, y, qRgb(color.red(), color.green(), color.blue()));
   }
-  //沿x轴翻转地图
-  cv::Mat rotaedMap = RotaMap(image);
-  QImage imageMap = Mat2QImage(rotaedMap);
-  emit updateMap(imageMap);
-  //计算map坐标系地图中心点坐标
-  // scene(0,0) ^
-  //           **********|************
-  //           **********|************
-  //           ----------o-map(0,0)---
-  //           **********|************
-  //           **********|************
-  // origin(x,y)^
-  //地图中心点map坐标系坐标
-  m_mapCenterPoint.setX(m_mapOriginX + m_mapResolution * mapWidth * 0.5);
-  m_mapCenterPoint.setY(m_mapOriginY + m_mapResolution * mapHeight * 0.5);
-  //地图中心点图元坐标系坐标
-  m_sceneCenterPoint.setX(mapWidth / 2.0);
-  m_sceneCenterPoint.setY(mapHeight / 2.0);
+  //延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
+  //但是图元坐标系为左上角度
+  map_image = rotateMapWithY(map_image);
+  emit updateMap(map_image);
+  //计算翻转后的图元坐标系原点的世界坐标
+  double origin_x_ = origin_x;
+  double origin_y_ = origin_y + height * m_mapResolution;
+  //世界坐标系原点在图元坐标系下的坐标
+  m_wordOrigin.setX(fabs(origin_x_) / m_mapResolution);
+  m_wordOrigin.setY(fabs(origin_y_) / m_mapResolution);
 }
 
 //速度回调函数
@@ -357,16 +343,16 @@ void QNode::Sub_Image(QString topic, int frame_id) {
   ros::spinOnce();
 }
 void QNode::slot_pub2DPos(algo::RobotPose pose) {
-  QPointF tmp = transScenePoint2Map(QPointF(pose.x, pose.y));
+  QPointF tmp = transScenePoint2Word(QPointF(pose.x, pose.y));
   pose.x = tmp.x();
   pose.y = tmp.y();
-  //qDebug() << "init pose:" << pose.x << " " << pose.y << " " << pose.theta;
+  // qDebug() << "init pose:" << pose.x << " " << pose.y << " " << pose.theta;
   geometry_msgs::PoseWithCovarianceStamped goal;
   //设置frame
   goal.header.frame_id = "map";
   //设置时刻
   goal.header.stamp = ros::Time::now();
-  goal.pose.pose.position.x=pose.x;
+  goal.pose.pose.position.x = pose.x;
   goal.pose.pose.position.y = pose.y;
   goal.pose.pose.position.z = 0;
   goal.pose.pose.orientation =
@@ -374,36 +360,33 @@ void QNode::slot_pub2DPos(algo::RobotPose pose) {
   m_initialposePub.publish(goal);
 }
 void QNode::slot_pub2DGoal(algo::RobotPose pose) {
-  QPointF tmp = transScenePoint2Map(QPointF(pose.x, pose.y));
+  QPointF tmp = transScenePoint2Word(QPointF(pose.x, pose.y));
   pose.x = tmp.x();
   pose.y = tmp.y();
-   move_base_msgs::MoveBaseGoal goal;
+  move_base_msgs::MoveBaseGoal goal;
   goal.target_pose.header.frame_id = "map";
   goal.target_pose.header.stamp = ros::Time::now();
- 
+
   goal.target_pose.pose.position.x = pose.x;
   goal.target_pose.pose.position.y = pose.y;
- goal.target_pose.pose.position.z = 0;
- goal.target_pose.pose.orientation=tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
-movebase_client->sendGoal(goal);
+  goal.target_pose.pose.position.z = 0;
+  goal.target_pose.pose.orientation =
+      tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
+  movebase_client->sendGoal(goal);
 }
-//图元坐标系转换为map坐标系
-QPointF QNode::transScenePoint2Map(QPointF pos) {
-  QPointF roboPos;
-  roboPos.setX((pos.x() - m_sceneCenterPoint.x()) * m_mapResolution +
-               m_mapCenterPoint.x());
-  roboPos.setY(-1 * (pos.y() - m_sceneCenterPoint.y()) * m_mapResolution +
-               m_mapCenterPoint.y());
-  return roboPos;
+QPointF QNode::transScenePoint2Word(QPointF pose) {
+  QPointF res;
+  res.setX((pose.x() - m_wordOrigin.x()) * m_mapResolution);
+  // y坐标系相反
+  res.setY(-1 * (pose.y() - m_wordOrigin.y()) * m_mapResolution);
+  return res;
 }
-// map坐标系转换为图元坐标系
-QPointF QNode::transMapPoint2Scene(QPointF pos) {
-  QPointF roboPos;
-  roboPos.setX((pos.x() - m_mapCenterPoint.x()) / m_mapResolution +
-               m_sceneCenterPoint.x());
-  roboPos.setY(-1 * (pos.y() - m_mapCenterPoint.y()) / m_mapResolution +
-               m_sceneCenterPoint.y());
-  return roboPos;
+QPointF QNode::transWordPoint2Scene(QPointF pose) {
+  //    qDebug()<<pose;
+  QPointF res;
+  res.setX(m_wordOrigin.x() + pose.x() / m_mapResolution);
+  res.setY(m_wordOrigin.y() - (pose.y() / m_mapResolution));
+  return res;
 }
 double QNode::getRealTheta(QPointF start, QPointF end) {
   double y = end.y() - start.y();
@@ -468,18 +451,14 @@ void QNode::imageCallback1(const sensor_msgs::CompressedImageConstPtr& msg) {
     return;
   }
 }
-//沿x轴翻转地图
-cv::Mat QNode::RotaMap(cv::Mat const& map) {
-  cv::Mat result;
-  result.create(map.size(), map.type());
-  int height = map.rows;
-  int width = map.cols;
-  for (int i = 0; i < height; i++) {
-    for (int j = 0; j < width; j++) {
-      result.at<uchar>(height - i - 1, j) = map.at<uchar>(i, j);
+QImage QNode::rotateMapWithY(QImage map) {
+  QImage res = map;
+  for (int x = 0; x < map.width(); x++) {
+    for (int y = 0; y < map.height(); y++) {
+      res.setPixelColor(x, map.height() - y - 1, map.pixel(x, y));
     }
   }
-  return result;
+  return res;
 }
 QImage QNode::Mat2QImage(cv::Mat const& src) {
   QImage dest(src.cols, src.rows, QImage::Format_ARGB32);

@@ -21,12 +21,14 @@
 #ifndef Q_MOC_RUN
 #include <ros/ros.h>
 #endif
+#include <actionlib/client/simple_action_client.h>
 #include <actionlib/server/simple_action_server.h>
 #include <cv_bridge/cv_bridge.h>  //cv_bridge
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Twist.h>
 #include <image_transport/image_transport.h>  //image_transport
+#include <move_base_msgs/MoveBaseAction.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
@@ -48,10 +50,9 @@
 #include <string>
 
 #include "robomap.h"
-#include <move_base_msgs/MoveBaseAction.h>
-#include <actionlib/client/simple_action_client.h>
- 
-typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
+
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
+    MoveBaseClient;
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
@@ -74,8 +75,8 @@ class QNode : public QThread {
   void Sub_Image(QString topic, int frame_id);
   void pub_imageMap(QImage map);
   double getRealTheta(QPointF start, QPointF end);
-  QPointF transScenePoint2Map(QPointF pos);
-  QPointF transMapPoint2Scene(QPointF pos);
+  QPointF transScenePoint2Word(QPointF pos);
+  QPointF transWordPoint2Scene(QPointF pos);
   QMap<QString, QString> get_topic_list();
   int mapWidth{0};
   int mapHeight{0};
@@ -147,10 +148,8 @@ class QNode : public QThread {
   //地图 0 0点坐标对应世界坐标系的坐标
   float m_mapOriginX;
   float m_mapOriginY;
-  //地图坐标系中心点坐标
-  QPointF m_mapCenterPoint;
-  //图元坐标系中心点坐标
-  QPointF m_sceneCenterPoint;
+  //世界坐标系原点在图元坐标系坐标
+  QPointF m_wordOrigin;
   //地图一个像素对应真实世界的距离
   float m_mapResolution;
   //地图是否被初始化
@@ -159,7 +158,7 @@ class QNode : public QThread {
   // ros::Timer m_rosTimer;
   QImage Mat2QImage(cv::Mat const &src);
   cv::Mat QImage2Mat(QImage &image);
-  cv::Mat RotaMap(cv::Mat const &map);
+  QImage rotateMapWithY(QImage map);
   tf::TransformListener *m_robotPoselistener;
   tf::TransformListener *m_Laserlistener;
   std::string base_frame, laser_frame, map_frame;

@@ -381,7 +381,7 @@ void MainWindow::slot_changeMapType(int index) {
   }
 }
 void MainWindow::slot_updateCursorPos(QPointF pos) {
-  QPointF mapPos = qnode.transScenePoint2Map(pos);
+  QPointF mapPos = qnode.transScenePoint2Word(pos);
   ui.label_pos_map->setText("x: " + QString::number(mapPos.x()).mid(0, 4) +
                             "  y: " + QString::number(mapPos.y()).mid(0, 4));
   ui.label_pos_scene->setText("x: " + QString::number(pos.x()).mid(0, 4) +
