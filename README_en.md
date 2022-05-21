@@ -130,7 +130,7 @@ catkin_make
 #### 3，run
 
 ```cpp
-rosrun cyrobot_monitor cyrobot_monitor
+rosrun ros_qt5_gui_app ros_qt5_gui_app
 ```
 ***
 ### LIENSE

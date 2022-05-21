@@ -9,7 +9,7 @@
 ** Includes
 *****************************************************************************/
 
-#include "../include/cyrobot_monitor/main_window.hpp"
+#include "main_window.hpp"
 
 #include <QMessageBox>
 #include <QtGui>
@@ -19,7 +19,7 @@
 ** Namespaces
 *****************************************************************************/
 
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
 using namespace Qt;
 
@@ -45,7 +45,7 @@ MainWindow::MainWindow(int argc, char **argv, QWidget *parent)
 }
 //订阅video话题
 void MainWindow::initVideos() {
-  QSettings video_topic_setting("cyrobot_monitor", "settings");
+  QSettings video_topic_setting("ros_qt5_gui_app", "settings");
   QStringList names = video_topic_setting.value("video/names").toStringList();
   QStringList topics = video_topic_setting.value("video/topics").toStringList();
   if (topics.size() == 4) {
@@ -60,7 +60,7 @@ void MainWindow::initVideos() {
           SLOT(slot_show_image(int, QImage)));
 }
 void MainWindow::display_rviz() {
-  QSettings settings("cyrobot_monitor", "Displays");
+  QSettings settings("ros_qt5_gui_app", "Displays");
   bool Grid_enable = settings.value("Grid/enable", bool(true)).toBool();
   double Grid_count = settings.value("Grid/count", double(20)).toDouble();
 
@@ -100,19 +100,18 @@ void MainWindow::display_rviz() {
           .value("Navigation/LocalPlan/topic",
                  QString("/move_base/DWAPlannerROS/local_plan"))
           .toString();
-  QTimer::singleShot(500,[=](){
-      map_rviz->Display_Grid(Grid_enable, "QGrid", Grid_count,
-                             QColor(160, 160, 160));
+  QTimer::singleShot(500, [=]() {
+    map_rviz->Display_Grid(Grid_enable, "QGrid", Grid_count,
+                           QColor(160, 160, 160));
   });
-  QTimer::singleShot(1000,[=](){
-      map_rviz->Display_Map(Map_enable, Map_topic, Map_alpha, Map_scheme);
-    });
-  QTimer::singleShot(3000,[=](){
-      map_rviz->Display_LaserScan(Laser_enable, Laser_topic);
+  QTimer::singleShot(1000, [=]() {
+    map_rviz->Display_Map(Map_enable, Map_topic, Map_alpha, Map_scheme);
   });
-//  QTimer::singleShot(2000,[=](){
-//      map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
-//  });
+  QTimer::singleShot(
+      3000, [=]() { map_rviz->Display_LaserScan(Laser_enable, Laser_topic); });
+  //  QTimer::singleShot(2000,[=](){
+  //      map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
+  //  });
 }
 void MainWindow::slot_show_image(int frame_id, QImage image) {
   switch (frame_id) {
@@ -146,9 +145,9 @@ void MainWindow::initUis() {
       new QGraphicsScene;  //要用QGraphicsView就必须要有QGraphicsScene搭配着用
   m_qgraphicsScene->clear();
   //创建item
-  m_roboMap = new roboMap();
+  m_roboItem = new roboItem();
   //视图添加item
-  m_qgraphicsScene->addItem(m_roboMap);
+  m_qgraphicsScene->addItem(m_roboItem);
   //设置item的坐标原点与视图的原点重合（默认为视图中心）
   // widget添加视图
   ui.mapViz->setScene(m_qgraphicsScene);
@@ -177,7 +176,7 @@ void MainWindow::initUis() {
   ui.btn_control->setIcon(QIcon("://images/control.png"));
   ui.btn_status->setIcon(QIcon("://images/status.png"));
   ui.btn_other->setIcon(QIcon("://images/toolbar_other.png"));
-  
+
   ui.widget_rviz->hide();
   rock_widget = new JoyStick(ui.JoyStick_widget);
   rock_widget->show();
@@ -190,7 +189,7 @@ void MainWindow::initUis() {
     ui.settings_btn->hide();
     this->showFullScreen();
   } else {
-    QSettings windows_setting("cyrobot_monitor", "windows");
+    QSettings windows_setting("ros_qt5_gui_app", "windows");
     int x = windows_setting.value("WindowGeometry/x").toInt();
     int y = windows_setting.value("WindowGeometry/y").toInt();
     int width = windows_setting.value("WindowGeometry/width").toInt();
@@ -249,8 +248,8 @@ void MainWindow::connections() {
   connect(&qnode, SIGNAL(speed_x(double)), this, SLOT(slot_speed_x(double)));
   connect(&qnode, SIGNAL(speed_y(double)), this, SLOT(slot_speed_yaw(double)));
   //机器人状态
-  connect(&qnode, SIGNAL(updateRobotStatus(algo::RobotStatus)), this,
-          SLOT(slot_updateRobotStatus(algo::RobotStatus)));
+  connect(&qnode, SIGNAL(updateRobotStatus(::RobotStatus)), this,
+          SLOT(slot_updateRobotStatus(::RobotStatus)));
   //电源的信号
   connect(&qnode, SIGNAL(batteryState(sensor_msgs::BatteryState)), this,
           SLOT(slot_batteryState(sensor_msgs::BatteryState)));
@@ -290,55 +289,55 @@ void MainWindow::connections() {
   connect(ui.max_btn, SIGNAL(clicked()), this, SLOT(slot_maxWindows()));
   connect(rock_widget, SIGNAL(keyNumchanged(int)), this,
           SLOT(slot_rockKeyChange(int)));
-  connect(&qnode, SIGNAL(updateMap(QImage)), m_roboMap,
+  connect(&qnode, SIGNAL(updateMap(QImage)), m_roboItem,
           SLOT(paintMaps(QImage)));
-  connect(&qnode, SIGNAL(plannerPath(QPolygonF)), m_roboMap,
+  connect(&qnode, SIGNAL(plannerPath(QPolygonF)), m_roboItem,
           SLOT(paintPlannerPath(QPolygonF)));
-  connect(&qnode, SIGNAL(updateRoboPose(algo::RobotPose)), m_roboMap,
-          SLOT(paintRoboPos(algo::RobotPose)));
-  connect(&qnode, SIGNAL(updateLaserScan(QPolygonF)), m_roboMap,
+  connect(&qnode, SIGNAL(updateRoboPose(::RobotPose)), m_roboItem,
+          SLOT(paintRoboPos(::RobotPose)));
+  connect(&qnode, SIGNAL(updateLaserScan(QPolygonF)), m_roboItem,
           SLOT(paintLaserScan(QPolygonF)));
-  connect(m_roboMap, SIGNAL(cursorPos(QPointF)), this,
+  connect(m_roboItem, SIGNAL(cursorPos(QPointF)), this,
           SLOT(slot_updateCursorPos(QPointF)));
   // map
-  connect(m_roboMap, SIGNAL(signalPub2DPos(algo::RobotPose)), &qnode,
-          SLOT(slot_pub2DPos(algo::RobotPose)));
-  connect(m_roboMap, SIGNAL(signalPub2DGoal(algo::RobotPose)), &qnode,
-          SLOT(slot_pub2DGoal(algo::RobotPose)));
-  connect(this, SIGNAL(signalSet2DPose()), m_roboMap, SLOT(slot_set2DPos()));
-  connect(this, SIGNAL(signalSet2DGoal()), m_roboMap, SLOT(slot_set2DGoal()));
-  connect(this, SIGNAL(signalSetMoveCamera()), m_roboMap,
+  connect(m_roboItem, SIGNAL(signalPub2DPos(::RobotPose)), &qnode,
+          SLOT(slot_pub2DPos(::RobotPose)));
+  connect(m_roboItem, SIGNAL(signalPub2DGoal(::RobotPose)), &qnode,
+          SLOT(slot_pub2DGoal(::RobotPose)));
+  connect(this, SIGNAL(signalSet2DPose()), m_roboItem, SLOT(slot_set2DPos()));
+  connect(this, SIGNAL(signalSet2DGoal()), m_roboItem, SLOT(slot_set2DGoal()));
+  connect(this, SIGNAL(signalSetMoveCamera()), m_roboItem,
           SLOT(slot_setMoveCamera()));
   //    connect(ui.stackedWidget_2,SIGNAL())
 }
-void MainWindow::slot_updateRobotStatus(algo::RobotStatus status) {
+void MainWindow::slot_updateRobotStatus(::RobotStatus status) {
   switch (status) {
-    case algo::RobotStatus::none: {
+    case ::RobotStatus::none: {
       QTimer::singleShot(100, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_none.png"));
-        m_roboMap->setRobotColor(eRobotColor::blue);
+        m_roboItem->setRobotColor(eRobotColor::blue);
       });
     } break;
-    case algo::RobotStatus::normal: {
+    case ::RobotStatus::normal: {
       QTimer::singleShot(200, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_normal.png"));
-        m_roboMap->setRobotColor(eRobotColor::blue);
+        m_roboItem->setRobotColor(eRobotColor::blue);
       });
     } break;
-    case algo::RobotStatus::error: {
+    case ::RobotStatus::error: {
       QTimer::singleShot(300, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_error.png"));
-        m_roboMap->setRobotColor(eRobotColor::red);
+        m_roboItem->setRobotColor(eRobotColor::red);
       });
     } break;
-    case algo::RobotStatus::warn: {
+    case ::RobotStatus::warn: {
       QTimer::singleShot(400, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_warn.png"));
-        m_roboMap->setRobotColor(eRobotColor::yellow);
+        m_roboItem->setRobotColor(eRobotColor::yellow);
       });
     } break;
   }
@@ -381,7 +380,7 @@ void MainWindow::slot_changeMapType(int index) {
   }
 }
 void MainWindow::slot_updateCursorPos(QPointF pos) {
-  QPointF mapPos = qnode.transScenePoint2Map(pos);
+  QPointF mapPos = qnode.transScenePoint2Word(pos);
   ui.label_pos_map->setText("x: " + QString::number(mapPos.x()).mid(0, 4) +
                             "  y: " + QString::number(mapPos.y()).mid(0, 4));
   ui.label_pos_scene->setText("x: " + QString::number(pos.x()).mid(0, 4) +
@@ -484,9 +483,7 @@ void MainWindow::slot_position_change(QString frame, double x, double y,
   //    ui.label_w->setText(QString::number(w));
 }
 //刷新返航地点
-void MainWindow::slot_set_mutil_goal_btn() {
-
-}
+void MainWindow::slot_set_mutil_goal_btn() {}
 //返航
 void MainWindow::slot_return_point() {
   // qnode.set_goal(ui.label_frame->text(),ui.label_return_x->text().toDouble(),ui.label_return_y->text().toDouble(),ui.label_return_z->text().toDouble(),ui.label_return_w->text().toDouble());
@@ -777,7 +774,7 @@ void MainWindow::initTopicList() {
 void MainWindow::refreashTopicList() { initTopicList(); }
 //当ros与master的连接断开时
 void MainWindow::slot_rosShutdown() {
-  slot_updateRobotStatus(algo::RobotStatus::none);
+  slot_updateRobotStatus(::RobotStatus::none);
 }
 void MainWindow::slot_batteryState(sensor_msgs::BatteryState msg) {
   ui.label_power->setText(QString::number(msg.voltage).mid(0, 5) + "V");
@@ -853,7 +850,7 @@ void MainWindow::on_actionAbout_triggered() {
 *****************************************************************************/
 
 void MainWindow::ReadSettings() {
-  QSettings settings("cyrobot_monitor", "settings");
+  QSettings settings("ros_qt5_gui_app", "settings");
   restoreGeometry(settings.value("geometry").toByteArray());
   restoreState(settings.value("windowState").toByteArray());
   m_masterUrl =
@@ -874,7 +871,7 @@ void MainWindow::ReadSettings() {
 }
 
 void MainWindow::WriteSettings() {
-  QSettings windows_setting("cyrobot_monitor", "windows");
+  QSettings windows_setting("ros_qt5_gui_app", "windows");
   windows_setting.clear();  //清空当前配置文件中的内容
   windows_setting.setValue("WindowGeometry/x", this->x());
   windows_setting.setValue("WindowGeometry/y", this->y());
@@ -913,4 +910,4 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   QMainWindow::closeEvent(event);
 }
 
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app

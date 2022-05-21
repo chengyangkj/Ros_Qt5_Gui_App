@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package>
-  <name>cyrobot_monitor</name>
+  <name>ros_qt5_gui_app</name>
   <version>0.1.0</version>
   <description>
 
-     cyrobot_monitor
+     ros_qt5_gui_app
 
   </description>
   <maintainer email="chengyangkj@gmail.com">chengyangkj</maintainer>

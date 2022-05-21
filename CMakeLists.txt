@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.0)
-project(cyrobot_monitor)
+project(ros_qt5_gui_app)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 #添加c++11的支持
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
     image_transport
     )
 
-include_directories(${catkin_INCLUDE_DIRS})
+include_directories(${catkin_INCLUDE_DIRS} include/)
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
 # exporting anything. 
@@ -60,7 +60,7 @@ find_package(Qt5 REQUIRED ${ModuleList})
 file(GLOB QT_FORMS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ui/*.ui)
 file(GLOB QT_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*.qrc)
 #file(GLOB_RECURSE QRC_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR} resources/*.qrc)
-file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/cyrobot_monitor/*.hpp *.h basewidget/*.hpp *.h)
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/*.hpp *.h basewidget/*.hpp *.h)
 
 #set(QRC_SOURCE_FILES image.qrc)
 #qt5_add_resources(QRC_FILES ${QRC_SOURCE_FILES})
@@ -81,9 +81,9 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Binaries
 ##############################################################################
 
-add_executable(cyrobot_monitor ${QRC_FILES} ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(cyrobot_monitor ${QT_LIBRARIES} ${catkin_LIBRARIES})
-install(TARGETS cyrobot_monitor RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+add_executable(ros_qt5_gui_app ${QRC_FILES} ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(ros_qt5_gui_app ${QT_LIBRARIES} ${catkin_LIBRARIES})
+install(TARGETS ros_qt5_gui_app RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 #############################################################################
 #HTML 将html文件拷贝到可执行文件同级目录

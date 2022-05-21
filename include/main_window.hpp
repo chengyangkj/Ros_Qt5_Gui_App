@@ -1,12 +1,12 @@
 /**
- * @file /include/cyrobot_monitor/main_window.hpp
+ * @file /include/ros_qt5_gui_app/main_window.hpp
  *
- * @brief Qt based gui for cyrobot_monitor.
+ * @brief Qt based gui for ros_qt5_gui_app.
  *
  * @date November 2010
  **/
-#ifndef cyrobot_monitor_MAIN_WINDOW_H
-#define cyrobot_monitor_MAIN_WINDOW_H
+#ifndef ros_qt5_gui_app_MAIN_WINDOW_H
+#define ros_qt5_gui_app_MAIN_WINDOW_H
 
 /*****************************************************************************
 ** Includes
@@ -34,12 +34,12 @@
 #include "joystick.h"
 #include "qnode.hpp"
 #include "qrviz.hpp"
-#include "robomap.h"
+#include "roboItem.h"
 #include "ui_main_window.h"
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
 /*****************************************************************************
 ** Interface [MainWindow]
@@ -127,7 +127,7 @@ class MainWindow : public QMainWindow {
   void slot_pubImageMapTimeOut();
   void slot_updateCursorPos(QPointF pos);
   void slot_changeMapType(int);
-  void slot_updateRobotStatus(algo::RobotStatus);
+  void slot_updateRobotStatus(::RobotStatus);
   //    void on_horizontalSlider_raw_valueChanged(int value);
  private slots:
 
@@ -170,7 +170,7 @@ class MainWindow : public QMainWindow {
   double m_turnLightThre = 0.1;
   JoyStick *rock_widget;
   QGraphicsScene *m_qgraphicsScene = NULL;
-  roboMap *m_roboMap = NULL;
+  roboItem *m_roboItem = NULL;
   QRviz *map_rviz = NULL;
   QVariantList m_sendVelList, m_recvVelList, m_timeList;
   //曲线
@@ -189,6 +189,6 @@ class MainWindow : public QMainWindow {
   //    QChartView *chartView;
   DashBoard *speedDashBoard;
 };
-}  // namespace cyrobot_monitor
+}  // namespace ros_qt5_gui_app
 
-#endif  // cyrobot_monitor_MAIN_WINDOW_H
+#endif  // ros_qt5_gui_app_MAIN_WINDOW_H

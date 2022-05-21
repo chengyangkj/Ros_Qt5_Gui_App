@@ -1,5 +1,5 @@
-#ifndef ROBOMAP_H
-#define ROBOMAP_H
+#ifndef roboItem_H
+#define roboItem_H
 
 #include <QColor>
 #include <QCursor>
@@ -14,19 +14,15 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "RobotAlgorithm.h"
-namespace cyrobot_monitor {
+namespace ros_qt5_gui_app {
 
-enum eRobotColor{
-    blue,
-    red,
-    yellow
-};
+enum eRobotColor { blue, red, yellow };
 
-class roboMap : public QObject, public QGraphicsItem {
+class roboItem : public QObject, public QGraphicsItem {
   Q_OBJECT
 
  public:
-  roboMap();
+  roboItem();
   QRectF boundingRect() const;
   void wheelEvent(QGraphicsSceneWheelEvent *event);
   void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -63,11 +59,11 @@ class roboMap : public QObject, public QGraphicsItem {
   QCursor *currCursor = NULL;
  signals:
   void cursorPos(QPointF);
-  void signalPub2DPos(algo::RobotPose pose);
-  void signalPub2DGoal(algo::RobotPose pose);
+  void signalPub2DPos(::RobotPose pose);
+  void signalPub2DGoal(::RobotPose pose);
  public slots:
   void paintMaps(QImage map);
-  void paintRoboPos(algo::RobotPose pos);
+  void paintRoboPos(::RobotPose pos);
   void paintImage(int, QImage);
   void paintPlannerPath(QPolygonF);
   void paintLaserScan(QPolygonF);
@@ -93,5 +89,5 @@ class roboMap : public QObject, public QGraphicsItem {
   qreal m_scaleValue = 1;
   qreal m_scaleDafault = 1;
 };
-}  // namespace cyrobot_monitor
-#endif  // ROBOMAP_H
+}  // namespace ros_qt5_gui_app
+#endif  // roboItem_H

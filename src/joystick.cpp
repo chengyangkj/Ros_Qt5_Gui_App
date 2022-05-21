@@ -1,4 +1,4 @@
-#include "../include/cyrobot_monitor/joystick.h"
+#include "joystick.h"
 
 #include <QDebug>
 JoyStick::JoyStick(QWidget* parent) : QWidget(parent) {

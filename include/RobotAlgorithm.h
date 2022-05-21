@@ -2,8 +2,6 @@
 #ifndef ROBOTALGORITHM_H
 #define ROBOTALGORITHM_H
 #include <QSizeF>
-namespace algo {
-
 //#define M_PI 3.1415
 enum RobotStatus{
     none,
@@ -50,8 +48,6 @@ inline double getAngle(float x1, float y1, float x2, float y2)
     return (angle_temp);
 }
 
-
-}
 
 
 #endif // ALGORITHM_H
