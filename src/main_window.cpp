@@ -236,8 +236,8 @@ void MainWindow::connections() {
   connect(&qnode, SIGNAL(speed_x(double)), this, SLOT(slot_speed_x(double)));
   connect(&qnode, SIGNAL(speed_y(double)), this, SLOT(slot_speed_yaw(double)));
   //机器人状态
-  connect(&qnode, SIGNAL(updateRobotStatus(::RobotStatus)), this,
-          SLOT(slot_updateRobotStatus(::RobotStatus)));
+  connect(&qnode, SIGNAL(updateRobotStatus(RobotStatus)), this,
+          SLOT(slot_updateRobotStatus(RobotStatus)));
   //电源的信号
   connect(&qnode, SIGNAL(batteryState(sensor_msgs::BatteryState)), this,
           SLOT(slot_batteryState(sensor_msgs::BatteryState)));
@@ -298,30 +298,30 @@ void MainWindow::connections() {
           SLOT(slot_setMoveCamera()));
   //    connect(ui.stackedWidget_2,SIGNAL())
 }
-void MainWindow::slot_updateRobotStatus(::RobotStatus status) {
+void MainWindow::slot_updateRobotStatus(RobotStatus status) {
   switch (status) {
-    case ::RobotStatus::none: {
+    case RobotStatus::none: {
       QTimer::singleShot(100, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_none.png"));
         m_roboItem->setRobotColor(eRobotColor::blue);
       });
     } break;
-    case ::RobotStatus::normal: {
+    case RobotStatus::normal: {
       QTimer::singleShot(200, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_normal.png"));
         m_roboItem->setRobotColor(eRobotColor::blue);
       });
     } break;
-    case ::RobotStatus::error: {
+    case RobotStatus::error: {
       QTimer::singleShot(300, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_error.png"));
         m_roboItem->setRobotColor(eRobotColor::red);
       });
     } break;
-    case ::RobotStatus::warn: {
+    case RobotStatus::warn: {
       QTimer::singleShot(400, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_warn.png"));
@@ -732,7 +732,7 @@ void MainWindow::initTopicList() {
 void MainWindow::refreashTopicList() { initTopicList(); }
 //当ros与master的连接断开时
 void MainWindow::slot_rosShutdown() {
-  slot_updateRobotStatus(::RobotStatus::none);
+  slot_updateRobotStatus(RobotStatus::none);
 }
 void MainWindow::slot_batteryState(sensor_msgs::BatteryState msg) {
   ui.label_power->setText(QString::number(msg.voltage).mid(0, 5) + "V");

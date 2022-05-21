@@ -51,8 +51,8 @@ QNode::QNode(int argc, char** argv) : init_argc(argc), init_argv(argv) {
   path_topic =
       settings.value("GlobalPlan/topic", "/movebase").toString().toStdString();
   qRegisterMetaType<sensor_msgs::BatteryState>("sensor_msgs::BatteryState");
-  qRegisterMetaType<RobotPose>("  RobotPose");
-  qRegisterMetaType<RobotStatus>("  RobotStatus");
+  qRegisterMetaType<RobotPose>("RobotPose");
+  qRegisterMetaType<RobotStatus>("RobotStatus");
   qRegisterMetaType<QVector<int>>("QVector<int>");
 }
 
@@ -289,7 +289,7 @@ void QNode::run() {
   //当当前节点没有关闭时
   while (ros::ok()) {
     updateRobotPose();
-    emit updateRobotStatus(::RobotStatus::normal);
+    emit updateRobotStatus(RobotStatus::normal);
     loop_rate.sleep();
   }
   //如果当前节点关闭
@@ -535,12 +535,12 @@ void QNode::log(const LogLevel& level, const std::string& msg) {
       break;
     }
     case (Warn): {
-      emit updateRobotStatus(::RobotStatus::warn);
+      emit updateRobotStatus(RobotStatus::warn);
       logging_model_msg << "[INFO] [" << ros::Time::now() << "]: " << msg;
       break;
     }
     case (Error): {
-      emit updateRobotStatus(::RobotStatus::error);
+      emit updateRobotStatus(RobotStatus::error);
       logging_model_msg << "[ERROR] [" << ros::Time::now() << "]: " << msg;
       break;
     }

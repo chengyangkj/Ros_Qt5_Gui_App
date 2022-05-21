@@ -243,7 +243,7 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   //如果是选择点位模式 重置
   if (currCursor == set2DPoseCursor) {
     m_isOtherCursor = false;
-    ::RobotPose target_pos;
+    RobotPose target_pos;
     target_pos.x = m_pressedPoint.x();
     target_pos.y = m_pressedPoint.y();
     target_pos.theta = ::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
@@ -255,7 +255,7 @@ void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     currCursor = moveCursor;
   } else if (currCursor == set2DGoalCursor) {
     m_isOtherCursor = false;
-    ::RobotPose init_pos;
+    RobotPose init_pos;
     init_pos.x = m_pressedPoint.x();
     init_pos.y = m_pressedPoint.y();
     init_pos.theta = ::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
