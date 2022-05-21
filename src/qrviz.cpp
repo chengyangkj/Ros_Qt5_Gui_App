@@ -1,4 +1,4 @@
-#include "../include/ros_qt5_gui_app/qrviz.hpp"
+#include "qrviz.hpp"
 
 #include <QTimer>
 QRviz::QRviz(QVBoxLayout* layout, QString node_name) {

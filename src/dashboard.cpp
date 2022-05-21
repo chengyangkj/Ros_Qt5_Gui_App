@@ -1,4 +1,4 @@
-#include "../include/ros_qt5_gui_app/dashboard.h"
+#include "dashboard.h"
 
 #include <qapplication.h>
 #include <qpainter.h>

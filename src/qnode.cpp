@@ -10,7 +10,7 @@
 ** Includes
 *****************************************************************************/
 
-#include "../include/ros_qt5_gui_app/qnode.hpp"
+#include "qnode.hpp"
 
 #include <ros/network.h>
 #include <ros/ros.h>

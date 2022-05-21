@@ -14,7 +14,7 @@
 #include <QDesktopWidget>
 #include <QtGui>
 
-#include "../include/ros_qt5_gui_app/loginwidget.h"
+#include "loginwidget.h"
 
 /*****************************************************************************
 ** Main

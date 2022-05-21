@@ -8,7 +8,7 @@
  <作者>    <日期>        <版本>        <内容>
 
 *******************************************************************/
-#include "../include/ros_qt5_gui_app/loginwidget.h"
+#include "loginwidget.h"
 
 #include <QCompleter>
 #include <QDebug>
@@ -20,7 +20,7 @@
 #include <QPropertyAnimation>
 #include <QStringListModel>
 
-#include "../include/ros_qt5_gui_app/main_window.hpp"
+#include "main_window.hpp"
 #include "ui_loginwidget.h"
 LoginWidget::LoginWidget(QWidget* parent)
     : CustomMoveWidget(parent), ui(new Ui::LoginWidget) {

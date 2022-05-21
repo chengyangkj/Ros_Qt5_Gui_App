@@ -9,7 +9,7 @@
 ** Includes
 *****************************************************************************/
 
-#include "../include/ros_qt5_gui_app/main_window.hpp"
+#include "main_window.hpp"
 
 #include <QMessageBox>
 #include <QtGui>

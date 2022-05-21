@@ -1,4 +1,4 @@
-#include "../include/ros_qt5_gui_app/robomap.h"
+#include "robomap.h"
 
 #include <QDebug>
 
