@@ -59,11 +59,11 @@ class roboItem : public QObject, public QGraphicsItem {
   QCursor *currCursor = NULL;
  signals:
   void cursorPos(QPointF);
-  void signalPub2DPos(::RobotPose pose);
-  void signalPub2DGoal(::RobotPose pose);
+  void signalPub2DPos(RobotPose pose);
+  void signalPub2DGoal(RobotPose pose);
  public slots:
   void paintMaps(QImage map);
-  void paintRoboPos(::RobotPose pos);
+  void paintRoboPos(RobotPose pos);
   void paintImage(int, QImage);
   void paintPlannerPath(QPolygonF);
   void paintLaserScan(QPolygonF);

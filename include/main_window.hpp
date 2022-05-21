@@ -33,7 +33,6 @@
 #include "dashboard.h"
 #include "joystick.h"
 #include "qnode.hpp"
-#include "qrviz.hpp"
 #include "roboItem.h"
 #include "ui_main_window.h"
 /*****************************************************************************
@@ -127,7 +126,7 @@ class MainWindow : public QMainWindow {
   void slot_pubImageMapTimeOut();
   void slot_updateCursorPos(QPointF pos);
   void slot_changeMapType(int);
-  void slot_updateRobotStatus(::RobotStatus);
+  void slot_updateRobotStatus(RobotStatus);
   //    void on_horizontalSlider_raw_valueChanged(int value);
  private slots:
 
@@ -171,7 +170,6 @@ class MainWindow : public QMainWindow {
   JoyStick *rock_widget;
   QGraphicsScene *m_qgraphicsScene = NULL;
   roboItem *m_roboItem = NULL;
-  QRviz *map_rviz = NULL;
   QVariantList m_sendVelList, m_recvVelList, m_timeList;
   //曲线
   //    QSplineSeries* line;

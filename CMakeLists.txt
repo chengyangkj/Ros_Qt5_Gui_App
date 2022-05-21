@@ -11,13 +11,15 @@ set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 # Catkin
 ##############################################################################
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
-find_package(catkin REQUIRED COMPONENTS rviz roscpp sensor_msgs
+find_package(catkin REQUIRED COMPONENTS roscpp 
+    tf
+    sensor_msgs
     cv_bridge
     std_msgs
     image_transport
     )
 
-include_directories(${catkin_INCLUDE_DIRS} include/)
+include_directories(${catkin_INCLUDE_DIRS} ./include)
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
 # exporting anything. 
