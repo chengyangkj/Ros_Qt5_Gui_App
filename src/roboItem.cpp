@@ -1,10 +1,10 @@
-#include "robomap.h"
-
 #include <QDebug>
+
+#include "roboItem.h"
 
 namespace ros_qt5_gui_app {
 
-roboMap::roboMap() {
+roboItem::roboItem() {
   setAcceptHoverEvents(true);
   setAcceptedMouseButtons(Qt::AllButtons);
   setAcceptDrops(true);
@@ -16,7 +16,7 @@ roboMap::roboMap() {
   setRobotColor(eRobotColor::blue);
   setDefault();
 }
-void roboMap::setRobotColor(eRobotColor color) {
+void roboItem::setRobotColor(eRobotColor color) {
   switch (color) {
     case eRobotColor::blue: {
       robotImg.load("://images/robot_blue.png");
@@ -32,42 +32,42 @@ void roboMap::setRobotColor(eRobotColor color) {
   matrix.rotate(90);
   robotImg = robotImg.transformed(matrix, Qt::SmoothTransformation);
 }
-void roboMap::setRobotSize(QSize size) { robotImg = robotImg.scaled(size); }
-int roboMap::QColorToInt(const QColor &color) {
+void roboItem::setRobotSize(QSize size) { robotImg = robotImg.scaled(size); }
+int roboItem::QColorToInt(const QColor &color) {
   //将Color 从QColor 转换成 int
   return (int)(((unsigned int)color.blue() << 16) |
                (unsigned short)(((unsigned short)color.green() << 8) |
                                 color.red()));
 }
-void roboMap::paintImage(int id, QImage image) { m_image = image; }
-void roboMap::paintLaserScan(QPolygonF points) {
+void roboItem::paintImage(int id, QImage image) { m_image = image; }
+void roboItem::paintLaserScan(QPolygonF points) {
   laserPoints = points;
   update();
 }
 // palnner规划path绘制
-void roboMap::paintPlannerPath(QPolygonF path) {
+void roboItem::paintPlannerPath(QPolygonF path) {
   plannerPath = path;
   update();
 }
-void roboMap::paintMaps(QImage map) {
+void roboItem::paintMaps(QImage map) {
   m_imageMap = map;
   update();
 }
-void roboMap::paintRoboPos(algo::RobotPose pos) {
+void roboItem::paintRoboPos(algo::RobotPose pos) {
   //  qDebug()<<"pos:"<<pos.x<<" "<<pos.y<<" "<<pos.theta;
   RoboPostion = QPointF(pos.x, pos.y);
   m_roboYaw = pos.theta;
   update();
 }
-void roboMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                    QWidget *widget) {
+void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                     QWidget *widget) {
   drawMap(painter);
   drawRoboPos(painter);
   drawPlannerPath(painter);
   drawLaserScan(painter);
   drawTools(painter);
 }
-void roboMap::drawTools(QPainter *painter) {
+void roboItem::drawTools(QPainter *painter) {
   if (currCursor == set2DPoseCursor || currCursor == set2DGoalCursor) {
     //绘制箭头
     if (m_pressedPoint.x() != 0 && m_pressedPoint.y() != 0 &&
@@ -121,10 +121,10 @@ void roboMap::drawTools(QPainter *painter) {
     }
   }
 }
-void roboMap::drawMap(QPainter *painter) {
+void roboItem::drawMap(QPainter *painter) {
   painter->drawImage(0, 0, m_imageMap);
 }
-void roboMap::drawRoboPos(QPainter *painter) {
+void roboItem::drawRoboPos(QPainter *painter) {
   painter->setPen(QPen(QColor(255, 0, 0, 255), 1, Qt::SolidLine, Qt::RoundCap,
                        Qt::RoundJoin));
   painter->save();
@@ -135,37 +135,37 @@ void roboMap::drawRoboPos(QPainter *painter) {
                       robotImg);
   painter->restore();
 }
-void roboMap::drawLaserScan(QPainter *painter) {
+void roboItem::drawLaserScan(QPainter *painter) {
   //绘制laser
   painter->setPen(QPen(QColor(255, 0, 0, 255), 1));
   painter->drawPoints(laserPoints);
 }
-void roboMap::drawPlannerPath(QPainter *painter) {
+void roboItem::drawPlannerPath(QPainter *painter) {
   //绘制planner Path
   painter->setPen(QPen(QColor(0, 0, 0, 255), 1));
   painter->drawPoints(plannerPath);
 }
-void roboMap::setMax() {
+void roboItem::setMax() {
   m_scaleValue *= 1.1;  //每次放大10%
   setScale(m_scaleValue);
 }
-void roboMap::setMin() {
+void roboItem::setMin() {
   m_scaleValue *= 0.9;  //每次缩小10%
   setScale(m_scaleValue);
 }
-void roboMap::setDefault() {
+void roboItem::setDefault() {
   this->setScale(defaultScale);
   this->moveBy(0, 0);
   m_scaleValue = defaultScale;
 }
-QRectF roboMap::boundingRect() const {
+QRectF roboItem::boundingRect() const {
   //设置当前item绘制区域 (x,y,width,height)
   return QRectF(0, 0, m_imageMap.width(), m_imageMap.height());
 }
 
-void roboMap::move(double x, double y) { this->moveBy(x, y); }
+void roboItem::move(double x, double y) { this->moveBy(x, y); }
 // mouse event
-void roboMap::wheelEvent(QGraphicsSceneWheelEvent *event) {
+void roboItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
   this->setCursor(Qt::CrossCursor);
   if ((event->delta() > 0) && (m_scaleValue >= 50))  //最大放大到原始图像的50倍
   {
@@ -195,19 +195,19 @@ void roboMap::wheelEvent(QGraphicsSceneWheelEvent *event) {
     }
   }
 }
-void roboMap::slot_set2DPos() {
+void roboItem::slot_set2DPos() {
   this->setCursor(*set2DPoseCursor);  //设置自定义的鼠标样式
   currCursor = set2DPoseCursor;
 }
-void roboMap::slot_set2DGoal() {
+void roboItem::slot_set2DGoal() {
   this->setCursor(*set2DGoalCursor);  //设置自定义的鼠标样式
   currCursor = set2DGoalCursor;
 }
-void roboMap::slot_setMoveCamera() {
+void roboItem::slot_setMoveCamera() {
   this->setCursor(*moveCursor);  //设置自定义的鼠标样式
   currCursor = moveCursor;
 }
-void roboMap::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+void roboItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     if (currCursor != moveCursor) {
       m_pressedPoint = event->pos();
@@ -220,7 +220,7 @@ void roboMap::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   update();
 }
 
-void roboMap::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void roboItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   m_pressingPoint = event->pos();
   //设置鼠标样式为移动
   if (currCursor == NULL) {
@@ -234,11 +234,11 @@ void roboMap::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   }
   update();
 }
-void roboMap::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+void roboItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
   emit cursorPos(event->pos());
 }
 
-void roboMap::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   m_isPress = false;  //标记鼠标左键已经抬起
   //如果是选择点位模式 重置
   if (currCursor == set2DPoseCursor) {

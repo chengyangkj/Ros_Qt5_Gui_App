@@ -100,18 +100,6 @@ void MainWindow::display_rviz() {
           .value("Navigation/LocalPlan/topic",
                  QString("/move_base/DWAPlannerROS/local_plan"))
           .toString();
-  QTimer::singleShot(500, [=]() {
-    map_rviz->Display_Grid(Grid_enable, "QGrid", Grid_count,
-                           QColor(160, 160, 160));
-  });
-  QTimer::singleShot(1000, [=]() {
-    map_rviz->Display_Map(Map_enable, Map_topic, Map_alpha, Map_scheme);
-  });
-  QTimer::singleShot(
-      3000, [=]() { map_rviz->Display_LaserScan(Laser_enable, Laser_topic); });
-  //  QTimer::singleShot(2000,[=](){
-  //      map_rviz->Display_Navigate(Navigation_enable,GlobalMap_topic,GlobalMap_paln,LocalMap_topic,LocalMap_plan);
-  //  });
 }
 void MainWindow::slot_show_image(int frame_id, QImage image) {
   switch (frame_id) {
@@ -145,9 +133,9 @@ void MainWindow::initUis() {
       new QGraphicsScene;  //要用QGraphicsView就必须要有QGraphicsScene搭配着用
   m_qgraphicsScene->clear();
   //创建item
-  m_roboMap = new roboMap();
+  m_roboItem = new roboItem();
   //视图添加item
-  m_qgraphicsScene->addItem(m_roboMap);
+  m_qgraphicsScene->addItem(m_roboItem);
   //设置item的坐标原点与视图的原点重合（默认为视图中心）
   // widget添加视图
   ui.mapViz->setScene(m_qgraphicsScene);
@@ -289,24 +277,24 @@ void MainWindow::connections() {
   connect(ui.max_btn, SIGNAL(clicked()), this, SLOT(slot_maxWindows()));
   connect(rock_widget, SIGNAL(keyNumchanged(int)), this,
           SLOT(slot_rockKeyChange(int)));
-  connect(&qnode, SIGNAL(updateMap(QImage)), m_roboMap,
+  connect(&qnode, SIGNAL(updateMap(QImage)), m_roboItem,
           SLOT(paintMaps(QImage)));
-  connect(&qnode, SIGNAL(plannerPath(QPolygonF)), m_roboMap,
+  connect(&qnode, SIGNAL(plannerPath(QPolygonF)), m_roboItem,
           SLOT(paintPlannerPath(QPolygonF)));
-  connect(&qnode, SIGNAL(updateRoboPose(algo::RobotPose)), m_roboMap,
+  connect(&qnode, SIGNAL(updateRoboPose(algo::RobotPose)), m_roboItem,
           SLOT(paintRoboPos(algo::RobotPose)));
-  connect(&qnode, SIGNAL(updateLaserScan(QPolygonF)), m_roboMap,
+  connect(&qnode, SIGNAL(updateLaserScan(QPolygonF)), m_roboItem,
           SLOT(paintLaserScan(QPolygonF)));
-  connect(m_roboMap, SIGNAL(cursorPos(QPointF)), this,
+  connect(m_roboItem, SIGNAL(cursorPos(QPointF)), this,
           SLOT(slot_updateCursorPos(QPointF)));
   // map
-  connect(m_roboMap, SIGNAL(signalPub2DPos(algo::RobotPose)), &qnode,
+  connect(m_roboItem, SIGNAL(signalPub2DPos(algo::RobotPose)), &qnode,
           SLOT(slot_pub2DPos(algo::RobotPose)));
-  connect(m_roboMap, SIGNAL(signalPub2DGoal(algo::RobotPose)), &qnode,
+  connect(m_roboItem, SIGNAL(signalPub2DGoal(algo::RobotPose)), &qnode,
           SLOT(slot_pub2DGoal(algo::RobotPose)));
-  connect(this, SIGNAL(signalSet2DPose()), m_roboMap, SLOT(slot_set2DPos()));
-  connect(this, SIGNAL(signalSet2DGoal()), m_roboMap, SLOT(slot_set2DGoal()));
-  connect(this, SIGNAL(signalSetMoveCamera()), m_roboMap,
+  connect(this, SIGNAL(signalSet2DPose()), m_roboItem, SLOT(slot_set2DPos()));
+  connect(this, SIGNAL(signalSet2DGoal()), m_roboItem, SLOT(slot_set2DGoal()));
+  connect(this, SIGNAL(signalSetMoveCamera()), m_roboItem,
           SLOT(slot_setMoveCamera()));
   //    connect(ui.stackedWidget_2,SIGNAL())
 }
@@ -316,28 +304,28 @@ void MainWindow::slot_updateRobotStatus(algo::RobotStatus status) {
       QTimer::singleShot(100, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_none.png"));
-        m_roboMap->setRobotColor(eRobotColor::blue);
+        m_roboItem->setRobotColor(eRobotColor::blue);
       });
     } break;
     case algo::RobotStatus::normal: {
       QTimer::singleShot(200, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_normal.png"));
-        m_roboMap->setRobotColor(eRobotColor::blue);
+        m_roboItem->setRobotColor(eRobotColor::blue);
       });
     } break;
     case algo::RobotStatus::error: {
       QTimer::singleShot(300, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_error.png"));
-        m_roboMap->setRobotColor(eRobotColor::red);
+        m_roboItem->setRobotColor(eRobotColor::red);
       });
     } break;
     case algo::RobotStatus::warn: {
       QTimer::singleShot(400, [this]() {
         ui.pushButton_status->setIcon(
             QIcon("://images/status/status_warn.png"));
-        m_roboMap->setRobotColor(eRobotColor::yellow);
+        m_roboItem->setRobotColor(eRobotColor::yellow);
       });
     } break;
   }
@@ -371,10 +359,6 @@ void MainWindow::slot_changeMapType(int index) {
     case 1:
       ui.mapViz->hide();
       ui.widget_rviz->show();
-      if (map_rviz == NULL) {
-        map_rviz = new QRviz(ui.verticalLayout_rviz, "qrviz");
-        display_rviz();
-      }
 
       break;
   }
@@ -496,37 +480,11 @@ void MainWindow::slot_return_point() {
   media_player->play();
 }
 //设置导航当前位置按钮的槽函数
-void MainWindow::slot_set_2D_Pos() {
-  if (ui.comboBox_mapType->currentIndex()) {
-    map_rviz->Set_Pos();
-  } else {
-    emit signalSet2DPose();
-  }
-
-  // ui.label_map_msg->setText("请在地图中选择机器人的初始位置");
-}
+void MainWindow::slot_set_2D_Pos() { emit signalSet2DPose(); }
 //设置导航目标位置按钮的槽函数
-void MainWindow::slot_set_2D_Goal() {
-  if (ui.comboBox_mapType->currentIndex()) {
-    map_rviz->Set_Goal();
-  } else {
-    emit signalSet2DGoal();
-  }
-
-  //  ui.label_map_msg->setText("请在地图中选择机器人导航的目标位置");
-}
-void MainWindow::slot_move_camera_btn() {
-  if (ui.comboBox_mapType->currentIndex()) {
-    map_rviz->Set_MoveCamera();
-  } else {
-    emit signalSetMoveCamera();
-  }
-}
-void MainWindow::slot_set_select() {
-  if (ui.comboBox_mapType->currentIndex()) {
-    map_rviz->Set_Select();
-  }
-}
+void MainWindow::slot_set_2D_Goal() { emit signalSet2DGoal(); }
+void MainWindow::slot_move_camera_btn() { emit signalSetMoveCamera(); }
+void MainWindow::slot_set_select() {}
 
 //左工具栏索引改变
 void MainWindow::slot_tab_manage_currentChanged(int index) {

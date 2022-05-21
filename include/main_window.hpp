@@ -33,8 +33,7 @@
 #include "dashboard.h"
 #include "joystick.h"
 #include "qnode.hpp"
-#include "qrviz.hpp"
-#include "robomap.h"
+#include "roboItem.h"
 #include "ui_main_window.h"
 /*****************************************************************************
 ** Namespace
@@ -170,8 +169,7 @@ class MainWindow : public QMainWindow {
   double m_turnLightThre = 0.1;
   JoyStick *rock_widget;
   QGraphicsScene *m_qgraphicsScene = NULL;
-  roboMap *m_roboMap = NULL;
-  QRviz *map_rviz = NULL;
+  roboItem *m_roboItem = NULL;
   QVariantList m_sendVelList, m_recvVelList, m_timeList;
   //曲线
   //    QSplineSeries* line;

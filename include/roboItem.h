@@ -1,5 +1,5 @@
-#ifndef ROBOMAP_H
-#define ROBOMAP_H
+#ifndef roboItem_H
+#define roboItem_H
 
 #include <QColor>
 #include <QCursor>
@@ -18,11 +18,11 @@ namespace ros_qt5_gui_app {
 
 enum eRobotColor { blue, red, yellow };
 
-class roboMap : public QObject, public QGraphicsItem {
+class roboItem : public QObject, public QGraphicsItem {
   Q_OBJECT
 
  public:
-  roboMap();
+  roboItem();
   QRectF boundingRect() const;
   void wheelEvent(QGraphicsSceneWheelEvent *event);
   void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -90,4 +90,4 @@ class roboMap : public QObject, public QGraphicsItem {
   qreal m_scaleDafault = 1;
 };
 }  // namespace ros_qt5_gui_app
-#endif  // ROBOMAP_H
+#endif  // roboItem_H
