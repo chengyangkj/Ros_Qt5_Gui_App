@@ -8,10 +8,9 @@
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 
 
-### Contributors
+### How To Contribute
 
-This project exists thanks to all the people who contribute. 
-<a href="https://github.com/chengyangkj/Ros_Qt5_Gui_App/graphs/contributors"><img src="https://opencollective.com/Ros_Qt5_Gui_App/contributors.svg?width=890&button=false" /></a>
+欢迎提交Issues与bug的pull resquest
 
 
 ***
@@ -26,6 +25,7 @@ This project exists thanks to all the people who contribute.
 - 欢迎在issues提交bug
   
 [![image.png](https://i.postimg.cc/htDgpxDc/image.png)](https://postimg.cc/N5zW0K2z)
+[![022.png](https://i.postimg.cc/ydnKc8Rv/022.png)](https://postimg.cc/LYqGMRN1)
 
 **注意！主分支（master）已不再维护librviz功能，使用Qt自行绘制实现一些图层显示，如需librviz功能请切换分支[rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)或[CSDN及古月居课程例程版本](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)**
 
@@ -61,9 +61,11 @@ sudo apt-get install qtmultimedia5-dev
 
 #### 3，编译
 
-将软件包放入ros src软件包目录下：
-
-```cpp
+```shell
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App
+cd ~/catkin_ws
 catkin_make
 ```
 #### 4,运行
@@ -75,16 +77,22 @@ rosrun ros_qt5_gui_app ros_qt5_gui_app
 
 - 借助 ROS windows版本，编译后可在win10平板使用，安装教程[古月学院 如何实现Windows ROS人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
 
+
+常见问题及解决方法见[wiki](https://github.com/chengyangkj/Ros_Qt5_Gui_App/wiki)
+
 ## 三，分支
 
-| 分支名         | 支持平台         | 功能           | 
+| 友链名         | 支持平台         | 功能           | 
 | ------------- | --------------- |  ------------ | 
 | [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master)      | Win10 Ubuntu |ROS + QWidget + QGraphicsview自绘制可视化界面显示    | 
 | [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)    | Win10 Ubuntu |ROS + QML + C++混合编程，qml自绘制地图，激光雷达可视化显示等demo| 
 | [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)      | Win10 Ubuntu |ROS + QWidget + Librviz进行可视化显示，为《ROS人机交互软件开发》系列课程中实现的版本，CSDN博客例程版本|
 | [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)| Win10 Ubuntu |ROS + QWidget + Librviz原生图层Api实现图层管理，不需手动创建图层|
 | [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)| Win10 Ubuntu |cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行|
-| [web版本](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_web_gui_app)| Win10 Ubuntu Android Mac .... |暂未实现 敬请期待.....|
+| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo)| ROS2 |在ROS2平台上运行的qt demo包，cmakelist.txt已配置好改为qt5，可以直接colcon build 编译使用|
+| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)| ROS2 |在ROS2平台上实现自绘制话题消息显示的功能包，近期上线....|
+| [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app)| 基于flutter实现多平台运行|逐步推进.....|
+
 
 ## 四，使用说明
 
