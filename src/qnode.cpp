@@ -33,10 +33,10 @@ QNode::QNode(int argc, char** argv) : init_argc(argc), init_argv(argv) {
   batteryState_topic =
       topic_setting.value("topic/topic_power", "battery_state").toString();
   initPose_topic =
-      topic_setting.value("topic/topic_init_pose", "move_base_simple/goal")
-          .toString();
+      topic_setting.value("topic/topic_init_pose", "/initialpose").toString();
   naviGoal_topic =
-      topic_setting.value("topic/topic_goal", "initialpose").toString();
+      topic_setting.value("topic/topic_goal", "move_base_simple/goal")
+          .toString();
   pose_topic = topic_setting.value("topic/topic_amcl", "amcl_pose").toString();
   m_frameRate = topic_setting.value("main/framerate", 40).toInt();
   m_threadNum = topic_setting.value("main/thread_num", 6).toInt();
@@ -240,7 +240,6 @@ void QNode::set_goal(QString frame, double x, double y, double z, double w) {
   goal.pose.orientation.z = z;
   goal.pose.orientation.w = w;
   goal_pub.publish(goal);
-  ros::spinOnce();
 }
 //地图信息订阅回调函数
 void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
