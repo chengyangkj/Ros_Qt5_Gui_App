@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/foxy.jpg</file>
+        <file>images/robot.png</file>
+        <file>images/cursor.svg</file>
+        <file>images/cursor_move.png</file>
+        <file>images/cursor_mutile_pose.png</file>
+        <file>images/cursor_point.png</file>
+        <file>images/cursor_pos.png</file>
+    </qresource>
+</RCC>
