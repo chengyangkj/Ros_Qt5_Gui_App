@@ -14,6 +14,8 @@
 #include "nav_msgs/msg/path.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "RobotAlgorithm.h"
+#include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 class rclcomm :public QThread
 {
      Q_OBJECT
@@ -29,9 +31,13 @@ private:
     void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
     QImage rotateMapWithY(QImage map);
     void getRobotPose();
-
+public slots:
+    void pub2DPose(QPointF,QPointF);
+    void pub2DGoal(QPointF,QPointF);
 private:
     rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
+    rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr _initPosePublisher;
+    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr _navPosePublisher;
     rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr _subscription;
     rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr _map_sub;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr _laser_sub;

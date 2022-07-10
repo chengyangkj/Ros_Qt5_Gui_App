@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QGraphicsItem>
+#include <QCursor>
 #include <QPainter>
 #include <QGraphicsSceneWheelEvent>
 #include "RobotAlgorithm.h"
@@ -26,6 +27,8 @@ public slots:
       void updateRobotPose(RobotPose pose);
       void updateLaserPoints(QPolygonF points);
       void updatePath(QPolygonF points);
+      void start2DPose();
+      void start2DGoal();
 private:
     QImage m_images;
     QImage m_map;
@@ -35,9 +38,15 @@ private:
     double m_scaleValue=1;
     bool m_isMousePress=false;
     QPointF m_pressedPose;
+    QPointF m_startPose;
+    QPointF m_endPose;
     RobotPose m_currRobotPose;
     QPolygonF m_laserPoints;
     QPolygonF m_pathPoints;
+    QCursor *m_currCursor=nullptr;
+    QCursor *m_moveCursor=nullptr;
+    QCursor *m_set2DPoseCursor=nullptr;
+    QCursor *m_set2DGoalCursor=nullptr;
 private:
     void drawLine(QPainter* painter);
     void drawImage(QPainter* painter);
@@ -46,6 +55,10 @@ private:
     void drawRobotPose(QPainter* painter);
     void drawLaserScan(QPainter* painter);
     void drawPath(QPainter* painter);
+    void drawTools(QPainter* painter);
+signals:
+    void signalPub2DPose(QPointF,QPointF);
+    void signalPub2DGoal(QPointF,QPointF);
 };
 
 #endif // ROBOITEM_H

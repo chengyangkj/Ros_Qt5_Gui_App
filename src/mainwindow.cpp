@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(commNode,&rclcomm::emitUpdateMap,[this](QImage img){
 //        m_roboItem->updateMap(img);
 //    });
+    connect(m_roboItem,SIGNAL(signalPub2DPose(QPointF,QPointF)),commNode,SLOT(pub2DPose(QPointF,QPointF)));
+    connect(m_roboItem,SIGNAL(signalPub2DGoal(QPointF,QPointF)),commNode,SLOT(pub2DGoal(QPointF,QPointF)));
     commNode->start();
 }
 
@@ -67,4 +69,14 @@ void MainWindow::on_pushButton_4_clicked()
 {
     QLine line(QPoint(0,0),QPoint(30,30));
     m_roboItem->updateLine(line);
+}
+//设置重定位点
+void MainWindow::on_pushButton_5_clicked()
+{
+     m_roboItem->start2DPose();
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+      m_roboItem->start2DGoal();
 }
