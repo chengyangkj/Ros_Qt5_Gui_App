@@ -74,7 +74,6 @@ class QNode : public QThread {
   void set_goal(QString frame, double x, double y, double z, double w);
   void Sub_Image(QString topic, int frame_id);
   void pub_imageMap(QImage map);
-  double getRealTheta(QPointF start, QPointF end);
   QPointF transScenePoint2Word(QPointF pos);
   QPointF transWordPoint2Scene(QPointF pos);
   QMap<QString, QString> get_topic_list();
@@ -91,8 +90,8 @@ class QNode : public QThread {
   void log(const LogLevel &level, const std::string &msg);
 
  public slots:
-  void slot_pub2DPos(RobotPose pose);
-  void slot_pub2DGoal(RobotPose pose);
+  void pub2DPose(QPointF,QPointF);
+  void pub2DGoal(QPointF,QPointF);
  Q_SIGNALS:
   void loggingUpdated();
   void rosShutdown();

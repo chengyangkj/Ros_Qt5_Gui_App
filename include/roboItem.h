@@ -53,14 +53,14 @@ class roboItem : public QObject, public QGraphicsItem {
   void setMin();
   void setDefault();
   void move(double x, double y);
-  QCursor *moveCursor = NULL;
+  QCursor *m_moveCursor = NULL;
   QCursor *set2DPoseCursor = NULL;
   QCursor *set2DGoalCursor = NULL;
-  QCursor *currCursor = NULL;
+  QCursor *m_currCursor = NULL;
  signals:
   void cursorPos(QPointF);
-  void signalPub2DPos(RobotPose pose);
-  void signalPub2DGoal(RobotPose pose);
+  void signalPub2DPose(QPointF,QPointF);
+  void signalPub2DGoal(QPointF,QPointF);
  public slots:
   void paintMaps(QImage map);
   void paintRoboPos(RobotPose pos);
@@ -80,10 +80,10 @@ class roboItem : public QObject, public QGraphicsItem {
 
  private:
   int m_zoomState;
-  bool m_isPress;
-  bool m_isOtherCursor{false};
+  bool m_isMousePress{false};
   QPixmap robotImg;
-  QPointF m_startPos;
+  QPointF m_startPose;
+  QPointF m_endPose;
   QPointF m_pressedPoint = QPointF(0, 0);
   QPointF m_pressingPoint = QPointF(0, 0);
   qreal m_scaleValue = 1;

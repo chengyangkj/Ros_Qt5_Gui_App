@@ -100,8 +100,6 @@ class MainWindow : public QMainWindow {
   void slot_cmd_control();
   void slot_tab_manage_currentChanged(int);
   void slot_tab_Widget_currentChanged(int);
-  void slot_set_2D_Goal();
-  void slot_set_2D_Pos();
   void slot_set_select();
   void slot_move_camera_btn();
   //设置界面

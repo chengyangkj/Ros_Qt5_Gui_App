@@ -341,37 +341,37 @@ void QNode::Sub_Image(QString topic, int frame_id) {
   }
   ros::spinOnce();
 }
-void QNode::slot_pub2DPos(RobotPose pose) {
-  QPointF tmp = transScenePoint2Word(QPointF(pose.x, pose.y));
-  pose.x = tmp.x();
-  pose.y = tmp.y();
-  // qDebug() << "init pose:" << pose.x << " " << pose.y << " " << pose.theta;
-  geometry_msgs::PoseWithCovarianceStamped goal;
-  //设置frame
-  goal.header.frame_id = "map";
-  //设置时刻
-  goal.header.stamp = ros::Time::now();
-  goal.pose.pose.position.x = pose.x;
-  goal.pose.pose.position.y = pose.y;
-  goal.pose.pose.position.z = 0;
-  goal.pose.pose.orientation =
-      tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
-  m_initialposePub.publish(goal);
-}
-void QNode::slot_pub2DGoal(RobotPose pose) {
-  QPointF tmp = transScenePoint2Word(QPointF(pose.x, pose.y));
-  pose.x = tmp.x();
-  pose.y = tmp.y();
-  move_base_msgs::MoveBaseGoal goal;
-  goal.target_pose.header.frame_id = "map";
-  goal.target_pose.header.stamp = ros::Time::now();
+void QNode::pub2DPose(QPointF start_pose,QPointF end_pose){
+    start_pose =transScenePoint2Word(start_pose);
+    end_pose =transScenePoint2Word(end_pose);
+    double angle = atan2(end_pose.y()-start_pose.y(),end_pose.x()-start_pose.x());
+    geometry_msgs::PoseWithCovarianceStamped goal;
+    //设置frame
+    goal.header.frame_id = "map";
+    //设置时刻
+    goal.header.stamp = ros::Time::now();
+    goal.pose.pose.position.x = start_pose.x();
+    goal.pose.pose.position.y = start_pose.y();
+    goal.pose.pose.position.z = 0;
+    goal.pose.pose.orientation =
+        tf::createQuaternionMsgFromRollPitchYaw(0, 0, angle);
+    m_initialposePub.publish(goal);
 
-  goal.target_pose.pose.position.x = pose.x;
-  goal.target_pose.pose.position.y = pose.y;
-  goal.target_pose.pose.position.z = 0;
-  goal.target_pose.pose.orientation =
-      tf::createQuaternionMsgFromRollPitchYaw(0, 0, pose.theta);
-  movebase_client->sendGoal(goal);
+}
+void QNode::pub2DGoal(QPointF start_pose,QPointF end_pose){
+    start_pose =transScenePoint2Word(start_pose);
+    end_pose =transScenePoint2Word(end_pose);
+    double angle = atan2(end_pose.y()-start_pose.y(),end_pose.x()-start_pose.x());
+    move_base_msgs::MoveBaseGoal goal;
+    goal.target_pose.header.frame_id = "map";
+    goal.target_pose.header.stamp = ros::Time::now();
+
+    goal.target_pose.pose.position.x = start_pose.x();
+    goal.target_pose.pose.position.y = start_pose.y();
+    goal.target_pose.pose.position.z = 0;
+    goal.target_pose.pose.orientation =
+        tf::createQuaternionMsgFromRollPitchYaw(0, 0, angle);
+    movebase_client->sendGoal(goal);
 }
 QPointF QNode::transScenePoint2Word(QPointF pose) {
   QPointF res;
@@ -387,34 +387,7 @@ QPointF QNode::transWordPoint2Scene(QPointF pose) {
   res.setY(m_wordOrigin.y() - (pose.y() / m_mapResolution));
   return res;
 }
-double QNode::getRealTheta(QPointF start, QPointF end) {
-  double y = end.y() - start.y();
-  double x = end.x() - start.x();
-  double theta = ::rad2deg(atan(y / x));
-  qDebug() << start << " " << end << " " << theta;
-  // 1 4
-  if (end.x() > start.x()) {
-    // 1
-    if (end.y() > start.y()) {
-      theta = -theta;
-    }
-    // 4
-    else {
-      theta = 270 - theta;
-    }
-  } else {
-    // 2 3
-    theta = 180 - theta;
-    //    if(end.y()>start.y()){
-    //      //2
-    //      theta = 180- theta;
-    //    }
-    //    else {
 
-    //    }
-  }
-  return theta;
-}
 void QNode::pub_imageMap(QImage map) {
   cv::Mat image = QImage2Mat(map);
   sensor_msgs::ImagePtr msg =

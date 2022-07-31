@@ -10,7 +10,7 @@ roboItem::roboItem() {
   setAcceptDrops(true);
   setFlag(ItemAcceptsInputMethod, true);
   moveBy(0, 0);
-  moveCursor = new QCursor(QPixmap("://images/cursor_move"), 0, 0);
+  m_moveCursor = new QCursor(QPixmap("://images/cursor_move"), 0, 0);
   set2DPoseCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   set2DGoalCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   setRobotColor(eRobotColor::blue);
@@ -68,56 +68,36 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   drawTools(painter);
 }
 void roboItem::drawTools(QPainter *painter) {
-  if (currCursor == set2DPoseCursor || currCursor == set2DGoalCursor) {
-    //绘制箭头
-    if (m_pressedPoint.x() != 0 && m_pressedPoint.y() != 0 &&
-        m_pressingPoint.x() != 0 && m_pressingPoint.y() != 0) {
-      painter->setPen(QPen(QColor(0, 255, 0, 255), 2));
+  if (m_currCursor == set2DPoseCursor || m_currCursor == set2DGoalCursor) {
+      //绘制箭头
+    if (m_startPose.x() != 0 && m_startPose.y() != 0 &&
+        m_endPose.x() != 0 && m_endPose.y() != 0) {
+        QPen pen(QColor(50, 205, 50, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        QBrush brush(QColor(50, 205, 50, 255), Qt::SolidPattern);
+
+        painter->setPen(pen);
+        painter->setBrush(brush);
       //计算线弧度
-      double theta = qAtan((m_pressingPoint.y() - m_pressedPoint.y()) /
-                           (m_pressingPoint.x() - m_pressedPoint.x()));
-      //根据固定长度计算箭头主体结束点坐标
-      double dy = sin(theta) * 20;
-      double dx = cos(theta) * 20;
+      double theta = atan((m_endPose.y() - m_startPose.y()) /
+                           (m_endPose.x() - m_startPose.x()));
+      //绘制直线
       QPointF startPoint, endPoint;
-      startPoint = m_pressedPoint;
-      if (m_pressingPoint.x() - m_pressedPoint.x() > 0) {
-        endPoint = QPointF(m_pressedPoint.x() + dx, m_pressedPoint.y() + dy);
-      } else {
-        endPoint = QPointF(m_pressedPoint.x() - dx, m_pressedPoint.y() - dy);
-      }
+      startPoint = m_startPose;
+      endPoint =m_endPose;
       QLineF line(startPoint, endPoint);
       painter->drawLine(line);
-      QLineF v = line.unitVector();
-      if (!v.isNull()) {
-        v.setLength(5);
-        v.translate(QPointF(line.dx(), line.dy()));
-        QLineF n = v.normalVector();
-        n.setLength(n.length() * 0.5);
-        QLineF n2 = n.normalVector().normalVector();
-        QPointF p1 = v.p2();
-        QPointF p2 = n.p2();
-        QPointF p3 = n2.p2();
-        // painter->setBrush(QBrush(color));
-        if (p1.isNull() == false && p2.isNull() == false) {
-          QLineF lineA(p1, p2);
-          if (lineA.length() > 4) {
-            painter->drawLine(lineA);
-          }
-        }
-        if (p2.isNull() == false && p3.isNull() == false) {
-          QLineF lineB(p2, p3);
-          if (lineB.length() > 4) {
-            painter->drawLine(lineB);
-          }
-        }
-        if (p3.isNull() == false && p1.isNull() == false) {
-          QLineF lineC(p3, p1);
-          if (lineC.length() > 4) {
-            painter->drawLine(lineC);
-          }
-        }
-      }
+      float angle = atan2(endPoint.y()-startPoint.y(), endPoint.x()-startPoint.x()) + 3.1415926;//
+      //绘制三角形
+      QPolygonF points;
+      points.push_back(endPoint);
+      QPointF point1,point2;
+      point1.setX(endPoint.x() + 10 * cos(angle - 0.5));//求得箭头点1坐标
+      point1.setY(endPoint.y() + 10 * sin(angle - 0.5));
+      point2.setX(endPoint.x() + 10 * cos(angle + 0.5));//求得箭头点2坐标
+      point2.setY(endPoint.y() + 10 * sin(angle + 0.5));
+      points.push_back(point1);
+      points.push_back(point2);
+      painter->drawPolygon(points);
     }
   }
 }
@@ -197,23 +177,23 @@ void roboItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
 }
 void roboItem::slot_set2DPos() {
   this->setCursor(*set2DPoseCursor);  //设置自定义的鼠标样式
-  currCursor = set2DPoseCursor;
+  m_currCursor = set2DPoseCursor;
 }
 void roboItem::slot_set2DGoal() {
   this->setCursor(*set2DGoalCursor);  //设置自定义的鼠标样式
-  currCursor = set2DGoalCursor;
+  m_currCursor = set2DGoalCursor;
 }
 void roboItem::slot_setMoveCamera() {
-  this->setCursor(*moveCursor);  //设置自定义的鼠标样式
-  currCursor = moveCursor;
+  this->setCursor(*m_moveCursor);  //设置自定义的鼠标样式
+  m_currCursor = m_moveCursor;
 }
 void roboItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
-    if (currCursor != moveCursor) {
+    if (m_currCursor != m_moveCursor) {
       m_pressedPoint = event->pos();
     }
-    m_startPos = event->pos();  //鼠标左击时，获取当前鼠标在图片中的坐标，
-    m_isPress = true;  //标记鼠标左键被按下
+    m_startPose=event->pos();  //鼠标左击时，获取当前鼠标在图片中的坐标，
+    m_isMousePress = true;  //标记鼠标左键被按下
   } else if (event->button() == Qt::RightButton) {
     // ResetItemPos();//右击鼠标重置大小
   }
@@ -223,15 +203,16 @@ void roboItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 void roboItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   m_pressingPoint = event->pos();
   //设置鼠标样式为移动
-  if (currCursor == NULL) {
-    this->setCursor(*moveCursor);  //设置自定义的鼠标样式
-    currCursor = moveCursor;
+  if (m_currCursor == NULL) {
+    this->setCursor(*m_moveCursor);  //设置自定义的鼠标样式
+    m_currCursor = m_moveCursor;
   }
   //移动图层
-  if (m_isPress && currCursor == moveCursor) {
-    QPointF point = (event->pos() - m_startPos) * m_scaleValue;
+  if (m_isMousePress && m_currCursor == m_moveCursor) {
+    QPointF point = (event->pos() - m_startPose) * m_scaleValue;
     moveBy(point.x(), point.y());
   }
+  m_endPose=event->pos();
   update();
 }
 void roboItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
@@ -239,33 +220,21 @@ void roboItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-  m_isPress = false;  //标记鼠标左键已经抬起
+  m_isMousePress = false;  //标记鼠标左键已经抬起
   //如果是选择点位模式 重置
-  if (currCursor == set2DPoseCursor) {
-    m_isOtherCursor = false;
-    RobotPose target_pos;
-    target_pos.x = m_pressedPoint.x();
-    target_pos.y = m_pressedPoint.y();
-    target_pos.theta = ::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
-                                  m_pressingPoint.x(), m_pressingPoint.y());
-    emit signalPub2DPos(target_pos);
-    m_pressedPoint = QPointF(0, 0);
-    m_pressingPoint = QPointF(0, 0);
-    this->setCursor(*moveCursor);  //设置自定义的鼠标样式
-    currCursor = moveCursor;
-  } else if (currCursor == set2DGoalCursor) {
-    m_isOtherCursor = false;
-    RobotPose init_pos;
-    init_pos.x = m_pressedPoint.x();
-    init_pos.y = m_pressedPoint.y();
-    init_pos.theta = ::getAngle(m_pressedPoint.x(), m_pressedPoint.y(),
-                                m_pressingPoint.x(), m_pressingPoint.y());
-    emit signalPub2DGoal(init_pos);
-    m_pressedPoint = QPointF(0, 0);
-    m_pressingPoint = QPointF(0, 0);
-    this->setCursor(*moveCursor);  //设置自定义的鼠标样式
-    currCursor = moveCursor;
+  if (m_currCursor == set2DPoseCursor) {
+      emit signalPub2DPose(m_startPose,m_endPose);
+      m_currCursor=m_moveCursor;
+      this->setCursor(*m_currCursor);
+  } else if (m_currCursor == set2DGoalCursor) {
+      emit signalPub2DGoal(m_startPose,m_endPose);
+      m_currCursor=m_moveCursor;
+      this->setCursor(*m_currCursor);
   }
+  m_startPose=QPointF();
+  m_endPose=QPointF();
+  m_pressedPoint = QPointF();
+  m_pressingPoint = QPointF();
 }
 
 }  // namespace ros_qt5_gui_app

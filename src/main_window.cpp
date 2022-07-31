@@ -260,10 +260,7 @@ void MainWindow::connections() {
   connect(ui.pushButton_backr, SIGNAL(clicked()), this,
           SLOT(slot_cmd_control()));
   connect(ui.pushButton, SIGNAL(clicked()), this, SLOT(slot_dis_connect()));
-  //设置2D Pose
-  connect(ui.set_pos_btn, SIGNAL(clicked()), this, SLOT(slot_set_2D_Pos()));
-  //设置2D goal
-  connect(ui.set_goal_btn, SIGNAL(clicked()), this, SLOT(slot_set_2D_Goal()));
+
   //设置返航点
   connect(ui.set_mutil_goal_btn, SIGNAL(clicked()), this,
           SLOT(slot_set_mutil_goal_btn()));
@@ -287,13 +284,12 @@ void MainWindow::connections() {
           SLOT(paintLaserScan(QPolygonF)));
   connect(m_roboItem, SIGNAL(cursorPos(QPointF)), this,
           SLOT(slot_updateCursorPos(QPointF)));
-  // map
-  connect(m_roboItem, SIGNAL(signalPub2DPos(RobotPose)), &qnode,
-          SLOT(slot_pub2DPos(RobotPose)));
-  connect(m_roboItem, SIGNAL(signalPub2DGoal(RobotPose)), &qnode,
-          SLOT(slot_pub2DGoal(RobotPose)));
-  connect(this, SIGNAL(signalSet2DPose()), m_roboItem, SLOT(slot_set2DPos()));
-  connect(this, SIGNAL(signalSet2DGoal()), m_roboItem, SLOT(slot_set2DGoal()));
+  connect(m_roboItem,SIGNAL(signalPub2DPose(QPointF,QPointF)),&qnode,SLOT(pub2DPose(QPointF,QPointF)));
+  connect(m_roboItem,SIGNAL(signalPub2DGoal(QPointF,QPointF)),&qnode,SLOT(pub2DGoal(QPointF,QPointF)));
+  //设置2D Pose
+  connect(ui.set_pos_btn, SIGNAL(clicked()), m_roboItem, SLOT(slot_set2DPos()));
+  //设置2D goal
+  connect(ui.set_goal_btn, SIGNAL(clicked()), m_roboItem, SLOT(slot_set2DGoal()));
   connect(this, SIGNAL(signalSetMoveCamera()), m_roboItem,
           SLOT(slot_setMoveCamera()));
   //    connect(ui.stackedWidget_2,SIGNAL())
@@ -479,10 +475,7 @@ void MainWindow::slot_return_point() {
   media_player->setSource(QUrl::fromLocalFile("://media/start_return.wav"));
   media_player->play();
 }
-//设置导航当前位置按钮的槽函数
-void MainWindow::slot_set_2D_Pos() { emit signalSet2DPose(); }
-//设置导航目标位置按钮的槽函数
-void MainWindow::slot_set_2D_Goal() { emit signalSet2DGoal(); }
+
 void MainWindow::slot_move_camera_btn() { emit signalSetMoveCamera(); }
 void MainWindow::slot_set_select() {}
 
