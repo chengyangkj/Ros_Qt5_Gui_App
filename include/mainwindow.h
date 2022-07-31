@@ -19,6 +19,12 @@ public:
 public slots:
     void onRecvData(QString);
 private slots:
+    void on_pushButton_6_clicked();
+
+private slots:
+    void on_pushButton_5_clicked();
+
+private slots:
     void on_pushButton_4_clicked();
 
 private slots:
