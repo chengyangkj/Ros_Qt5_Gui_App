@@ -53,6 +53,10 @@ void roboItem::paintMaps(QImage map) {
   m_imageMap = map;
   update();
 }
+void roboItem::paintLocalCostMaps(QImage map) {
+  m_localCostMap = map;
+  update();
+}
 void roboItem::paintRoboPos(RobotPose pos) {
   //  qDebug()<<"pos:"<<pos.x<<" "<<pos.y<<" "<<pos.theta;
   RoboPostion = QPointF(pos.x, pos.y);
@@ -62,6 +66,7 @@ void roboItem::paintRoboPos(RobotPose pos) {
 void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                      QWidget *widget) {
   drawMap(painter);
+  drawLocalCostMap(painter);
   drawRoboPos(painter);
   drawPlannerPath(painter);
   drawLaserScan(painter);
@@ -103,6 +108,14 @@ void roboItem::drawTools(QPainter *painter) {
 }
 void roboItem::drawMap(QPainter *painter) {
   painter->drawImage(0, 0, m_imageMap);
+}
+void roboItem::drawLocalCostMap(QPainter *painter){
+    painter->save();
+    painter->translate(RoboPostion.x(), RoboPostion.y());
+    painter->drawImage(QPoint(-m_localCostMap.width() / 2, -m_localCostMap.height() / 2),
+                        m_localCostMap);
+    m_localCostMap.save("/home/chengyangkj/map.jpg");
+    painter->restore();
 }
 void roboItem::drawRoboPos(QPainter *painter) {
   painter->setPen(QPen(QColor(255, 0, 0, 255), 1, Qt::SolidLine, Qt::RoundCap,

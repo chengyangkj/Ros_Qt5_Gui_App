@@ -275,7 +275,9 @@ void MainWindow::connections() {
   connect(rock_widget, SIGNAL(keyNumchanged(int)), this,
           SLOT(slot_rockKeyChange(int)));
   connect(&qnode, SIGNAL(updateMap(QImage)), m_roboItem,
-          SLOT(paintMaps(QImage)));
+          SLOT(paintLocalCostMaps(QImage)));
+  connect(&qnode, SIGNAL(updateLocalCostMap(QImage)), m_roboItem,
+                         SLOT(paintLocalCostMaps(QImage)));
   connect(&qnode, SIGNAL(plannerPath(QPolygonF)), m_roboItem,
           SLOT(paintPlannerPath(QPolygonF)));
   connect(&qnode, SIGNAL(updateRoboPose(RobotPose)), m_roboItem,

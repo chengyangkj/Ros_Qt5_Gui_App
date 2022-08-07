@@ -105,7 +105,7 @@ class QNode : public QThread {
   void plannerPath(QPolygonF path);
   void updateLaserScan(QPolygonF points);
   void updateRobotStatus(RobotStatus status);
-
+  void updateLocalCostMap(QImage map);
  private:
   int init_argc;
   char **init_argv;
@@ -114,6 +114,7 @@ class QNode : public QThread {
   ros::Subscriber chatter_subscriber;
   ros::Subscriber pos_sub;
   ros::Subscriber m_laserSub;
+  ros::Subscriber m_locCostMapSub;
   ros::Subscriber battery_sub;
   ros::Subscriber m_plannerPathSub;
   ros::Subscriber m_compressedImgSub0;
@@ -161,7 +162,7 @@ class QNode : public QThread {
   tf::TransformListener *m_robotPoselistener;
   tf::TransformListener *m_Laserlistener;
   std::string base_frame, laser_frame, map_frame;
-
+  std::vector<QColor> m_colorBar;
  private:
   void speedCallback(const nav_msgs::Odometry::ConstPtr &msg);
   void batteryCallback(const sensor_msgs::BatteryState &message);
@@ -169,6 +170,7 @@ class QNode : public QThread {
   void imageCallback1(const sensor_msgs::CompressedImageConstPtr &msg);
   void myCallback(const std_msgs::Float64 &message_holder);
   void mapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
+  void localCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr map);
   void laserScanCallback(sensor_msgs::LaserScanConstPtr scan);
   void plannerPathCallback(nav_msgs::Path::ConstPtr path);
   void SubAndPubTopic();

@@ -40,6 +40,7 @@ class roboItem : public QObject, public QGraphicsItem {
   QPointF RoboPostion;
   QSizeF mapSize;
   QImage m_image;
+  QImage m_localCostMap;
   QImage m_imageMap;
   QTimer timer_update;
   int m_sizeCar = 4;
@@ -63,6 +64,7 @@ class roboItem : public QObject, public QGraphicsItem {
   void signalPub2DGoal(QPointF,QPointF);
  public slots:
   void paintMaps(QImage map);
+  void paintLocalCostMaps(QImage map);
   void paintRoboPos(RobotPose pos);
   void paintImage(int, QImage);
   void paintPlannerPath(QPolygonF);
@@ -77,7 +79,7 @@ class roboItem : public QObject, public QGraphicsItem {
   void drawLaserScan(QPainter *painter);
   void drawPlannerPath(QPainter *painter);
   void drawTools(QPainter *painter);
-
+  void drawLocalCostMap(QPainter *painter);
  private:
   int m_zoomState;
   bool m_isMousePress{false};

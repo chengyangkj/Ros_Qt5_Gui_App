@@ -102,14 +102,15 @@ void QNode::SubAndPubTopic() {
   battery_sub = n.subscribe(batteryState_topic.toStdString(), 1000,
                             &QNode::batteryCallback, this);
   //地图订阅
-  map_sub = n.subscribe("map", 1000, &QNode::mapCallback, this);
-  //导航目标点发送话题
+  map_sub = n.subscribe("map", 1, &QNode::mapCallback, this);
+  m_locCostMapSub = n.subscribe("/move_base/local_costmap/costmap", 5, &QNode::localCostMapCallback, this);
+   //导航目标点发送话题
   goal_pub = n.advertise<geometry_msgs::PoseStamped>(
       naviGoal_topic.toStdString(), 1000);
   //速度控制话题
   cmd_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1000);
   //激光雷达点云话题订阅
-  m_laserSub = n.subscribe(laser_topic.toStdString(), 1000,
+  m_laserSub = n.subscribe(laser_topic.toStdString(), 5,
                            &QNode::laserScanCallback, this);
   //全局规划Path
   m_plannerPathSub =
@@ -240,6 +241,37 @@ void QNode::set_goal(QString frame, double x, double y, double z, double w) {
   goal.pose.orientation.z = z;
   goal.pose.orientation.w = w;
   goal_pub.publish(goal);
+}
+void QNode::localCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg){
+    int width = msg->info.width;
+    int height = msg->info.height;
+
+    m_mapResolution = msg->info.resolution;
+    double origin_x = msg->info.origin.position.x;
+    double origin_y = msg->info.origin.position.y;
+    QImage map_image(width, height, QImage::Format_RGB32);
+    for (int i = 0; i < msg->data.size(); i++) {
+      int x = i % width;
+      int y = (int)i / width;
+      //计算像素值
+      QColor color;
+
+      if (msg->data[i] >= 80) {
+        color.setRgb(0xff,00,0xff);  // black
+      } else if (msg->data[i] >= 60&&msg->data[i] < 80) {
+        color.setRgb(0x66,0xff,0xff); // white
+      }else if (msg->data[i] >= 30&&msg->data[i] < 60) {
+          color.setRgb(0xff,0x00,0x33); // white
+        }else{
+          color.setRgb(0x00,0x00,0xff); // white
+      }
+      map_image.setPixel(x, y, qRgb(color.red(), color.green(), color.blue()));
+    }
+    //延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
+    //但是图元坐标系为左上角度
+    map_image = rotateMapWithY(map_image);
+//    map_image.save("/home/chengyangkj/test.jpg");
+    emit updateLocalCostMap(map_image);
 }
 //地图信息订阅回调函数
 void QNode::mapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
