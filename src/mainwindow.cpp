@@ -8,9 +8,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     commNode=new rclcomm();
     connect(commNode,SIGNAL(emitTopicData(QString)),this,SLOT(onRecvData(QString)));
-    QImage img;
-    img.load("://images/foxy.jpg");
-    ui->label_3->setPixmap(QPixmap::fromImage(img).scaled(ui->label_3->size(),Qt::KeepAspectRatio, Qt::SmoothTransformation));
     //初始化场景类
     m_qGraphicScene=new QGraphicsScene();
     m_qGraphicScene->clear();
@@ -40,7 +37,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::onRecvData(QString msg){
-   ui->label_2->setText(msg);
+
 }
 
 void MainWindow::on_pushButton_clicked()
