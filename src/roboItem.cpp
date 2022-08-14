@@ -1,11 +1,17 @@
 #include "roboItem.h"
 #include "QDebug"
+
 roboItem::roboItem()
 {
    m_robotImg.load("://images/robot.png");
    QMatrix matrix;
    matrix.rotate(90);
    m_robotImg = m_robotImg.transformed(matrix,Qt::SmoothTransformation);
+   m_set2DPoseCursor=new QCursor(QPixmap("://images/cursor_pos.png"),0,0);
+   m_set2DGoalCursor=new QCursor(QPixmap("://images/cursor_pos.png"),0,0);
+   m_moveCursor =  new QCursor(QPixmap("://images/cursor_move.png"),0,0);
+   m_currCursor=m_moveCursor;
+   this->setCursor(*m_currCursor);
 }
 QRectF roboItem::boundingRect() const {
    return QRectF(0,0,400,400);
@@ -13,7 +19,7 @@ QRectF roboItem::boundingRect() const {
 
 void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
 //    qDebug()<<"我被调用啦";
-
+   painter->setRenderHint(QPainter::Antialiasing,true);  //设置反锯齿 反走样
    drawImage(painter);
    drawPoints(painter);
    drawLine(painter);
@@ -21,6 +27,7 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
    drawRobotPose(painter);
    drawLaserScan(painter);
    drawPath(painter);
+   drawTools(painter);
 }
 void roboItem::drawPath(QPainter* painter){
      painter->setPen(QPen(QColor(0,0,255),1));
@@ -42,6 +49,41 @@ void roboItem::drawRobotPose(QPainter* painter){
   painter->rotate(rad2deg(-m_currRobotPose.theta));
   painter->drawPixmap(-m_robotImg.width()/2,-m_robotImg.height()/2,m_robotImg);
   painter->restore();
+}
+void roboItem::drawTools(QPainter* painter){
+
+    if (m_currCursor == m_set2DPoseCursor || m_currCursor == m_set2DGoalCursor) {
+      //绘制箭头
+      if (m_startPose.x() != 0 && m_startPose.y() != 0 &&
+          m_endPose.x() != 0 && m_endPose.y() != 0) {
+          QPen pen(QColor(50, 205, 50, 255), 4, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+          QBrush brush(QColor(50, 205, 50, 255), Qt::SolidPattern);
+
+          painter->setPen(pen);
+          painter->setBrush(brush);
+        //计算线弧度
+        double theta = atan((m_endPose.y() - m_startPose.y()) /
+                             (m_endPose.x() - m_startPose.x()));
+        //绘制直线
+        QPointF startPoint, endPoint;
+        startPoint = m_startPose;
+        endPoint =m_endPose;
+        QLineF line(startPoint, endPoint);
+        painter->drawLine(line);
+        float angle = atan2(endPoint.y()-startPoint.y(), endPoint.x()-startPoint.x()) + 3.1415926;//
+        //绘制三角形
+        QPolygonF points;
+        points.push_back(endPoint);
+        QPointF point1,point2;
+        point1.setX(endPoint.x() + 10 * cos(angle - 0.5));//求得箭头点1坐标
+        point1.setY(endPoint.y() + 10 * sin(angle - 0.5));
+        point2.setX(endPoint.x() + 10 * cos(angle + 0.5));//求得箭头点2坐标
+        point2.setY(endPoint.y() + 10 * sin(angle + 0.5));
+        points.push_back(point1);
+        points.push_back(point2);
+        painter->drawPolygon(points);
+      }
+    }
 }
 void roboItem::drawMap(QPainter* painter){
     painter->drawImage(0,0,m_map);
@@ -109,20 +151,46 @@ void roboItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
 }
 void roboItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
     if(m_isMousePress){
-        QPointF point=(event->pos()-m_pressedPose)*m_scaleValue;
-        moveBy(point.x(),point.y());
+        if(m_currCursor==m_moveCursor){
+            QPointF point=(event->pos()-m_pressedPose)*m_scaleValue;
+            moveBy(point.x(),point.y());
+        }
+        m_endPose=event->pos();
     }
+    update();
 }
 void roboItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
     if(event->button()==Qt::LeftButton){
         m_pressedPose = event->pos();
         m_isMousePress=true;
+        m_startPose=event->pos();
     }
+    update();
 }
 void roboItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     if(event->button()==Qt::LeftButton){
         m_pressedPose = QPointF();
         m_isMousePress=false;
+        if(m_currCursor==m_set2DPoseCursor){
+            emit signalPub2DPose(m_startPose,m_endPose);
+            m_currCursor=m_moveCursor;
+            this->setCursor(*m_currCursor);
+        }else if(m_currCursor==m_set2DGoalCursor){
+            emit signalPub2DGoal(m_startPose,m_endPose);
+            m_currCursor=m_moveCursor;
+            this->setCursor(*m_currCursor);
+        }
+        m_startPose=QPointF();
+        m_endPose=QPointF();
     }
+    update();
+}
+void roboItem::start2DPose(){
+    this->setCursor(*m_set2DPoseCursor);
+    m_currCursor=m_set2DPoseCursor;
+}
+void roboItem::start2DGoal(){
+    this->setCursor(*m_set2DGoalCursor);
+    m_currCursor=m_set2DGoalCursor;
 }
