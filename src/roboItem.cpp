@@ -14,7 +14,7 @@ roboItem::roboItem()
    this->setCursor(*m_currCursor);
 }
 QRectF roboItem::boundingRect() const {
-   return QRectF(0,0,m_map.width(),m_map.height());
+   return QRectF(0,0,m_map.width()+100,m_map.height()+100);
 }
 
 void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
@@ -24,6 +24,7 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
    drawPoints(painter);
    drawLine(painter);
    drawMap(painter);
+   drawGlobalCostMap(painter);
    drawLocalCostMap(painter);
    drawRobotPose(painter);
    drawLaserScan(painter);
@@ -89,10 +90,16 @@ void roboItem::drawTools(QPainter* painter){
 void roboItem::drawMap(QPainter* painter){
     painter->drawImage(0,0,m_map);
 }
+void roboItem::drawGlobalCostMap(QPainter* painter){
+    //显示方法1 直接绘制图片
+    painter->save();
+    painter->drawImage(0,0,m_GlobalCostMap);
+    painter->restore();
+}
 void roboItem::drawLocalCostMap(QPainter* painter){
     //显示方法1 直接绘制图片
     painter->save();
-    painter->translate(m_currRobotPose.x, m_currRobotPose.y);
+    painter->translate(m_lastLocalCostMapRobotPose.x, m_lastLocalCostMapRobotPose.y);
     painter->drawImage(QPoint(-m_LocalCostMap.width() / 2, -m_LocalCostMap.height() / 2),m_LocalCostMap);
     painter->restore();
         //显示方法2 绘制点
@@ -136,6 +143,11 @@ void roboItem::updateImage(QImage img){
 }
 void roboItem::updateLocalCostMap(QImage img){
     m_LocalCostMap=img;
+    m_lastLocalCostMapRobotPose=m_currRobotPose;
+    update();
+}
+void roboItem::updateGlobalCostMap(QImage img){
+    m_GlobalCostMap=img;
     update();
 }
 void roboItem::updateMap(QImage img){
