@@ -84,8 +84,6 @@ QPointF rclcomm::transScenePoint2Word(QPointF point){
  return ret;
 }
 void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg){
-    qDebug()<<"path frame id:"<<QString::fromStdString(msg->header.frame_id);
-    qDebug()<<"num:"<<msg->poses.size();
     QPolygonF emit_points;
     for(int i=0;i<msg->poses.size();i++){
         double x = msg->poses.at(i).pose.position.x;
