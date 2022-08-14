@@ -3,8 +3,12 @@
 
 #include <QMainWindow>
 
+#include "dashboard.h"
 #include "rclcomm.h"
 #include "roboItem.h"
+#include "ui_mainwindow.h"
+#include "QTimer"
+#include <QDateTime>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -20,27 +24,17 @@ class MainWindow : public QMainWindow {
   rclcomm *commNode;
  public slots:
   void onRecvData(QString);
- private slots:
-  void on_pushButton_6_clicked();
-
- private slots:
-  void on_pushButton_5_clicked();
-
- private slots:
-  void on_pushButton_4_clicked();
-
- private slots:
-  void on_pushButton_3_clicked();
-
- private slots:
-  void on_pushButton_2_clicked();
-
- private slots:
-  void on_pushButton_clicked();
 
  private:
-  Ui::MainWindow *ui;
+  void initUi();
+  void closeEvent(QCloseEvent *event);  // Overloaded function
+  void setCurrentMenu(QPushButton *cur_btn);
+
+ private:
+  Ui::MainWindowDesign *ui;
   QGraphicsScene *m_qGraphicScene = nullptr;
   roboItem *m_roboItem = nullptr;
+  DashBoard *m_speedDashBoard;
+  QTimer *m_timerCurrentTime;
 };
 #endif  // MAINWINDOW_H

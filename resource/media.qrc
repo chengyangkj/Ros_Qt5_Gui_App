@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>media/start_return.wav</file>
+        <file>media/refresh_return.wav</file>
+    </qresource>
+</RCC>

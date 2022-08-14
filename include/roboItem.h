@@ -24,6 +24,7 @@ class roboItem : public QObject, public QGraphicsItem {
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+  void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
  public slots:
   void updateMap(QImage img);
   void updateLocalCostMap(QImage img);
@@ -70,6 +71,7 @@ class roboItem : public QObject, public QGraphicsItem {
  signals:
   void signalPub2DPose(QPointF, QPointF);
   void signalPub2DGoal(QPointF, QPointF);
+  void cursorPos(QPointF);
 };
 
 #endif  // ROBOITEM_H

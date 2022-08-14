@@ -8,7 +8,7 @@ roboItem::roboItem() {
   setAcceptDrops(true);
   setFlag(ItemAcceptsInputMethod, true);
   moveBy(0, 0);
-  m_robotImg.load("://images/robot.png");
+  m_robotImg.load("://images/robot_blue.png");
   QMatrix matrix;
   matrix.rotate(90);
   m_robotImg = m_robotImg.transformed(matrix, Qt::SmoothTransformation);
@@ -179,6 +179,7 @@ void roboItem::updatePath(QPolygonF points) {
   update();
 }
 void roboItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
+  this->setCursor(Qt::CrossCursor);
   double beforeScaleValue = m_scaleValue;
   if (event->delta() > 0) {
     //        qDebug()<<"放大";
@@ -199,6 +200,9 @@ void roboItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
   }
   update();
   //    qDebug()<<"m_scaleValue:"<<m_scaleValue;
+}
+void roboItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+  emit cursorPos(event->pos());
 }
 void roboItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (m_isMousePress) {
