@@ -27,6 +27,7 @@ public:
 private:
     void recv_callback(const std_msgs::msg::Int32::SharedPtr msg);
     void map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
+    void localCostMapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
     void laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
     void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
     QImage rotateMapWithY(QImage map);
@@ -59,6 +60,7 @@ signals:
     void emitUpdateRobotPose(RobotPose pose);
     void emitUpdateLaserPoint(QPolygonF points);
     void emitUpdatePath(QPolygonF points);
+    void emitUpdateLocalCostMap(QImage img);
 };
 
 #endif // RCLCOMM_H

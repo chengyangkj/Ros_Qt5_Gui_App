@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent)
     QImage img;
     img.load("://images/foxy.jpg");
     ui->label_3->setPixmap(QPixmap::fromImage(img).scaled(ui->label_3->size(),Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
     //初始化场景类
     m_qGraphicScene=new QGraphicsScene();
     m_qGraphicScene->clear();
@@ -22,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     //ui中的graphicsView添加场景
     ui->graphicsView->setScene(m_qGraphicScene);
     connect(commNode,SIGNAL(emitUpdateMap(QImage)),m_roboItem,SLOT(updateMap(QImage)));
+    connect(commNode,SIGNAL(emitUpdateLocalCostMap(QImage)),m_roboItem,SLOT(updateLocalCostMap(QImage)));
     connect(commNode,SIGNAL(emitUpdateRobotPose(RobotPose)),m_roboItem,SLOT(updateRobotPose(RobotPose)));
     connect(commNode,SIGNAL(emitUpdateLaserPoint(QPolygonF)),m_roboItem,SLOT(updateLaserPoints(QPolygonF)));
     connect(commNode,SIGNAL(emitUpdatePath(QPolygonF)),m_roboItem,SLOT(updatePath(QPolygonF)));

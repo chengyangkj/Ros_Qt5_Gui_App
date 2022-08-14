@@ -17,6 +17,7 @@ public:
     void updateImage(QImage img);
     void updatePoints(QPolygonF points);
     void updateLine(QLine line);
+
 public:
     void wheelEvent(QGraphicsSceneWheelEvent *event) override;
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
@@ -24,6 +25,7 @@ public:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 public slots:
       void updateMap(QImage img);
+      void updateLocalCostMap(QImage img);
       void updateRobotPose(RobotPose pose);
       void updateLaserPoints(QPolygonF points);
       void updatePath(QPolygonF points);
@@ -32,6 +34,7 @@ public slots:
 private:
     QImage m_images;
     QImage m_map;
+    QImage m_LocalCostMap;
     QPixmap m_robotImg;
     QPolygonF m_points;
     QLine m_lines;
@@ -52,6 +55,7 @@ private:
     void drawImage(QPainter* painter);
     void drawPoints(QPainter* painter);
     void drawMap(QPainter* painter);
+    void drawLocalCostMap(QPainter* painter);
     void drawRobotPose(QPainter* painter);
     void drawLaserScan(QPainter* painter);
     void drawPath(QPainter* painter);

@@ -1,6 +1,7 @@
 #ifndef ROBOTALGORITHM_H
 #define ROBOTALGORITHM_H
 #include <math.h>
+#include <QColor>
 struct RobotPose{
     double x{0};
     double y{0};

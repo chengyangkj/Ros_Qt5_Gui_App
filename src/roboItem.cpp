@@ -14,7 +14,7 @@ roboItem::roboItem()
    this->setCursor(*m_currCursor);
 }
 QRectF roboItem::boundingRect() const {
-   return QRectF(0,0,400,400);
+   return QRectF(0,0,m_map.width(),m_map.height());
 }
 
 void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
@@ -24,6 +24,7 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
    drawPoints(painter);
    drawLine(painter);
    drawMap(painter);
+   drawLocalCostMap(painter);
    drawRobotPose(painter);
    drawLaserScan(painter);
    drawPath(painter);
@@ -88,6 +89,27 @@ void roboItem::drawTools(QPainter* painter){
 void roboItem::drawMap(QPainter* painter){
     painter->drawImage(0,0,m_map);
 }
+void roboItem::drawLocalCostMap(QPainter* painter){
+    //显示方法1 直接绘制图片
+    painter->save();
+    painter->translate(m_currRobotPose.x, m_currRobotPose.y);
+    painter->drawImage(QPoint(-m_LocalCostMap.width() / 2, -m_LocalCostMap.height() / 2),m_LocalCostMap);
+    painter->restore();
+        //显示方法2 绘制点
+//        painter->save();
+//        painter->translate(m_currRobotPose.x, m_currRobotPose.y);
+//        for(int x=0;x<m_LocalCostMap.width();x++){
+//            for(int y=0;y<m_LocalCostMap.height();y++){
+//              QColor color =  m_LocalCostMap.pixelColor(x,y);
+//              int r,g,b,a;
+//              color.getRgb(&r,&g,&b,&a);
+//              if(color==Qt::transparent) continue;
+//              painter->setPen(QPen(color,1));
+//              painter->drawPoint(-m_LocalCostMap.width() / 2+x,-m_LocalCostMap.height() / 2+y);
+//            }
+//        }
+//        painter->restore();
+}
 void roboItem::drawImage(QPainter* painter){
     painter->drawImage(0,0,m_images);
 }
@@ -110,6 +132,10 @@ void roboItem::updatePoints(QPolygonF points){
 }
 void roboItem::updateImage(QImage img){
     m_images=img;
+    update();
+}
+void roboItem::updateLocalCostMap(QImage img){
+    m_LocalCostMap=img;
     update();
 }
 void roboItem::updateMap(QImage img){
