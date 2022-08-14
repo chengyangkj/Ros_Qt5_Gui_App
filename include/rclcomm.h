@@ -31,11 +31,10 @@ private:
     void getRobotPose();
 
 private:
-    rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
-    rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr _subscription;
-    rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr _map_sub;
-    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr _laser_sub;
-    rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _path_sub;
+    rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr m_map_sub;
+    rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr m_localCostMapSub;
+    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr m_laser_sub;
+    rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr m_path_sub;
     std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> m_transform_listener;
     std::shared_ptr<rclcpp::Node> node;
