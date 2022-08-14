@@ -14,20 +14,15 @@ rclcomm::rclcomm()
     sub1_obt.callback_group=callback_group_other;
     auto sub_laser_obt = rclcpp::SubscriptionOptions();
     sub_laser_obt.callback_group=callback_group_laser;
-<<<<<<< HEAD
 
-    m_map_sub = node->create_subscription<nav_msgs::msg::OccupancyGrid>("/map",rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),std::bind(&rclcomm::map_callback,this,std::placeholders::_1),sub1_obt);
-    m_laser_sub = node->create_subscription<sensor_msgs::msg::LaserScan>("/scan",20,std::bind(&rclcomm::laser_callback,this,std::placeholders::_1),sub_laser_obt);
-    m_path_sub =node->create_subscription<nav_msgs::msg::Path>("/plan",20,std::bind(&rclcomm::path_callback,this,std::placeholders::_1),sub1_obt);
-=======
+
     _navPosePublisher=node->create_publisher<geometry_msgs::msg::PoseStamped>("goal_pose",10);
     _initPosePublisher=node->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>("initialpose",10);
     _publisher = node->create_publisher<std_msgs::msg::Int32>("ros2_qt_dmeo_publish",10);
     _subscription = node->create_subscription<std_msgs::msg::Int32>("ros2_qt_dmeo_publish",10,std::bind(&rclcomm::recv_callback,this,std::placeholders::_1),sub1_obt);
-    _map_sub = node->create_subscription<nav_msgs::msg::OccupancyGrid>("/map",rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),std::bind(&rclcomm::map_callback,this,std::placeholders::_1),sub1_obt);
-    _laser_sub = node->create_subscription<sensor_msgs::msg::LaserScan>("/scan",20,std::bind(&rclcomm::laser_callback,this,std::placeholders::_1),sub_laser_obt);
-    _path_sub =node->create_subscription<nav_msgs::msg::Path>("/plan",20,std::bind(&rclcomm::path_callback,this,std::placeholders::_1),sub1_obt);
->>>>>>> edce5eb21004d1fdfc6456a0d4624fc57425e54e
+    m_map_sub = node->create_subscription<nav_msgs::msg::OccupancyGrid>("/map",rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),std::bind(&rclcomm::map_callback,this,std::placeholders::_1),sub1_obt);
+    m_laser_sub = node->create_subscription<sensor_msgs::msg::LaserScan>("/scan",20,std::bind(&rclcomm::laser_callback,this,std::placeholders::_1),sub_laser_obt);
+    m_path_sub =node->create_subscription<nav_msgs::msg::Path>("/plan",20,std::bind(&rclcomm::path_callback,this,std::placeholders::_1),sub1_obt);
     m_tf_buffer=std::make_unique<tf2_ros::Buffer>(node->get_clock());
     m_transform_listener=std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 }
