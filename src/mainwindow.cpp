@@ -86,11 +86,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_time->setText(
         QDateTime::currentDateTime().toString("  hh:mm:ss  "));
   });
-//   QImage image(600, 600, QImage::Format_RGB888);
-//   QPainter painter(&image);
-//   painter.setRenderHint(QPainter::Antialiasing);
-//   m_qGraphicScene->render(&painter);
-//   image.save("/home/chengyangkj/test.jpg");
+  //   QImage image(600, 600, QImage::Format_RGB888);
+  //   QPainter painter(&image);
+  //   painter.setRenderHint(QPainter::Antialiasing);
+  //   m_qGraphicScene->render(&painter);
+  //   image.save("/home/chengyangkj/test.jpg");
+
   commNode->start();
   initUi();
 }

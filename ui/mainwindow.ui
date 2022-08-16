@@ -205,18 +205,12 @@ background-color: transparent;
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_carback">
+               <widget class="roboGLWidget" name="openGLWidget">
                 <property name="minimumSize">
                  <size>
                   <width>300</width>
                   <height>400</height>
                  </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string/>
                 </property>
                </widget>
               </item>
@@ -880,7 +874,7 @@ QProgressBar::chunk
           <item>
            <widget class="QStackedWidget" name="stackedWidget_main">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -1919,6 +1913,13 @@ margin:0px 0px 0px 0px;
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>roboGLWidget</class>
+   <extends>QOpenGLWidget</extends>
+   <header location="global">roboGLWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resource/image.qrc"/>
   <include location="../resource/images.qrc"/>

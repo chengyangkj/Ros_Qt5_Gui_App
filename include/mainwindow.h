@@ -9,6 +9,7 @@
 #include "ui_mainwindow.h"
 #include "QTimer"
 #include <QDateTime>
+#include "roboGLWidget.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -36,5 +37,6 @@ class MainWindow : public QMainWindow {
   roboItem *m_roboItem = nullptr;
   DashBoard *m_speedDashBoard;
   QTimer *m_timerCurrentTime;
+  roboGLWidget *m_roboGLWidget;
 };
 #endif  // MAINWINDOW_H
