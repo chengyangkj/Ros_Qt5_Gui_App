@@ -1,15 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QDateTime>
 #include <QMainWindow>
 
+#include "QTimer"
 #include "dashboard.h"
 #include "rclcomm.h"
+#include "roboGLWidget.h"
+#include "roboImg.h"
 #include "roboItem.h"
 #include "ui_mainwindow.h"
-#include "QTimer"
-#include <QDateTime>
-#include "roboGLWidget.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -25,7 +26,7 @@ class MainWindow : public QMainWindow {
   rclcomm *commNode;
  public slots:
   void onRecvData(QString);
-
+  void updateRobotPose(RobotPose pose);
  private:
   void initUi();
   void closeEvent(QCloseEvent *event);  // Overloaded function
@@ -35,6 +36,7 @@ class MainWindow : public QMainWindow {
   Ui::MainWindowDesign *ui;
   QGraphicsScene *m_qGraphicScene = nullptr;
   roboItem *m_roboItem = nullptr;
+  roboImg *m_roboImg = nullptr;
   DashBoard *m_speedDashBoard;
   QTimer *m_timerCurrentTime;
   roboGLWidget *m_roboGLWidget;

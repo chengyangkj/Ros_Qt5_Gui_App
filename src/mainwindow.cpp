@@ -13,8 +13,12 @@ MainWindow::MainWindow(QWidget *parent)
   m_qGraphicScene->clear();
   //初始化item
   m_roboItem = new roboItem();
+  m_roboImg = new roboImg();
+  m_roboItem->setZValue(1);
+  m_roboImg->setZValue(10);
   //视图中添加Item
   m_qGraphicScene->addItem(m_roboItem);
+  m_qGraphicScene->addItem(m_roboImg);
   // ui中的graphicsView添加场景
   ui->mapViz->setScene(m_qGraphicScene);
   connect(commNode, SIGNAL(emitUpdateMap(QImage)), m_roboItem,
@@ -23,7 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
           SLOT(updateLocalCostMap(QImage)));
   connect(commNode, SIGNAL(emitUpdateGlobalCostMap(QImage)), m_roboItem,
           SLOT(updateGlobalCostMap(QImage)));
-  connect(commNode, SIGNAL(emitUpdateRobotPose(RobotPose)), m_roboItem,
+
+  connect(commNode, SIGNAL(emitUpdateRobotPose(RobotPose)), this,
           SLOT(updateRobotPose(RobotPose)));
   connect(commNode, SIGNAL(emitUpdateLaserPoint(QPolygonF)), m_roboItem,
           SLOT(updateLaserPoints(QPolygonF)));
@@ -94,6 +99,15 @@ MainWindow::MainWindow(QWidget *parent)
 
   commNode->start();
   initUi();
+}
+void MainWindow::updateRobotPose(RobotPose pose) {
+  m_roboItem->updateRobotPose(pose);
+  QPointF pos;
+  pos.setX(pose.x);
+  pos.setY(pose.y);
+  QPointF scenePose = m_roboItem->mapToScene(pos);
+  m_roboImg->updatePose(pose);
+  m_roboImg->setPos(scenePose.x(), scenePose.y());
 }
 void MainWindow::setCurrentMenu(QPushButton *cur_btn) {
   for (int i = 0; i < ui->horizontalLayout_menu->layout()->count(); i++) {

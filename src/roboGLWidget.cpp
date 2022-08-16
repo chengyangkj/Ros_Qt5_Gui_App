@@ -1,18 +1,16 @@
 #include "roboGLWidget.h"
+
 #include <QPainter>
-roboGLWidget::roboGLWidget(QWidget *parent)
-    : QOpenGLWidget(parent)
- {}
+roboGLWidget::roboGLWidget(QWidget *parent) : QOpenGLWidget(parent) {}
 
 roboGLWidget::~roboGLWidget() {}
-void roboGLWidget::paintEvent(QPaintEvent *e){
-    QPainter painter;
-	painter.begin(this);
- 
-	QImage img;
-    img.load("/home/chengyangkj/hourse.pgm");
-	painter.drawImage(QPoint(0, 0), img);
+void roboGLWidget::paintEvent(QPaintEvent *e) {
+  QPainter painter;
+  painter.begin(this);
 
-	painter.end();
+  QImage img;
+  img.load("/home/chengyangkj/hourse.pgm");
+  painter.drawImage(QPoint(0, 0), img);
 
+  painter.end();
 }

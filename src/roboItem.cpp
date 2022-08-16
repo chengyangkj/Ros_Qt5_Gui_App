@@ -32,7 +32,7 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   drawMap(painter);
   drawGlobalCostMap(painter);
   drawLocalCostMap(painter);
-  drawRobotPose(painter);
+  // drawRobotPose(painter);
   drawLaserScan(painter);
   drawPath(painter);
   drawTools(painter);
