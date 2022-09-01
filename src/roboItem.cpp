@@ -108,9 +108,8 @@ void roboItem::drawLocalCostMap(QPainter *painter) {
   painter->save();
   painter->translate(m_lastLocalCostMapRobotPose.x,
                      m_lastLocalCostMapRobotPose.y);
-  painter->drawImage(
-      QPoint(-m_LocalCostMap.width() / 2, -m_LocalCostMap.height() / 2),
-      m_LocalCostMap);
+  //  painter->rotate(rad2deg(-m_lastLocalCostMapRobotPose.theta));
+  painter->drawImage(QPoint(0, -m_LocalCostMap.height()), m_LocalCostMap);
   painter->restore();
   //显示方法2 绘制点
   //        painter->save();
@@ -152,9 +151,9 @@ void roboItem::updateImage(QImage img) {
   m_images = img;
   update();
 }
-void roboItem::updateLocalCostMap(QImage img) {
+void roboItem::updateLocalCostMap(QImage img, RobotPose pose) {
   m_LocalCostMap = img;
-  m_lastLocalCostMapRobotPose = m_currRobotPose;
+  m_lastLocalCostMapRobotPose = pose;
   update();
 }
 void roboItem::updateGlobalCostMap(QImage img) {

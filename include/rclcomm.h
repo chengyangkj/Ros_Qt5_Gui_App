@@ -34,6 +34,7 @@ class rclcomm : public QThread {
   void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
   QImage rotateMapWithY(QImage map);
   void getRobotPose();
+  void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
  public slots:
   void pub2DPose(QPointF, QPointF);
   void pub2DGoal(QPointF, QPointF);
@@ -51,24 +52,27 @@ class rclcomm : public QThread {
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
       m_globalCostMapSub;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr m_laser_sub;
+      rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _local_path_sub;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr m_path_sub;
   std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
   std::shared_ptr<tf2_ros::TransformListener> m_transform_listener;
   std::shared_ptr<rclcpp::Node> node;
   QPointF m_wordOrigin;
-  double m_resolution;
+  double m_resolution; 
   RobotPose m_currPose;
   rclcpp::executors::MultiThreadedExecutor *m_executor;
   rclcpp::CallbackGroup::SharedPtr callback_group_laser;
   rclcpp::CallbackGroup::SharedPtr callback_group_other;
  signals:
   void emitTopicData(QString);
-  void emitUpdateMap(QImage img);
-  void emitUpdateRobotPose(RobotPose pose);
-  void emitUpdateLaserPoint(QPolygonF points);
-  void emitUpdatePath(QPolygonF points);
-  void emitUpdateLocalCostMap(QImage img);
-  void emitUpdateGlobalCostMap(QImage img);
+    void emitUpdateMap(QImage img);
+    void emitUpdateLocalCostMap(QImage img,RobotPose pose);
+    void emitUpdateGlobalCostMap(QImage img);
+    void emitUpdateRobotPose(RobotPose pose);
+    void emitUpdateLaserPoint(QPolygonF points);
+    void emitUpdatePath(QPolygonF points);
+    void emitUpdateLocalPath(QPolygonF points);
+
 };
 
 #endif  // RCLCOMM_H

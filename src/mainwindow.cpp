@@ -23,17 +23,17 @@ MainWindow::MainWindow(QWidget *parent)
   ui->mapViz->setScene(m_qGraphicScene);
   connect(commNode, SIGNAL(emitUpdateMap(QImage)), m_roboItem,
           SLOT(updateMap(QImage)));
-  connect(commNode, SIGNAL(emitUpdateLocalCostMap(QImage)), m_roboItem,
-          SLOT(updateLocalCostMap(QImage)));
+  connect(commNode, SIGNAL(emitUpdateLocalCostMap(QImage,RobotPose)), m_roboItem,
+          SLOT(updateLocalCostMap(QImage,RobotPose)));
   connect(commNode, SIGNAL(emitUpdateGlobalCostMap(QImage)), m_roboItem,
           SLOT(updateGlobalCostMap(QImage)));
-
   connect(commNode, SIGNAL(emitUpdateRobotPose(RobotPose)), this,
           SLOT(updateRobotPose(RobotPose)));
   connect(commNode, SIGNAL(emitUpdateLaserPoint(QPolygonF)), m_roboItem,
           SLOT(updateLaserPoints(QPolygonF)));
   connect(commNode, SIGNAL(emitUpdatePath(QPolygonF)), m_roboItem,
           SLOT(updatePath(QPolygonF)));
+              connect(commNode,SIGNAL(emitUpdateLocalPath(QPolygonF)),m_roboItem,SLOT(updateLocalPath(QPolygonF)));
   //    connect(commNode,&rclcomm::emitUpdateMap,[this](QImage img){
   //        m_roboItem->updateMap(img);
   //    });

@@ -1,2 +1,3 @@
 build/*
-CMakeLists.txt.user
+*.user
+*.autosave

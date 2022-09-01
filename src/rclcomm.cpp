@@ -216,6 +216,12 @@ void rclcomm::localCostMapCallback(
   int height = msg->info.height;
   double origin_x = msg->info.origin.position.x;
   double origin_y = msg->info.origin.position.y;
+  tf2::Quaternion q;
+  tf2::fromMsg(msg->info.origin.orientation,q);
+  tf2::Matrix3x3 mat(q);
+  double roll,pitch,yaw;
+  mat.getRPY(roll,pitch,yaw);
+  double origin_theta=yaw;
   QImage map_image(width, height, QImage::Format_ARGB32);
   for (int i = 0; i < msg->data.size(); i++) {
     int x = i % width;
@@ -250,7 +256,33 @@ void rclcomm::localCostMapCallback(
   //但是图元坐标系为左上角度
   map_image = rotateMapWithY(map_image);
   //      map_image.save("/home/chengyangkj/test.jpg");
-  emit emitUpdateLocalCostMap(map_image);
+  try {
+      //坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
+      geometry_msgs::msg::PoseStamped pose_map_frame;
+      geometry_msgs::msg::PoseStamped pose_curr_frame;
+      pose_curr_frame.pose.position.x=origin_x;
+      pose_curr_frame.pose.position.y=origin_y;
+      q.setRPY(0,0,origin_theta);
+      pose_curr_frame.pose.orientation=tf2::toMsg(q);
+      pose_curr_frame.header.frame_id = msg->header.frame_id;
+      m_tf_buffer->transform(pose_curr_frame,pose_map_frame,"map");
+      tf2::fromMsg(pose_map_frame.pose.orientation,q);
+      tf2::Matrix3x3 mat(q);
+      double roll,pitch,yaw;
+      mat.getRPY(roll,pitch,yaw);
+      //原点坐标转到图元坐标系下
+      QPointF scene_origin= transWordPoint2Scene(QPointF(pose_map_frame.pose.position.x,pose_map_frame.pose.position.y));
+      RobotPose localCostmapPose;
+      localCostmapPose.x=scene_origin.x();
+      localCostmapPose.y=scene_origin.y();
+      localCostmapPose.theta=yaw;
+//      std::cout<<"odomInMapPose:"<<pose_map_frame.pose.position.x<<" "<<pose_map_frame.pose.position.y<<" curr:"<<m_currPose.x<<" "<<m_currPose.y<<std::endl;
+//      std::cout<<"origin x:"<<origin_x<<" y:"<<origin_y<<" theta:"<<origin_theta<<std::endl;
+      emit emitUpdateLocalCostMap(map_image,localCostmapPose);
+  } catch (tf2::TransformException &ex) {
+      qDebug()<<"local cost map pose transform error:"<<ex.what();
+  }
+
 }
 void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   double origin_x = msg->info.origin.position.x;
