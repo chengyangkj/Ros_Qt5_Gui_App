@@ -35,11 +35,16 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   // drawRobotPose(painter);
   drawLaserScan(painter);
   drawPath(painter);
+    drawLocalPath(painter);
   drawTools(painter);
 }
 void roboItem::drawPath(QPainter *painter) {
   painter->setPen(QPen(QColor(0, 0, 255), 1));
   painter->drawPoints(m_pathPoints);
+}
+void roboItem::drawLocalPath(QPainter *painter) {
+  painter->setPen(QPen(QColor(255, 0, 0), 1));
+  painter->drawPoints(m_localPathPoints);
 }
 void roboItem::drawLaserScan(QPainter *painter) {
   painter->setPen(QPen(QColor(255, 0, 0), 1));
@@ -176,6 +181,10 @@ void roboItem::updateLaserPoints(QPolygonF points) {
 void roboItem::updatePath(QPolygonF points) {
   m_pathPoints = points;
   update();
+}
+void roboItem::updateLocalPath(QPolygonF points){
+    m_localPathPoints=points;
+    update();
 }
 void roboItem::wheelEvent(QGraphicsSceneWheelEvent *event) {
   this->setCursor(Qt::CrossCursor);
