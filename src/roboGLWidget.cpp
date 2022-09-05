@@ -8,8 +8,8 @@ void roboGLWidget::paintEvent(QPaintEvent *e) {
   QPainter painter;
   painter.begin(this);
 
-//  QImage img;
-//  img.load("/home/chengyangkj/hourse.pgm");
+  //  QImage img;
+  //  img.load("/home/chengyangkj/hourse.pgm");
   // painter.drawImage(QPoint(0, 0), img);
 
   painter.end();

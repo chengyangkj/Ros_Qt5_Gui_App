@@ -52,6 +52,10 @@ rclcomm::rclcomm() {
       "/local_plan", 20,
       std::bind(&rclcomm::local_path_callback, this, std::placeholders::_1),
       sub1_obt);
+  m_odom_sub = node->create_subscription<nav_msgs::msg::Odometry>(
+      "/odom", 20,
+      std::bind(&rclcomm::odom_callback, this, std::placeholders::_1),
+      sub1_obt);
   m_tf_buffer = std::make_unique<tf2_ros::Buffer>(node->get_clock());
   m_transform_listener =
       std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
@@ -78,6 +82,24 @@ void rclcomm::getRobotPose() {
   } catch (tf2::TransformException &ex) {
     qDebug() << "robot pose transform error:" << ex.what();
   }
+}
+void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+  RobotState state;
+  state.vx = (double)msg->twist.twist.linear.x;
+  state.vy = (double)msg->twist.twist.linear.y;
+  state.w = (double)msg->twist.twist.angular.z;
+  state.x = (double)msg->pose.pose.position.x;
+  state.y = (double)msg->pose.pose.position.y;
+
+  geometry_msgs::msg::Quaternion msg_quat = msg->pose.pose.orientation;
+  //转换类型
+  tf2::Quaternion q;
+  tf2::fromMsg(msg_quat, q);
+  tf2::Matrix3x3 mat(q);
+  double roll, pitch, yaw;
+  mat.getRPY(roll, pitch, yaw);
+  state.theta = yaw;
+  emit emitOdomInfo(state);
 }
 void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   try {

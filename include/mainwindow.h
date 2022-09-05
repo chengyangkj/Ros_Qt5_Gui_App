@@ -27,6 +27,7 @@ class MainWindow : public QMainWindow {
  public slots:
   void onRecvData(QString);
   void updateRobotPose(RobotPose pose);
+  void updateOdomInfo(RobotState);
  private:
   void initUi();
   void closeEvent(QCloseEvent *event);  // Overloaded function

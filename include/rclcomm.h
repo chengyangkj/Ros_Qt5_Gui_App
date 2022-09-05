@@ -11,6 +11,7 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
+#include "nav_msgs/msg/odometry.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "std_msgs/msg/int32.hpp"
@@ -28,6 +29,7 @@ class rclcomm : public QThread {
  private:
   void recv_callback(const std_msgs::msg::Int32::SharedPtr msg);
   void map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
+  void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
   void localCostMapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
   void globalCostMapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
   void laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
@@ -52,6 +54,7 @@ class rclcomm : public QThread {
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
       m_globalCostMapSub;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr m_laser_sub;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr m_odom_sub;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _local_path_sub;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr m_path_sub;
   std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
@@ -72,6 +75,7 @@ class rclcomm : public QThread {
   void emitUpdateLaserPoint(QPolygonF points);
   void emitUpdatePath(QPolygonF points);
   void emitUpdateLocalPath(QPolygonF points);
+  void emitOdomInfo(RobotState state);
 };
 
 #endif  // RCLCOMM_H

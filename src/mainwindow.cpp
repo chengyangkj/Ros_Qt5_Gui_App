@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
   ui->mapViz->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   connect(commNode, SIGNAL(emitUpdateMap(QImage)), m_roboItem,
           SLOT(updateMap(QImage)));
-  connect(commNode, SIGNAL(emitUpdateLocalCostMap(QImage,RobotPose)), m_roboItem,
-          SLOT(updateLocalCostMap(QImage,RobotPose)));
+  connect(commNode, SIGNAL(emitUpdateLocalCostMap(QImage, RobotPose)),
+          m_roboItem, SLOT(updateLocalCostMap(QImage, RobotPose)));
   connect(commNode, SIGNAL(emitUpdateGlobalCostMap(QImage)), m_roboItem,
           SLOT(updateGlobalCostMap(QImage)));
   connect(commNode, SIGNAL(emitUpdateRobotPose(RobotPose)), this,
@@ -34,7 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
           SLOT(updateLaserPoints(QPolygonF)));
   connect(commNode, SIGNAL(emitUpdatePath(QPolygonF)), m_roboItem,
           SLOT(updatePath(QPolygonF)));
-              connect(commNode,SIGNAL(emitUpdateLocalPath(QPolygonF)),m_roboItem,SLOT(updateLocalPath(QPolygonF)));
+  connect(commNode, SIGNAL(emitUpdateLocalPath(QPolygonF)), m_roboItem,
+          SLOT(updateLocalPath(QPolygonF)));
+  connect(commNode, SIGNAL(emitOdomInfo(RobotState)), this,
+          SLOT(updateOdomInfo(RobotState)));
   //    connect(commNode,&rclcomm::emitUpdateMap,[this](QImage img){
   //        m_roboItem->updateMap(img);
   //    });
@@ -100,6 +103,35 @@ MainWindow::MainWindow(QWidget *parent)
 
   commNode->start();
   initUi();
+}
+void MainWindow::updateOdomInfo(RobotState state) {
+  //转向灯
+  if (state.w > 0.1) {
+    ui->label_turnLeft->setPixmap(
+        QPixmap::fromImage(QImage("://images/turnLeft_hl.png")));
+  } else if (state.w < -0.1) {
+    ui->label_turnRight->setPixmap(
+        QPixmap::fromImage(QImage("://images/turnRight_hl.png")));
+  } else {
+    ui->label_turnLeft->setPixmap(
+        QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
+    ui->label_turnRight->setPixmap(
+        QPixmap::fromImage(QImage("://images/turnRight_l.png")));
+  }
+  //仪表盘
+  m_speedDashBoard->set_speed(abs(state.vx * 100));
+  if (state.vx > 0.001) {
+    m_speedDashBoard->set_gear(DashBoard::kGear_D);
+  } else if (state.vx < -0.001) {
+    m_speedDashBoard->set_gear(DashBoard::kGear_R);
+  } else {
+    m_speedDashBoard->set_gear(DashBoard::kGear_N);
+  }
+  QString number = QString::number(abs(state.vx * 100)).mid(0, 2);
+  if (number[1] == ".") {
+    number = number.mid(0, 1);
+  }
+  ui->label_speed->setText(number);
 }
 void MainWindow::updateRobotPose(RobotPose pose) {
   m_roboItem->updateRobotPose(pose);
