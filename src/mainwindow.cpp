@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
   m_qGraphicScene->addItem(m_roboImg);
   // ui中的graphicsView添加场景
   ui->mapViz->setScene(m_qGraphicScene);
+  ui->mapViz->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   connect(commNode, SIGNAL(emitUpdateMap(QImage)), m_roboItem,
           SLOT(updateMap(QImage)));
   connect(commNode, SIGNAL(emitUpdateLocalCostMap(QImage,RobotPose)), m_roboItem,

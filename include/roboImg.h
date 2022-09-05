@@ -8,6 +8,7 @@
 #include <QPainter>
 
 #include "RobotAlgorithm.h"
+enum eRobotColor { blue, red, yellow };
 class roboImg : public QObject, public QGraphicsItem {
   Q_OBJECT
  public:
@@ -15,7 +16,7 @@ class roboImg : public QObject, public QGraphicsItem {
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   QRectF boundingRect() const override;
-
+  void setRobotColor(eRobotColor color);
  private:
    QPixmap m_robotImg;
    RobotPose m_currRobotPose;

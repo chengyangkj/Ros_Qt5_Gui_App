@@ -16,7 +16,22 @@ roboImg::roboImg() {
 QRectF roboImg::boundingRect() const {
   return QRectF(0, 0, m_robotImg.width(), m_robotImg.height());
 }
-
+void roboImg::setRobotColor(eRobotColor color) {
+  switch (color) {
+    case eRobotColor::blue: {
+      m_robotImg.load("://images/robot_blue.png");
+    } break;
+    case eRobotColor::red: {
+      m_robotImg.load("://images/robot_red.png");
+    } break;
+    case eRobotColor::yellow: {
+      m_robotImg.load("://images/robot_yellow.png");
+    } break;
+  }
+  QMatrix matrix;
+  matrix.rotate(90);
+  m_robotImg = m_robotImg.transformed(matrix, Qt::SmoothTransformation);
+}
 void roboImg::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget) {
   painter->setRenderHint(QPainter::Antialiasing, true);  //设置反锯齿 反走样
