@@ -33,6 +33,21 @@ padding:0;
     <string notr="true">margin:0</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_15">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_8">
       <property name="spacing">
