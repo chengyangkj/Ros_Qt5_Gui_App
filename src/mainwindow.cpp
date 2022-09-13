@@ -65,11 +65,9 @@ MainWindow::MainWindow(QWidget *parent)
   });
   connect(ui->btn_control, &QPushButton::clicked, [=]() {
     ui->stackedWidget_left->setCurrentIndex(1);
-    setCurrentMenu(ui->btn_control);
   });
   connect(ui->btn_status, &QPushButton::clicked, [=]() {
     ui->stackedWidget_left->setCurrentIndex(0);
-    setCurrentMenu(ui->btn_status);
   });
   connect(ui->btn_map, &QPushButton::clicked, [=]() {
     ui->stackedWidget_main->setCurrentIndex(1);
