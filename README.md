@@ -1,4 +1,4 @@
-## ROS Qt Deskotp GUI App
+## ROS Qt Desktop GUI App
 
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
