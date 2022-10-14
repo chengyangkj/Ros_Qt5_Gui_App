@@ -6,7 +6,7 @@
 ![GitHub forks](https://img.shields.io/github/forks/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub issues](https://img.shields.io/github/issues/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
-
+[![Gitter](https://badges.gitter.im/ros_qt5_gui_app/community.svg)](https://gitter.im/ros_qt5_gui_app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ### How To Contribute
 
