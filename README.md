@@ -40,23 +40,16 @@
 
 ## 二，安装教程
 
-#### 1，首先安装ros对qt pkg的支持（非必须）
+#### 1,安装项目依赖
 
-melodic需要换成自己的ROS版本号
+程序依赖Qtmultimedia实现音频功能，因此需要安装依赖(命令中melodic换成自己的ROS发行版本)
 
-```cpp
-sudo apt-get install ros-melodic-qt-create
-```
-
-```cpp
-sudo apt-get install ros-melodic-qt-build
-```
-#### 2,安装Qtmultimedia5依赖
-
-程序依赖Qtmultimedia实现音频功能，因此需要安装依赖
 
 ```cpp
 sudo apt-get install qtmultimedia5-dev
+```
+```cpp
+sudo apt-get install ros-melodic-move-base-msgs
 ```
 
 #### 3，编译
