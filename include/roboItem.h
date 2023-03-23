@@ -71,10 +71,12 @@ class roboItem : public QObject, public QGraphicsItem {
   void drawLocalPath(QPainter* painter);
   void drawTools(QPainter *painter);
   void drawGlobalCostMap(QPainter *painter);
+  void drawRunMap();
  signals:
   void signalPub2DPose(QPointF, QPointF);
   void signalPub2DGoal(QPointF, QPointF);
   void cursorPos(QPointF);
+  void signalRunMap(QPixmap map);
 };
 
 #endif  // ROBOITEM_H

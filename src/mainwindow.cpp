@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
   // ui中的graphicsView添加场景
   ui->mapViz->setScene(m_qGraphicScene);
   ui->mapViz->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  m_roboGLWidget=new roboGLWidget();
+  ui->verticalLayout_status->addWidget(m_roboGLWidget);
   connect(commNode, SIGNAL(emitUpdateMap(QImage)), m_roboItem,
           SLOT(updateMap(QImage)));
   connect(commNode, SIGNAL(emitUpdateLocalCostMap(QImage, RobotPose)),
@@ -38,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
           SLOT(updateLocalPath(QPolygonF)));
   connect(commNode, SIGNAL(emitOdomInfo(RobotState)), this,
           SLOT(updateOdomInfo(RobotState)));
+  connect(m_roboItem, SIGNAL(signalRunMap(QPixmap)), m_roboGLWidget,
+          SLOT(updateRunMap(QPixmap)));
   //    connect(commNode,&rclcomm::emitUpdateMap,[this](QImage img){
   //        m_roboItem->updateMap(img);
   //    });
@@ -129,7 +133,11 @@ void MainWindow::updateOdomInfo(RobotState state) {
   if (number[1] == ".") {
     number = number.mid(0, 1);
   }
-  ui->label_speed->setText(number);
+//  ui->label_speed->setText(number);
+//  ui->mapViz->grab().save("/home/chengyangkj/test.jpg");
+//  QImage image(mysize,QImage::Format_RGB32);
+//           QPainter painter(&image);
+//           myscene->render(&painter);   //关键函数
 }
 void MainWindow::updateRobotPose(RobotPose pose) {
   m_roboItem->updateRobotPose(pose);

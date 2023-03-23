@@ -5,8 +5,12 @@ class roboGLWidget :public QOpenGLWidget  {
   Q_OBJECT
  private:
   void paintEvent(QPaintEvent *e);
+public slots:
+  void updateRunMap(QPixmap map);
+private:
+  QPixmap m_map;
  public:
-  roboGLWidget(QWidget *parent);
+  roboGLWidget(QWidget *parent=nullptr);
   ~roboGLWidget();
 };
 

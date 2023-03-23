@@ -1,16 +1,21 @@
 #include "roboGLWidget.h"
 
 #include <QPainter>
+#include <QDebug>
 roboGLWidget::roboGLWidget(QWidget *parent) : QOpenGLWidget(parent) {}
 
+void roboGLWidget::updateRunMap(QPixmap map){
+    m_map=map;
+    update();
+}
 roboGLWidget::~roboGLWidget() {}
 void roboGLWidget::paintEvent(QPaintEvent *e) {
+
+
   QPainter painter;
   painter.begin(this);
 
-  //  QImage img;
-  //  img.load("/home/chengyangkj/hourse.pgm");
-  // painter.drawImage(QPoint(0, 0), img);
+  painter.drawPixmap(QPoint(0, 0), m_map);
 
   painter.end();
 }

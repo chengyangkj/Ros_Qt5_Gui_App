@@ -159,5 +159,7 @@
         <file>background/loding3.gif</file>
         <file>background/loding4.gif</file>
         <file>background/loding5.gif</file>
+        <file>images/dir.png</file>
+        <file>images/dir_16.png</file>
     </qresource>
 </RCC>

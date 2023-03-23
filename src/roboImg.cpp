@@ -8,9 +8,9 @@ roboImg::roboImg() {
   setAcceptDrops(true);
   setFlag(ItemAcceptsInputMethod, true);
   moveBy(0, 0);
-  m_robotImg.load("://images/robot_blue.png");
+  m_robotImg.load("://images/dir_16.png");
   QMatrix matrix;
-  matrix.rotate(90);
+  matrix.rotate(45);
   m_robotImg = m_robotImg.transformed(matrix, Qt::SmoothTransformation);
 }
 QRectF roboImg::boundingRect() const {

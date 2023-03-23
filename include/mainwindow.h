@@ -32,9 +32,15 @@ class MainWindow : public QMainWindow {
   void initUi();
   void closeEvent(QCloseEvent *event);  // Overloaded function
   void setCurrentMenu(QPushButton *cur_btn);
-
+void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void mouseReleaseEvent(QMouseEvent *event);
  private:
   Ui::MainWindowDesign *ui;
+    QPoint pLast;
+  bool m_bPressed;
+  QPoint clickPos;
+  bool m_bresize = false;
   QGraphicsScene *m_qGraphicScene = nullptr;
   roboItem *m_roboItem = nullptr;
   roboImg *m_roboImg = nullptr;

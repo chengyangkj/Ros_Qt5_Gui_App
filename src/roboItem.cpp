@@ -8,9 +8,9 @@ roboItem::roboItem() {
   setAcceptDrops(true);
   setFlag(ItemAcceptsInputMethod, true);
   moveBy(0, 0);
-  m_robotImg.load("://images/robot_blue.png");
+  m_robotImg.load("://images/dir_16.png");
   QMatrix matrix;
-  matrix.rotate(90);
+  matrix.rotate(45);
   m_robotImg = m_robotImg.transformed(matrix, Qt::SmoothTransformation);
   m_set2DPoseCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   m_set2DGoalCursor = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
@@ -37,6 +37,49 @@ void roboItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   drawPath(painter);
   drawLocalPath(painter);
   drawTools(painter);
+  drawRunMap();
+}
+void roboItem::drawRunMap(){
+//    QPixmap pixmap(m_map.width(),m_map.height());
+//    QPainter painter(&pixmap);
+//    painter.drawImage(0, 0, m_map);
+//    painter.drawImage(0, 0, m_GlobalCostMap);
+//    painter.save();
+//    painter.translate(m_lastLocalCostMapRobotPose.x,
+//                       m_lastLocalCostMapRobotPose.y);
+//    painter.drawImage(QPoint(0, -m_LocalCostMap.height()), m_LocalCostMap);
+//    painter.restore();
+//    painter.setPen(QPen(QColor(255, 0, 0), 1));
+//    painter.drawPoints(m_laserPoints);
+//    painter.save();
+//    painter.translate(QPointF(m_currRobotPose.x, m_currRobotPose.y));
+//    painter.setPen(QPen(QColor(255, 0, 0), 1));
+//    painter.drawPoint(0, 0);
+//    painter.rotate(rad2deg(-m_currRobotPose.theta));
+//    painter.drawPixmap(-m_robotImg.width() / 2, -m_robotImg.height() / 2,
+//                        m_robotImg);
+//    painter.restore();
+//    painter.setPen(QPen(QColor(255, 0, 0), 1));
+//    painter.drawPoints(m_pathPoints);
+//    painter.setPen(QPen(QColor(0, 255, 0), 1));
+//    painter.drawPoints(m_localPathPoints);
+//    painter.end();
+
+//    QMatrix matrix;
+//    //迁移到中心
+//    matrix.translate(pixmap.width()/2.0,pixmap.height()/2.0);
+//    matrix.rotate(-90);
+//    pixmap = pixmap.transformed(matrix, Qt::SmoothTransformation);
+//    matrix.reset();
+//    matrix.translate(pixmap.width()/2.0,pixmap.height()/2.0);
+//    matrix.rotate(rad2deg(m_currRobotPose.theta));
+//    pixmap = pixmap.transformed(matrix, Qt::SmoothTransformation);
+//     pixmap.save("/home/chengyangkj/test_before.jpg");
+//        int roi_size=200;
+//        pixmap = pixmap.copy(m_currRobotPose.x-roi_size/2.0,m_currRobotPose.y-roi_size/2.0,roi_size,roi_size);
+//    pixmap.save("/home/chengyangkj/test.jpg");
+//    emit signalRunMap(pixmap);
+
 }
 void roboItem::drawPath(QPainter *painter) {
   painter->setPen(QPen(QColor(255, 0, 0), 1));
