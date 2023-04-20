@@ -1,3 +1,12 @@
+/*
+ * @Author: chengyang cyjiang@robovision.cn
+ * @Date: 2023-04-20 15:46:29
+ * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditTime: 2023-04-20 16:02:07
+ * @FilePath: /ROS2_Qt5_Gui_App/include/rclcomm.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
+ * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #ifndef RCLCOMM_H
 #define RCLCOMM_H
 
@@ -16,8 +25,9 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "tf2/LinearMath/Quaternion.h"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "tf2_ros/transform_listener.h"
+#include <tf2_ros/buffer.h>
 class rclcomm : public QThread {
   Q_OBJECT
  public:

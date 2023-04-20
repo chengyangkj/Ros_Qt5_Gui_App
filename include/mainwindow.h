@@ -1,3 +1,12 @@
+/*
+ * @Author: chengyang cyjiang@robovision.cn
+ * @Date: 2023-04-20 15:46:29
+ * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditTime: 2023-04-20 16:03:40
+ * @FilePath: /ROS2_Qt5_Gui_App/include/mainwindow.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
+ * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -32,9 +41,6 @@ class MainWindow : public QMainWindow {
   void initUi();
   void closeEvent(QCloseEvent *event);  // Overloaded function
   void setCurrentMenu(QPushButton *cur_btn);
-void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseReleaseEvent(QMouseEvent *event);
  private:
   Ui::MainWindowDesign *ui;
     QPoint pLast;
