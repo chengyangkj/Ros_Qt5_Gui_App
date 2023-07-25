@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-04-20 15:46:29
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-07-25 16:29:28
+ * @LastEditTime: 2023-07-25 16:57:48
  * @FilePath: /ROS2_Qt5_Gui_App/include/mainwindow.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -23,6 +23,7 @@
 #include "roboItem.h"
 #include "ui_mainwindow.h"
 QT_BEGIN_NAMESPACE
+#define MARGIN 10
 namespace Ui {
 class MainWindow;
 }
@@ -39,27 +40,35 @@ class MainWindow : public QMainWindow {
   void onRecvData(QString);
   void updateRobotPose(RobotPose pose);
   void updateOdomInfo(RobotState);
-
+  // ui 相关函数
  private:
   void mouseReleaseEvent(QMouseEvent *event);
   void mousePressEvent(QMouseEvent *event);
   void mouseMoveEvent(QMouseEvent *event);
-
+  void mouseHoverMoveEvent(QMouseEvent *event);
+  int countRow(QPoint p);  // 获取光标在窗口所在区域的 行   返回行数
+  int countFlag(QPoint p, int row);  // 获取光标在窗口所在区域的 列 返回行列坐标
+  void setCursorType(int flag);  // 根据传入的坐标，设置光标样式
  private:
   void initUi();
   void closeEvent(QCloseEvent *event);  // Overloaded function
   void setCurrentMenu(QPushButton *cur_btn);
 
+  // ui相关变量
  private:
   Ui::MainWindowDesign *ui;
   QPoint pLast;
-  bool pressed_{false};
-  QPoint pressed_point_;  // 鼠标按下后的pose
+  bool left_pressed_{false};
+  QPoint left_pressed_point_;  // 鼠标按下后的pose
+  QPoint last_pressed_point_;  // 鼠标按下后的pose
+  int curpos_ = 0;
   bool m_bresize = false;
   QGraphicsScene *m_qGraphicScene = nullptr;
   roboItem *m_roboItem = nullptr;
   roboImg *m_roboImg = nullptr;
   DashBoard *m_speedDashBoard;
+
+ private:
   QTimer *m_timerCurrentTime;
   roboGLWidget *m_roboGLWidget;
   DisplayManager *display_manager_;
