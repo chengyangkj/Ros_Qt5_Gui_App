@@ -1,13 +1,12 @@
-/******************************************************************
- Copyright (C) 2017 - All Rights Reserved by
- 文 件 名 : loginwidget.cpp --- LoginWidget
- 作 者    :
- 编写日期 : 2017
- 说 明    :
- 历史纪录 :
- <作者>    <日期>        <版本>        <内容>
+/*
+ * @Author: chengyang cyjiang@robovision.cn
+ * @Date: 2023-07-25 14:28:09
+ * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditTime: 2023-07-25 15:03:37
+ * @FilePath: /Ros_Qt5_Gui_App/src/loginwidget.cpp
+ * @Description: 登陆界面类
+ */
 
-*******************************************************************/
 #include "loginwidget.h"
 
 #include <QCompleter>
@@ -20,7 +19,7 @@
 #include <QPropertyAnimation>
 #include <QStringListModel>
 
-#include "main_window.hpp"
+#include "mainwindow.hpp"
 #include "ui_loginwidget.h"
 LoginWidget::LoginWidget(QWidget *parent)
     : CustomMoveWidget(parent), ui(new Ui::LoginWidget) {
@@ -32,7 +31,7 @@ LoginWidget::LoginWidget(QWidget *parent)
   this->setAttribute(Qt::WA_TranslucentBackground);
   this->setWindowFlags(Qt::FramelessWindowHint);
 
-  this->setWindowFlags(Qt::FramelessWindowHint);  //去掉标题栏
+  this->setWindowFlags(Qt::FramelessWindowHint);  // 去掉标题栏
   InitWidget();
   readSettings();
   QMovie *movie = new QMovie("://background/background.gif");
@@ -67,14 +66,14 @@ LoginWidget::LoginWidget(QWidget *parent)
                      "master/README.md")));
   });
   connect(ui->pushButton_return, &QPushButton::clicked, [=]() {
-    QMessageBox msg(this);                  //对话框设置父组件
-    msg.setWindowTitle("返回主界面");       //对话框标题
-    msg.setText("是否保存设置");            //对话框提示文本
-    msg.setIcon(QMessageBox::Information);  //设置图标类型
+    QMessageBox msg(this);                  // 对话框设置父组件
+    msg.setWindowTitle("返回主界面");       // 对话框标题
+    msg.setText("是否保存设置");            // 对话框提示文本
+    msg.setIcon(QMessageBox::Information);  // 设置图标类型
     msg.setStandardButtons(QMessageBox::Yes |
-                           QMessageBox::No);  //对话框上包含的按钮
+                           QMessageBox::No);  // 对话框上包含的按钮
 
-    if (msg.exec() == QMessageBox::Yes)  //模态调用
+    if (msg.exec() == QMessageBox::Yes)  // 模态调用
     {
       slot_writeSettings();
     }
@@ -396,61 +395,61 @@ void LoginWidget::InitWidget() {
 
   // Grid
   QTreeWidgetItem *Grid = new QTreeWidgetItem(QStringList() << "Grid");
-  //设置图标
+  // 设置图标
   Grid->setIcon(0, QIcon("://images/classes/Grid.png"));
   // checkbox
   Grid_Check = new QCheckBox();
-  //添加top节点
+  // 添加top节点
   ui->treeWidget->addTopLevelItem(Grid);
-  //添加checkbox
+  // 添加checkbox
   ui->treeWidget->setItemWidget(Grid, 1, Grid_Check);
-  //设置grid默认展开状态
+  // 设置grid默认展开状态
   Grid->setExpanded(true);
 
-  //添加Cell Count子节点
+  // 添加Cell Count子节点
   QTreeWidgetItem *Cell_Count =
       new QTreeWidgetItem(QStringList() << "Plane Cell Count");
   Grid->addChild(Cell_Count);
   // CellCount添加SpinBox
   Cell_Count_Box = new QSpinBox();
   Cell_Count_Box->setValue(13);
-  //设置Spinbox的宽度
+  // 设置Spinbox的宽度
   Cell_Count_Box->setMaximumWidth(150);
   ui->treeWidget->setItemWidget(Cell_Count, 1, Cell_Count_Box);
 
-  //添加color子节点
+  // 添加color子节点
   QTreeWidgetItem *Grid_Color = new QTreeWidgetItem(QStringList() << "Color");
   Grid->addChild(Grid_Color);
   // Color添加ComboBox
   Grid_Color_Box = new QComboBox();
   Grid_Color_Box->addItem("160;160;160");
-  //设置Comboox可编辑
+  // 设置Comboox可编辑
   Grid_Color_Box->setEditable(true);
-  //设置Combox的宽度
+  // 设置Combox的宽度
   Grid_Color_Box->setMaximumWidth(150);
   ui->treeWidget->setItemWidget(Grid_Color, 1, Grid_Color_Box);
 
   // TF ui
   QTreeWidgetItem *TF = new QTreeWidgetItem(QStringList() << "TF");
-  //设置图标
+  // 设置图标
   TF->setIcon(0, QIcon("://images/classes/TF.png"));
   // checkbox
   TF_Check = new QCheckBox();
-  //向Treewidget添加TF Top节点
+  // 向Treewidget添加TF Top节点
   ui->treeWidget->addTopLevelItem(TF);
-  //向TF添加checkbox
+  // 向TF添加checkbox
   ui->treeWidget->setItemWidget(TF, 1, TF_Check);
 
   // LaserScan
   QTreeWidgetItem *LaserScan =
       new QTreeWidgetItem(QStringList() << "LaserScan");
-  //设置图标
+  // 设置图标
   LaserScan->setIcon(0, QIcon("://images/classes/LaserScan.png"));
   // checkbox
   Laser_Check = new QCheckBox();
-  //向Treewidget添加TF Top节点
+  // 向Treewidget添加TF Top节点
   ui->treeWidget->addTopLevelItem(LaserScan);
-  //向TF添加checkbox
+  // 向TF添加checkbox
   ui->treeWidget->setItemWidget(LaserScan, 1, Laser_Check);
   // laser topic
   QTreeWidgetItem *LaserTopic = new QTreeWidgetItem(QStringList() << "Topic");
@@ -463,12 +462,12 @@ void LoginWidget::InitWidget() {
   // polygon
   // checkbox
   QTreeWidgetItem *Polygon = new QTreeWidgetItem(QStringList() << "Polygon");
-  //设置图标
+  // 设置图标
   Polygon->setIcon(0, QIcon("://images/classes/Polygon.png"));
   Polygon_Check = new QCheckBox();
-  //向Treewidget添加TF Top节点
+  // 向Treewidget添加TF Top节点
   ui->treeWidget->addTopLevelItem(Polygon);
-  //向TF添加checkbox
+  // 向TF添加checkbox
   ui->treeWidget->setItemWidget(Polygon, 1, Polygon_Check);
   // laser topic
   QTreeWidgetItem *PolygonTopic = new QTreeWidgetItem(QStringList() << "Topic");
@@ -482,24 +481,24 @@ void LoginWidget::InitWidget() {
   // RobotModel
   QTreeWidgetItem *RobotModel =
       new QTreeWidgetItem(QStringList() << "RobotModel");
-  //设置图标
+  // 设置图标
   RobotModel->setIcon(0, QIcon("://images/classes/RobotModel.png"));
   // checkbox
   RobotModel_Check = new QCheckBox();
-  //向Treewidget添加TF Top节点
+  // 向Treewidget添加TF Top节点
   ui->treeWidget->addTopLevelItem(RobotModel);
-  //向TF添加checkbox
+  // 向TF添加checkbox
   ui->treeWidget->setItemWidget(RobotModel, 1, RobotModel_Check);
 
   // Map
   QTreeWidgetItem *Map = new QTreeWidgetItem(QStringList() << "Map");
-  //设置图标
+  // 设置图标
   Map->setIcon(0, QIcon("://images/classes/Map.png"));
   // checkbox
   Map_Check = new QCheckBox();
-  //向Treewidget添加Map Top节点
+  // 向Treewidget添加Map Top节点
   ui->treeWidget->addTopLevelItem(Map);
-  //向Map添加checkbox
+  // 向Map添加checkbox
   ui->treeWidget->setItemWidget(Map, 1, Map_Check);
   // Map topic
   QTreeWidgetItem *MapTopic = new QTreeWidgetItem(QStringList() << "Topic");
@@ -522,13 +521,13 @@ void LoginWidget::InitWidget() {
 
   // Path
   QTreeWidgetItem *Path = new QTreeWidgetItem(QStringList() << "Path");
-  //设置图标
+  // 设置图标
   Path->setIcon(0, QIcon("://images/classes/Path.png"));
   // checkbox
   Path_Check = new QCheckBox();
-  //向Treewidget添加Path Top节点
+  // 向Treewidget添加Path Top节点
   ui->treeWidget->addTopLevelItem(Path);
-  //向Path添加checkbox
+  // 向Path添加checkbox
   ui->treeWidget->setItemWidget(Path, 1, Path_Check);
   // Path topic
   QTreeWidgetItem *PathTopic = new QTreeWidgetItem(QStringList() << "Topic");
@@ -548,8 +547,8 @@ void LoginWidget::InitWidget() {
   Path->addChild(PathColorScheme);
   ui->treeWidget->setItemWidget(PathColorScheme, 1, Path_Color_box);
 
-  //机器人Navigate 相关UI********************************
-  // Golabal Map***************************************
+  // 机器人Navigate 相关UI********************************
+  //  Golabal Map***************************************
   QTreeWidgetItem *GlobalMap =
       new QTreeWidgetItem(QStringList() << "Global Map");
   GlobalMap->setIcon(0, QIcon("://images/default_package_icon.png"));
@@ -560,7 +559,7 @@ void LoginWidget::InitWidget() {
   // Global CostMap
   QTreeWidgetItem *Global_CostMap =
       new QTreeWidgetItem(QStringList() << "Costmap");
-  //设置图标
+  // 设置图标
   Global_CostMap->setIcon(0, QIcon("://images/classes/Map.png"));
   // Global Map添加子节点
   GlobalMap->addChild(Global_CostMap);
@@ -589,9 +588,9 @@ void LoginWidget::InitWidget() {
   // Global Planner
   QTreeWidgetItem *Global_Planner =
       new QTreeWidgetItem(QStringList() << "Planner");
-  //设置图标
+  // 设置图标
   Global_Planner->setIcon(0, QIcon("://images/classes/Path.png"));
-  //向TGlobal Map添加Path Top节点
+  // 向TGlobal Map添加Path Top节点
   GlobalMap->addChild(Global_Planner);
 
   // Path topic
@@ -625,7 +624,7 @@ void LoginWidget::InitWidget() {
   // Local CostMap
   QTreeWidgetItem *Local_CostMap =
       new QTreeWidgetItem(QStringList() << "Costmap");
-  //设置图标
+  // 设置图标
   Local_CostMap->setIcon(0, QIcon("://images/classes/Map.png"));
   // Local Map添加子节点
   LocalMap->addChild(Local_CostMap);
@@ -654,9 +653,9 @@ void LoginWidget::InitWidget() {
   // Local Planner
   QTreeWidgetItem *Local_Planner =
       new QTreeWidgetItem(QStringList() << "Planner");
-  //设置图标
+  // 设置图标
   Local_Planner->setIcon(0, QIcon("://images/classes/Path.png"));
-  //向TLocal Map添加Path Top节点
+  // 向TLocal Map添加Path Top节点
   LocalMap->addChild(Local_Planner);
 
   // Path topic

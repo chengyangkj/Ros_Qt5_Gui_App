@@ -21,9 +21,10 @@ find_package(catkin REQUIRED COMPONENTS roscpp
     image_transport
     )
 
+find_package(Eigen3 REQUIRED)
 
 #包含的头文件目录
-include_directories(${catkin_INCLUDE_DIRS} ${PROJECT_SRC_DIR}/include)
+include_directories(${catkin_INCLUDE_DIRS} ${PROJECT_SRC_DIR}/include  ${EIGEN3_INCLUDE_DIR})
 
 catkin_package()
 

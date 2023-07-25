@@ -32,7 +32,7 @@ padding:0;
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page">
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -309,7 +309,7 @@ padding:0;
 color:GRAY；</string>
                     </property>
                     <property name="text">
-                     <string>主节点地址:</string>
+                     <string>master uri:</string>
                     </property>
                    </widget>
                   </item>
@@ -347,7 +347,7 @@ color:GRAY；</string>
 color:GRAY；</string>
                     </property>
                     <property name="text">
-                     <string>本机IP:         </string>
+                     <string>loc ip:</string>
                     </property>
                    </widget>
                   </item>
@@ -389,7 +389,7 @@ color:GRAY；</string>
                      <string notr="true">color:GRAY;</string>
                     </property>
                     <property name="text">
-                     <string>使用环境变量</string>
+                     <string>use envirment</string>
                     </property>
                     <property name="checkable">
                      <bool>true</bool>
@@ -408,7 +408,7 @@ color:GRAY；</string>
                      <string notr="true">color:GRAY;</string>
                     </property>
                     <property name="text">
-                     <string>自动连接</string>
+                     <string>auto connect</string>
                     </property>
                     <property name="checked">
                      <bool>false</bool>
@@ -891,8 +891,8 @@ background-color:none</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>579</width>
-              <height>191</height>
+              <width>201</width>
+              <height>107</height>
              </rect>
             </property>
             <attribute name="label">
@@ -952,8 +952,8 @@ background-color:none</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>579</width>
-              <height>191</height>
+              <width>100</width>
+              <height>88</height>
              </rect>
             </property>
             <attribute name="label">
@@ -976,7 +976,7 @@ background-color:none</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>565</width>
+              <width>267</width>
               <height>312</height>
              </rect>
             </property>
@@ -1301,8 +1301,8 @@ background-color:none</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>579</width>
-              <height>191</height>
+              <width>313</width>
+              <height>135</height>
              </rect>
             </property>
             <attribute name="label">

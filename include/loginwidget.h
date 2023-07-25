@@ -16,7 +16,7 @@
 #include <QSpinBox>
 
 #include "./basewidget/customwidget.h"
-#include "main_window.hpp"
+#include "mainwindow.hpp"
 namespace Ui {
 class LoginWidget;
 }

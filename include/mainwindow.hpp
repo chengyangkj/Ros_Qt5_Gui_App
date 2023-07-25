@@ -5,14 +5,14 @@
  *
  * @date November 2010
  **/
-#ifndef ros_qt5_gui_app_MAIN_WINDOW_H
-#define ros_qt5_gui_app_MAIN_WINDOW_H
+#ifndef ROS_QT5_GUI_APP_MAIN_WINDOW_H
+#define ROS_QT5_GUI_APP_MAIN_WINDOW_H
 
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
 
-//#include <QtGui/QMainWindow>
+// #include <QtGui/QMainWindow>
 #include <sensor_msgs/BatteryState.h>
 
 #include <QComboBox>
@@ -31,10 +31,11 @@
 #include "QProcess"
 #include "RobotAlgorithm.h"
 #include "dashboard.h"
+#include "display/display_manager.h"
 #include "joystick.h"
 #include "qnode.hpp"
 #include "roboItem.h"
-#include "ui_main_window.h"
+#include "ui_mainwindow.h"
 /*****************************************************************************
 ** Namespace
 *****************************************************************************/
@@ -102,17 +103,17 @@ class MainWindow : public QMainWindow {
   void slot_tab_Widget_currentChanged(int);
   void slot_set_select();
   void slot_move_camera_btn();
-  //设置界面
+  // 设置界面
   void slot_setting_frame();
   void slot_set_mutil_goal_btn();
-  //返航
+  // 返航
   void slot_return_point();
-  //机器人位置
+  // 机器人位置
   void slot_position_change(QString, double, double, double, double);
   void quick_cmd_add();
   void quick_cmd_remove();
-  //显示图像
-  //显示图像
+  // 显示图像
+  // 显示图像
   void slot_show_image(int, QImage);
   void slot_dis_connect();
   void slot_hide_table_widget();
@@ -144,7 +145,8 @@ class MainWindow : public QMainWindow {
   void setCurrentMenu(QPushButton *btn);
 
  private:
-  Ui::MainWindowDesign ui;
+  Ui::MainWindow *ui;
+  DisplayManager *display_manager_;
   bool isPressedWidget;
   QPoint m_lastPos;
   QNode qnode;
@@ -152,11 +154,11 @@ class MainWindow : public QMainWindow {
   QProcess *close_remote_cmd = NULL;
   QProcess *base_cmd = NULL;
   QStandardItemModel *treeView_rviz_model = NULL;
-  //存放rviz treewidget当前显示的控件及控件的父亲的地址
+  // 存放rviz treewidget当前显示的控件及控件的父亲的地址
   QMap<QWidget *, QTreeWidgetItem *> widget_to_parentItem_map;
-  //存放状态栏的对应关系 display名 状态item
+  // 存放状态栏的对应关系 display名 状态item
   QMap<QString, QTreeWidgetItem *> tree_rviz_stues;
-  //存放display的当前值 item名，参数名称和值
+  // 存放display的当前值 item名，参数名称和值
   QMap<QTreeWidgetItem *, QMap<QString, QString>> tree_rviz_values;
   QSoundEffect *media_player = NULL;
   bool m_useEnviorment = false;
@@ -169,16 +171,16 @@ class MainWindow : public QMainWindow {
   QGraphicsScene *m_qgraphicsScene = NULL;
   roboItem *m_roboItem = NULL;
   QVariantList m_sendVelList, m_recvVelList, m_timeList;
-  //曲线
-  //    QSplineSeries* line;
-  //曲线点的最大数量
+  // 曲线
+  //     QSplineSeries* line;
+  // 曲线点的最大数量
   int line_max = 10;
-  //绘图变量和坐标
-  //    QChart* chart;
-  //    QValueAxis *axisX;
-  //    QValueAxis *axisY;
-  //    QQueue<QPointF> data1;
-  //    QQueue<QPointF> data2;
+  // 绘图变量和坐标
+  //     QChart* chart;
+  //     QValueAxis *axisX;
+  //     QValueAxis *axisY;
+  //     QQueue<QPointF> data1;
+  //     QQueue<QPointF> data2;
   QTimer *m_timerChart;
   QTimer *m_timerPubImageMap;
   QTimer *m_timerCurrentTime;
@@ -187,4 +189,4 @@ class MainWindow : public QMainWindow {
 };
 }  // namespace ros_qt5_gui_app
 
-#endif  // ros_qt5_gui_app_MAIN_WINDOW_H
+#endif  // ROS_QT5_GUI_APP_MAIN_WINDOW_H

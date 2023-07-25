@@ -1,3 +1,12 @@
+/*
+ * @Author: chengyang cyjiang@robovision.cn
+ * @Date: 2023-07-25 14:28:09
+ * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditTime: 2023-07-25 15:23:47
+ * @FilePath: /Ros_Qt5_Gui_App/include/roboItem.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
+ * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 #ifndef roboItem_H
 #define roboItem_H
 
@@ -47,7 +56,6 @@ class roboItem : public QObject, public QGraphicsItem {
   double m_roboR = 5;
   double map_size = 1;
   double defaultScale = 2;
-  double PI = 3.1415926;
   void get_version() { qDebug() << "1.0.0"; }
   void setMax();
   void setMin();
@@ -59,8 +67,8 @@ class roboItem : public QObject, public QGraphicsItem {
   QCursor *m_currCursor = NULL;
  signals:
   void cursorPos(QPointF);
-  void signalPub2DPose(QPointF,QPointF);
-  void signalPub2DGoal(QPointF,QPointF);
+  void signalPub2DPose(QPointF, QPointF);
+  void signalPub2DGoal(QPointF, QPointF);
  public slots:
   void paintMaps(QImage map);
   void paintRoboPos(RobotPose pos);
