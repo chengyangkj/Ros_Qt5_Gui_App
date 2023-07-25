@@ -8,21 +8,15 @@ MainWindow::MainWindow(QWidget *parent)
   commNode = new rclcomm();
   connect(commNode, SIGNAL(emitTopicData(QString)), this,
           SLOT(onRecvData(QString)));
-  //初始化场景类
+  // 初始化场景类
   m_qGraphicScene = new QGraphicsScene();
   m_qGraphicScene->clear();
-  //初始化item
+  // 初始化item
   m_roboItem = new roboItem();
   m_roboImg = new roboImg();
-  m_roboItem->setZValue(1);
-  m_roboImg->setZValue(10);
-  //视图中添加Item
-  m_qGraphicScene->addItem(m_roboItem);
-  m_qGraphicScene->addItem(m_roboImg);
-  // ui中的graphicsView添加场景
-  ui->mapViz->setScene(m_qGraphicScene);
-  ui->mapViz->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-  m_roboGLWidget=new roboGLWidget();
+
+  display_manager_ = new DisplayManager(ui->mapViz);
+  m_roboGLWidget = new roboGLWidget();
   ui->verticalLayout_status->addWidget(m_roboGLWidget);
   connect(commNode, SIGNAL(emitUpdateMap(QImage)), m_roboItem,
           SLOT(updateMap(QImage)));
@@ -67,12 +61,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->stackedWidget_main->setCurrentIndex(0);
     setCurrentMenu(ui->btn_dash);
   });
-  connect(ui->btn_control, &QPushButton::clicked, [=]() {
-    ui->stackedWidget_left->setCurrentIndex(1);
-  });
-  connect(ui->btn_status, &QPushButton::clicked, [=]() {
-    ui->stackedWidget_left->setCurrentIndex(0);
-  });
+  connect(ui->btn_control, &QPushButton::clicked,
+          [=]() { ui->stackedWidget_left->setCurrentIndex(1); });
+  connect(ui->btn_status, &QPushButton::clicked,
+          [=]() { ui->stackedWidget_left->setCurrentIndex(0); });
   connect(ui->btn_map, &QPushButton::clicked, [=]() {
     ui->stackedWidget_main->setCurrentIndex(1);
     setCurrentMenu(ui->btn_map);
@@ -107,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent)
   initUi();
 }
 void MainWindow::updateOdomInfo(RobotState state) {
-  //转向灯
+  // 转向灯
   if (state.w > 0.1) {
     ui->label_turnLeft->setPixmap(
         QPixmap::fromImage(QImage("://images/turnLeft_hl.png")));
@@ -120,7 +112,7 @@ void MainWindow::updateOdomInfo(RobotState state) {
     ui->label_turnRight->setPixmap(
         QPixmap::fromImage(QImage("://images/turnRight_l.png")));
   }
-  //仪表盘
+  // 仪表盘
   m_speedDashBoard->set_speed(abs(state.vx * 100));
   if (state.vx > 0.001) {
     m_speedDashBoard->set_gear(DashBoard::kGear_D);
@@ -133,11 +125,11 @@ void MainWindow::updateOdomInfo(RobotState state) {
   if (number[1] == ".") {
     number = number.mid(0, 1);
   }
-//  ui->label_speed->setText(number);
-//  ui->mapViz->grab().save("/home/chengyangkj/test.jpg");
-//  QImage image(mysize,QImage::Format_RGB32);
-//           QPainter painter(&image);
-//           myscene->render(&painter);   //关键函数
+  //  ui->label_speed->setText(number);
+  //  ui->mapViz->grab().save("/home/chengyangkj/test.jpg");
+  //  QImage image(mysize,QImage::Format_RGB32);
+  //           QPainter painter(&image);
+  //           myscene->render(&painter);   //关键函数
 }
 void MainWindow::updateRobotPose(RobotPose pose) {
   m_roboItem->updateRobotPose(pose);
@@ -169,7 +161,7 @@ void MainWindow::setCurrentMenu(QPushButton *cur_btn) {
   }
 }
 void MainWindow::initUi() {
-  setWindowFlags(Qt::CustomizeWindowHint);  //去掉标题栏
+  setWindowFlags(Qt::CustomizeWindowHint);  // 去掉标题栏
   ui->label_turnLeft->setPixmap(
       QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
   ui->label_turnRight->setPixmap(
@@ -194,3 +186,19 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::onRecvData(QString msg) {}
+void MainWindow::mousePressEvent(QMouseEvent *event) {
+  if (event->button() == Qt::LeftButton)  // 判断左键是否按下
+  {
+    pressed_ = true;
+    pressed_point_ = event->pos();
+  }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
+  Q_UNUSED(event);
+  pressed_ = false;
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event) {
+  if (pressed_) move(event->pos() - pressed_point_ + pos());  // 移动当前窗口
+}

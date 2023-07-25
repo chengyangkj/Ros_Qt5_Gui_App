@@ -1,4 +1,4 @@
-#include "rclcomm.h"
+#include "communication/rclcomm.h"
 rclcomm::rclcomm() {
   int argc = 0;
   char **argv = NULL;
@@ -65,7 +65,7 @@ void rclcomm::getRobotPose() {
     geometry_msgs::msg::TransformStamped transform =
         m_tf_buffer->lookupTransform("map", "base_link", tf2::TimePointZero);
     geometry_msgs::msg::Quaternion msg_quat = transform.transform.rotation;
-    //转换类型
+    // 转换类型
     tf2::Quaternion q;
     tf2::fromMsg(msg_quat, q);
     tf2::Matrix3x3 mat(q);
@@ -92,7 +92,7 @@ void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   state.y = (double)msg->pose.pose.position.y;
 
   geometry_msgs::msg::Quaternion msg_quat = msg->pose.pose.orientation;
-  //转换类型
+  // 转换类型
   tf2::Quaternion q;
   tf2::fromMsg(msg_quat, q);
   tf2::Matrix3x3 mat(q);
@@ -187,7 +187,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
     geometry_msgs::msg::PointStamped point_laser_frame;
     QPolygonF emit_points;
     for (int i = 0; i < msg->ranges.size(); i++) {
-      //计算当前偏移角度
+      // 计算当前偏移角度
       double angle = angle_min + i * angle_increment;
 
       double x = msg->ranges[i] * cos(angle);
@@ -222,7 +222,7 @@ void rclcomm::globalCostMapCallback(
   for (int i = 0; i < msg->data.size(); i++) {
     int x = i % width;
     int y = (int)i / width;
-    //计算像素值
+    // 计算像素值
     QColor color;
     int data = msg->data[i];
     if (data >= 100) {
@@ -257,8 +257,8 @@ void rclcomm::globalCostMapCallback(
     }
     map_image.setPixelColor(x, y, color);
   }
-  //延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
-  //但是图元坐标系为左上角度
+  // 延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
+  // 但是图元坐标系为左上角度
   map_image = rotateMapWithY(map_image);
   //      map_image.save("/home/chengyangkj/test.jpg");
   emit emitUpdateGlobalCostMap(map_image);
@@ -279,7 +279,7 @@ void rclcomm::localCostMapCallback(
   for (int i = 0; i < msg->data.size(); i++) {
     int x = i % width;
     int y = (int)i / width;
-    //计算像素值
+    // 计算像素值
     QColor color;
     int data = msg->data[i];
     if (data >= 100) {
@@ -305,12 +305,12 @@ void rclcomm::localCostMapCallback(
     }
     map_image.setPixelColor(x, y, color);
   }
-  //延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
-  //但是图元坐标系为左上角度
+  // 延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
+  // 但是图元坐标系为左上角度
   map_image = rotateMapWithY(map_image);
   //      map_image.save("/home/chengyangkj/test.jpg");
   try {
-    //坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
+    // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
     geometry_msgs::msg::PoseStamped pose_map_frame;
     geometry_msgs::msg::PoseStamped pose_curr_frame;
     pose_curr_frame.pose.position.x = origin_x;
@@ -323,7 +323,7 @@ void rclcomm::localCostMapCallback(
     tf2::Matrix3x3 mat(q);
     double roll, pitch, yaw;
     mat.getRPY(roll, pitch, yaw);
-    //原点坐标转到图元坐标系下
+    // 原点坐标转到图元坐标系下
     QPointF scene_origin = transWordPoint2Scene(QPointF(
         pose_map_frame.pose.position.x, pose_map_frame.pose.position.y));
     RobotPose localCostmapPose;
@@ -351,9 +351,9 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
     int y = int(i / width);
     QColor color;
     if (msg->data[i] == 100) {
-      color = Qt::black;  //黑色
+      color = Qt::black;  // 黑色
     } else if (msg->data[i] == 0) {
-      color = Qt::white;  //白色
+      color = Qt::white;  // 白色
     } else {
       color = Qt::gray;
     }
@@ -363,10 +363,10 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   QImage rotate_map = rotateMapWithY(map_image);
   //   rotate_map.save("/home/chengyangkj/rotate_map.png");
   emit emitUpdateMap(rotate_map);
-  //计算图元坐标系原点在世界坐标系下的坐标(翻转之后的栅格地图坐标原点在世界坐标系下的坐标)
+  // 计算图元坐标系原点在世界坐标系下的坐标(翻转之后的栅格地图坐标原点在世界坐标系下的坐标)
   double trans_origin_x = origin_x;
   double trans_origin_y = origin_y + height * m_resolution;
-  //世界坐标系原点在图元坐标系下的坐标
+  // 世界坐标系原点在图元坐标系下的坐标
   m_wordOrigin.setX(fabs(trans_origin_x / m_resolution));
   m_wordOrigin.setY(fabs(trans_origin_y / m_resolution));
 }
