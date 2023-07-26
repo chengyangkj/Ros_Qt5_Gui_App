@@ -9,21 +9,24 @@
  */
 #ifndef VIRTUAL_DISPLAY_H
 #define VIRTUAL_DISPLAY_H
+#include <math.h>
+
 #include <Eigen/Dense>
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsSceneWheelEvent>
 #include <QObject>
 #include <QPainter>
+#include <QVector2D>
+#include <QVector3D>
 #include <QtCore>
 #include <any>
 #include <iostream>
-#include <QVector2D>
-#include <QVector3D>
-#include "map/occupancy_map.h"
-#include <math.h>
-#include "display_defines.h"
 
+#include "basic/map/occupancy_map.h"
+#include "basic/point_type.h"
+#include "display_defines.h"
+using namespace basic;
 #define GetAnyData(type, data, res_data)    \
   {                                         \
     try {                                   \
@@ -32,7 +35,6 @@
       std::cout << e.what() << '\n';        \
     }                                       \
   }
-
 
 class VirtualDisplay : public QObject, public QGraphicsItem {
   Q_OBJECT
@@ -124,7 +126,7 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   QRectF bounding_rect_;
   QTransform transform_;
   double rotate_value_{0};
-    OccupancyMap map_data_;
+  OccupancyMap map_data_;
  signals:
   void displayUpdated(std::string name);
   void displaySetScaled(std::string name, double value);
@@ -138,9 +140,7 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
     emit displayUpdated(display_name_);
     return UpdateData(data);
   }
-  void UpdateMap(OccupancyMap map){
-    map_data_=map;
-  }
+  void UpdateMap(OccupancyMap map) { map_data_ = map; }
   // 设置当前图层是否响应鼠标事件
   void SetResposeMouseEvent(const bool& response) {
     is_response_mouse_event_ = response;

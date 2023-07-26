@@ -7,7 +7,9 @@
 #include <QObject>
 #include <QPainter>
 
-#include "RobotAlgorithm.h"
+#include "basic/algorithm.h"
+#include "basic/point_type.h"
+using namespace basic;
 class roboItem : public QObject, public QGraphicsItem {
   Q_OBJECT
  public:
@@ -27,12 +29,12 @@ class roboItem : public QObject, public QGraphicsItem {
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
  public slots:
   void updateMap(QImage img);
-  void updateLocalCostMap(QImage img,RobotPose);
+  void updateLocalCostMap(QImage img, RobotPose);
   void updateGlobalCostMap(QImage img);
   void updateRobotPose(RobotPose pose);
   void updateLaserPoints(QPolygonF points);
   void updatePath(QPolygonF points);
-        void updateLocalPath(QPolygonF points);
+  void updateLocalPath(QPolygonF points);
   void start2DPose();
   void start2DGoal();
 
@@ -43,7 +45,7 @@ class roboItem : public QObject, public QGraphicsItem {
   QImage m_GlobalCostMap;
   QPixmap m_robotImg;
   QPolygonF m_points;
-      QPolygonF m_localPathPoints;
+  QPolygonF m_localPathPoints;
   QLine m_lines;
   double m_scaleValue = 1;
   bool m_isMousePress = false;
@@ -68,7 +70,7 @@ class roboItem : public QObject, public QGraphicsItem {
   void drawRobotPose(QPainter *painter);
   void drawLaserScan(QPainter *painter);
   void drawPath(QPainter *painter);
-  void drawLocalPath(QPainter* painter);
+  void drawLocalPath(QPainter *painter);
   void drawTools(QPainter *painter);
   void drawGlobalCostMap(QPainter *painter);
   void drawRunMap();

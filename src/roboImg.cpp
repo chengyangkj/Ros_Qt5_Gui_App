@@ -1,7 +1,6 @@
 #include "roboImg.h"
 
 #include "QDebug"
-
 roboImg::roboImg() {
   setAcceptHoverEvents(true);
   setAcceptedMouseButtons(Qt::AllButtons);
@@ -34,7 +33,7 @@ void roboImg::setRobotColor(eRobotColor color) {
 }
 void roboImg::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                     QWidget *widget) {
-  painter->setRenderHint(QPainter::Antialiasing, true);  //设置反锯齿 反走样
+  painter->setRenderHint(QPainter::Antialiasing, true);  // 设置反锯齿 反走样
   painter->save();
   painter->rotate(rad2deg(-m_currRobotPose.theta));
   painter->drawPixmap(-m_robotImg.width() / 2, -m_robotImg.height() / 2,

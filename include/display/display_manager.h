@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-05-11 15:14:36
+ * @LastEditTime: 2023-07-26 10:46:25
  * @FilePath:
  * /hontai/src/tools/localizationViewer/include/display/display_manager.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -18,12 +18,12 @@
 #include <functional>
 #include <map>
 
+#include "display_tag.h"
 #include "laser_points.h"
 #include "particle_points.h"
 #include "point_shape.h"
-#include "robot_map.h"
 #include "region.h"
-#include "display_tag.h"
+#include "robot_map.h"
 #define DISPLAY_ROBOT "Robot"
 #define DISPLAY_MAP "OccupyMap"
 #define DISPLAY_LASER "LaserScan"
@@ -57,7 +57,8 @@ class DisplayManager : public QObject {
   Eigen::Vector2f transWord2Scene(const Eigen::Vector2f& point);
   void FocusDisplay(std::string display_name);
   void InitUi();
-   QPushButton* btn_move_focus_;
+  QPushButton* btn_move_focus_;
+
  public:
   DisplayManager(QGraphicsView* viewer);
   ~DisplayManager();

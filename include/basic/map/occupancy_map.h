@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-03-30 15:38:12
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-03-30 19:12:36
+ * @LastEditTime: 2023-07-26 16:44:24
  * @FilePath: /hontai/src/tools/localizationViewer/include/map/occupancy_map.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -23,9 +23,10 @@
  * ++++++x
  *
  */
-#ifndef MAP_META_DATA
-#define MAP_META_DATA
+#ifndef OCCUPANCY_MAP_H
+#define OCCUPANCY_MAP_H
 #include <Eigen/Dense>
+namespace basic {
 
 class OccupancyMap {
  public:
@@ -34,9 +35,9 @@ class OccupancyMap {
   double origin_theta{0};  // 地图原点theta(栅格地图左下角)
   double resolution{0};    // 地图分辨率
   Eigen::Vector3d origin_pose{0, 0, 0};  // 地图原点位置(栅格地图左下角)
-  int rows{0};                           //行(高)
-  int cols{0};                           //列(宽)
-  Eigen::MatrixXi map_data;  //地图数据,数据的地图已经被上下翻转
+  int rows{0};                           // 行(高)
+  int cols{0};                           // 列(宽)
+  Eigen::MatrixXi map_data;  // 地图数据,数据的地图已经被上下翻转
  public:
   OccupancyMap() {}
   OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
@@ -49,10 +50,16 @@ class OccupancyMap {
         origin_theta(origin[2]),
         resolution(res),
         map_data(data) {}
-  double operator()(int r, int c) { return map_data(r, c); }
-  void setFromMatrix(const Eigen::MatrixXi& data) { map_data = data; }
   ~OccupancyMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
+  Eigen::MatrixXi flip() { return map_data.rowwise().reverse(); }
+  void SetFlip() { map_data = flip(); }
+  auto& operator()(int r, int c) { return map_data(r, c); }
+  // 输入原始栅格地图数据(地图未翻转)
+  void SetMapData(const Eigen::MatrixXi& data) {
+    map_data = data;
+    map_data = flip();
+  }
   int Rows() { return rows; }
   int height() { return rows; }
   int Cols() { return cols; }
@@ -125,5 +132,7 @@ class OccupancyMap {
     scene_y = height() - (word_y - origin_y) / resolution;
   }
 };
+
+}  // namespace basic
 
 #endif

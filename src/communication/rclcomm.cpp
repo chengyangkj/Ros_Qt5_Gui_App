@@ -74,9 +74,8 @@ void rclcomm::getRobotPose() {
     // x y
     double x = transform.transform.translation.x;
     double y = transform.transform.translation.y;
-    QPointF trans_pose = transWordPoint2Scene(QPointF(x, y));
-    m_currPose.x = trans_pose.x();
-    m_currPose.y = trans_pose.y();
+    m_currPose.x = x;
+    m_currPose.y = y;
     m_currPose.theta = yaw;
     emit emitUpdateRobotPose(m_currPose);
   } catch (tf2::TransformException &ex) {
@@ -84,7 +83,7 @@ void rclcomm::getRobotPose() {
   }
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
-  RobotState state;
+  basic::RobotState state;
   state.vx = (double)msg->twist.twist.linear.x;
   state.vy = (double)msg->twist.twist.linear.y;
   state.w = (double)msg->twist.twist.angular.z;
@@ -107,7 +106,7 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
     //        m_tf_buffer->lookupTransform("map","base_scan",tf2::TimePointZero);
     geometry_msgs::msg::PointStamped point_map_frame;
     geometry_msgs::msg::PointStamped point_odom_frame;
-    QPolygonF emit_points;
+    basic::RobotPath path;
     for (int i = 0; i < msg->poses.size(); i++) {
       double x = msg->poses.at(i).pose.position.x;
       double y = msg->poses.at(i).pose.position.y;
@@ -115,15 +114,14 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
       point_odom_frame.point.y = y;
       point_odom_frame.header.frame_id = msg->header.frame_id;
       m_tf_buffer->transform(point_odom_frame, point_map_frame, "map");
-      QPointF point;
-      point.setX(point_map_frame.point.x);
-      point.setY(point_map_frame.point.y);
-      point = transWordPoint2Scene(point);
-      emit_points.push_back(point);
+      basic::Point point;
+      point.x = point_map_frame.point.x;
+      point.y = point_map_frame.point.y;
+      path.push_back(point);
       //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<"
       //        "<<point.y();
     }
-    emit emitUpdateLocalPath(emit_points);
+    emit emitUpdateLocalPath(path);
   } catch (tf2::TransformException &ex) {
     qDebug() << "local path transform error:" << ex.what();
   }
@@ -140,40 +138,19 @@ void rclcomm::run() {
   }
   rclcpp::shutdown();
 }
-QImage rclcomm::rotateMapWithY(QImage map) {
-  QImage res = map;
-  for (int x = 0; x < map.width(); x++) {
-    for (int y = 0; y < map.height(); y++) {
-      res.setPixelColor(x, map.height() - y - 1, map.pixelColor(x, y));
-    }
-  }
-  return res;
-}
-QPointF rclcomm::transWordPoint2Scene(QPointF point) {
-  QPointF ret;
-  ret.setX(m_wordOrigin.x() + point.x() / m_resolution);
-  ret.setY(m_wordOrigin.y() - point.y() / m_resolution);
-  return ret;
-}
-QPointF rclcomm::transScenePoint2Word(QPointF point) {
-  QPointF ret;
-  ret.setX((point.x() - m_wordOrigin.x()) * m_resolution);
-  ret.setY(-1 * (point.y() - m_wordOrigin.y()) * m_resolution);
-  return ret;
-}
+
 void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
-  QPolygonF emit_points;
+  basic::RobotPath path;
   for (int i = 0; i < msg->poses.size(); i++) {
     double x = msg->poses.at(i).pose.position.x;
     double y = msg->poses.at(i).pose.position.y;
-    QPointF point;
-    point.setX(x);
-    point.setY(y);
-    point = transWordPoint2Scene(point);
-    emit_points.push_back(point);
+    basic::Point point;
+    point.x = x;
+    point.y = y;
+    path.push_back(point);
     //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<" "<<point.y();
   }
-  emit emitUpdatePath(emit_points);
+  emit emitUpdatePath(path);
 }
 void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
   //   qDebug()<<"订阅到激光话题";
@@ -185,7 +162,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
     //        m_tf_buffer->lookupTransform("map","base_scan",tf2::TimePointZero);
     geometry_msgs::msg::PointStamped point_map_frame;
     geometry_msgs::msg::PointStamped point_laser_frame;
-    QPolygonF emit_points;
+    basic::LaserScan laser_points;
     for (int i = 0; i < msg->ranges.size(); i++) {
       // 计算当前偏移角度
       double angle = angle_min + i * angle_increment;
@@ -201,67 +178,31 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       //            qDebug()<<"转换前:"<<x<<" "<<y<<"
       //            转换后:"<<point_map_frame.point.x<<"
       //            "<<point_map_frame.point.y;
-      QPointF laser_scene_point;
-      laser_scene_point.setX(point_map_frame.point.x);
-      laser_scene_point.setY(point_map_frame.point.y);
-      laser_scene_point = transWordPoint2Scene(laser_scene_point);
-      emit_points.push_back(laser_scene_point);
+      basic::Point p;
+      p.x = point_map_frame.point.x;
+      p.x = point_map_frame.point.y;
+      laser_points.push_back(p);
     }
-    emit emitUpdateLaserPoint(emit_points);
+    emit emitUpdateLaserPoint(laser_points);
   } catch (tf2::TransformException &ex) {
     qDebug() << "laser pose transform error:" << ex.what();
   }
 }
+
 void rclcomm::globalCostMapCallback(
     const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   int width = msg->info.width;
   int height = msg->info.height;
   double origin_x = msg->info.origin.position.x;
   double origin_y = msg->info.origin.position.y;
-  QImage map_image(width, height, QImage::Format_ARGB32);
+  basic::CostMap cost_map(height, width, Eigen::Vector3d(origin_x, origin_y, 0),
+                          msg->info.resolution);
   for (int i = 0; i < msg->data.size(); i++) {
     int x = i % width;
     int y = (int)i / width;
-    // 计算像素值
-    QColor color;
-    int data = msg->data[i];
-    if (data >= 100) {
-      color.setRgb(0xff, 0x00, 0xff);
-      color.setAlpha(50);
-    } else if (data >= 90 && data < 100) {
-      color.setRgb(0x66, 0xff, 0xff);
-      color.setAlpha(50);
-    } else if (data >= 70 && data <= 90) {
-      color.setRgb(0xff, 0x00, 0x33);
-      color.setAlpha(50);
-    } else if (data >= 60 && data <= 70) {
-      color.setRgb(0xbe, 0x28, 0x1a);  // red
-      color.setAlpha(50);
-    } else if (data >= 50 && data < 60) {
-      color.setRgb(0xBE, 0x1F, 0x58);
-      color.setAlpha(50);
-    } else if (data >= 40 && data < 50) {
-      color.setRgb(0xBE, 0x25, 0x76);
-      color.setAlpha(50);
-    } else if (data >= 30 && data < 40) {
-      color.setRgb(0xBE, 0x2A, 0x99);
-      color.setAlpha(50);
-    } else if (data >= 20 && data < 30) {
-      color.setRgb(0xBE, 0x35, 0xB3);
-      color.setAlpha(50);
-    } else if (data >= 10 && data < 20) {
-      color.setRgb(0xB0, 0x3C, 0xbE);
-      color.setAlpha(50);
-    } else {
-      color = Qt::transparent;
-    }
-    map_image.setPixelColor(x, y, color);
+    cost_map(x, y) = msg->data[i];
   }
-  // 延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
-  // 但是图元坐标系为左上角度
-  map_image = rotateMapWithY(map_image);
-  //      map_image.save("/home/chengyangkj/test.jpg");
-  emit emitUpdateGlobalCostMap(map_image);
+  emit emitUpdateGlobalCostMap(cost_map);
 }
 void rclcomm::localCostMapCallback(
     const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
@@ -275,39 +216,14 @@ void rclcomm::localCostMapCallback(
   double roll, pitch, yaw;
   mat.getRPY(roll, pitch, yaw);
   double origin_theta = yaw;
-  QImage map_image(width, height, QImage::Format_ARGB32);
+  basic::CostMap cost_map(height, width, Eigen::Vector3d(origin_x, origin_y, 0),
+                          msg->info.resolution);
   for (int i = 0; i < msg->data.size(); i++) {
     int x = i % width;
     int y = (int)i / width;
-    // 计算像素值
-    QColor color;
-    int data = msg->data[i];
-    if (data >= 100) {
-      color.setRgb(0xff, 00, 0xff);
-    } else if (data >= 90 && data < 100) {
-      color.setRgb(0x66, 0xff, 0xff);
-    } else if (data >= 70 && data <= 90) {
-      color.setRgb(0xff, 0x00, 0x33);
-    } else if (data >= 60 && data <= 70) {
-      color.setRgb(0xbe, 0x28, 0x1a);  // red
-    } else if (data >= 50 && data < 60) {
-      color.setRgb(0xBE, 0x1F, 0x58);
-    } else if (data >= 40 && data < 50) {
-      color.setRgb(0xBE, 0x25, 0x76);
-    } else if (data >= 30 && data < 40) {
-      color.setRgb(0xBE, 0x2A, 0x99);
-    } else if (data >= 20 && data < 30) {
-      color.setRgb(0xBE, 0x35, 0xB3);
-    } else if (data >= 10 && data < 20) {
-      color.setRgb(0xB0, 0x3C, 0xbE);
-    } else {
-      color = Qt::transparent;
-    }
-    map_image.setPixelColor(x, y, color);
+    cost_map(x, y) = msg->data[i];
   }
-  // 延y翻转地图 因为解析到的栅格地图的坐标系原点为左下角
-  // 但是图元坐标系为左上角度
-  map_image = rotateMapWithY(map_image);
+
   //      map_image.save("/home/chengyangkj/test.jpg");
   try {
     // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
@@ -323,18 +239,16 @@ void rclcomm::localCostMapCallback(
     tf2::Matrix3x3 mat(q);
     double roll, pitch, yaw;
     mat.getRPY(roll, pitch, yaw);
-    // 原点坐标转到图元坐标系下
-    QPointF scene_origin = transWordPoint2Scene(QPointF(
-        pose_map_frame.pose.position.x, pose_map_frame.pose.position.y));
-    RobotPose localCostmapPose;
-    localCostmapPose.x = scene_origin.x();
-    localCostmapPose.y = scene_origin.y();
+
+    basic::RobotPose localCostmapPose;
+    localCostmapPose.x = pose_map_frame.pose.position.x;
+    localCostmapPose.y = pose_map_frame.pose.position.y;
     localCostmapPose.theta = yaw;
     //      std::cout<<"odomInMapPose:"<<pose_map_frame.pose.position.x<<"
     //      "<<pose_map_frame.pose.position.y<<" curr:"<<m_currPose.x<<"
     //      "<<m_currPose.y<<std::endl; std::cout<<"origin x:"<<origin_x<<"
     //      y:"<<origin_y<<" theta:"<<origin_theta<<std::endl;
-    emit emitUpdateLocalCostMap(map_image, localCostmapPose);
+    emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
   } catch (tf2::TransformException &ex) {
     qDebug() << "local cost map pose transform error:" << ex.what();
   }
@@ -345,61 +259,45 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   int width = msg->info.width;
   int height = msg->info.height;
   m_resolution = msg->info.resolution;
-  QImage map_image(width, height, QImage::Format_RGB32);
+  occ_map_ = basic::OccupancyMap(
+      height, width, Eigen::Vector3d(origin_x, origin_y, 0), m_resolution);
+
   for (int i = 0; i < msg->data.size(); i++) {
     int x = i % width;
     int y = int(i / width);
-    QColor color;
-    if (msg->data[i] == 100) {
-      color = Qt::black;  // 黑色
-    } else if (msg->data[i] == 0) {
-      color = Qt::white;  // 白色
-    } else {
-      color = Qt::gray;
-    }
-    map_image.setPixel(x, y, qRgb(color.red(), color.green(), color.blue()));
+    occ_map_(x, y) = msg->data[i];
   }
-  //   map_image.save("/home/chengyangkj/map.png");
-  QImage rotate_map = rotateMapWithY(map_image);
-  //   rotate_map.save("/home/chengyangkj/rotate_map.png");
-  emit emitUpdateMap(rotate_map);
-  // 计算图元坐标系原点在世界坐标系下的坐标(翻转之后的栅格地图坐标原点在世界坐标系下的坐标)
-  double trans_origin_x = origin_x;
-  double trans_origin_y = origin_y + height * m_resolution;
-  // 世界坐标系原点在图元坐标系下的坐标
-  m_wordOrigin.setX(fabs(trans_origin_x / m_resolution));
-  m_wordOrigin.setY(fabs(trans_origin_y / m_resolution));
+  occ_map_.SetFlip();
+  emit emitUpdateMap(occ_map_);
 }
 void rclcomm::recv_callback(const std_msgs::msg::Int32::SharedPtr msg) {
   //     qDebug()<<msg->data;
   emit emitTopicData("i am listen from topic:" +
                      QString::fromStdString(std::to_string(msg->data)));
 }
-void rclcomm::pub2DPose(QPointF start_pose, QPointF end_pose) {
-  start_pose = transScenePoint2Word(start_pose);
-  end_pose = transScenePoint2Word(end_pose);
-  double angle =
-      atan2(end_pose.y() - start_pose.y(), end_pose.x() - start_pose.x());
+void rclcomm::pub2DPose(QPointF start, QPointF end) {
+  auto start_pose = transScenePoint2Word(basic::Point(start.x(), start.y()));
+  auto end_pose = transScenePoint2Word(basic::Point(end.x(), end.y()));
+  double angle = atan2(end_pose.y - start_pose.y, end_pose.x - start_pose.x);
   geometry_msgs::msg::PoseWithCovarianceStamped pose;
   pose.header.frame_id = "map";
   pose.header.stamp = node->get_clock()->now();
-  pose.pose.pose.position.x = start_pose.x();
-  pose.pose.pose.position.y = start_pose.y();
+  pose.pose.pose.position.x = start_pose.x;
+  pose.pose.pose.position.y = start_pose.y;
   tf2::Quaternion q;
   q.setRPY(0, 0, angle);
   pose.pose.pose.orientation = tf2::toMsg(q);
   _initPosePublisher->publish(pose);
 }
-void rclcomm::pub2DGoal(QPointF start_pose, QPointF end_pose) {
-  start_pose = transScenePoint2Word(start_pose);
-  end_pose = transScenePoint2Word(end_pose);
-  double angle =
-      atan2(end_pose.y() - start_pose.y(), end_pose.x() - start_pose.x());
+void rclcomm::pub2DGoal(QPointF start, QPointF end) {
+  auto start_pose = transScenePoint2Word(basic::Point(start.x(), start.y()));
+  auto end_pose = transScenePoint2Word(basic::Point(end.x(), end.y()));
+  double angle = atan2(end_pose.y - start_pose.y, end_pose.x - start_pose.x);
   geometry_msgs::msg::PoseStamped pose;
   pose.header.frame_id = "map";
   pose.header.stamp = node->get_clock()->now();
-  pose.pose.position.x = start_pose.x();
-  pose.pose.position.y = start_pose.y();
+  pose.pose.position.x = start_pose.x;
+  pose.pose.position.y = start_pose.y;
   tf2::Quaternion q;
   q.setRPY(0, 0, angle);
   pose.pose.orientation = tf2::toMsg(q);

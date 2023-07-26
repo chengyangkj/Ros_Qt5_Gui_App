@@ -7,7 +7,9 @@
 #include <QObject>
 #include <QPainter>
 
-#include "RobotAlgorithm.h"
+#include "basic/algorithm.h"
+#include "basic/point_type.h"
+using namespace basic;
 enum eRobotColor { blue, red, yellow };
 class roboImg : public QObject, public QGraphicsItem {
   Q_OBJECT
@@ -17,11 +19,12 @@ class roboImg : public QObject, public QGraphicsItem {
              QWidget *widget = nullptr) override;
   QRectF boundingRect() const override;
   void setRobotColor(eRobotColor color);
+
  private:
-   QPixmap m_robotImg;
-   RobotPose m_currRobotPose;
-public slots:
-   void updatePose(RobotPose pose);
+  QPixmap m_robotImg;
+  RobotPose m_currRobotPose;
+ public slots:
+  void updatePose(RobotPose pose);
 };
 
 #endif  // roboImg_H

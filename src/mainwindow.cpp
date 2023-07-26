@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include "RobotAlgorithm.h"
+#include "basic/algorithm.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindowDesign) {
@@ -76,9 +76,10 @@ MainWindow::MainWindow(QWidget *parent)
   connect(ui->pushButton_status, &QPushButton::clicked,
           [=]() { ui->btn_other->click(); });
   connect(m_roboItem, &roboItem::cursorPos, [=](QPointF pos) {
-    QPointF mapPos = commNode->transScenePoint2Word(pos);
-    ui->label_pos_map->setText("x: " + QString::number(mapPos.x()).mid(0, 4) +
-                               "  y: " + QString::number(mapPos.y()).mid(0, 4));
+    basic::Point mapPos =
+        commNode->transScenePoint2Word(basic::Point(pos.x(), pos.y()));
+    ui->label_pos_map->setText("x: " + QString::number(mapPos.x).mid(0, 4) +
+                               "  y: " + QString::number(mapPos.y).mid(0, 4));
     ui->label_pos_scene->setText("x: " + QString::number(pos.x()).mid(0, 4) +
                                  "  y: " + QString::number(pos.y()).mid(0, 4));
   });
