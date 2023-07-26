@@ -66,7 +66,7 @@ void DashBoard::paintEvent(QPaintEvent* event) {
 }
 
 void DashBoard::draw_tachometer(QPainter& painter) {
-  static QColor normal_color(26, 245, 245, 245);
+  static QColor normal_color(18, 11, 10, 245);
   static QColor overrun_color(245, 64, 64, 225);
 
   // 绘制表盘外檐
@@ -129,7 +129,7 @@ void DashBoard::draw_tachometer(QPainter& painter) {
   // 绘制指针
   static const QPoint hand[] = {QPoint(-4, 0), QPoint(0, 94), QPoint(4, 0),
                                 QPoint(0, -6)};
-  static QColor hand_color(26, 245, 245, 176);
+  static QColor hand_color(0x88, 0x37, 0x4f, 176);
   painter.save();
   painter.setPen(Qt::NoPen);
   painter.setBrush(hand_color);
