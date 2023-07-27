@@ -13,11 +13,13 @@
 
 namespace basic {
 typedef OrientedPoint RobotPose;
+typedef std::vector<Point> RobotPath;
 struct RobotSpeed {
   double vx{0};
   double vy{0};
   double w{0};
 };
+
 struct RobotState : public RobotPose, RobotSpeed {};
 // 激光点云数据结构
 struct LaserScan {
@@ -29,14 +31,6 @@ struct LaserScan {
   void clear() { data.clear(); }
 };
 // 机器人路径 由点集组成
-struct RobotPath {
-  RobotPath() = default;
-  RobotPath(std::vector<Point>&& p) : data(std::move(p)) {}
-  void push_back(Point p) { data.push_back(p); }
-  void clear() { data.clear(); }
-
-  std::vector<Point> data;
-};
 
 }  // namespace basic
 

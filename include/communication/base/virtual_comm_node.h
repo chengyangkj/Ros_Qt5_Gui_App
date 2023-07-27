@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-07-25 16:20:39
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-07-26 16:55:29
+ * @LastEditTime: 2023-07-27 14:07:54
  * @FilePath:
  * /ROS2_Qt5_Gui_App/include/communication/base/virtual_communcation_node.h
  */
@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QThread>
 
+#include "QPointF"
 #include "basic/map/cost_map.h"
 #include "basic/map/occupancy_map.h"
 #include "basic/point_type.h"
@@ -45,4 +46,11 @@ class VirtualCommNode : public QThread {
   void emitUpdatePath(RobotPath points);
   void emitUpdateLocalPath(RobotPath points);
   void emitOdomInfo(basic::RobotState state);
+ public slots:
+  void slotPub2DPose(QPointF start, QPointF end) { pub2DPose(start, end); }
+  void slotPub2DGoal(QPointF start, QPointF end) { pub2DGoal(start, end); }
+
+ public:
+  virtual void pub2DPose(QPointF start, QPointF end) = 0;
+  virtual void pub2DGoal(QPointF start, QPointF end) = 0;
 };

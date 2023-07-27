@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-04-20 15:46:29
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-07-25 16:57:48
+ * @LastEditTime: 2023-07-27 13:56:13
  * @FilePath: /ROS2_Qt5_Gui_App/include/mainwindow.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -15,7 +15,8 @@
 #include <QMouseEvent>
 
 #include "QTimer"
-#include "communication/rclcomm.h"
+#include "basic/point_type.h"
+#include "communication/base/comm_instance.h"
 #include "dashboard.h"
 #include "display/display_manager.h"
 #include "roboGLWidget.h"
@@ -35,10 +36,8 @@ class MainWindow : public QMainWindow {
  public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
-  rclcomm *commNode;
  public slots:
   void onRecvData(QString);
-  void updateRobotPose(RobotPose pose);
   void updateOdomInfo(RobotState);
   // ui 相关函数
  private:
@@ -64,13 +63,11 @@ class MainWindow : public QMainWindow {
   int curpos_ = 0;
   bool m_bresize = false;
   QGraphicsScene *m_qGraphicScene = nullptr;
-  roboItem *m_roboItem = nullptr;
-  roboImg *m_roboImg = nullptr;
   DashBoard *m_speedDashBoard;
 
  private:
   QTimer *m_timerCurrentTime;
   roboGLWidget *m_roboGLWidget;
-  DisplayManager *display_manager_;
+  Display::DisplayManager *display_manager_;
 };
 #endif  // MAINWINDOW_H

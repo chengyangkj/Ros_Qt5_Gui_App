@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-04-20 15:46:29
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-07-26 16:48:52
+ * @LastEditTime: 2023-07-27 14:02:02
  * @FilePath: /ROS2_Qt5_Gui_App/include/rclcomm.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -35,7 +35,6 @@ class rclcomm : public VirtualCommNode {
   rclcomm();
   void run() override;
 
-
  private:
   void recv_callback(const std_msgs::msg::Int32::SharedPtr msg);
   void map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
@@ -47,9 +46,11 @@ class rclcomm : public VirtualCommNode {
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
 
+ public:
+  void pub2DPose(QPointF start, QPointF end) override;
+  void pub2DGoal(QPointF start, QPointF end) override;
+
  public slots:
-  void pub2DPose(QPointF, QPointF);
-  void pub2DGoal(QPointF, QPointF);
 
  private:
   rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
@@ -78,7 +79,6 @@ class rclcomm : public VirtualCommNode {
   rclcpp::CallbackGroup::SharedPtr callback_group_other;
 
  private:
-
  signals:
   void emitTopicData(QString);
 };

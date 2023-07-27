@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-05-17 16:31:13
+ * @LastEditTime: 2023-07-27 13:45:55
  * @FilePath:
  * /hontai/src/tools/localizationViewer/src/display/display_manager.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -11,6 +11,8 @@
 #include "display/display_manager.h"
 
 #include <Eigen/Eigen>
+namespace Display {
+
 DisplayManager::DisplayManager(QGraphicsView* viewer)
     : viewer_ptr_(viewer),
       DisplayInstance(VirtualDisplay::FactoryDisplay::Instance) {
@@ -156,7 +158,7 @@ bool DisplayManager::UpdateDisplay(const std::string& display_name,
     }
   } else if (display_name == DISPLAY_ROBOT) {
     display->UpdateDisplay(data);
-    GetAnyData(Eigen::Vector3f, data, robot_pose_);
+    GetAnyData(Pose3f, data, robot_pose_);
     UpdateRobotPose(robot_pose_);
 
   } else if (display_name == DISPLAY_LASER) {
@@ -294,3 +296,7 @@ Eigen::Vector2f DisplayManager::transWord2Scene(const Eigen::Vector2f& point) {
 VirtualDisplay* DisplayManager::GetDisplay(const std::string& name) {
   return DisplayInstance()->GetDisplay(name);
 }
+void DisplayManager::start2DPose() {}
+void DisplayManager::start2DGoal() {}
+
+}  // namespace Display

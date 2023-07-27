@@ -2,7 +2,7 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-07-26 10:46:25
+ * @LastEditTime: 2023-07-27 13:45:27
  * @FilePath:
  * /hontai/src/tools/localizationViewer/include/display/display_manager.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -26,10 +26,15 @@
 #include "robot_map.h"
 #define DISPLAY_ROBOT "Robot"
 #define DISPLAY_MAP "OccupyMap"
+#define DISPLAY_COST_MAP "CostMap"
+#define DISPLAY_GLOBAL_COST_MAP "GlobalMap"
+#define DISPLAY_GLOBAL_PATH "GlobalPath"
+#define DISPLAY_LOCAL_PATH "LocalPath"
 #define DISPLAY_LASER "LaserScan"
 #define DISPLAY_PARTICLE "Particle"
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
+namespace Display {
 class DisplayManager : public QObject {
   Q_OBJECT
  private:
@@ -45,6 +50,8 @@ class DisplayManager : public QObject {
   void cursorPosMap(QPointF);
   void cursorPosScene(QPointF);
   void robotPoseMap(Eigen::Vector3f pose);
+  void signalPub2DPose(QPointF, QPointF);
+  void signalPub2DGoal(QPointF, QPointF);
  public slots:
   void updateCoordinateSystem();
   void updateScaled(double value);
@@ -52,6 +59,8 @@ class DisplayManager : public QObject {
   void slotDisplaySetScaled(std::string display_name, double value);
   void slotUpdateCursorPose(std::string, QPointF);
   void slotDisplayScenePoseChanged(std::string, QPointF);
+  void start2DPose();
+  void start2DGoal();
 
  private:
   Eigen::Vector2f transWord2Scene(const Eigen::Vector2f& point);
@@ -70,5 +79,7 @@ class DisplayManager : public QObject {
   void SetMoveRobot(bool is_move);
   void SetFocusOn(std::string display_name) { focus_display_ = display_name; }
 };
+
+}  // namespace Display
 
 #endif

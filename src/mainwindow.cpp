@@ -1,53 +1,84 @@
 #include "mainwindow.h"
 
+#include "Eigen/Dense"
 #include "basic/algorithm.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindowDesign) {
   ui->setupUi(this);
-  commNode = new rclcomm();
-  connect(commNode, SIGNAL(emitTopicData(QString)), this,
+  connect(CommInstance::Instance(), SIGNAL(emitTopicData(QString)), this,
           SLOT(onRecvData(QString)));
   // 初始化场景类
-  m_qGraphicScene = new QGraphicsScene();
-  m_qGraphicScene->clear();
-  // 初始化item
-  m_roboItem = new roboItem();
-  m_roboImg = new roboImg();
 
-  display_manager_ = new DisplayManager(ui->mapViz);
+  display_manager_ = new Display::DisplayManager(ui->mapViz);
   m_roboGLWidget = new roboGLWidget();
   ui->verticalLayout_status->addWidget(m_roboGLWidget);
-  connect(commNode, SIGNAL(emitUpdateMap(QImage)), m_roboItem,
-          SLOT(updateMap(QImage)));
-  connect(commNode, SIGNAL(emitUpdateLocalCostMap(QImage, RobotPose)),
-          m_roboItem, SLOT(updateLocalCostMap(QImage, RobotPose)));
-  connect(commNode, SIGNAL(emitUpdateGlobalCostMap(QImage)), m_roboItem,
-          SLOT(updateGlobalCostMap(QImage)));
-  connect(commNode, SIGNAL(emitUpdateRobotPose(RobotPose)), this,
-          SLOT(updateRobotPose(RobotPose)));
-  connect(commNode, SIGNAL(emitUpdateLaserPoint(QPolygonF)), m_roboItem,
-          SLOT(updateLaserPoints(QPolygonF)));
-  connect(commNode, SIGNAL(emitUpdatePath(QPolygonF)), m_roboItem,
-          SLOT(updatePath(QPolygonF)));
-  connect(commNode, SIGNAL(emitUpdateLocalPath(QPolygonF)), m_roboItem,
-          SLOT(updateLocalPath(QPolygonF)));
-  connect(commNode, SIGNAL(emitOdomInfo(RobotState)), this,
+  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateMap,
+          [this](OccupancyMap map) {
+            display_manager_->UpdateDisplay(DISPLAY_MAP, map);
+          });
+  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateLocalCostMap,
+          [this](CostMap map, RobotPose) {
+            display_manager_->UpdateDisplay(DISPLAY_COST_MAP, map);
+          });
+  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateGlobalCostMap,
+          [this](CostMap map) {
+            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_COST_MAP, map);
+          });
+  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateRobotPose,
+          [this](RobotPose pose) {
+            display_manager_->UpdateDisplay(
+                DISPLAY_ROBOT, Display::Pose3f(pose.x, pose.y, pose.theta));
+          });
+  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateLaserPoint,
+          [this](LaserScan scan) {
+            // 数据转换
+            Display::LaserDataMap laser_data;
+
+            Display::LaserData vector_scan;
+            for (auto one_point : scan.data) {
+              Eigen::Vector2f point;
+              point[0] = one_point.x;
+              point[1] = one_point.y;
+              vector_scan.push_back(point);
+            }
+            laser_data[scan.id] = vector_scan;
+
+            display_manager_->UpdateDisplay(DISPLAY_LASER, laser_data);
+          });
+  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdatePath,
+          [this](RobotPath path) {
+            Display::PathData data;
+            for (auto one_point : path) {
+              data.push_back(Display::Point2f(one_point.x, one_point.y));
+            }
+            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
+          });
+  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateLocalPath,
+          [this](RobotPath path) {
+            Display::PathData data;
+            for (auto one_point : path) {
+              data.push_back(Display::Point2f(one_point.x, one_point.y));
+            }
+            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
+          });
+  connect(CommInstance::Instance(), SIGNAL(emitOdomInfo(RobotState)), this,
           SLOT(updateOdomInfo(RobotState)));
-  connect(m_roboItem, SIGNAL(signalRunMap(QPixmap)), m_roboGLWidget,
-          SLOT(updateRunMap(QPixmap)));
-  //    connect(commNode,&rclcomm::emitUpdateMap,[this](QImage img){
+  // connect(m_roboItem, SIGNAL(signalRunMap(OccupancyMap)), m_roboGLWidget,
+  //         SLOT(updateRunMap(QPixmap)));
+  //    connect(CommInstance::Instance(),&rclcomm::emitUpdateMap,[this](QImage
+  //    img){
   //        m_roboItem->updateMap(img);
   //    });
-  connect(m_roboItem, SIGNAL(signalPub2DPose(QPointF, QPointF)), commNode,
-          SLOT(pub2DPose(QPointF, QPointF)));
-  connect(m_roboItem, SIGNAL(signalPub2DGoal(QPointF, QPointF)), commNode,
-          SLOT(pub2DGoal(QPointF, QPointF)));
+  connect(display_manager_, SIGNAL(signalPub2DPose(QPointF, QPointF)),
+          CommInstance::Instance(), SLOT(pub2DPose(QPointF, QPointF)));
+  connect(display_manager_, SIGNAL(signalPub2DGoal(QPointF, QPointF)),
+          CommInstance::Instance(), SLOT(pub2DGoal(QPointF, QPointF)));
   // ui相关
   connect(ui->set_pos_btn, &QPushButton::clicked,
-          [=]() { m_roboItem->start2DPose(); });
+          [=]() { display_manager_->start2DPose(); });
   connect(ui->set_goal_btn, &QPushButton::clicked,
-          [=]() { m_roboItem->start2DGoal(); });
+          [=]() { display_manager_->start2DGoal(); });
   connect(ui->close_btn, &QPushButton::clicked, [=]() { this->close(); });
   connect(ui->min_btn, &QPushButton::clicked, [=]() { this->showMinimized(); });
   connect(ui->max_btn, &QPushButton::clicked, [=]() {
@@ -75,14 +106,18 @@ MainWindow::MainWindow(QWidget *parent)
   });
   connect(ui->pushButton_status, &QPushButton::clicked,
           [=]() { ui->btn_other->click(); });
-  connect(m_roboItem, &roboItem::cursorPos, [=](QPointF pos) {
-    basic::Point mapPos =
-        commNode->transScenePoint2Word(basic::Point(pos.x(), pos.y()));
-    ui->label_pos_map->setText("x: " + QString::number(mapPos.x).mid(0, 4) +
-                               "  y: " + QString::number(mapPos.y).mid(0, 4));
-    ui->label_pos_scene->setText("x: " + QString::number(pos.x()).mid(0, 4) +
-                                 "  y: " + QString::number(pos.y()).mid(0, 4));
-  });
+  connect(
+      display_manager_, &Display::DisplayManager::cursorPosScene,
+      [=](QPointF pos) {
+        basic::Point mapPos = CommInstance::Instance()->transScenePoint2Word(
+            basic::Point(pos.x(), pos.y()));
+        ui->label_pos_map->setText(
+            "x: " + QString::number(mapPos.x).mid(0, 4) +
+            "  y: " + QString::number(mapPos.y).mid(0, 4));
+        ui->label_pos_scene->setText(
+            "x: " + QString::number(pos.x()).mid(0, 4) +
+            "  y: " + QString::number(pos.y()).mid(0, 4));
+      });
   m_timerCurrentTime = new QTimer;
   m_timerCurrentTime->setInterval(100);
   m_timerCurrentTime->start();
@@ -90,13 +125,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_time->setText(
         QDateTime::currentDateTime().toString("  hh:mm:ss  "));
   });
-  //   QImage image(600, 600, QImage::Format_RGB888);
-  //   QPainter painter(&image);
-  //   painter.setRenderHint(QPainter::Antialiasing);
-  //   m_qGraphicScene->render(&painter);
-  //   image.save("/home/chengyangkj/test.jpg");
 
-  commNode->start();
+  CommInstance::Instance()->start();
   initUi();
 }
 void MainWindow::updateOdomInfo(RobotState state) {
@@ -132,15 +162,7 @@ void MainWindow::updateOdomInfo(RobotState state) {
   //           QPainter painter(&image);
   //           myscene->render(&painter);   //关键函数
 }
-void MainWindow::updateRobotPose(RobotPose pose) {
-  m_roboItem->updateRobotPose(pose);
-  QPointF pos;
-  pos.setX(pose.x);
-  pos.setY(pose.y);
-  QPointF scenePose = m_roboItem->mapToScene(pos);
-  m_roboImg->updatePose(pose);
-  m_roboImg->setPos(scenePose.x(), scenePose.y());
-}
+
 void MainWindow::setCurrentMenu(QPushButton *cur_btn) {
   for (int i = 0; i < ui->horizontalLayout_menu->layout()->count(); i++) {
     QPushButton *btn = qobject_cast<QPushButton *>(
