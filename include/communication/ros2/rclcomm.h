@@ -16,7 +16,7 @@
 #include <QImage>
 #include <rclcpp/rclcpp.hpp>
 
-#include "base/virtual_comm_node.h"
+#include "communication/base/virtual_comm_node.h"
 #include "basic/algorithm.h"
 #include "basic/point_type.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
