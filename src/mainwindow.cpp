@@ -79,9 +79,10 @@ MainWindow::MainWindow(QWidget *parent)
           [=]() { display_manager_->start2DPose(); });
   connect(ui->set_goal_btn, &QPushButton::clicked,
           [=]() { display_manager_->start2DGoal(); });
-  connect(ui->close_btn, &QPushButton::clicked, [=]() { this->close(); });
-  connect(ui->min_btn, &QPushButton::clicked, [=]() { this->showMinimized(); });
-  connect(ui->max_btn, &QPushButton::clicked, [=]() {
+  connect(ui->close_btn, &QPushButton::clicked, [this]() { this->close(); });
+  connect(ui->min_btn, &QPushButton::clicked,
+          [this]() { this->showMinimized(); });
+  connect(ui->max_btn, &QPushButton::clicked, [this]() {
     if (this->isFullScreen()) {
       this->showNormal();
     } else {
@@ -106,18 +107,18 @@ MainWindow::MainWindow(QWidget *parent)
   });
   connect(ui->pushButton_status, &QPushButton::clicked,
           [=]() { ui->btn_other->click(); });
-  connect(
-      display_manager_, &Display::DisplayManager::cursorPosScene,
-      [=](QPointF pos) {
-        basic::Point mapPos = CommInstance::Instance()->transScenePoint2Word(
-            basic::Point(pos.x(), pos.y()));
-        ui->label_pos_map->setText(
-            "x: " + QString::number(mapPos.x).mid(0, 4) +
-            "  y: " + QString::number(mapPos.y).mid(0, 4));
-        ui->label_pos_scene->setText(
-            "x: " + QString::number(pos.x()).mid(0, 4) +
-            "  y: " + QString::number(pos.y()).mid(0, 4));
-      });
+  connect(display_manager_, &Display::DisplayManager::cursorPosScene,
+          [=](QPointF pos) {
+            basic::Point mapPos =
+                CommInstance::Instance()->transScenePoint2Word(
+                    basic::Point(pos.x(), pos.y()));
+            ui->label_pos_map->setText(
+                "x: " + QString::number(mapPos.x).mid(0, 4) +
+                "  y: " + QString::number(mapPos.y).mid(0, 4));
+            ui->label_pos_scene->setText(
+                "x: " + QString::number(pos.x()).mid(0, 4) +
+                "  y: " + QString::number(pos.y()).mid(0, 4));
+          });
   m_timerCurrentTime = new QTimer;
   m_timerCurrentTime->setInterval(100);
   m_timerCurrentTime->start();
