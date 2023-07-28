@@ -14,7 +14,7 @@
 #define COMM_NODE_NAME rclcomm
 #include "communication/ros2/rclcomm.h"
 #elif ROS1_NODE
-#define COMM_NODE_NAME "rosnode"
+#define COMM_NODE_NAME rosnode
 #include "communication/ros1/rosnode.h"
 #endif
 

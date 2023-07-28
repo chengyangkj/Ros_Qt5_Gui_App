@@ -1,3 +1,11 @@
+/*
+ * @Author: chengyang cyjiang@robovision.cn
+ * @Date: 2023-07-27 14:47:24
+ * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditTime: 2023-07-28 10:12:02
+ * @FilePath: /ROS2_Qt5_Gui_App/src/communication/ros1/rosnode.cpp
+ * @Description: ros2通讯类
+ */
 #include "communication/ros2/rclcomm.h"
 rclcomm::rclcomm() {
   int argc = 0;

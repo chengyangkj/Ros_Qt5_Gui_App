@@ -2,12 +2,17 @@
  * @Author: chengyang cyjiang@robovision.cn
  * @Date: 2023-07-27 14:47:24
  * @LastEditors: chengyang cyjiang@robovision.cn
- * @LastEditTime: 2023-07-27 15:10:37
+ * @LastEditTime: 2023-07-28 10:21:19
  * @FilePath: /ROS2_Qt5_Gui_App/src/communication/ros1/rosnode.cpp
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
- * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ * @Description: ros1通讯类
  */
 #include "communication/ros1/rosnode.h"
-rosnode::rosnode(/* args */) {}
+rosnode::rosnode(/* args */) {
+  ros::init(init_argc, init_argv, "ros_qt5_gui_app",
+            ros::init_options::AnonymousName);
+}
 
 rosnode::~rosnode() {}
+void rosnode::run() {}
+void rosnode::pub2DPose(QPointF start, QPointF end) {}
+void rosnode::pub2DGoal(QPointF start, QPointF end) {}
