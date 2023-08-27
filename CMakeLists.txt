@@ -47,7 +47,7 @@ find_package(Boost REQUIRED COMPONENTS thread)
 find_package(Eigen3 REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 ##################################3,设置程序源文件路径#######################
-file(GLOB_RECURSE SOURCE_FILE RELATIVE ${CMAKE_SOURCE_DIR} FOLLOW_SYMLINKS  src/*.cpp)
+file(GLOB_RECURSE SOURCE_FILE RELATIVE ${CMAKE_SOURCE_DIR} FOLLOW_SYMLINKS  src/*.cpp src/*.cc)
 file(GLOB_RECURSE UI_FILE RELATIVE ${CMAKE_SOURCE_DIR} FOLLOW_SYMLINKS  ui/*.ui)
 file(GLOB_RECURSE QRC_FILE RELATIVE ${CMAKE_SOURCE_DIR} FOLLOW_SYMLINKS  resource/*.qrc)
 file(GLOB_RECURSE INCLUDE_FILE RELATIVE ${CMAKE_SOURCE_DIR} FOLLOW_SYMLINKS  include/*.h *.hpp)
@@ -76,7 +76,7 @@ qt5_add_resources(QT_RESOUCE_HPP ${QRC_FILE})
 #项目包含的头文件路径
 include_directories(
 	include/
-	${CMAKE_CURRENT_BINARY_DIR}
+ ${CMAKE_CURRENT_BINARY_DIR}
   ${catkin_INCLUDE_DIRS} 
   ${EIGEN3_INCLUDE_DIR}
 )

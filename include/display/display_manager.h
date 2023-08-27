@@ -66,6 +66,8 @@ class DisplayManager : public QObject {
   Eigen::Vector2f transWord2Scene(const Eigen::Vector2f& point);
   void FocusDisplay(std::string display_name);
   void InitUi();
+  std::vector<Eigen::Vector2f> transLaserPoint(
+    const std::vector<Eigen::Vector2f> &point);
   QPushButton* btn_move_focus_;
 
  public:
@@ -75,6 +77,7 @@ class DisplayManager : public QObject {
   bool UpdateDisplay(const std::string& display_name, const std::any& data);
   void UpdateRobotPose(const Eigen::Vector3f& pose);
   bool SetDisplayConfig(const std::string& config_name, const std::any& data);
+  Eigen::Vector3f MapPose2Scene(const Eigen::Vector3f& pose);
   Eigen::Vector3f GetMapPoseInScene(const Eigen::Vector3f& pose);
   void SetMoveRobot(bool is_move);
   void SetFocusOn(std::string display_name) { focus_display_ = display_name; }

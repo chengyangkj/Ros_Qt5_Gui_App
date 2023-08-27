@@ -19,39 +19,12 @@ void LaserPoints::paint(QPainter *painter,
 }
 
 LaserPoints::~LaserPoints() {}
-/**
- * @description:激光车身坐标系转换为图元坐标系
- * @return {*}
- */
-std::vector<Eigen::Vector2f> LaserPoints::transLaserPoint(
-    const std::vector<Eigen::Vector2f> &point) {
-  std::vector<Eigen::Vector2f> res;
-  for (auto one_point : point) {
-    Eigen::Vector3d point_map = Display::absoluteSum(
-        Eigen::Vector3d(robot_pose_[0], robot_pose_[1], robot_pose_[2]),
-        Eigen::Vector3d(one_point[0], one_point[1], 0));
-    // 转换为图元坐标系
-    int x, y;
-    map_data_.xy2scene(point_map[0], point_map[1], x, y);
-    res.push_back(Eigen::Vector2f(x, y));
-  }
-  return res;
-}
-bool LaserPoints::UpdateData(const std::any &data) {
-  if (data.type() == typeid(OccupancyMap)) {
-    map_data_ = std::any_cast<OccupancyMap>(data);
-  } else if (data.type() == typeid(Display::LaserDataMap)) {
-    laser_data_scene_.clear();
-    laser_data_map_ = std::any_cast<Display::LaserDataMap>(data);
-    // 点坐标转换为地图坐标系下
-    for (auto one_laser : laser_data_map_) {
-      laser_data_scene_[one_laser.first] = transLaserPoint(one_laser.second);
-    }
-    computeBoundRect(laser_data_scene_);
-  } else if (data.type() == typeid(Eigen::Vector3f)) {
-    robot_pose_ = std::any_cast<Eigen::Vector3f>(data);
-  }
 
+bool LaserPoints::UpdateData(const std::any &data) {
+ if (data.type() == typeid(Display::LaserDataMap)) {
+    laser_data_scene_ = std::any_cast<Display::LaserDataMap>(data);
+    computeBoundRect(laser_data_scene_);
+  } 
   update();
 }
 void LaserPoints::computeBoundRect(const Display::LaserDataMap &laser_scan) {
@@ -98,6 +71,7 @@ void LaserPoints::drawLaser(QPainter *painter, int id,
   painter->setPen(QPen(color));
   for (auto one_point : data) {
     QPointF point = QPointF(one_point[0], one_point[1]);
+    // std::cout<<"point:"<<point.x()<<std::endl;
     painter->drawPoint(point);
   }
 }

@@ -25,11 +25,7 @@ class LaserPoints : public VirtualDisplay {
   void Id2Color(int id, int &R, int &G, int &B);
   void drawLaser(QPainter *painter, int id, std::vector<Eigen::Vector2f>);
   void computeBoundRect(const Display::LaserDataMap &laser_scan);
-  std::vector<Eigen::Vector2f> transLaserPoint(
-      const std::vector<Eigen::Vector2f> &point);
   Display::LaserColorMap location_to_color_;
-  Eigen::Vector3f robot_pose_{0, 0, 0};
-  OccupancyMap map_data_;
 };
 
 #endif

@@ -26,6 +26,7 @@
 #ifndef OCCUPANCY_MAP_H
 #define OCCUPANCY_MAP_H
 #include <Eigen/Dense>
+#include <iostream>
 namespace basic {
 
 class OccupancyMap {
@@ -40,8 +41,7 @@ class OccupancyMap {
   Eigen::MatrixXi map_data;  // 地图数据,数据的地图已经被上下翻转
  public:
   OccupancyMap() {}
-  OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
-               Eigen::MatrixXi data = Eigen::MatrixXi())
+  OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res)
       : rows(rows_),
         cols(cols_),
         origin_pose(origin),
@@ -49,12 +49,25 @@ class OccupancyMap {
         origin_y(origin[1]),
         origin_theta(origin[2]),
         resolution(res),
-        map_data(data) {}
+        map_data(rows_,cols) {
+        }
+      OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
+               Eigen::MatrixXi data )
+      : rows(rows_),
+        cols(cols_),
+        origin_pose(origin),
+        origin_x(origin[0]),
+        origin_y(origin[1]),
+        origin_theta(origin[2]),
+        resolution(res),
+        map_data(data) {
+        }
   ~OccupancyMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
   Eigen::MatrixXi flip() { return map_data.rowwise().reverse(); }
   void SetFlip() { map_data = flip(); }
-  auto& operator()(int r, int c) { return map_data(r, c); }
+  auto& operator()(int r, int c) {
+     return map_data(r, c); }
   // 输入原始栅格地图数据(地图未翻转)
   void SetMapData(const Eigen::MatrixXi& data) {
     map_data = data;

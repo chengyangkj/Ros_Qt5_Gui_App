@@ -41,8 +41,17 @@ class CostMap {
   Eigen::MatrixXi map_data;  // 地图数据,数据的地图已经被上下翻转
  public:
   CostMap() {}
-  CostMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
-          Eigen::MatrixXi data = Eigen::MatrixXi())
+  CostMap(int rows_, int cols_, Eigen::Vector3d origin, double res)
+      : rows(rows_),
+        cols(cols_),
+        origin_pose(origin),
+        origin_x(origin[0]),
+        origin_y(origin[1]),
+        origin_theta(origin[2]),
+        resolution(res),
+        map_data(rows_,cols_) {}
+ CostMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
+          Eigen::MatrixXi data )
       : rows(rows_),
         cols(cols_),
         origin_pose(origin),
@@ -51,7 +60,6 @@ class CostMap {
         origin_theta(origin[2]),
         resolution(res),
         map_data(data) {}
-
   ~CostMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
   // 沿X上下翻转

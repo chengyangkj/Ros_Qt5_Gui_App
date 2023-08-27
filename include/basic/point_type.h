@@ -10,7 +10,7 @@
 #ifndef POINT_TYPE_H
 #define POINT_TYPE_H
 #include "point.h"
-
+#include <Eigen/Dense>
 namespace basic {
 typedef OrientedPoint RobotPose;
 typedef std::vector<Point> RobotPath;
@@ -31,6 +31,19 @@ struct LaserScan {
   void clear() { data.clear(); }
 };
 // 机器人路径 由点集组成
+
+inline Eigen::Vector3d absoluteSum(const Eigen::Vector3d& p,
+                                   const Eigen::Vector3d& d) {
+  Eigen::Quaterniond q1 = Eigen::AngleAxisd(p[2], Eigen::Vector3d::UnitZ()) *
+                          Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
+                          Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX());
+  Eigen::Vector3d t1 = Eigen::Vector3d(p[0], p[1], 0.0);
+  Eigen::Vector3d p1 = Eigen::Vector3d(d[0], d[1], 0.0);
+  Eigen::Vector3d pw;
+  pw = q1 * p1 + t1;
+  pw[2] += d[2];
+  return pw;
+}
 
 }  // namespace basic
 

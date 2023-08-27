@@ -901,7 +901,7 @@ QProgressBar::chunk
                <item>
                 <widget class="QPushButton" name="min_btn">
                  <property name="cursor">
-                  <cursorShape>PointingHandCursor</cursorShape>
+                  <cursorShape>OpenHandCursor</cursorShape>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">border:none</string>
@@ -918,7 +918,7 @@ QProgressBar::chunk
                <item>
                 <widget class="QPushButton" name="max_btn">
                  <property name="cursor">
-                  <cursorShape>PointingHandCursor</cursorShape>
+                  <cursorShape>OpenHandCursor</cursorShape>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">border:none</string>
@@ -935,7 +935,7 @@ QProgressBar::chunk
                <item>
                 <widget class="QPushButton" name="close_btn">
                  <property name="cursor">
-                  <cursorShape>PointingHandCursor</cursorShape>
+                  <cursorShape>OpenHandCursor</cursorShape>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">border:none</string>
@@ -1708,7 +1708,7 @@ background-color:rgb(211, 215, 207);
               </size>
              </property>
              <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
+              <cursorShape>ArrowCursor</cursorShape>
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton:hover{
@@ -1753,7 +1753,7 @@ margin:0px 0px 0px 0px;
               </size>
              </property>
              <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
+              <cursorShape>ArrowCursor</cursorShape>
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton:hover{
@@ -1798,7 +1798,7 @@ margin:0px 0px 0px 0px;
               </size>
              </property>
              <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
+              <cursorShape>ArrowCursor</cursorShape>
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton:hover{
@@ -1843,7 +1843,7 @@ margin:0px 0px 0px 0px;
               </size>
              </property>
              <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
+              <cursorShape>ArrowCursor</cursorShape>
              </property>
              <property name="styleSheet">
               <string notr="true">QPushButton:hover{

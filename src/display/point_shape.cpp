@@ -17,7 +17,7 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
     : VirtualDisplay(display_name, z_value), type_(type) {
   enable_scale_ = false;
   moveBy(0, 0);
-  robot_image_.load("://images/robot_3.png");
+  robot_image_.load("://images/dir.png");
   QMatrix matrix;
   matrix.rotate(90);
   robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);

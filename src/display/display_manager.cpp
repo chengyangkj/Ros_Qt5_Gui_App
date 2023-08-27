@@ -157,14 +157,18 @@ bool DisplayManager::UpdateDisplay(const std::string& display_name,
       display->UpdateMap(map_data_);
     }
   } else if (display_name == DISPLAY_ROBOT) {
-    display->UpdateDisplay(data);
     GetAnyData(Pose3f, data, robot_pose_);
     UpdateRobotPose(robot_pose_);
 
   } else if (display_name == DISPLAY_LASER) {
-    display->UpdateDisplay(map_data_);
-    display->UpdateDisplay(robot_pose_);
-    display->UpdateDisplay(data);
+    Display::LaserDataMap laser_data_map,laser_data_scene;
+    GetAnyData(Display::LaserDataMap,data,laser_data_map)
+    // 点坐标转换为地图坐标系下
+    for (auto one_laser : laser_data_map) {
+      laser_data_scene[one_laser.first] = transLaserPoint(one_laser.second);
+    }
+
+    display->UpdateDisplay(laser_data_scene);
   } else if (display_name == DISPLAY_PARTICLE) {
     // 激光坐标转换为地图的图元坐标
     Display::ParticlePointsType particles;
@@ -205,6 +209,25 @@ bool DisplayManager::UpdateDisplay(const std::string& display_name,
   return true;
 }
 /**
+ * @description:激光车身坐标系转换为图元坐标系
+ * @return {*}
+ */
+std::vector<Eigen::Vector2f> DisplayManager::transLaserPoint(
+    const std::vector<Eigen::Vector2f> &point) {
+  std::vector<Eigen::Vector2f> res;
+  for (auto one_point : point) {
+    Eigen::Vector3d point_map = basic::absoluteSum(
+        Eigen::Vector3d(robot_pose_[0], robot_pose_[1], robot_pose_[2]),
+        Eigen::Vector3d(one_point[0], one_point[1], 0));
+
+    // 转换为图元坐标系
+    int x, y;
+    map_data_.xy2scene(point_map[0], point_map[1], x, y);
+    res.push_back(Eigen::Vector2f(x, y));
+  }
+  return res;
+}
+/**
  * @description: 传入一个世界坐标,得到该坐标的在GriphicsScene的图元坐标
  * @param {Vector3f&} pose
  * @return {*}
@@ -228,17 +251,22 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f& pose) {
   emit robotPoseMap(pose);
   robot_pose_ = pose;
   // 地图图层 更新机器人图元坐标
-  int x, y;
-  map_data_.xy2scene(robot_pose_[0], robot_pose_[1], x, y);
-  robot_pose_scene_[0] = x;
-  robot_pose_scene_[1] = y;
-  robot_pose_scene_[2] = robot_pose_[2];
-  GetDisplay(DISPLAY_LASER)->UpdateDisplay(pose);
+  robot_pose_scene_=MapPose2Scene(pose);
+  GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_scene_);
   GetDisplay(DISPLAY_MAP)->SetDisplayConfig("RobotPose", robot_pose_scene_);
 
   // 更新图元之间的坐标系
   updateCoordinateSystem();
   // 设置移动时的跟随焦点
+}
+Eigen::Vector3f DisplayManager::MapPose2Scene(const Eigen::Vector3f& pose){
+  Eigen::Vector3f ret;
+  int x, y;
+  map_data_.xy2scene(pose[0], pose[1], x, y);
+  ret[0]=x;
+  ret[1]=y;
+  ret[2]=pose[2];
+  return ret;
 }
 void DisplayManager::updateScaled(double value) {
   DisplayInstance()->SetDisplayScaled(DISPLAY_LASER, value);
