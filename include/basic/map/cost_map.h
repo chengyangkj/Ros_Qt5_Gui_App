@@ -63,7 +63,7 @@ class CostMap {
   ~CostMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
   // 沿X上下翻转
-  Eigen::MatrixXi flip() { return map_data.rowwise().reverse(); }
+  Eigen::MatrixXi flip() { return map_data.colwise().reverse(); }
   void SetFlip() { map_data = flip(); }
   auto& operator()(int r, int c) { return map_data(r, c); }
 

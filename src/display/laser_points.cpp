@@ -71,7 +71,7 @@ void LaserPoints::drawLaser(QPainter *painter, int id,
   painter->setPen(QPen(color));
   for (auto one_point : data) {
     QPointF point = QPointF(one_point[0], one_point[1]);
-    // std::cout<<"point:"<<point.x()<<std::endl;
+    // std::cout<<"point:"<<point.x() <<" "<<point.y()<<std::endl;
     painter->drawPoint(point);
   }
 }

@@ -11,6 +11,7 @@
 #include "display/display_manager.h"
 
 #include <Eigen/Eigen>
+#include <fstream>
 namespace Display {
 
 DisplayManager::DisplayManager(QGraphicsView* viewer)
@@ -23,7 +24,7 @@ DisplayManager::DisplayManager(QGraphicsView* viewer)
   viewer_ptr_->setScene(scene_ptr_);
   viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1);
-  new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 5);
+  new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7);
   new LaserPoints(DISPLAY_LASER, 2);
   new ParticlePoints(DISPLAY_PARTICLE, 4);
   new Region(DISPLAY_REGION, 3);
@@ -144,14 +145,13 @@ bool DisplayManager::UpdateDisplay(const std::string& display_name,
                                    const std::any& data) {
   VirtualDisplay* display = GetDisplay(display_name);
   if (!display) {
-    std::cout << "error current display not find on update:" << display_name
-              << std::endl;
+    // std::cout << "error current display not find on update:" << display_name
+    //           << std::endl;
     return false;
   }
   if (display_name == DISPLAY_MAP) {
     display->UpdateDisplay(data);
     GetAnyData(OccupancyMap, data, map_data_);
-    GetDisplay(DISPLAY_LASER)->UpdateDisplay(data);
     // 所有图层更新地图数据
     for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
       display->UpdateMap(map_data_);
@@ -205,24 +205,21 @@ bool DisplayManager::UpdateDisplay(const std::string& display_name,
   } else {
     display->UpdateDisplay(data);
   }
-  FocusDisplay(focus_display_);
+  // FocusDisplay(focus_display_);
+  updateCoordinateSystem();
   return true;
 }
 /**
- * @description:激光车身坐标系转换为图元坐标系
+ * @description:坐标系转换为图元坐标系
  * @return {*}
  */
 std::vector<Eigen::Vector2f> DisplayManager::transLaserPoint(
     const std::vector<Eigen::Vector2f> &point) {
   std::vector<Eigen::Vector2f> res;
   for (auto one_point : point) {
-    Eigen::Vector3d point_map = basic::absoluteSum(
-        Eigen::Vector3d(robot_pose_[0], robot_pose_[1], robot_pose_[2]),
-        Eigen::Vector3d(one_point[0], one_point[1], 0));
-
     // 转换为图元坐标系
     int x, y;
-    map_data_.xy2scene(point_map[0], point_map[1], x, y);
+    map_data_.xy2scene(one_point[0], one_point[1], x, y);
     res.push_back(Eigen::Vector2f(x, y));
   }
   return res;
@@ -254,10 +251,6 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f& pose) {
   robot_pose_scene_=MapPose2Scene(pose);
   GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_scene_);
   GetDisplay(DISPLAY_MAP)->SetDisplayConfig("RobotPose", robot_pose_scene_);
-
-  // 更新图元之间的坐标系
-  updateCoordinateSystem();
-  // 设置移动时的跟随焦点
 }
 Eigen::Vector3f DisplayManager::MapPose2Scene(const Eigen::Vector3f& pose){
   Eigen::Vector3f ret;
@@ -294,6 +287,7 @@ void DisplayManager::updateCoordinateSystem() {
     auto scene_pose =
         transWord2Scene(Eigen::Vector2f(robot_pose_[0], robot_pose_[1]));
     QPointF pose = QPointF(scene_pose[0], scene_pose[1]);
+    
     DisplayInstance()->SetDisplayScenePose(DISPLAY_ROBOT, pose);
 
     // 地图0 0点在view 的坐标

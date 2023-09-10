@@ -1,7 +1,7 @@
 #pragma once
 #include <ros/ros.h>
 
-#include "communication/base/virtual_comm_node.h"
+#include "channel/base/virtual_comm_node.h"
 class rosnode : public VirtualCommNode {
   Q_OBJECT
  private:

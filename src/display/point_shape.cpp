@@ -19,7 +19,7 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
   moveBy(0, 0);
   robot_image_.load("://images/dir.png");
   QMatrix matrix;
-  matrix.rotate(90);
+  matrix.rotate(45);
   robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);
   bounding_rect_ = QRectF(0, 0, robot_image_.width(), robot_image_.height());
 }

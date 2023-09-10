@@ -957,7 +957,7 @@ QProgressBar::chunk
           <item>
            <widget class="QStackedWidget" name="stackedWidget_main">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="page_3">
              <layout class="QVBoxLayout" name="verticalLayout_12">
@@ -1323,20 +1323,14 @@ margin:0px 0px 0px 0px;
                  </layout>
                 </item>
                 <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_build_map">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_rviz">
                   <item>
-                   <widget class="QWidget" name="widget_rviz" native="true">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>100</height>
-                     </size>
+                   <widget class="QGraphicsView" name="mapViz">
+                    <property name="layoutDirection">
+                     <enum>Qt::LeftToRight</enum>
                     </property>
                     <property name="styleSheet">
-                     <string notr="true">QWidget{
+                     <string notr="true">QGraphicsView{
 border-top: 5px solid qlineargradient(y0:0, y1:1,stop: 0 #ececef, stop: 1 white);
 border-left: 5px solid qlineargradient(x0:0, x1:1,stop: 0 #ececef, stop: 1 white);
  border-bottom: 5px solid qlineargradient(y0:0, y1:1,stop: 0 white, stop: 1  #ececef);
@@ -1345,35 +1339,12 @@ background-color: rgb(255,255,255);
 }
 </string>
                     </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_16">
-                     <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_rviz">
-                       <item>
-                        <widget class="QGraphicsView" name="mapViz">
-                         <property name="layoutDirection">
-                          <enum>Qt::LeftToRight</enum>
-                         </property>
-                         <property name="styleSheet">
-                          <string notr="true">QGraphicsView{
-border-top: 5px solid qlineargradient(y0:0, y1:1,stop: 0 #ececef, stop: 1 white);
-border-left: 5px solid qlineargradient(x0:0, x1:1,stop: 0 #ececef, stop: 1 white);
- border-bottom: 5px solid qlineargradient(y0:0, y1:1,stop: 0 white, stop: 1  #ececef);
-border-right: 5px solid qlineargradient(x0:0, x1:1,stop:  0 white, stop: 1 #ececef);
-background-color: rgb(255,255,255);
-}
-</string>
-                         </property>
-                         <property name="verticalScrollBarPolicy">
-                          <enum>Qt::ScrollBarAlwaysOff</enum>
-                         </property>
-                         <property name="horizontalScrollBarPolicy">
-                          <enum>Qt::ScrollBarAlwaysOff</enum>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
-                     </item>
-                    </layout>
+                    <property name="verticalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                    </property>
+                    <property name="horizontalScrollBarPolicy">
+                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                    </property>
                    </widget>
                   </item>
                  </layout>

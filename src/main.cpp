@@ -1,16 +1,19 @@
+#include "common/logger/easylogging++.h"
+#include "mainwindow.h"
 #include <QApplication>
 #include <QMovie>
 #include <QPixmap>
 #include <QSplashScreen>
 #include <iostream>
 
-#include "mainwindow.h"
+INITIALIZE_EASYLOGGINGPP
+
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   //启动动画
   QPixmap pixmap("://background/loding5.gif");
   QSplashScreen splash(pixmap);
-  splash.setWindowOpacity(1);  // 设置窗口透明度
+  splash.setWindowOpacity(1); // 设置窗口透明度
   QLabel label(&splash);
   QMovie mv("://background/loding5.gif");
   label.setMovie(&mv);
@@ -18,14 +21,36 @@ int main(int argc, char *argv[]) {
   splash.show();
   splash.setCursor(Qt::BlankCursor);
   for (int i = 0; i < 2000; i += mv.speed()) {
-    a.processEvents();  //使程序在显示启动画面的同时仍能响应鼠标等其他事件
-    QThread::msleep(50);  // 延时
+    a.processEvents(); //使程序在显示启动画面的同时仍能响应鼠标等其他事件
+    QThread::msleep(50); // 延时
   }
-  qRegisterMetaType<RobotPose>("RobotPose");
-  qRegisterMetaType<RobotSpeed>("RobotSpeed");
-  qRegisterMetaType<RobotState>("RobotState");
+
+  // logger
+  el::Configurations defaultConf;
+  defaultConf.setToDefault();
+  //设置最大文件大小
+  defaultConf.setGlobally(el::ConfigurationType::MaxLogFileSize, "1000000");
+  //是否写入文件
+  defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
+  //是否输出控制台
+  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
+  // filename
+  defaultConf.setGlobally(el::ConfigurationType::Filename, "ros_qt_gui_app.log");
+  //设置配置文件
+  el::Loggers::reconfigureLogger("default", defaultConf);
+
+  /// 防止Fatal级别日志中断程序
+  el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortOnFatalLog);
+
+  /// 选择划分级别的日志
+  el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
+
+  /// 设置级别门阀值，修改参数可以控制日志输出
+  el::Loggers::setLoggingLevel(el::Level::Global);
+  LOG(INFO) << "ros qt5 gui app init";
+
   MainWindow w;
   w.show();
-  splash.finish(&w);  //在主体对象初始化完成后结束启动动画
+  splash.finish(&w); //在主体对象初始化完成后结束启动动画
   return a.exec();
 }

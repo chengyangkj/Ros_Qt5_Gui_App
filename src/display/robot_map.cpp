@@ -115,17 +115,6 @@ void RobotMap::ParseOccupyMap() {
       }
       map_image_.setPixel(i, j, qRgb(color.red(), color.green(), color.blue()));
     }
-  //栅格地图需要翻转成原始样式
-  map_image_ = rotateMapWithY(map_image_);
-}
-QImage RobotMap::rotateMapWithY(QImage map) {
-  QImage res = map;
-  for (int x = 0; x < map.width(); x++) {
-    for (int y = 0; y < map.height(); y++) {
-      res.setPixelColor(x, map.height() - y - 1, map.pixelColor(x, y));
-    }
-  }
-  return res;
 }
 void RobotMap::ParseGridMap() {
   // QImage map_image(map_data_.rows(), map_data_.cols(), QImage::Format_RGB32);

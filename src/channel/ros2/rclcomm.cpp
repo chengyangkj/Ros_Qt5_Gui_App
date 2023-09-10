@@ -3,10 +3,11 @@
  * @Date: 2023-07-27 14:47:24
  * @LastEditors: chengyang cyjiang@robovision.cn
  * @LastEditTime: 2023-07-28 10:12:02
- * @FilePath: /ROS2_Qt5_Gui_App/src/communication/ros1/rosnode.cpp
+ * @FilePath: /ROS2_Qt5_Gui_App/src/channel/ros1/rosnode.cpp
  * @Description: ros2通讯类
  */
-#include "communication/ros2/rclcomm.h"
+#include "channel/ros2/rclcomm.h"
+#include <fstream>
 rclcomm::rclcomm()
 {
   int argc = 0;
@@ -193,21 +194,17 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg)
     {
       // 计算当前偏移角度
       double angle = angle_min + i * angle_increment;
-
-      double x = msg->ranges[i] * cos(angle);
-      double y = msg->ranges[i] * sin(angle);
+      double dist =msg->ranges[i];
+      if(isinf(dist)) continue;
+      double x = dist * cos(angle);
+      double y = dist * sin(angle);
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-
-      //            tf2::doTransform(point_laser_frame,point_map_frame,laser_transform);
       m_tf_buffer->transform(point_laser_frame, point_map_frame, "map");
-      //            qDebug()<<"转换前:"<<x<<" "<<y<<"
-      //            转换后:"<<point_map_frame.point.x<<"
-      //            "<<point_map_frame.point.y;
       basic::Point p;
       p.x = point_map_frame.point.x;
-      p.x = point_map_frame.point.y;
+      p.y = point_map_frame.point.y;
       laser_points.push_back(p);
     }
     laser_points.id=0;

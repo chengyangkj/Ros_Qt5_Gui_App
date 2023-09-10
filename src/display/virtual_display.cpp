@@ -58,7 +58,7 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent* event) {
   double beforeScaleValue = scale_value_;
   if (event->delta() > 0) {
     //  qDebug()<<"放大";
-    scale_value_ *= 1.1;  // 每次放大10%
+    scale_value_ *= 1.1;  // 每次放大10% 
   } else {
     //  qDebug()<<"缩小";
     scale_value_ *= 0.9;  // 每次缩小10%
@@ -88,8 +88,8 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     if (curr_cursor_ == move_cursor_) {
       QPointF point = (event->pos() - pressed_pose_) * scale_value_;
       moveBy(point.x(), point.y());
-      std::cout << "mouse move:" << GetDisplayName() << "(" << event->pos().x()
-                << "," << event->pos().y() << ")" << std::endl;
+      // std::cout << "mouse move:" << GetDisplayName() << "(" << event->pos().x()
+      //           << "," << event->pos().y() << ")" << std::endl;
     }
     end_pose_ = event->pos();
   }

@@ -4,7 +4,7 @@
  * @LastEditors: chengyang cyjiang@robovision.cn
  * @LastEditTime: 2023-07-27 14:07:54
  * @FilePath:
- * /ROS2_Qt5_Gui_App/include/communication/base/virtual_communcation_node.h
+ * /ROS2_Qt5_Gui_App/include/channel/base/virtual_communcation_node.h
  */
 #pragma once
 #include <QObject>

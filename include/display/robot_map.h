@@ -34,7 +34,6 @@ class RobotMap : public VirtualDisplay {
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   QRectF boundingRect() const override;
-  QImage rotateMapWithY(QImage map);
   void ParseCostMap();
   void ParseGridMap();
   void ParseTrustMap();

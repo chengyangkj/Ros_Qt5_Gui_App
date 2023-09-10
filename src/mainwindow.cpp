@@ -2,9 +2,17 @@
 
 #include "Eigen/Dense"
 #include "basic/algorithm.h"
-
+#include <fstream>
+#include "common/logger/easylogging++.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindowDesign) {
+  LOG(INFO)<<"mainwindow init";
+  qRegisterMetaType<std::string>("std::string");
+  qRegisterMetaType<basic::RobotPose>("basic::RobotPose");
+  qRegisterMetaType<OccupancyMap>("OccupancyMap");
+  qRegisterMetaType<CostMap>("CostMap");
+  qRegisterMetaType<LaserScan>("LaserScan");
+  qRegisterMetaType<RobotPath>("RobotPath");
   ui->setupUi(this);
   connect(CommInstance::Instance(), SIGNAL(emitTopicData(QString)), this,
           SLOT(onRecvData(QString)));
@@ -25,43 +33,14 @@ MainWindow::MainWindow(QWidget *parent)
           [this](CostMap map) {
             display_manager_->UpdateDisplay(DISPLAY_GLOBAL_COST_MAP, map);
           });
-  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateRobotPose,
-          [this](RobotPose pose) {
-            display_manager_->UpdateDisplay(
-                DISPLAY_ROBOT, Display::Pose3f(pose.x, pose.y, pose.theta));
-          });
-  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateLaserPoint,
-          [this](LaserScan scan) {
-            // 数据转换
-            Display::LaserDataMap laser_data;
+  connect(CommInstance::Instance(),
+          SIGNAL(emitUpdateRobotPose(basic::RobotPose)), this,
+          SLOT(slotUpdateRobotPose(basic::RobotPose)));
 
-            Display::LaserData vector_scan;
-            for (auto one_point : scan.data) {
-              Eigen::Vector2f point;
-              point[0] = one_point.x;
-              point[1] = one_point.y;
-              vector_scan.push_back(point);
-            }
-            laser_data[scan.id] = vector_scan;
-
-            display_manager_->UpdateDisplay(DISPLAY_LASER, laser_data);
-          });
-  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdatePath,
-          [this](RobotPath path) {
-            Display::PathData data;
-            for (auto one_point : path) {
-              data.push_back(Display::Point2f(one_point.x, one_point.y));
-            }
-            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
-          });
-  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateLocalPath,
-          [this](RobotPath path) {
-            Display::PathData data;
-            for (auto one_point : path) {
-              data.push_back(Display::Point2f(one_point.x, one_point.y));
-            }
-            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
-          });
+  connect(CommInstance::Instance(), SIGNAL(emitUpdateLaserPoint(LaserScan)),
+          this, SLOT(slotUpdateLaserPoint(LaserScan)));
+  connect(CommInstance::Instance(), SIGNAL(emitUpdatePath(RobotPath)),this,SLOT(updateGlobalPath(RobotPath)));
+  connect(CommInstance::Instance(), SIGNAL(emitUpdateLocalPath(RobotPath)),this,SLOT(updateLocalPath(RobotPath)));
   connect(CommInstance::Instance(), SIGNAL(emitOdomInfo(RobotState)), this,
           SLOT(updateOdomInfo(RobotState)));
   // connect(m_roboItem, SIGNAL(signalRunMap(OccupancyMap)), m_roboGLWidget,
@@ -130,6 +109,39 @@ MainWindow::MainWindow(QWidget *parent)
   CommInstance::Instance()->start();
   initUi();
 }
+void MainWindow::updateGlobalPath(RobotPath path) {
+        Display::PathData data;
+            for (auto one_point : path) {
+              data.push_back(Display::Point2f(one_point.x, one_point.y));
+            }
+            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
+}
+void MainWindow::updateLocalPath(RobotPath path) {
+        Display::PathData data;
+            for (auto one_point : path) {
+              data.push_back(Display::Point2f(one_point.x, one_point.y));
+            }
+            display_manager_->UpdateDisplay(DISPLAY_LOCAL_PATH, data);
+}
+void MainWindow::slotUpdateLaserPoint(LaserScan scan) {
+  // 数据转换
+  Display::LaserDataMap laser_data;
+
+  Display::LaserData vector_scan;
+  for (auto one_point : scan.data) {
+    Eigen::Vector2f point;
+    point[0] = one_point.x;
+    point[1] = one_point.y;
+    vector_scan.push_back(point);
+  }
+  laser_data[scan.id] = vector_scan;
+
+  display_manager_->UpdateDisplay(DISPLAY_LASER, laser_data);
+}
+void MainWindow::slotUpdateRobotPose(basic::RobotPose pose) {
+  display_manager_->UpdateDisplay(DISPLAY_ROBOT,
+                                  Display::Pose3f(pose.x, pose.y, pose.theta));
+}
 void MainWindow::updateOdomInfo(RobotState state) {
   // 转向灯
   if (state.w > 0.1) {
@@ -185,7 +197,7 @@ void MainWindow::setCurrentMenu(QPushButton *cur_btn) {
   }
 }
 void MainWindow::initUi() {
-  setWindowFlags(Qt::CustomizeWindowHint);  // 去掉标题栏
+  setWindowFlags(Qt::CustomizeWindowHint); // 去掉标题栏
   ui->label_turnLeft->setPixmap(
       QPixmap::fromImage(QImage("://images/turnLeft_l.png")));
   ui->label_turnRight->setPixmap(
@@ -212,7 +224,7 @@ MainWindow::~MainWindow() { delete ui; }
 void MainWindow::onRecvData(QString msg) {}
 void MainWindow::mousePressEvent(QMouseEvent *event) {
   Q_UNUSED(event);
-  if (event->button() == Qt::LeftButton)  // 判断左键是否按下
+  if (event->button() == Qt::LeftButton) // 判断左键是否按下
   {
     left_pressed_ = true;
     left_pressed_point_ = event->pos();
@@ -223,14 +235,16 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
   Q_UNUSED(event);
-  if (left_pressed_) left_pressed_ = false;
+  if (left_pressed_)
+    left_pressed_ = false;
   setCursor(Qt::ArrowCursor);
   curpos_ = 0;
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event) {
   Q_UNUSED(event);
-  if (this->isFullScreen()) return;  // 窗口铺满全屏，直接返回，不做任何操作
+  if (this->isFullScreen())
+    return; // 窗口铺满全屏，直接返回，不做任何操作
   // if (left_pressed_)
   //   move(event->pos() - left_pressed_point_ + pos());  // 移动当前窗口
 
@@ -239,42 +253,42 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
   std::cout << "curpos_:" << curpos_ << " pos:" << poss << std::endl;
   if (left_pressed_) {
     QPoint ptemp = event->pos() - left_pressed_point_;
-    if (curpos_ == 22)  // 按下窗体中心 移动窗口
+    if (curpos_ == 22) // 按下窗体中心 移动窗口
     {
       ptemp = ptemp + pos();
       move(ptemp);
     } else {
       QRect wid = geometry();
-      switch (curpos_)  // 窗体四周 改变窗口的大小
+      switch (curpos_) // 窗体四周 改变窗口的大小
       {
-        case 11:
-          wid.setTopLeft(wid.topLeft() + ptemp);
-          break;  // 左上角
-        case 13:
-          wid.setTopRight(wid.topRight() + ptemp);
-          break;  // 右上角
-        case 31:
-          wid.setBottomLeft(wid.bottomLeft() + ptemp);
-          break;  // 左下角
-        case 33:
-          wid.setBottomRight(wid.bottomRight() + ptemp);
-          break;  // 右下角
-        case 12:
-          wid.setTop(wid.top() + ptemp.y());
-          break;  // 中上角
-        case 21:
-          wid.setLeft(wid.left() + ptemp.x());
-          break;  // 中左角
-        case 23:
-          wid.setRight(wid.right() + ptemp.x());
-          break;  // 中右角
-        case 32:
-          wid.setBottom(wid.bottom() + ptemp.y());
-          break;  // 中下角
+      case 11:
+        wid.setTopLeft(wid.topLeft() + ptemp);
+        break; // 左上角
+      case 13:
+        wid.setTopRight(wid.topRight() + ptemp);
+        break; // 右上角
+      case 31:
+        wid.setBottomLeft(wid.bottomLeft() + ptemp);
+        break; // 左下角
+      case 33:
+        wid.setBottomRight(wid.bottomRight() + ptemp);
+        break; // 右下角
+      case 12:
+        wid.setTop(wid.top() + ptemp.y());
+        break; // 中上角
+      case 21:
+        wid.setLeft(wid.left() + ptemp.x());
+        break; // 中左角
+      case 23:
+        wid.setRight(wid.right() + ptemp.x());
+        break; // 中右角
+      case 32:
+        wid.setBottom(wid.bottom() + ptemp.y());
+        break; // 中下角
       }
       setGeometry(wid);
     }
-    last_pressed_point_ = event->globalPos();  // 更新位置
+    last_pressed_point_ = event->globalPos(); // 更新位置
   }
 }
 // 获取光标在窗口所在区域的 行   返回行数
@@ -292,25 +306,25 @@ int MainWindow::countFlag(QPoint p, int row) {
 }
 void MainWindow::setCursorType(int flag) {
   switch (flag) {
-    case 11:
-    case 33:
-      setCursor(Qt::SizeFDiagCursor);
-      break;
-    case 13:
-    case 31:
-      setCursor(Qt::SizeBDiagCursor);
-      break;
-    case 21:
-    case 23:
-      setCursor(Qt::SizeHorCursor);
-      break;
-    case 12:
-    case 32:
-      setCursor(Qt::SizeVerCursor);
-      break;
-    case 22:
-      setCursor(Qt::ArrowCursor);
-      QApplication::restoreOverrideCursor();  // 恢复鼠标指针性状
-      break;
+  case 11:
+  case 33:
+    setCursor(Qt::SizeFDiagCursor);
+    break;
+  case 13:
+  case 31:
+    setCursor(Qt::SizeBDiagCursor);
+    break;
+  case 21:
+  case 23:
+    setCursor(Qt::SizeHorCursor);
+    break;
+  case 12:
+  case 32:
+    setCursor(Qt::SizeVerCursor);
+    break;
+  case 22:
+    setCursor(Qt::ArrowCursor);
+    QApplication::restoreOverrideCursor(); // 恢复鼠标指针性状
+    break;
   }
 }
