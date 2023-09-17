@@ -3,7 +3,7 @@
  * @Date: 2023-07-27 14:47:24
  * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-28 10:21:19
- * @FilePath: /ROS2_Qt5_Gui_App/src/channel/ros1/rosnode.cpp
+ * @FilePath: /ros_qt5_gui_app/src/channel/ros1/rosnode.cpp
  * @Description: ros1通讯类
  */
 #include "channel/ros1/rosnode.h"

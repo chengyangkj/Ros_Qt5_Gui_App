@@ -4,7 +4,7 @@
  * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-27 14:07:54
  * @FilePath:
- * /ROS2_Qt5_Gui_App/include/channel/base/virtual_communcation_node.h
+ * /ros_qt5_gui_app/include/channel/base/virtual_communcation_node.h
  */
 #pragma once
 #include <QObject>
@@ -17,10 +17,10 @@
 using namespace basic;
 class VirtualCommNode : public QThread {
   Q_OBJECT
- public:
+public:
   basic::OccupancyMap occ_map_;
 
- public:
+public:
   VirtualCommNode(/* args */) {}
   ~VirtualCommNode() {}
   basic::Point transWordPoint2Scene(basic::Point point) {
@@ -37,7 +37,7 @@ class VirtualCommNode : public QThread {
 
     return ret;
   }
- signals:
+signals:
   void emitUpdateMap(OccupancyMap map);
   void emitUpdateLocalCostMap(CostMap img, basic::RobotPose pose);
   void emitUpdateGlobalCostMap(CostMap img);
@@ -46,11 +46,11 @@ class VirtualCommNode : public QThread {
   void emitUpdatePath(RobotPath points);
   void emitUpdateLocalPath(RobotPath points);
   void emitOdomInfo(basic::RobotState state);
- public slots:
+public slots:
   void slotPub2DPose(QPointF start, QPointF end) { pub2DPose(start, end); }
   void slotPub2DGoal(QPointF start, QPointF end) { pub2DGoal(start, end); }
 
- public:
+public:
   virtual void pub2DPose(QPointF start, QPointF end) = 0;
   virtual void pub2DGoal(QPointF start, QPointF end) = 0;
 };

@@ -2,11 +2,11 @@
 
 #include "Eigen/Dense"
 #include "basic/algorithm.h"
-#include <fstream>
 #include "common/logger/easylogging++.h"
+#include <fstream>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindowDesign) {
-  LOG(INFO)<<"mainwindow init";
+  LOG(INFO) << "mainwindow init";
   qRegisterMetaType<std::string>("std::string");
   qRegisterMetaType<basic::RobotPose>("basic::RobotPose");
   qRegisterMetaType<OccupancyMap>("OccupancyMap");
@@ -25,22 +25,22 @@ MainWindow::MainWindow(QWidget *parent)
           [this](OccupancyMap map) {
             display_manager_->UpdateDisplay(DISPLAY_MAP, map);
           });
-  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateLocalCostMap,
-          [this](CostMap map, RobotPose) {
-            display_manager_->UpdateDisplay(DISPLAY_COST_MAP, map);
-          });
-  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateGlobalCostMap,
-          [this](CostMap map) {
-            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_COST_MAP, map);
-          });
+  connect(CommInstance::Instance(),
+          SIGNAL(emitUpdateLocalCostMap(CostMap, basic::RobotPose)), this,
+          SLOT(updateLocalCostMap(CostMap map, basic::RobotPose)));
+  connect(CommInstance::Instance(),
+          SIGNAL(emitUpdateGlobalCostMap(CostMap)), this,
+          SLOT(updateGlobalCostMap(CostMap)));
   connect(CommInstance::Instance(),
           SIGNAL(emitUpdateRobotPose(basic::RobotPose)), this,
           SLOT(slotUpdateRobotPose(basic::RobotPose)));
 
   connect(CommInstance::Instance(), SIGNAL(emitUpdateLaserPoint(LaserScan)),
           this, SLOT(slotUpdateLaserPoint(LaserScan)));
-  connect(CommInstance::Instance(), SIGNAL(emitUpdatePath(RobotPath)),this,SLOT(updateGlobalPath(RobotPath)));
-  connect(CommInstance::Instance(), SIGNAL(emitUpdateLocalPath(RobotPath)),this,SLOT(updateLocalPath(RobotPath)));
+  connect(CommInstance::Instance(), SIGNAL(emitUpdatePath(RobotPath)), this,
+          SLOT(updateGlobalPath(RobotPath)));
+  connect(CommInstance::Instance(), SIGNAL(emitUpdateLocalPath(RobotPath)),
+          this, SLOT(updateLocalPath(RobotPath)));
   connect(CommInstance::Instance(), SIGNAL(emitOdomInfo(RobotState)), this,
           SLOT(updateOdomInfo(RobotState)));
   // connect(m_roboItem, SIGNAL(signalRunMap(OccupancyMap)), m_roboGLWidget,
@@ -109,19 +109,25 @@ MainWindow::MainWindow(QWidget *parent)
   CommInstance::Instance()->start();
   initUi();
 }
+void MainWindow::updateLocalCostMap(CostMap map, RobotPose pose) {
+  // display_manager_->UpdateDisplay(DISPLAY_LOCAL_COST_MAP, map);
+}
+void MainWindow::updateGlobalCostMap(CostMap map) {
+  // display_manager_->UpdateDisplay(DISPLAY_GLOBAL_COST_MAP, map);
+}
 void MainWindow::updateGlobalPath(RobotPath path) {
-        Display::PathData data;
-            for (auto one_point : path) {
-              data.push_back(Display::Point2f(one_point.x, one_point.y));
-            }
-            display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
+  Display::PathData data;
+  for (auto one_point : path) {
+    data.push_back(Display::Point2f(one_point.x, one_point.y));
+  }
+  display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
 }
 void MainWindow::updateLocalPath(RobotPath path) {
-        Display::PathData data;
-            for (auto one_point : path) {
-              data.push_back(Display::Point2f(one_point.x, one_point.y));
-            }
-            display_manager_->UpdateDisplay(DISPLAY_LOCAL_PATH, data);
+  Display::PathData data;
+  for (auto one_point : path) {
+    data.push_back(Display::Point2f(one_point.x, one_point.y));
+  }
+  display_manager_->UpdateDisplay(DISPLAY_LOCAL_PATH, data);
 }
 void MainWindow::slotUpdateLaserPoint(LaserScan scan) {
   // 数据转换

@@ -3,7 +3,7 @@
  * @Date: 2023-07-26 10:07:32
  * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-26 16:30:38
- * @FilePath: /ROS2_Qt5_Gui_App/include/basic/point_type.h
+ * @FilePath: /ros_qt5_gui_app/include/basic/point_type.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -25,15 +25,15 @@ struct RobotState : public RobotPose, RobotSpeed {};
 struct LaserScan {
   LaserScan() = default;
   LaserScan(int i, std::vector<Point> d) : id(i), data(d) {}
-  int id;                   // 激光ID
-  std::vector<Point> data;  // 点坐标
+  int id;                  // 激光ID
+  std::vector<Point> data; // 点坐标
   void push_back(Point p) { data.push_back(p); }
   void clear() { data.clear(); }
 };
 // 机器人路径 由点集组成
 
-inline Eigen::Vector3d absoluteSum(const Eigen::Vector3d& p,
-                                   const Eigen::Vector3d& d) {
+inline Eigen::Vector3d absoluteSum(const Eigen::Vector3d &p,
+                                   const Eigen::Vector3d &d) {
   Eigen::Quaterniond q1 = Eigen::AngleAxisd(p[2], Eigen::Vector3d::UnitZ()) *
                           Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitY()) *
                           Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitX());
@@ -45,6 +45,6 @@ inline Eigen::Vector3d absoluteSum(const Eigen::Vector3d& p,
   return pw;
 }
 
-}  // namespace basic
+} // namespace basic
 
 #endif

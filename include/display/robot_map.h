@@ -1,19 +1,19 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-28 10:20:56
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-04-19 16:45:12
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-09-17 09:18:23
  * @FilePath: ////include/display/RobotMap.h
  */
 #ifndef ROBO_MAP_H
 #define ROBO_MAP_H
-#include <Eigen/Dense>
-
+#include "basic/map/cost_map.h"
 #include "virtual_display.h"
+#include <Eigen/Dense>
 class RobotMap : public VirtualDisplay {
- private:
+private:
   /* data */
- public:
+public:
   enum MapType { kGridMap, kOccupyMap, kTrustMap, kCostMap };
   RobotMap(const MapType &type, const std::string &display_name,
            const int &z_value);
@@ -22,15 +22,17 @@ class RobotMap : public VirtualDisplay {
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data);
 
- private:
+private:
   OccupancyMap map_data_;
+  CostMap cost_map_data_;
   MapType map_type_;
 
   QTransform transform_;
   QImage map_image_;
   Eigen::Vector3f sub_map_center_pose_;
   double sub_map_value_ = 1;
- private:
+
+private:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   QRectF boundingRect() const override;

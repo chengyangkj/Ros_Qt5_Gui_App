@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-07-27 13:45:27
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-09-17 08:51:21
  * @FilePath:
  * ////include/display/display_manager.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -18,16 +18,17 @@
 #include <functional>
 #include <map>
 
+#include "display_path.h"
 #include "display_tag.h"
 #include "laser_points.h"
 #include "particle_points.h"
 #include "point_shape.h"
 #include "region.h"
 #include "robot_map.h"
-#include "display_path.h"
+
 #define DISPLAY_ROBOT "Robot"
 #define DISPLAY_MAP "OccupyMap"
-#define DISPLAY_COST_MAP "CostMap"
+#define DISPLAY_LOCAL_COST_MAP "CostMap"
 #define DISPLAY_GLOBAL_COST_MAP "GlobalMap"
 #define DISPLAY_GLOBAL_PATH "GlobalPath"
 #define DISPLAY_LOCAL_PATH "LocalPath"
@@ -38,22 +39,22 @@
 namespace Display {
 class DisplayManager : public QObject {
   Q_OBJECT
- private:
+private:
   std::map<std::string, std::any> display_map_;
-  QGraphicsScene* scene_ptr_;
-  QGraphicsView* viewer_ptr_;
-  std::function<VirtualDisplay::FactoryDisplay*()> DisplayInstance;
+  QGraphicsScene *scene_ptr_;
+  QGraphicsView *viewer_ptr_;
+  std::function<VirtualDisplay::FactoryDisplay *()> DisplayInstance;
   Eigen::Vector3f robot_pose_{0, 0, 0};
   Eigen::Vector3f robot_pose_scene_;
   OccupancyMap map_data_;
   std::string focus_display_;
- signals:
+signals:
   void cursorPosMap(QPointF);
   void cursorPosScene(QPointF);
   void robotPoseMap(Eigen::Vector3f pose);
   void signalPub2DPose(QPointF, QPointF);
   void signalPub2DGoal(QPointF, QPointF);
- public slots:
+public slots:
   void updateCoordinateSystem();
   void updateScaled(double value);
   void slotDisplayUpdated(std::string display_name);
@@ -63,27 +64,27 @@ class DisplayManager : public QObject {
   void start2DPose();
   void start2DGoal();
 
- private:
-  Eigen::Vector2f transWord2Scene(const Eigen::Vector2f& point);
+private:
+  Eigen::Vector2f transWord2Scene(const Eigen::Vector2f &point);
   void FocusDisplay(std::string display_name);
   void InitUi();
-  std::vector<Eigen::Vector2f> transLaserPoint(
-    const std::vector<Eigen::Vector2f> &point);
-  QPushButton* btn_move_focus_;
+  std::vector<Eigen::Vector2f>
+  transLaserPoint(const std::vector<Eigen::Vector2f> &point);
+  QPushButton *btn_move_focus_;
 
- public:
-  DisplayManager(QGraphicsView* viewer);
+public:
+  DisplayManager(QGraphicsView *viewer);
   ~DisplayManager();
-  VirtualDisplay* GetDisplay(const std::string& name);
-  bool UpdateDisplay(const std::string& display_name, const std::any& data);
-  void UpdateRobotPose(const Eigen::Vector3f& pose);
-  bool SetDisplayConfig(const std::string& config_name, const std::any& data);
-  Eigen::Vector3f MapPose2Scene(const Eigen::Vector3f& pose);
-  Eigen::Vector3f GetMapPoseInScene(const Eigen::Vector3f& pose);
+  VirtualDisplay *GetDisplay(const std::string &name);
+  bool UpdateDisplay(const std::string &display_name, const std::any &data);
+  void UpdateRobotPose(const Eigen::Vector3f &pose);
+  bool SetDisplayConfig(const std::string &config_name, const std::any &data);
+  Eigen::Vector3f MapPose2Scene(const Eigen::Vector3f &pose);
+  Eigen::Vector3f GetMapPoseInScene(const Eigen::Vector3f &pose);
   void SetMoveRobot(bool is_move);
   void SetFocusOn(std::string display_name) { focus_display_ = display_name; }
 };
 
-}  // namespace Display
+} // namespace Display
 
 #endif

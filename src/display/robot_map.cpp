@@ -2,8 +2,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-28 10:21:04
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-05-09 15:02:05
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-09-17 09:37:13
  * @FilePath: ////src/display/robot_map.cpp
  */
 #include <algorithm>
@@ -17,27 +17,28 @@ RobotMap::RobotMap(const MapType &type, const std::string &display_name,
 }
 bool RobotMap::UpdateData(const std::any &data) {
   try {
-    map_data_ = std::any_cast<OccupancyMap>(data);
-    map_image_ =
-        QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_RGB32);
+    if (data.type() == typeid(OccupancyMap))
+      map_data_ = std::any_cast<OccupancyMap>(data);
+    if (data.type() == typeid(CostMap))
+      cost_map_data_ = std::any_cast<CostMap>(data);
   } catch (const std::bad_any_cast &e) {
     std::cout << e.what() << '\n';
     return false;
   }
 
   switch (map_type_) {
-    case kGridMap: {
-      ParseGridMap();
-    } break;
-    case kOccupyMap: {
-      ParseOccupyMap();
-    } break;
-    case kTrustMap: {
-      ParseTrustMap();
-    } break;
-    case kCostMap: {
-      ParseCostMap();
-    } break;
+  case kGridMap: {
+    ParseGridMap();
+  } break;
+  case kOccupyMap: {
+    ParseOccupyMap();
+  } break;
+  case kTrustMap: {
+    ParseTrustMap();
+  } break;
+  case kCostMap: {
+    ParseCostMap();
+  } break;
   }
   bounding_rect_ = QRectF(0, 0, map_image_.width(), map_image_.height());
   update();
@@ -96,7 +97,21 @@ void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   }
   painter->drawImage(draw_x, draw_y, sub_image);
 }
-void RobotMap::ParseCostMap() {}
+void RobotMap::ParseCostMap() {
+  Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> cost_map =
+      cost_map_data_.GetColorMapData();
+  map_image_ = QImage(cost_map_data_.Cols(), cost_map_data_.Rows(),
+                      QImage::Format_ARGB32);
+  for (int i = 0; i < cost_map.cols(); i++)
+    for (int j = 0; j < cost_map.rows(); j++) {
+
+      Eigen::Vector4i color_data = cost_map(j, i);
+      QColor color;
+      color.setRgb(color_data[0], color_data[1], color_data[2]);
+      color.setAlpha(color_data[3]);
+      map_image_.setPixelColor(i, j, color);
+    }
+}
 void RobotMap::ParseOccupyMap() {
   // Eigen::matrix 坐标系与QImage坐标系不同,这里行列反着遍历
   map_image_ = QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_RGB32);
@@ -107,11 +122,11 @@ void RobotMap::ParseOccupyMap() {
       double map_value = map_data_(j, i);
       QColor color;
       if (map_value > 0) {
-        color = Qt::black;  // black
+        color = Qt::black; // black
       } else if (map_value < 0) {
-        color = Qt::gray;  // gray
+        color = Qt::gray; // gray
       } else {
-        color = Qt::white;  // white
+        color = Qt::white; // white
       }
       map_image_.setPixel(i, j, qRgb(color.red(), color.green(), color.blue()));
     }

@@ -3,7 +3,7 @@
  * @Date: 2023-04-20 15:46:29
  * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-27 14:02:02
- * @FilePath: /ROS2_Qt5_Gui_App/include/rclcomm.h
+ * @FilePath: /ros_qt5_gui_app/include/rclcomm.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -16,9 +16,9 @@
 #include <QImage>
 #include <rclcpp/rclcpp.hpp>
 
-#include "channel/base/virtual_comm_node.h"
 #include "basic/algorithm.h"
 #include "basic/point_type.h"
+#include "channel/base/virtual_comm_node.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
@@ -31,11 +31,11 @@
 #include "tf2_ros/transform_listener.h"
 class rclcomm : public VirtualCommNode {
   Q_OBJECT
- public:
+public:
   rclcomm();
   void run() override;
 
- private:
+private:
   void recv_callback(const std_msgs::msg::Int32::SharedPtr msg);
   void map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
   void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
@@ -46,13 +46,13 @@ class rclcomm : public VirtualCommNode {
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
 
- public:
+public:
   void pub2DPose(QPointF start, QPointF end) override;
   void pub2DGoal(QPointF start, QPointF end) override;
 
- public slots:
+public slots:
 
- private:
+private:
   rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
       _initPosePublisher;
@@ -78,9 +78,9 @@ class rclcomm : public VirtualCommNode {
   rclcpp::CallbackGroup::SharedPtr callback_group_laser;
   rclcpp::CallbackGroup::SharedPtr callback_group_other;
 
- private:
- signals:
+private:
+signals:
   void emitTopicData(QString);
 };
 
-#endif  // RCLCOMM_H
+#endif // RCLCOMM_H

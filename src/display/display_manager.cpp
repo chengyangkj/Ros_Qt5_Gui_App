@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-07-27 13:45:55
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-09-17 08:52:05
  * @FilePath:
  * ////src/display/display_manager.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -23,7 +23,11 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
   // 初始化item
   viewer_ptr_->setScene(scene_ptr_);
   viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+  //------------------------------------start display instace (register
+  // display)-----------------------------
   new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1);
+  new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_GLOBAL_COST_MAP, 2);
+  new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3);
   new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7);
   new LaserPoints(DISPLAY_LASER, 2);
   new ParticlePoints(DISPLAY_PARTICLE, 4);
@@ -31,10 +35,11 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
   new DisplayTag(DISPLAY_TAG, 4);
   new DisplayPath(DISPLAY_GLOBAL_PATH, 6);
   new DisplayPath(DISPLAY_LOCAL_PATH, 6);
-  //defalut display config
 
-  SetDisplayConfig(DISPLAY_GLOBAL_PATH"/Color",Display::Color(0,0,255));
-  SetDisplayConfig(DISPLAY_LOCAL_PATH"/Color", Display::Color(0, 255, 0));
+  // defalut display config
+
+  SetDisplayConfig(DISPLAY_GLOBAL_PATH "/Color", Display::Color(0, 0, 255));
+  SetDisplayConfig(DISPLAY_LOCAL_PATH "/Color", Display::Color(0, 255, 0));
 
   for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
     scene_ptr_->addItem(display);
