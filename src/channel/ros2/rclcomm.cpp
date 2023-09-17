@@ -1,7 +1,7 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-27 14:47:24
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-28 10:12:02
  * @FilePath: /ROS2_Qt5_Gui_App/src/channel/ros1/rosnode.cpp
  * @Description: ros2通讯类

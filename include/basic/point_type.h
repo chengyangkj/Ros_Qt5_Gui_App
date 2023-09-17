@@ -1,7 +1,7 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-26 10:07:32
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-26 16:30:38
  * @FilePath: /ROS2_Qt5_Gui_App/include/basic/point_type.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置

@@ -1,10 +1,10 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-05-17 17:02:06
  * @FilePath:
- * /hontai/src/tools/localizationViewer/include/display/virtual_display.h
+ * ////include/display/virtual_display.h
  * @Description: 图层的虚拟类
  */
 #ifndef VIRTUAL_DISPLAY_H

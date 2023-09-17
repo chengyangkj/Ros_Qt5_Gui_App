@@ -1,16 +1,16 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-04-24 13:46:43
- * @FilePath: /hontai/src/tools/localizationViewer/src/display/laser_points.cpp
+ * @FilePath: ////src/display/laser_points.cpp
  * @Description:
  */
 #include "display/particle_points.h"
 ParticlePoints::ParticlePoints(const std::string &display_name,
                                const int &z_value)
     : VirtualDisplay(display_name, z_value) {}
-QRectF ParticlePoints::boundingRect() const { return boundRect_; }
+QRectF ParticlePoints::boundingRect() const { return bounding_rect_; }
 void ParticlePoints::paint(QPainter *painter,
                            const QStyleOptionGraphicsItem *option,
                            QWidget *widget) {
@@ -36,7 +36,7 @@ void ParticlePoints::drawParticle(QPainter *painter,
     painter->setPen(pen);
 
     double theta = -one_point[2];
-    int length = 25;  // 粒子的箭头长1m
+    int length = 25; // 粒子的箭头长1m
     int x1 = one_point[0];
     int y1 = one_point[1];
     int x2 = x1 + cos(theta) * length;
@@ -47,14 +47,14 @@ void ParticlePoints::drawParticle(QPainter *painter,
     painter->drawLine(line);
     float angle =
         atan2(endPoint.y() - startPoint.y(), endPoint.x() - startPoint.x()) +
-        3.1415926;  //
+        3.1415926; //
     //绘制三角形
     QPolygonF points;
     points.push_back(endPoint);
     QPointF point1, point2;
-    point1.setX(endPoint.x() + 10 * cos(angle - 0.5));  //求得箭头点1坐标
+    point1.setX(endPoint.x() + 10 * cos(angle - 0.5)); //求得箭头点1坐标
     point1.setY(endPoint.y() + 10 * sin(angle - 0.5));
-    point2.setX(endPoint.x() + 10 * cos(angle + 0.5));  //求得箭头点2坐标
+    point2.setX(endPoint.x() + 10 * cos(angle + 0.5)); //求得箭头点2坐标
     point2.setY(endPoint.y() + 10 * sin(angle + 0.5));
     points.push_back(point1);
     points.push_back(point2);
@@ -63,7 +63,8 @@ void ParticlePoints::drawParticle(QPainter *painter,
 }
 void ParticlePoints::computeBoundRect(
     const Display::ParticlePointsType &particle) {
-  if (particle.empty()) return;
+  if (particle.empty())
+    return;
   float xmax, xmin, ymax, ymin;
 
   xmax = xmin = particle[0][0];
@@ -76,5 +77,5 @@ void ParticlePoints::computeBoundRect(
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  boundRect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
+  bounding_rect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
 }

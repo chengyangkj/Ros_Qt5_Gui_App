@@ -1,15 +1,15 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-04-26 16:04:37
- * @FilePath: /hontai/src/tools/localizationViewer/src/display/laser_points.cpp
+ * @FilePath: ////src/display/laser_points.cpp
  * @Description:
  */
 #include "display/laser_points.h"
 LaserPoints::LaserPoints(const std::string &display_name, const int &z_value)
     : VirtualDisplay(display_name, z_value) {}
-QRectF LaserPoints::boundingRect() const { return boundRect_; }
+QRectF LaserPoints::boundingRect() const { return bounding_rect_; }
 void LaserPoints::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
@@ -21,16 +21,17 @@ void LaserPoints::paint(QPainter *painter,
 LaserPoints::~LaserPoints() {}
 
 bool LaserPoints::UpdateData(const std::any &data) {
- if (data.type() == typeid(Display::LaserDataMap)) {
+  if (data.type() == typeid(Display::LaserDataMap)) {
     laser_data_scene_ = std::any_cast<Display::LaserDataMap>(data);
     computeBoundRect(laser_data_scene_);
-  } 
+  }
   update();
 }
 void LaserPoints::computeBoundRect(const Display::LaserDataMap &laser_scan) {
   float xmax, xmin, ymax, ymin;
   for (auto [id, points] : laser_scan) {
-    if (points.empty()) continue;
+    if (points.empty())
+      continue;
     xmax = xmin = points[0][0];
     ymax = ymin = points[0][1];
     for (int i = 1; i < points.size(); ++i) {
@@ -43,7 +44,7 @@ void LaserPoints::computeBoundRect(const Display::LaserDataMap &laser_scan) {
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  boundRect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
+  bounding_rect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
 }
 bool LaserPoints::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {
@@ -76,13 +77,13 @@ void LaserPoints::drawLaser(QPainter *painter, int id,
   }
 }
 void LaserPoints::Id2Color(int id, int &R, int &G, int &B) {
-#define LocationColorJudge(JudegeId, color) \
-  if (id == JudegeId) {                     \
-    R = color & 0xFF0000;                   \
-    R >>= 16;                               \
-    G = color & 0x00FF00;                   \
-    G >>= 8;                                \
-    B = color & 0x0000FF;                   \
+#define LocationColorJudge(JudegeId, color)                                    \
+  if (id == JudegeId) {                                                        \
+    R = color & 0xFF0000;                                                      \
+    R >>= 16;                                                                  \
+    G = color & 0x00FF00;                                                      \
+    G >>= 8;                                                                   \
+    B = color & 0x0000FF;                                                      \
   }
   LocationColorJudge(0, 0xFF6347);
   LocationColorJudge(1, 0xff6600);

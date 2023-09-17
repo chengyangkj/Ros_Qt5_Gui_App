@@ -1,7 +1,7 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-25 16:06:32
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-27 16:54:54
  * @FilePath: /ROS2_Qt5_Gui_App/src/roboGLWidget.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置

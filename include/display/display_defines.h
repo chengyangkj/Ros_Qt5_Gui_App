@@ -11,6 +11,7 @@ using Point2f = Eigen::Vector2f;
 using PathData = std::vector<Point2f>;
 using RegionDataMap = std::map<std::string, std::vector<RangeVec>>;
 using TagDataMap = std::map<std::string, Pose3f>;
+using Color =Eigen::Vector3f;
 #ifndef RAD2DEG_ZEG
 #define RAD2DEG_ZEG 57.295779513082
 #endif

@@ -1,7 +1,7 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-20 15:46:29
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-27 14:02:02
  * @FilePath: /ROS2_Qt5_Gui_App/include/rclcomm.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置

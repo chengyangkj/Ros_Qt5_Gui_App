@@ -6,19 +6,19 @@
  * @FilePath: ////src/display/laser_points.cpp
  * @Description:
  */
-#include "display/display_demo.h"
-DisplayDemo::DisplayDemo(const std::string &display_name,
+#include "display/display_cost_map.h"
+DisplayCostMap::DisplayCostMap(const std::string &display_name,
                                const int &z_value)
     : VirtualDisplay(display_name, z_value) {}
-QRectF DisplayDemo::boundingRect() const {}
-void DisplayDemo::paint(QPainter *painter,
+QRectF DisplayCostMap::boundingRect() const {}
+void DisplayCostMap::paint(QPainter *painter,
                            const QStyleOptionGraphicsItem *option,
                            QWidget *widget) {
   drawFrame(painter);
 }
 
-DisplayDemo::~DisplayDemo() {}
-bool DisplayDemo::UpdateData(const std::any &data) {
+DisplayCostMap::~DisplayCostMap() {}
+bool DisplayCostMap::UpdateData(const std::any &data) {
   try {
     particle_data_ = std::any_cast<Display::ParticlePointsType>(data);
     update();
@@ -26,4 +26,4 @@ bool DisplayDemo::UpdateData(const std::any &data) {
     std::cout << e.what() << '\n';
   }
 }
-void DisplayDemo::drawFrame(QPainter *painter) {}
+void DisplayCostMap::drawFrame(QPainter *painter) {}

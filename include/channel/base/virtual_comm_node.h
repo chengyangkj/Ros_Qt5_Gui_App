@@ -1,7 +1,7 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-25 16:20:39
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-27 14:07:54
  * @FilePath:
  * /ROS2_Qt5_Gui_App/include/channel/base/virtual_communcation_node.h

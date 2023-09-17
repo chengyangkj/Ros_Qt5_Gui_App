@@ -1,7 +1,7 @@
 /*
- * @Author: chengyang cyjiang@robovision.cn
+ * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-26 10:06:31
- * @LastEditors: chengyang cyjiang@robovision.cn
+ * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-26 14:51:40
  * @FilePath: /ROS2_Qt5_Gui_App/include/basic/point.h
  * @Description: this Code reference from: openslam_gmapping,
