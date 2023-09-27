@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-17 08:51:21
+ * @LastEditTime: 2023-09-27 15:26:59
  * @FilePath:
  * ////include/display/display_manager.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -48,6 +48,9 @@ private:
   Eigen::Vector3f robot_pose_scene_;
   OccupancyMap map_data_;
   std::string focus_display_;
+  RobotPose local_cost_map_pose_;
+  CostMap local_cost_map_;
+  double global_scal_value_ = 1;
 signals:
   void cursorPosMap(QPointF);
   void cursorPosScene(QPointF);

@@ -27,10 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
           });
   connect(CommInstance::Instance(),
           SIGNAL(emitUpdateLocalCostMap(CostMap, basic::RobotPose)), this,
-          SLOT(updateLocalCostMap(CostMap map, basic::RobotPose)));
-  connect(CommInstance::Instance(),
-          SIGNAL(emitUpdateGlobalCostMap(CostMap)), this,
-          SLOT(updateGlobalCostMap(CostMap)));
+          SLOT(updateLocalCostMap(CostMap, basic::RobotPose)));
+  connect(CommInstance::Instance(), SIGNAL(emitUpdateGlobalCostMap(CostMap)),
+          this, SLOT(updateGlobalCostMap(CostMap)));
   connect(CommInstance::Instance(),
           SIGNAL(emitUpdateRobotPose(basic::RobotPose)), this,
           SLOT(slotUpdateRobotPose(basic::RobotPose)));
@@ -109,11 +108,12 @@ MainWindow::MainWindow(QWidget *parent)
   CommInstance::Instance()->start();
   initUi();
 }
-void MainWindow::updateLocalCostMap(CostMap map, RobotPose pose) {
-  // display_manager_->UpdateDisplay(DISPLAY_LOCAL_COST_MAP, map);
+void MainWindow::updateLocalCostMap(CostMap map, basic::RobotPose pose) {
+  display_manager_->UpdateDisplay(DISPLAY_LOCAL_COST_MAP, map);
+  display_manager_->UpdateDisplay(DISPLAY_LOCAL_COST_MAP, pose);
 }
 void MainWindow::updateGlobalCostMap(CostMap map) {
-  // display_manager_->UpdateDisplay(DISPLAY_GLOBAL_COST_MAP, map);
+  display_manager_->UpdateDisplay(DISPLAY_GLOBAL_COST_MAP, map);
 }
 void MainWindow::updateGlobalPath(RobotPath path) {
   Display::PathData data;
@@ -256,7 +256,6 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event) {
 
   int poss = countFlag(event->pos(), countRow(event->pos()));
   setCursorType(poss);
-  std::cout << "curpos_:" << curpos_ << " pos:" << poss << std::endl;
   if (left_pressed_) {
     QPoint ptemp = event->pos() - left_pressed_point_;
     if (curpos_ == 22) // 按下窗体中心 移动窗口

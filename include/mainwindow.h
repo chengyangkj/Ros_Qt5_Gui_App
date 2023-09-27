@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-20 15:46:29
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-07-27 13:56:13
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-09-27 14:52:55
  * @FilePath: /ros_qt5_gui_app/include/mainwindow.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -43,7 +43,7 @@ public slots:
   void slotUpdateLaserPoint(LaserScan scan);
   void updateGlobalPath(RobotPath path);
   void updateLocalPath(RobotPath path);
-  void updateLocalCostMap(CostMap map, RobotPose);
+  void updateLocalCostMap(CostMap, basic::RobotPose);
   void updateGlobalCostMap(CostMap map);
   // ui 相关函数
 private:

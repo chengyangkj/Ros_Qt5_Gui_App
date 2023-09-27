@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-27 14:47:24
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-17 09:47:18
+ * @LastEditTime: 2023-09-27 14:55:29
  * @FilePath: /ros_qt5_gui_app/src/channel/ros1/rosnode.cpp
  * @Description: ros2通讯类
  */
@@ -257,8 +257,7 @@ void rclcomm::localCostMapCallback(
     //      "<<pose_map_frame.pose.position.y<<" curr:"<<m_currPose.x<<"
     //      "<<m_currPose.y<<std::endl; std::cout<<"origin x:"<<origin_x<<"
     //      y:"<<origin_y<<" theta:"<<origin_theta<<std::endl;
-    emit emitUpdateLocalCostMap(
-        cost_map, localCostmapPose);
+    emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
   } catch (tf2::TransformException &ex) {
     qDebug() << "local cost map pose transform error:" << ex.what();
   }

@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-17 08:52:05
+ * @LastEditTime: 2023-09-27 15:20:58
  * @FilePath:
  * ////src/display/display_manager.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -125,6 +125,7 @@ void DisplayManager::slotDisplaySetScaled(std::string display_name,
       display->SetScaled(value);
     }
   }
+  global_scal_value_ = value;
   // std::cout << "scale:" << value << std::endl;
   // 地图0 0点在view 的坐标
   // QPointF map_zero_view_scene_pose =
@@ -231,6 +232,18 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       region_tans[region_name] = range_ve;
     }
     display->UpdateDisplay(region_tans);
+  } else if (display_name == DISPLAY_LOCAL_COST_MAP) {
+    if (data.type() == typeid(RobotPose)) {
+
+      GetAnyData(RobotPose, data, local_cost_map_pose_);
+
+    } else if (data.type() == typeid(CostMap)) {
+      GetAnyData(CostMap, data, local_cost_map_);
+      display->UpdateDisplay(data);
+    } else {
+      display->UpdateDisplay(data);
+    }
+
   } else {
     display->UpdateDisplay(data);
   }
@@ -322,9 +335,20 @@ void DisplayManager::updateCoordinateSystem() {
     // 地图0 0点在view 的坐标
     QPointF map_zero_view_scene_pose =
         DisplayInstance()->GetDisplay(DISPLAY_MAP)->mapToScene(0, 0);
+    // local cost map
+    Eigen::Vector3f local_cost_map_scene_pose = GetMapPoseInScene(
+        Eigen::Vector3f(local_cost_map_pose_.x, local_cost_map_pose_.y, 0));
+    std::cout << "scen pose:" << local_cost_map_scene_pose
+              << " local pose:" << local_cost_map_pose_.x << " "
+              << local_cost_map_pose_.y << std::endl;
+    DisplayInstance()->SetDisplayScenePose(
+        DISPLAY_LOCAL_COST_MAP,
+        QPointF(local_cost_map_scene_pose[0],
+                local_cost_map_scene_pose[1] -
+                    local_cost_map_.height() * global_scal_value_));
     // 图层对齐
     for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
-      if (name == DISPLAY_ROBOT)
+      if (name == DISPLAY_ROBOT || name == DISPLAY_LOCAL_COST_MAP)
         continue;
       DisplayInstance()->SetDisplayScenePose(name, map_zero_view_scene_pose);
     }

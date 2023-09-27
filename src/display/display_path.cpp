@@ -1,14 +1,16 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-04-20 16:44:15
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-09-27 15:29:51
  * @FilePath: ////src/display/laser_points.cpp
  * @Description:
  */
 #include "display/display_path.h"
 DisplayPath::DisplayPath(const std::string &display_name, const int &z_value)
-    : VirtualDisplay(display_name, z_value) {}
+    : VirtualDisplay(display_name, z_value) {
+  // enable_scale_ = false;
+}
 QRectF DisplayPath::boundingRect() const { return bounding_rect_; }
 void DisplayPath::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
@@ -31,6 +33,7 @@ bool DisplayPath::SetDisplayConfig(const std::string &config_name,
 bool DisplayPath::UpdateData(const std::any &data) {
   try {
     auto path_data = std::any_cast<Display::PathData>(data);
+    computeBoundRect(path_data);
     path_points_.clear();
     for (auto one_path : path_data) {
       path_points_.push_back(QPointF(one_path[0], one_path[1]));
