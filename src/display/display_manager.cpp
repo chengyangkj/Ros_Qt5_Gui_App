@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-27 15:20:58
+ * @LastEditTime: 2023-09-28 14:48:04
  * @FilePath:
  * ////src/display/display_manager.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -338,9 +338,6 @@ void DisplayManager::updateCoordinateSystem() {
     // local cost map
     Eigen::Vector3f local_cost_map_scene_pose = GetMapPoseInScene(
         Eigen::Vector3f(local_cost_map_pose_.x, local_cost_map_pose_.y, 0));
-    std::cout << "scen pose:" << local_cost_map_scene_pose
-              << " local pose:" << local_cost_map_pose_.x << " "
-              << local_cost_map_pose_.y << std::endl;
     DisplayInstance()->SetDisplayScenePose(
         DISPLAY_LOCAL_COST_MAP,
         QPointF(local_cost_map_scene_pose[0],

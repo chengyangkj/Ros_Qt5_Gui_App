@@ -2,8 +2,8 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-27 15:29:51
- * @FilePath: ////src/display/laser_points.cpp
+ * @LastEditTime: 2023-09-28 14:40:13
+ * @FilePath: /src/display/laser_points.cpp
  * @Description:
  */
 #include "display/display_path.h"
@@ -46,6 +46,9 @@ bool DisplayPath::UpdateData(const std::any &data) {
 void DisplayPath::drawPath(QPainter *painter) {
   painter->setRenderHint(QPainter::Antialiasing, true);
   painter->setPen(QPen(color_, 1));
+  // for (int i = 1; i < path_points_.size(); i++) {
+  //   painter->drawLine(path_points_[i - 1], path_points_[i]);
+  // }
   painter->drawPoints(path_points_);
 }
 void DisplayPath::computeBoundRect(const Display::PathData &path) {
