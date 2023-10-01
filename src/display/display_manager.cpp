@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-28 14:48:04
+ * @LastEditTime: 2023-10-01 01:42:45
  * @FilePath:
  * ////src/display/display_manager.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -307,6 +307,7 @@ void DisplayManager::updateScaled(double value) {
   DisplayInstance()->SetDisplayScaled(DISPLAY_LASER, value);
 }
 void DisplayManager::SetMoveRobot(bool is_move) {
+  is_move_robot_ = is_move;
   if (is_move) {
     DisplayInstance()->SetMouseHandleDisplay(DISPLAY_ROBOT);
   } else {
@@ -329,9 +330,9 @@ void DisplayManager::updateCoordinateSystem() {
     auto scene_pose =
         transWord2Scene(Eigen::Vector2f(robot_pose_[0], robot_pose_[1]));
     QPointF pose = QPointF(scene_pose[0], scene_pose[1]);
-
-    DisplayInstance()->SetDisplayScenePose(DISPLAY_ROBOT, pose);
-
+    if (!is_move_robot_) {
+      DisplayInstance()->SetDisplayScenePose(DISPLAY_ROBOT, pose);
+    }
     // 地图0 0点在view 的坐标
     QPointF map_zero_view_scene_pose =
         DisplayInstance()->GetDisplay(DISPLAY_MAP)->mapToScene(0, 0);
@@ -369,7 +370,7 @@ Eigen::Vector2f DisplayManager::transWord2Scene(const Eigen::Vector2f &point) {
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return DisplayInstance()->GetDisplay(name);
 }
-void DisplayManager::start2DPose() {}
+void DisplayManager::start2DPose() { SetMoveRobot(true); }
 void DisplayManager::start2DGoal() {}
 
 } // namespace Display

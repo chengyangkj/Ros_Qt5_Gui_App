@@ -1,6 +1,6 @@
 #include "display/virtual_display.h"
-VirtualDisplay::VirtualDisplay(const std::string& display_name,
-                               const int& z_value)
+VirtualDisplay::VirtualDisplay(const std::string &display_name,
+                               const int &z_value)
     : display_name_(display_name) {
   FactoryDisplay::Instance()->AddDisplay(this);
   this->setZValue(z_value);
@@ -26,10 +26,11 @@ VirtualDisplay::~VirtualDisplay() {
     curr_cursor_ = nullptr;
   }
 }
-bool VirtualDisplay::SetDisplayConfig(const std::string& config_name,
-                                      const std::any& config_data) {}
-bool VirtualDisplay::SetScaled(const double& value) {
-  if (!enable_scale_) return false;
+bool VirtualDisplay::SetDisplayConfig(const std::string &config_name,
+                                      const std::any &config_data) {}
+bool VirtualDisplay::SetScaled(const double &value) {
+  if (!enable_scale_)
+    return false;
   scale_value_ = value;
   setScale(value);
   update();
@@ -44,10 +45,10 @@ void VirtualDisplay::SetBoundingRect(QRectF rect) {
 }
 void VirtualDisplay::Update() { update(); }
 std::string VirtualDisplay::GetDisplayName() { return display_name_; }
-void VirtualDisplay::SetDisplayName(const std::string& display_name) {
+void VirtualDisplay::SetDisplayName(const std::string &display_name) {
   display_name_ = display_name;
 }
-void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent* event) {
+void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
   if (!is_response_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::wheelEvent(event);
@@ -58,10 +59,10 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent* event) {
   double beforeScaleValue = scale_value_;
   if (event->delta() > 0) {
     //  qDebug()<<"放大";
-    scale_value_ *= 1.1;  // 每次放大10% 
+    scale_value_ *= 1.1; // 每次放大10%
   } else {
     //  qDebug()<<"缩小";
-    scale_value_ *= 0.9;  // 每次缩小10%
+    scale_value_ *= 0.9; // 每次缩小10%
   }
   // qDebug()<<"scale:"<<scale_value_;
   SetScaled(scale_value_);
@@ -78,7 +79,7 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent* event) {
   emit scenePoseChanged(display_name_, scenePos());
   emit displayUpdated(display_name_);
 }
-void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
+void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (!is_response_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mouseMoveEvent(event);
@@ -88,7 +89,8 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
     if (curr_cursor_ == move_cursor_) {
       QPointF point = (event->pos() - pressed_pose_) * scale_value_;
       moveBy(point.x(), point.y());
-      // std::cout << "mouse move:" << GetDisplayName() << "(" << event->pos().x()
+      // std::cout << "mouse move:" << GetDisplayName() << "(" <<
+      // event->pos().x()
       //           << "," << event->pos().y() << ")" << std::endl;
     }
     end_pose_ = event->pos();
@@ -132,7 +134,22 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
   emit scenePoseChanged(display_name_, scenePos());
   emit displayUpdated(display_name_);
 }
-void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
+                                       const QPointF &mousePos) {
+  // QPointF center = m_rect.center();
+  // qreal angle = 0;
+  // QLineF line1(mapToScene(center), m_pressMouse);
+  // QLineF line2(mapToScene(center), newPoint);
+  // angle = line2.angleTo(line1);
+
+  // QTransform ts;
+  // ts.translate(center.x(), center.y());
+  // ts.rotate(angle);
+  // ts.translate(-center.x(), -center.y());
+  // this->setTransform(ts);
+  // this->afterSetRotate(angle);
+}
+void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (!is_response_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mousePressEvent(event);
@@ -150,13 +167,14 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent* event) {
   emit scenePoseChanged(display_name_, scenePos());
   emit displayUpdated(display_name_);
 }
-void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
+void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   if (!is_response_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mouseReleaseEvent(event);
     return;
   }
-  if (pressed_button_ == event->button()) pressed_button_ == Qt::NoButton;
+  if (pressed_button_ == event->button())
+    pressed_button_ == Qt::NoButton;
   if (event->button() == Qt::LeftButton) {
     pressed_pose_ = QPointF();
     is_mouse_press_ = false;
@@ -177,7 +195,7 @@ void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
   emit scenePoseChanged(display_name_, scenePos());
   emit displayUpdated(display_name_);
 }
-void VirtualDisplay::hoverMoveEvent(QGraphicsSceneHoverEvent* event) {
+void VirtualDisplay::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
   if (!is_response_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::hoverMoveEvent(event);

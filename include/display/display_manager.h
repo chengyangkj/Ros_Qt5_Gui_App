@@ -51,6 +51,7 @@ private:
   RobotPose local_cost_map_pose_;
   CostMap local_cost_map_;
   double global_scal_value_ = 1;
+  bool is_move_robot_{false};
 signals:
   void cursorPosMap(QPointF);
   void cursorPosScene(QPointF);
