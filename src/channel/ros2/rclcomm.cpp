@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-27 14:47:24
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-27 14:55:29
+ * @LastEditTime: 2023-10-06 12:46:11
  * @FilePath: /ros_qt5_gui_app/src/channel/ros1/rosnode.cpp
  * @Description: ros2通讯类
  */
@@ -278,6 +278,7 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   }
   occ_map_.SetFlip();
   emit emitUpdateMap(occ_map_);
+  std::cout << "recv map" << std::endl;
 }
 void rclcomm::recv_callback(const std_msgs::msg::Int32::SharedPtr msg) {
   //     qDebug()<<msg->data;

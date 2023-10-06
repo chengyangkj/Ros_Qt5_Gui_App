@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-25 16:20:39
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-07-27 14:07:54
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-06 12:43:13
  * @FilePath:
  * /ros_qt5_gui_app/include/channel/base/virtual_communcation_node.h
  */
@@ -22,7 +22,7 @@ public:
 
 public:
   VirtualCommNode(/* args */) {}
-  ~VirtualCommNode() {}
+  virtual ~VirtualCommNode() {}
   basic::Point transWordPoint2Scene(basic::Point point) {
     basic::Point ret;
     int x, y;

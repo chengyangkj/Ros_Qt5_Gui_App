@@ -25,11 +25,21 @@
    </property>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>view</string>
     </property>
    </widget>
    <addaction name="menuView"/>
   </widget>
+  <action name="speed_ctrl">
+   <property name="text">
+    <string>speed_ctrl</string>
+   </property>
+  </action>
+  <action name="speed_dashboard">
+   <property name="text">
+    <string>speed_dashboard</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="../resource/images.qrc"/>

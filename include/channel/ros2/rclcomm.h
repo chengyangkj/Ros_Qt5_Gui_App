@@ -33,6 +33,7 @@ class rclcomm : public VirtualCommNode {
   Q_OBJECT
 public:
   rclcomm();
+  ~rclcomm() override = default;
   void run() override;
 
 private:

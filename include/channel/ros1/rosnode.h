@@ -8,7 +8,7 @@ class rosnode : public VirtualCommNode {
   /* data */
  public:
   rosnode(/* args */);
-  ~rosnode();
+  ~rosnode() override;
   void pub2DPose(QPointF start, QPointF end) override;
   void pub2DGoal(QPointF start, QPointF end) override;
   void run() override;
