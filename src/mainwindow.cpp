@@ -2,7 +2,7 @@
  * @Author: chengyangkj chengyangkj@qq.com
  * @Date: 2023-10-06 07:12:50
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-06 13:58:02
+ * @LastEditTime: 2023-10-06 14:00:46
  * @FilePath: /ROS2_Qt5_Gui_App/src/ CMainWindow.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -492,9 +492,6 @@ void CMainWindow::setupUi() {
       new QSpacerItem(385, 21, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
   verticalLayout_speed_ctrl->addItem(verticalSpacer_4);
-
-  QPushButton *pushButton = new QPushButton();
-  pushButton->setObjectName(QString::fromUtf8("pushButton"));
 
   verticalLayout_speed_ctrl->addWidget(pushButton);
 
