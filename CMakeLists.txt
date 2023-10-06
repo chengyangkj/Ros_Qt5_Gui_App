@@ -4,6 +4,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(QT_VERSION_MAJOR 5)
+#############子构建项目
+#dockWidget
+set(VERSION_SHORT "0.0.1")
+add_subdirectory(dockWidget)
 ##################################1,编译平台设置:自动检查编译平台是ROS1还是ROS2#######################
 if(DEFINED ENV{ROS_VERSION} AND "$ENV{ROS_VERSION}" STREQUAL "1")
     message("USE ROS1")
@@ -89,7 +94,7 @@ add_executable(${PROJECT_NAME}
     ${QT_RESOUCE_HPP}
   )
 #链接公共库
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} Qt5::Widgets ${catkin_LIBRARIES} qt${QT_VERSION_MAJOR}advanceddocking)
 #################################5,不同平台，链接不同库####################
 # 判断使用ros1 还是ros2
 if(COMPILE_PLATFORM STREQUAL "ROS2")

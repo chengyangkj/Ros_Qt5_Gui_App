@@ -1,79 +1,71 @@
 /*
- * @Author: chengyang chengyangkj@outlook.com
- * @Date: 2023-04-20 15:46:29
+ * @Author: chengyangkj chengyangkj@qq.com
+ * @Date: 2023-10-01 06:31:04
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-27 14:52:55
- * @FilePath: /ros_qt5_gui_app/include/mainwindow.h
+ * @LastEditTime: 2023-10-06 06:30:27
+ * @FilePath: /examples/centralwidget/mainwindow.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QDateTime>
-#include <QMainWindow>
-#include <QMouseEvent>
-
-#include "QTimer"
-#include "basic/point_type.h"
-#include "channel/base/comm_instance.h"
-#include "dashboard.h"
+#include "DockAreaWidget.h"
+#include "DockManager.h"
+#include "DockWidget.h"
 #include "display/display_manager.h"
-#include "roboGLWidget.h"
-#include "roboImg.h"
-#include "roboItem.h"
-#include "ui_mainwindow.h"
+#include <QCalendarWidget>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QFileSystemModel>
+#include <QGraphicsItem>
+#include <QHBoxLayout>
+#include <QInputDialog>
+#include <QLabel>
+#include <QProgressBar>
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QPlainTextEdit>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QSettings>
+#include <QTableWidget>
+#include <QToolBar>
+#include <QTreeView>
+#include <QWidgetAction>
 QT_BEGIN_NAMESPACE
-#define MARGIN 10
 namespace Ui {
-class MainWindow;
+class CMainWindow;
 }
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow {
+class CMainWindow : public QMainWindow {
   Q_OBJECT
 
 public:
-  MainWindow(QWidget *parent = nullptr);
-  ~MainWindow();
-public slots:
-  void onRecvData(QString);
-  void updateOdomInfo(RobotState);
-  void slotUpdateRobotPose(basic::RobotPose pose);
-  void slotUpdateLaserPoint(LaserScan scan);
-  void updateGlobalPath(RobotPath path);
-  void updateLocalPath(RobotPath path);
-  void updateLocalCostMap(CostMap, basic::RobotPose);
-  void updateGlobalCostMap(CostMap map);
-  // ui 相关函数
-private:
-  void mouseReleaseEvent(QMouseEvent *event);
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void mouseHoverMoveEvent(QMouseEvent *event);
-  int countRow(QPoint p); // 获取光标在窗口所在区域的 行   返回行数
-  int countFlag(QPoint p, int row); // 获取光标在窗口所在区域的 列 返回行列坐标
-  void setCursorType(int flag); // 根据传入的坐标，设置光标样式
-private:
-  void initUi();
-  void closeEvent(QCloseEvent *event); // Overloaded function
-  void setCurrentMenu(QPushButton *cur_btn);
+  CMainWindow(QWidget *parent = nullptr);
+  ~CMainWindow();
 
-  // ui相关变量
-private:
-  Ui::MainWindowDesign *ui;
-  QPoint pLast;
-  bool left_pressed_{false};
-  QPoint left_pressed_point_; // 鼠标按下后的pose
-  QPoint last_pressed_point_; // 鼠标按下后的pose
-  int curpos_ = 0;
-  bool m_bresize = false;
-  QGraphicsScene *m_qGraphicScene = nullptr;
-  DashBoard *m_speedDashBoard;
+protected:
+  virtual void closeEvent(QCloseEvent *event) override;
 
 private:
-  QTimer *m_timerCurrentTime;
-  roboGLWidget *m_roboGLWidget;
+  QAction *SavePerspectiveAction = nullptr;
+  QWidgetAction *PerspectiveListAction = nullptr;
+  QComboBox *PerspectiveComboBox = nullptr;
+
+  Ui::CMainWindow *ui;
+
+  ads::CDockManager *dock_manager_;
+  ads::CDockAreaWidget *StatusDockArea;
+  ads::CDockWidget *TimelineDockWidget;
   Display::DisplayManager *display_manager_;
+  QLabel *label_time_;
+  QPushButton *pushButton_status_;
+  QProgressBar *battery_bar_;
+  QLabel *label_battery_v_;
+  private : void setupUi();
+private slots:
+  void savePerspective();
 };
 #endif // MAINWINDOW_H

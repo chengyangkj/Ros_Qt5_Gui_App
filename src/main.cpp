@@ -1,11 +1,19 @@
+/*
+ * @Author: chengyangkj chengyangkj@qq.com
+ * @Date: 2023-09-28 14:56:04
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-05 11:39:01
+ * @FilePath: /ROS2_Qt5_Gui_App/src/main.cpp
+ */
 #include "common/logger/easylogging++.h"
 #include "mainwindow.h"
 #include <QApplication>
+#include <QLabel>
 #include <QMovie>
 #include <QPixmap>
 #include <QSplashScreen>
+#include <QThread>
 #include <iostream>
-
 INITIALIZE_EASYLOGGINGPP
 
 int main(int argc, char *argv[]) {
@@ -35,7 +43,8 @@ int main(int argc, char *argv[]) {
   //是否输出控制台
   defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
   // filename
-  defaultConf.setGlobally(el::ConfigurationType::Filename, "ros_qt_gui_app.log");
+  defaultConf.setGlobally(el::ConfigurationType::Filename,
+                          "ros_qt_gui_app.log");
   //设置配置文件
   el::Loggers::reconfigureLogger("default", defaultConf);
 
@@ -49,7 +58,7 @@ int main(int argc, char *argv[]) {
   el::Loggers::setLoggingLevel(el::Level::Global);
   LOG(INFO) << "ros qt5 gui app init";
 
-  MainWindow w;
+  CMainWindow w;
   w.show();
   splash.finish(&w); //在主体对象初始化完成后结束启动动画
   return a.exec();
