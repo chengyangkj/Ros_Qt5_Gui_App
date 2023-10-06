@@ -2,7 +2,7 @@
  * @Author: chengyangkj chengyangkj@qq.com
  * @Date: 2023-10-01 06:31:04
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-06 06:30:27
+ * @LastEditTime: 2023-10-06 07:26:39
  * @FilePath: /examples/centralwidget/mainwindow.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -22,10 +22,10 @@
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
-#include <QProgressBar>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPlainTextEdit>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSettings>
@@ -33,6 +33,25 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QWidgetAction>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QListView>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QProgressBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QWidget>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class CMainWindow;
@@ -64,7 +83,14 @@ private:
   QPushButton *pushButton_status_;
   QProgressBar *battery_bar_;
   QLabel *label_battery_v_;
-  private : void setupUi();
+  QHBoxLayout *horizontalLayout_tools_;
+  QPushButton *set_pos_btn_;
+  QPushButton *set_goal_btn_;
+  QPushButton *set_mutil_goal_btn_;
+  QPushButton *return_btn_;
+
+private:
+  void setupUi();
 private slots:
   void savePerspective();
 };

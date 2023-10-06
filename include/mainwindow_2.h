@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-20 15:46:29
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-05 10:45:16
+ * @LastEditTime: 2023-10-06 07:16:46
  * @FilePath: /ros_qt5_gui_app/include/mainwindow.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -25,7 +25,7 @@
 #include "roboGLWidget.h"
 #include "roboImg.h"
 #include "roboItem.h"
-#include "ui_mainwindow.h"
+#include "ui_mainwindow_2.h"
 QT_BEGIN_NAMESPACE
 #define MARGIN 10
 namespace Ui {
@@ -60,7 +60,7 @@ private:
 private:
   void initUi();
   void initlizate();
-   void closeEvent(QCloseEvent *event); // Overloaded function
+  void closeEvent(QCloseEvent *event); // Overloaded function
   void setCurrentMenu(QPushButton *cur_btn);
 
   // ui相关变量
