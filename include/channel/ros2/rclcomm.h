@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-20 15:46:29
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-07-27 14:02:02
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-07 14:16:09
  * @FilePath: /ros_qt5_gui_app/include/rclcomm.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -46,11 +46,11 @@ private:
   void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
-
+  
 public:
   void pub2DPose(QPointF start, QPointF end) override;
   void pub2DGoal(QPointF start, QPointF end) override;
-
+  basic::RobotPose getTrasnsform(std::string from, std::string to);
 public slots:
 
 private:

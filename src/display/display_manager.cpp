@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-01 01:42:45
+ * @LastEditTime: 2023-10-07 15:09:40
  * @FilePath:
  * ////src/display/display_manager.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -173,13 +173,15 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       display->UpdateMap(map_data_);
     }
   } else if (display_name == DISPLAY_ROBOT) {
-    GetAnyData(Pose3f, data, robot_pose_);
-    UpdateRobotPose(robot_pose_);
-
+    //重定位时屏蔽位置更新
+    if (!is_move_robot_) {
+      GetAnyData(Pose3f, data, robot_pose_);
+      UpdateRobotPose(robot_pose_);
+    }
   } else if (display_name == DISPLAY_LASER) {
     Display::LaserDataMap laser_data_map, laser_data_scene;
     GetAnyData(Display::LaserDataMap, data, laser_data_map)
-        // 点坐标转换为地图坐标系下
+        // 点坐标转换为图元坐标系下
         for (auto one_laser : laser_data_map) {
       laser_data_scene[one_laser.first] = transLaserPoint(one_laser.second);
     }
@@ -257,11 +259,16 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
  */
 std::vector<Eigen::Vector2f>
 DisplayManager::transLaserPoint(const std::vector<Eigen::Vector2f> &point) {
+  // point为车身坐标系下的坐标 需要根据当前机器人坐标转换为map
   std::vector<Eigen::Vector2f> res;
   for (auto one_point : point) {
+    //根据机器人坐标转换为map坐标系下
+    basic::RobotPose map_pose = basic::absoluteSum(
+        basic::RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]),
+        basic::RobotPose(one_point[0], one_point[1], 0));
     // 转换为图元坐标系
     int x, y;
-    map_data_.xy2scene(one_point[0], one_point[1], x, y);
+    map_data_.xy2scene(map_pose.x, map_pose.y, x, y);
     res.push_back(Eigen::Vector2f(x, y));
   }
   return res;

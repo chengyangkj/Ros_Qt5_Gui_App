@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-27 14:47:24
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-06 12:46:11
+ * @LastEditTime: 2023-10-07 14:41:22
  * @FilePath: /ros_qt5_gui_app/src/channel/ros1/rosnode.cpp
  * @Description: ros2通讯类
  */
@@ -70,9 +70,18 @@ rclcomm::rclcomm() {
       std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
 }
 void rclcomm::getRobotPose() {
+  emit emitUpdateRobotPose(getTrasnsform("base_link", "map"));
+}
+/**
+ * @description: 获取坐标变化
+ * @param {string} from 要变换的坐标系
+ * @param {string} to 基坐标系
+ * @return {basic::RobotPose}from变换到to坐标系下，需要变换的坐标
+ */
+basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
   try {
     geometry_msgs::msg::TransformStamped transform =
-        m_tf_buffer->lookupTransform("map", "base_link", tf2::TimePointZero);
+        m_tf_buffer->lookupTransform(to, from, tf2::TimePointZero);
     geometry_msgs::msg::Quaternion msg_quat = transform.transform.rotation;
     // 转换类型
     tf2::Quaternion q;
@@ -83,12 +92,14 @@ void rclcomm::getRobotPose() {
     // x y
     double x = transform.transform.translation.x;
     double y = transform.transform.translation.y;
-    m_currPose.x = x;
-    m_currPose.y = y;
-    m_currPose.theta = yaw;
-    emit emitUpdateRobotPose(m_currPose);
+    basic::RobotPose ret;
+    ret.x = x;
+    ret.y = y;
+    ret.theta = yaw;
+    return ret;
   } catch (tf2::TransformException &ex) {
-    qDebug() << "robot pose transform error:" << ex.what();
+    std ::cout << "getTrasnsform error from:" << from << " to:" << to
+               << " error:" << ex.what();
   }
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -184,13 +195,17 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-      m_tf_buffer->transform(point_laser_frame, point_map_frame, "map");
+      m_tf_buffer->transform(point_laser_frame, point_map_frame, "base_link");
       basic::Point p;
       p.x = point_map_frame.point.x;
       p.y = point_map_frame.point.y;
       laser_points.push_back(p);
     }
     laser_points.id = 0;
+    // basic::RobotPose pose = getTrasnsform(msg->header.frame_id, "base_link");
+    // std::cout << "get transform" << pose.x << " " << pose.y << " " <<
+    // pose.theta
+    //           << std::endl;
     emit emitUpdateLaserPoint(laser_points);
   } catch (tf2::TransformException &ex) {
     qDebug() << "laser pose transform error:" << ex.what();

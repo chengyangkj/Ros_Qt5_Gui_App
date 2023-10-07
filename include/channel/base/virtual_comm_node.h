@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-25 16:20:39
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-06 12:43:13
+ * @LastEditTime: 2023-10-07 14:41:45
  * @FilePath:
  * /ros_qt5_gui_app/include/channel/base/virtual_communcation_node.h
  */
@@ -42,7 +42,7 @@ signals:
   void emitUpdateLocalCostMap(CostMap img, basic::RobotPose pose);
   void emitUpdateGlobalCostMap(CostMap img);
   void emitUpdateRobotPose(basic::RobotPose pose);
-  void emitUpdateLaserPoint(LaserScan laser_scan);
+  void emitUpdateLaserPoint(LaserScan laser_scan); //发布车身坐标系下的激光点
   void emitUpdatePath(RobotPath points);
   void emitUpdateLocalPath(RobotPath points);
   void emitOdomInfo(basic::RobotState state);
