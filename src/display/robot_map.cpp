@@ -3,7 +3,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-28 10:21:04
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-17 09:37:13
+ * @LastEditTime: 2023-10-09 14:55:16
  * @FilePath: ////src/display/robot_map.cpp
  */
 #include <algorithm>
@@ -95,7 +95,9 @@ void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     draw_x = top_left_x;
     draw_y = top_left_y;
   }
-  painter->drawImage(draw_x, draw_y, sub_image);
+  //以图片中心做原点进行绘制
+  painter->drawImage(draw_x - sub_image.width() / 2,
+                     draw_y - sub_image.height() / 2, sub_image);
 }
 void RobotMap::ParseCostMap() {
   Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> cost_map =

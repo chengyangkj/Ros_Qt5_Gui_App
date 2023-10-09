@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-01 02:45:57
+ * @LastEditTime: 2023-10-08 14:55:45
  * @FilePath:
  * ////include/display/virtual_display.h
  * @Description: 图层的虚拟类
@@ -124,11 +124,14 @@ public:
   QCursor *goal_cursor_ = nullptr;
   double scale_value_ = 1;
   bool is_response_mouse_event_{false};
+  bool is_rotate_event_{false};
   bool enable_scale_{true};
   QRectF bounding_rect_;
   QTransform transform_;
   double rotate_value_{0};
   OccupancyMap map_data_;
+  QPointF rotate_center_;
+
 signals:
   void displayUpdated(std::string name);
   void displaySetScaled(std::string name, double value);
@@ -160,6 +163,7 @@ public:
                                 const std::any &config_data);
   bool SetScaled(const double &value);
   void SetBoundingRect(QRectF rect);
+  void SetRotate(qreal RotateAngle, QPointF ptCenter = QPointF(-999, -999));
   QRectF GetBoundingRect() const { return bounding_rect_; }
   std::string GetDisplayName();
   void SetDisplayName(const std::string &display_name);

@@ -37,12 +37,7 @@ bool VirtualDisplay::SetScaled(const double &value) {
   emit displaySetScaled(display_name_, value);
   return true;
 }
-void VirtualDisplay::SetBoundingRect(QRectF rect) {
-  bounding_rect_ = rect;
-
-  std::cout << "set  bounding_rect_:" << bounding_rect_.width() << " "
-            << bounding_rect_.height() << std::endl;
-}
+void VirtualDisplay::SetBoundingRect(QRectF rect) { bounding_rect_ = rect; }
 void VirtualDisplay::Update() { update(); }
 std::string VirtualDisplay::GetDisplayName() { return display_name_; }
 void VirtualDisplay::SetDisplayName(const std::string &display_name) {
@@ -85,54 +80,68 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mouseMoveEvent(event);
     return;
   }
-  if (is_mouse_press_) {
+  if (pressed_button_ == Qt::LeftButton) {
     if (curr_cursor_ == move_cursor_) {
       QPointF point = (event->pos() - pressed_pose_) * scale_value_;
       moveBy(point.x(), point.y());
-      // std::cout << "mouse move:" << GetDisplayName() << "(" <<
-      // event->pos().x()
-      //           << "," << event->pos().y() << ")" << std::endl;
+      std::cout << "mouse move:" << GetDisplayName() << "(" << event->pos().x()
+                << "," << event->pos().y() << ")" << std::endl;
     }
     end_pose_ = event->pos();
   }
+  ////////////////////////// 右健旋转
+  if (pressed_button_ == Qt::RightButton) {
+    QPointF loacalPos = event->pos();
 
-  ////////////////////////// 旋转
-  // QPointF loacalPos = event->pos();
+    // 获取并设置为单位向量
+    QVector2D startVec(pressed_pose_.x() - 0, pressed_pose_.y() - 0);
+    startVec.normalize();
+    QVector2D endVec(loacalPos.x() - 0, loacalPos.y() - 0);
+    endVec.normalize();
 
-  // // 获取并设置为单位向量
-  // QVector2D startVec(pressed_pose_.x() - 0, pressed_pose_.y() - 0);
-  // startVec.normalize();
-  // QVector2D endVec(loacalPos.x() - 0, loacalPos.y() - 0);
-  // endVec.normalize();
+    // 单位向量点乘，计算角度
+    qreal dotValue = QVector2D::dotProduct(startVec, endVec);
+    if (dotValue > 1.0)
+      dotValue = 1.0;
+    else if (dotValue < -1.0)
+      dotValue = -1.0;
 
-  // // 单位向量点乘，计算角度
-  // qreal dotValue = QVector2D::dotProduct(startVec, endVec);
-  // if (dotValue > 1.0)
-  //   dotValue = 1.0;
-  // else if (dotValue < -1.0)
-  //   dotValue = -1.0;
+    dotValue = qAcos(dotValue);
+    if (isnan(dotValue))
+      dotValue = 0.0;
 
-  // dotValue = qAcos(dotValue);
-  // if (isnan(dotValue)) dotValue = 0.0;
+    // 获取角度
+    qreal angle = dotValue * 1.0 / (PI / 180);
 
-  // // 获取角度
-  // qreal angle = dotValue * 1.0 / (PI / 180);
+    // 向量叉乘获取方向
+    QVector3D crossValue = QVector3D::crossProduct(QVector3D(startVec, 1.0),
+                                                   QVector3D(endVec, 1.0));
 
-  // // 向量叉乘获取方向
-  // QVector3D crossValue =
-  //     QVector3D::crossProduct(QVector3D(startVec, 1.0),
-  //     QVector3D(endVec, 1.0));
+    if (crossValue.z() < 0)
+      angle = -angle;
+    rotate_value_ += angle;
 
-  // if (crossValue.z() < 0) angle = -angle;
-  // rotate_value_ += angle;
+    // 设置变化矩阵
+    transform_.rotate(rotate_value_);
+    this->setTransform(transform_);
+    update();
+    pressed_pose_ = loacalPos;
+  }
 
-  // // 设置变化矩阵
-  // transform_.rotate(rotate_value_);
-  // this->setTransform(transform_);
-
-  update();
   emit scenePoseChanged(display_name_, scenePos());
   emit displayUpdated(display_name_);
+}
+void VirtualDisplay::SetRotate(qreal RotateAngle, QPointF ptCenter) {
+  if (ptCenter.x() == -999 && ptCenter.y() == -999) {
+    rotate_center_ = QPointF(bounding_rect_.x() + bounding_rect_.width() / 2,
+                             bounding_rect_.y() + bounding_rect_.height() / 2);
+  } else {
+    rotate_center_ = ptCenter;
+  }
+  rotate_value_ += RotateAngle;
+  // 设置变化矩阵
+
+  setRotation(rotation() + RotateAngle);
 }
 void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
                                        const QPointF &mousePos) {
@@ -156,13 +165,18 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     return;
   }
   pressed_button_ = event->button();
+  pressed_pose_ = event->pos();
   if (event->button() == Qt::LeftButton) {
-    pressed_pose_ = event->pos();
+
     is_mouse_press_ = true;
     start_pose_ = event->pos();
     curr_cursor_ = move_cursor_;
     this->setCursor(*curr_cursor_);
+  } else if (event->button() == Qt::RightButton) {
+    rotate_center_ = event->pos();
+    is_rotate_event_ = true;
   }
+  transform_ = this->transform();
   update();
   emit scenePoseChanged(display_name_, scenePos());
   emit displayUpdated(display_name_);
