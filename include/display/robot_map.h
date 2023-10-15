@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-28 10:20:56
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-17 09:18:23
+ * @LastEditTime: 2023-10-14 09:46:16
  * @FilePath: ////include/display/RobotMap.h
  */
 #ifndef ROBO_MAP_H
@@ -35,7 +35,6 @@ private:
 private:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
-  QRectF boundingRect() const override;
   void ParseCostMap();
   void ParseGridMap();
   void ParseTrustMap();

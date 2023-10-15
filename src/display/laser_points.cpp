@@ -1,15 +1,14 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-04-26 16:04:37
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-14 09:56:25
  * @FilePath: ////src/display/laser_points.cpp
  * @Description:
  */
 #include "display/laser_points.h"
 LaserPoints::LaserPoints(const std::string &display_name, const int &z_value)
     : VirtualDisplay(display_name, z_value) {}
-QRectF LaserPoints::boundingRect() const { return bounding_rect_; }
 void LaserPoints::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
@@ -44,7 +43,7 @@ void LaserPoints::computeBoundRect(const Display::LaserDataMap &laser_scan) {
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  bounding_rect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
+  SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
 }
 bool LaserPoints::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {

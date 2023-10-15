@@ -31,7 +31,6 @@ public:
   ~DisplayPath();
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data) override;
-  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;

@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-05-12 14:37:07
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-14 09:56:12
  * @FilePath: ////src/display/laser_points.cpp
  * @Description:
  */
@@ -12,7 +12,6 @@ DisplayTag::DisplayTag(const std::string &display_name, const int &z_value)
   tag_image_.load("://images/qr.png");
   // enable_scale_ = false;
 }
-QRectF DisplayTag::boundingRect() const { return bounding_rect_; }
 void DisplayTag::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget) {
@@ -21,7 +20,7 @@ void DisplayTag::paint(QPainter *painter,
     // std::cout << "paint qr_name:" << qr_name << std::endl;
     // 坐标转换为图元坐标系
     int x, y;
-    map_data_.xy2scene(pose[0], pose[1], x, y);
+    map_data_.xy2occPose(pose[0], pose[1], x, y);
     painter->drawPixmap(x - tag_image_.width() / 2, y - tag_image_.height() / 2,
                         tag_image_);
   }
@@ -42,15 +41,19 @@ void DisplayTag::computeBoundRect(Display::TagDataMap &data_map) {
   // std::cout << "data map size:" << data_map.size() << std::endl;
   for (auto [region_name, pose] : data_map) {
     int x, y;
-    map_data_.xy2scene(pose[0], pose[1], x, y);
-    if (xmin > x) xmin = x;
-    if (xmax < x) xmax = x;
+    map_data_.xy2occPose(pose[0], pose[1], x, y);
+    if (xmin > x)
+      xmin = x;
+    if (xmax < x)
+      xmax = x;
 
-    if (ymin > y) ymin = y;
-    if (ymax < y) ymax = y;
+    if (ymin > y)
+      ymin = y;
+    if (ymax < y)
+      ymax = y;
 
     // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
     //           << "ymin:" << ymin <<" x:"<<x<<" y:"<<pose[1]<< std::endl;
   }
-  bounding_rect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
+  SetBoundingRect(QRectF(xmin, ymin, xmax - xmin, ymax - ymin));
 }

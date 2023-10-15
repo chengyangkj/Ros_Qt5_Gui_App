@@ -1,19 +1,17 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-04-20 16:44:15
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-14 09:47:41
  * @FilePath: ////src/display/laser_points.cpp
  * @Description:
  */
 #include "display/display_demo.h"
-DisplayDemo::DisplayDemo(const std::string &display_name,
-                               const int &z_value)
+DisplayDemo::DisplayDemo(const std::string &display_name, const int &z_value)
     : VirtualDisplay(display_name, z_value) {}
-QRectF DisplayDemo::boundingRect() const {}
 void DisplayDemo::paint(QPainter *painter,
-                           const QStyleOptionGraphicsItem *option,
-                           QWidget *widget) {
+                        const QStyleOptionGraphicsItem *option,
+                        QWidget *widget) {
   drawFrame(painter);
 }
 

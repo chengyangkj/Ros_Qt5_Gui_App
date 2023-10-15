@@ -25,7 +25,6 @@ public:
   ParticlePoints(const std::string &display_name, const int &z_value);
   ~ParticlePoints();
   void computeBoundRect(const Display::ParticlePointsType &particle);
-  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;

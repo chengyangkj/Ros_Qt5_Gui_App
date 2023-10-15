@@ -26,14 +26,14 @@ public:
   basic::Point transWordPoint2Scene(basic::Point point) {
     basic::Point ret;
     int x, y;
-    occ_map_.xy2scene(point.x, point.y, x, y);
+    occ_map_.xy2occPose(point.x, point.y, x, y);
     ret.x = x;
     ret.y = y;
     return ret;
   }
   basic::Point transScenePoint2Word(basic::Point point) {
     basic::Point ret;
-    occ_map_.scene2xy(point.x, point.y, ret.x, ret.y);
+    occ_map_.occPose2xy(point.x, point.y, ret.x, ret.y);
 
     return ret;
   }

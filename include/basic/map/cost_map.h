@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-30 15:38:12
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-27 15:07:39
+ * @LastEditTime: 2023-10-15 09:04:17
  * @FilePath: ////include/map/occupancy_map.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -114,9 +114,13 @@ public:
     return res;
   }
   int Rows() { return rows; }
-  int height() { return rows; }
   int Cols() { return cols; }
+  //宽高地图坐标系下的长度
   int width() { return cols; }
+  int height() { return rows; }
+  //宽map坐标系下的长度
+  int widthMap() { return cols * resolution; }
+  int heightMap() { return rows * resolution; }
   /**
    * @description: 输入栅格地图的行与列号，返回该位置的全局坐标
    * @param {int&} c 列号
@@ -165,8 +169,8 @@ public:
    * @description:输入原始(地图图片)图元坐标,返回世界坐标
    * @return {*}
    */
-  void scene2xy(const int &scene_x, const int &scene_y, double &word_x,
-                double &word_y) {
+  void occPose2xy(const int &scene_x, const int &scene_y, double &word_x,
+                  double &word_y) {
     word_x = scene_x * resolution + origin_x;
     word_y = (height() - scene_y) * resolution + origin_y;
   }
@@ -179,8 +183,8 @@ public:
    * @param {int&} scene_y
    * @return {*}
    */
-  void xy2scene(const double &word_x, const double &word_y, int &scene_x,
-                int &scene_y) {
+  void xy2occPose(const double &word_x, const double &word_y, int &scene_x,
+                  int &scene_y) {
     scene_x = (word_x - origin_x) / resolution;
     scene_y = height() - (word_y - origin_y) / resolution;
   }

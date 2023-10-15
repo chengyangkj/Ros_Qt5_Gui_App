@@ -24,7 +24,6 @@ class PointShape : public VirtualDisplay {
              const int &z_value);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
-  QRectF boundingRect() const override;
   bool UpdateData(const std::any &data) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 

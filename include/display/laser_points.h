@@ -13,7 +13,6 @@ public:
   Display::LaserDataMap laser_data_scene_;
   LaserPoints(const std::string &display_name, const int &z_value);
   ~LaserPoints();
-  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;

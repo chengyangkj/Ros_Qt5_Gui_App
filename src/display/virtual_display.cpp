@@ -37,7 +37,6 @@ bool VirtualDisplay::SetScaled(const double &value) {
   emit displaySetScaled(display_name_, value);
   return true;
 }
-void VirtualDisplay::SetBoundingRect(QRectF rect) { bounding_rect_ = rect; }
 void VirtualDisplay::Update() { update(); }
 std::string VirtualDisplay::GetDisplayName() { return display_name_; }
 void VirtualDisplay::SetDisplayName(const std::string &display_name) {
@@ -84,8 +83,6 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     if (curr_cursor_ == move_cursor_) {
       QPointF point = (event->pos() - pressed_pose_) * scale_value_;
       moveBy(point.x(), point.y());
-      std::cout << "mouse move:" << GetDisplayName() << "(" << event->pos().x()
-                << "," << event->pos().y() << ")" << std::endl;
     }
     end_pose_ = event->pos();
   }
@@ -158,6 +155,7 @@ void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
   // this->setTransform(ts);
   // this->afterSetRotate(angle);
 }
+
 void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (!is_response_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递

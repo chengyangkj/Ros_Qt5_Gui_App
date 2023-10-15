@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-08 14:55:45
+ * @LastEditTime: 2023-10-15 09:46:05
  * @FilePath:
  * ////include/display/virtual_display.h
  * @Description: 图层的虚拟类
@@ -90,11 +90,11 @@ public:
       return display_map_;
     }
     // 设置响应鼠标事件的图层(同一时刻只有一个图层响应鼠标事件)
-    bool SetMouseHandleDisplay(const std::string &display_name) {
+    bool SetMainDisplay(const std::string &display_name) {
       if (display_map_.count(display_name) == 0) {
         return false;
       }
-      main_mouse_handle_display_ = display_name;
+      main_display_ = display_name;
       for (auto [name, display] : display_map_) {
         if (name == display_name) {
           display->SetResposeMouseEvent(true);
@@ -104,10 +104,10 @@ public:
       }
       return true;
     }
-    std::string GetMouseHandleDisplay() { return main_mouse_handle_display_; }
+    std::string GetMainDisplay() { return main_display_; }
 
   private:
-    std::string main_mouse_handle_display_;
+    std::string main_display_;
     std::map<std::string, VirtualDisplay *> display_map_;
   };
 
@@ -131,7 +131,7 @@ public:
   double rotate_value_{0};
   OccupancyMap map_data_;
   QPointF rotate_center_;
-
+  bool align_to_map_{true};
 signals:
   void displayUpdated(std::string name);
   void displaySetScaled(std::string name, double value);
@@ -146,6 +146,12 @@ public:
     emit displayUpdated(display_name_);
     return UpdateData(data);
   }
+  VirtualDisplay *SetAlignToMap(const bool &align) {
+    align_to_map_ = align;
+    return this;
+  }
+
+  bool GetAlignToMap() { return align_to_map_; }
   void UpdateMap(OccupancyMap map) { map_data_ = map; }
   // 设置当前图层是否响应鼠标事件
   void SetResposeMouseEvent(const bool &response) {
@@ -162,9 +168,18 @@ public:
   virtual bool SetDisplayConfig(const std::string &config_name,
                                 const std::any &config_data);
   bool SetScaled(const double &value);
-  void SetBoundingRect(QRectF rect);
+  void SetBoundingRect(QRectF rect) { bounding_rect_ = rect; }
+  QPointF GetOriginPose() { return bounding_rect_.topLeft(); }
+  QPointF GetOriginPoseScene() { return mapToScene(GetOriginPose()); }
+  QPointF OccPoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
+    return mapToScene((pose + GetOriginPose()));
+  }
+  //设置原点在全局的坐标
+  void SetOriginPoseInScene(const QPointF &pose) {
+    setPos(pose - GetOriginPose());
+  }
   void SetRotate(qreal RotateAngle, QPointF ptCenter = QPointF(-999, -999));
-  QRectF GetBoundingRect() const { return bounding_rect_; }
+  QRectF boundingRect() const override { return bounding_rect_; }
   std::string GetDisplayName();
   void SetDisplayName(const std::string &display_name);
   void Update();

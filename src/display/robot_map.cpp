@@ -3,7 +3,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-28 10:21:04
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-09 14:55:16
+ * @LastEditTime: 2023-10-15 02:49:39
  * @FilePath: ////src/display/robot_map.cpp
  */
 #include <algorithm>
@@ -40,7 +40,10 @@ bool RobotMap::UpdateData(const std::any &data) {
     ParseCostMap();
   } break;
   }
-  bounding_rect_ = QRectF(0, 0, map_image_.width(), map_image_.height());
+  //绘制原点在地图中心
+  SetBoundingRect(QRectF(0 - map_image_.width() / 2,
+                         0 - map_image_.height() / 2, map_image_.width(),
+                         map_image_.height()));
   update();
   return true;
 }
@@ -51,53 +54,41 @@ bool RobotMap::SetDisplayConfig(const std::string &config_name,
   } else if (config_name == "RobotPose") {
     // using type = Eigen::Vector3f;
     GetAnyData(Eigen::Vector3f, config_data, sub_map_center_pose_);
-
-    // //保持机器人坐标在地图正中心
-    // QPointF point =
-    //     (QPointF(sub_map_center_pose_[0], sub_map_center_pose_[1]) -
-    //      QPointF(map_image_.width() / 2.0, map_image_.height() / 2.0)) *
-    //     scale_value_;
-    // std::cout << "x:" << point.x() << " y:" << point.y()
-    //           << " robot x:" << sub_map_center_pose_[0]
-    //           << " robot y:" << sub_map_center_pose_[1]
-    //           << " center x:" << map_image_.width() / 2.0
-    //           << " center y:" << map_image_.height() / 2.0 << std::endl;
-    // moveBy(point.x(), point.y());
   } else {
     return false;
   }
   update();
   return true;
 }
-QRectF RobotMap::boundingRect() const { return bounding_rect_; }
 void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                      QWidget *widget) {
-  QImage sub_image = map_image_;
-  int draw_x = 0;
-  int draw_y = 0;
-  //按照比例裁减地图
-  if (sub_map_value_ != 1) {
-    //以机器人为中心按比例进行裁剪
-    int width = std::min(map_data_.Cols(), map_data_.Rows());
-    width *= sub_map_value_;
-    int top_left_x = sub_map_center_pose_[0] - width / 2.0;
-    int top_left_y = sub_map_center_pose_[1] - width / 2.0;
-    top_left_x = top_left_x < 0 ? 0 : top_left_x;
-    top_left_y = top_left_y < 0 ? 0 : top_left_y;
-    int bottom_right_x = sub_map_center_pose_[0] + width / 2.0;
-    int bottom_right_y = sub_map_center_pose_[1] + width / 2.0;
-    bottom_right_x =
-        bottom_right_x > map_data_.Rows() ? map_data_.Rows() : bottom_right_x;
-    bottom_right_y =
-        bottom_right_y > map_data_.Cols() ? map_data_.Cols() : bottom_right_y;
-    sub_image = map_image_.copy(QRect(QPoint(top_left_x, top_left_y),
-                                      QPoint(bottom_right_x, bottom_right_y)));
-    draw_x = top_left_x;
-    draw_y = top_left_y;
-  }
-  //以图片中心做原点进行绘制
-  painter->drawImage(draw_x - sub_image.width() / 2,
-                     draw_y - sub_image.height() / 2, sub_image);
+  // //按照比例裁减地图
+  // if (sub_map_value_ != 1) {
+  //   //以机器人为中心按比例进行裁剪
+  //   int width = std::min(map_data_.Cols(), map_data_.Rows());
+  //   width *= sub_map_value_;
+  //   int top_left_x = sub_map_center_pose_[0] - width / 2.0;
+  //   int top_left_y = sub_map_center_pose_[1] - width / 2.0;
+  //   top_left_x = top_left_x < 0 ? 0 : top_left_x;
+  //   top_left_y = top_left_y < 0 ? 0 : top_left_y;
+  //   int bottom_right_x = sub_map_center_pose_[0] + width / 2.0;
+  //   int bottom_right_y = sub_map_center_pose_[1] + width / 2.0;
+  //   bottom_right_x =
+  //       bottom_right_x > map_data_.Rows() ? map_data_.Rows() :
+  //       bottom_right_x;
+  //   bottom_right_y =
+  //       bottom_right_y > map_data_.Cols() ? map_data_.Cols() :
+  //       bottom_right_y;
+  //   sub_image = map_image_.copy(QRect(QPoint(top_left_x, top_left_y),
+  //                                     QPoint(bottom_right_x,
+  //                                     bottom_right_y)));
+  //   draw_x = top_left_x;
+  //   draw_y = top_left_y;
+  // }
+  //以图片中心做原点进行绘制(方便旋转)
+  std::cout << "map origin pose: " << GetOriginPose().x() << " "
+            << GetOriginPose().y() << std::endl;
+  painter->drawImage(GetOriginPose().x(), GetOriginPose().y(), map_image_);
 }
 void RobotMap::ParseCostMap() {
   Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> cost_map =

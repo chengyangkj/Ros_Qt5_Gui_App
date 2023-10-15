@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2022-12-15 09:59:43
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-06-15 11:34:50
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-14 09:48:15
  * @FilePath: ////src/PointShape.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -21,9 +21,8 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
   QMatrix matrix;
   matrix.rotate(45);
   robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);
-  bounding_rect_ = QRectF(0, 0, robot_image_.width(), robot_image_.height());
+  SetBoundingRect(QRectF(0, 0, robot_image_.width(), robot_image_.height()));
 }
-QRectF PointShape::boundingRect() const { return bounding_rect_; }
 bool PointShape::UpdateData(const std::any &data) {
   GetAnyData(Eigen::Vector3f, data, robot_pose_);
   update();
@@ -32,16 +31,16 @@ void PointShape::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget) {
   switch (type_) {
-    case kRobot:
-      drawRobot(painter);
-      break;
-    case kParticle:
-      drawParticle(painter);
-      break;
+  case kRobot:
+    drawRobot(painter);
+    break;
+  case kParticle:
+    drawParticle(painter);
+    break;
   }
 }
 void PointShape::drawRobot(QPainter *painter) {
-  painter->setRenderHint(QPainter::Antialiasing, true);  // 设置反锯齿 反走样
+  painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
   painter->save();
   double deg = robot_pose_[2];
   painter->rotate(rad2deg(-deg));
@@ -60,8 +59,6 @@ void PointShape::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     if (curr_cursor_ == move_cursor_) {
       QPointF point = (event->pos() - pressed_pose_) * scale_value_;
       moveBy(point.x(), point.y());
-      std::cout << "mouse move:" << GetDisplayName() << "(" << event->pos().x()
-                << "," << event->pos().y() << ")" << std::endl;
     }
     end_pose_ = event->pos();
   }
@@ -83,7 +80,8 @@ void PointShape::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
       dotValue = -1.0;
 
     dotValue = qAcos(dotValue);
-    if (isnan(dotValue)) dotValue = 0.0;
+    if (isnan(dotValue))
+      dotValue = 0.0;
 
     // 获取角度
     qreal angle = dotValue * 1.0 / (PI / 180);
@@ -92,7 +90,8 @@ void PointShape::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     QVector3D crossValue = QVector3D::crossProduct(QVector3D(startVec, 1.0),
                                                    QVector3D(endVec, 1.0));
 
-    if (crossValue.z() < 0) angle = -angle;
+    if (crossValue.z() < 0)
+      angle = -angle;
     rotate_value_ += angle;
 
     // 设置变化矩阵

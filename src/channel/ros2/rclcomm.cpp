@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-07-27 14:47:24
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-07 14:41:22
+ * @LastEditTime: 2023-10-15 09:14:17
  * @FilePath: /ros_qt5_gui_app/src/channel/ros1/rosnode.cpp
  * @Description: ros2通讯类
  */
@@ -99,7 +99,7 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     return ret;
   } catch (tf2::TransformException &ex) {
     std ::cout << "getTrasnsform error from:" << from << " to:" << to
-               << " error:" << ex.what();
+               << " error:" << ex.what() << std::endl;
   }
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {

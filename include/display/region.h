@@ -24,7 +24,6 @@ class Region : public VirtualDisplay {
   Display::RegionDataMap region_data_;
   Region(const std::string &display_name, const int &z_value);
   ~Region();
-  QRectF boundingRect() const override;
   void computeBoundRect(Display::RegionDataMap& data_map);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;

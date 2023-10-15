@@ -24,7 +24,6 @@ public:
   Display::ParticlePointsType particle_data_;
   DisplayDemo(const std::string &display_name, const int &z_value);
   ~DisplayDemo();
-  QRectF boundingRect() const override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;

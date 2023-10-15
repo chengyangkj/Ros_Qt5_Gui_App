@@ -10,7 +10,6 @@
 ParticlePoints::ParticlePoints(const std::string &display_name,
                                const int &z_value)
     : VirtualDisplay(display_name, z_value) {}
-QRectF ParticlePoints::boundingRect() const { return bounding_rect_; }
 void ParticlePoints::paint(QPainter *painter,
                            const QStyleOptionGraphicsItem *option,
                            QWidget *widget) {
@@ -77,5 +76,5 @@ void ParticlePoints::computeBoundRect(
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  bounding_rect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
+  SetBoundingRect(QRectF(xmin, ymin, xmax - xmin, ymax - ymin));
 }

@@ -2,12 +2,16 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-07 15:09:40
+ * @LastEditTime: 2023-10-15 09:50:01
  * @FilePath:
  * ////src/display/display_manager.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
+// 1,图元坐标系 scenPose 对应所有图层的外部全局坐标系
+// 2, 图层坐标系 每个图层的单独坐标系
+// 3, 占栅格地图坐标系 occPose
+// 4,机器人全局地图坐标系 wordPose
 #include "display/display_manager.h"
 
 #include <Eigen/Eigen>
@@ -25,10 +29,13 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
   viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   //------------------------------------start display instace (register
   // display)-----------------------------
-  new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1);
+  (new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1))
+      ->SetAlignToMap(false);
   new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_GLOBAL_COST_MAP, 2);
-  new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3);
-  new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7);
+  (new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3))
+      ->SetAlignToMap(false);
+  (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7))
+      ->SetAlignToMap(false);
   new LaserPoints(DISPLAY_LASER, 2);
   new ParticlePoints(DISPLAY_PARTICLE, 4);
   new Region(DISPLAY_REGION, 3);
@@ -56,7 +63,7 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
             SLOT(slotUpdateCursorPose(std::string, QPointF)));
   }
   // 设置默认地图图层响应鼠标事件
-  DisplayInstance()->SetMouseHandleDisplay(DISPLAY_MAP);
+  DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
   std::cout << "display size:" << DisplayInstance()->GetDisplaySize()
             << std::endl;
   InitUi();
@@ -72,7 +79,7 @@ void DisplayManager::InitUi() {
 DisplayManager::~DisplayManager() {}
 void DisplayManager::slotDisplayUpdated(std::string display_name) {
   // 不响应主图层的事件
-  if (DisplayInstance()->GetMouseHandleDisplay() != display_name)
+  if (DisplayInstance()->GetMainDisplay() != display_name)
     return;
   // 其他所有图层update
   for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
@@ -89,13 +96,13 @@ void DisplayManager::slotDisplayUpdated(std::string display_name) {
 void DisplayManager::slotDisplayScenePoseChanged(std::string display_name,
                                                  QPointF pose) {
   // 不响应主图层的事件
-  if (DisplayInstance()->GetMouseHandleDisplay() != display_name)
+  if (DisplayInstance()->GetMainDisplay() != display_name)
     return;
   if (display_name == DISPLAY_ROBOT) {
     // 机器人的图元坐标转世界坐标
     QPointF map_scene_pose = GetDisplay(DISPLAY_MAP)->mapFromScene(pose);
     double x, y;
-    map_data_.scene2xy(map_scene_pose.x(), map_scene_pose.y(), x, y);
+    map_data_.occPose2xy(map_scene_pose.x(), map_scene_pose.y(), x, y);
     Eigen::Vector3f robot_pose_new;
     // 更新坐标
     robot_pose_new[0] = x;
@@ -110,14 +117,14 @@ void DisplayManager::slotUpdateCursorPose(std::string name, QPointF pose) {
     int scene_y = pose.y();
     emit cursorPosScene(QPointF(scene_x, scene_y));
     double x, y;
-    map_data_.scene2xy(scene_x, scene_y, x, y);
+    map_data_.occPose2xy(scene_x, scene_y, x, y);
     emit cursorPosMap(QPointF(x, y));
   }
 }
 void DisplayManager::slotDisplaySetScaled(std::string display_name,
                                           double value) {
   // 只响应主图层的事件
-  if (DisplayInstance()->GetMouseHandleDisplay() != display_name)
+  if (DisplayInstance()->GetMainDisplay() != display_name)
     return;
   // 其他所有图层scaled
   for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
@@ -196,7 +203,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       // std::cout << "location:" << one_laser.first << std::endl;
       // 转换为图元坐标系
       int x, y;
-      map_data_.xy2scene(one_points[0], one_points[1], x, y);
+      map_data_.xy2occPose(one_points[0], one_points[1], x, y);
       particles_tans.push_back(Eigen::Vector3f(x, y, one_points[2]));
     }
     display->UpdateDisplay(particles_tans);
@@ -210,7 +217,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       // std::cout << "location:" << one_laser.first << std::endl;
       // 转换为图元坐标系
       int x, y;
-      map_data_.xy2scene(one_points[0], one_points[1], x, y);
+      map_data_.xy2occPose(one_points[0], one_points[1], x, y);
       path_data_trans.push_back(Display::Point2f(x, y));
     }
     display->UpdateDisplay(path_data_trans);
@@ -223,8 +230,8 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       for (auto one_region : region) {
         Display::RangeVec ivec;
         int xmin, ymin, xmax, ymax;
-        map_data_.xy2scene(one_region[0], one_region[1], xmin, ymin);
-        map_data_.xy2scene(one_region[2], one_region[3], xmax, ymax);
+        map_data_.xy2occPose(one_region[0], one_region[1], xmin, ymin);
+        map_data_.xy2occPose(one_region[2], one_region[3], xmax, ymax);
         ivec[0] = xmin;
         ivec[1] = ymin;
         ivec[2] = xmax;
@@ -237,7 +244,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
   } else if (display_name == DISPLAY_LOCAL_COST_MAP) {
     if (data.type() == typeid(RobotPose)) {
 
-      GetAnyData(RobotPose, data, local_cost_map_pose_);
+      GetAnyData(RobotPose, data, local_cost_world_pose_);
 
     } else if (data.type() == typeid(CostMap)) {
       GetAnyData(CostMap, data, local_cost_map_);
@@ -268,26 +275,12 @@ DisplayManager::transLaserPoint(const std::vector<Eigen::Vector2f> &point) {
         basic::RobotPose(one_point[0], one_point[1], 0));
     // 转换为图元坐标系
     int x, y;
-    map_data_.xy2scene(map_pose.x, map_pose.y, x, y);
+    map_data_.xy2occPose(map_pose.x, map_pose.y, x, y);
     res.push_back(Eigen::Vector2f(x, y));
   }
   return res;
 }
-/**
- * @description: 传入一个世界坐标,得到该坐标的在GriphicsScene的图元坐标
- * @param {Vector3f&} pose
- * @return {*}
- */
-Eigen::Vector3f DisplayManager::GetMapPoseInScene(const Eigen::Vector3f &pose) {
-  int x, y;
-  map_data_.xy2scene(pose[0], pose[1], x, y);
-  QPointF scene_pose = GetDisplay(DISPLAY_MAP)->mapToScene(x, y);
-  Eigen::Vector3f scene_pose_e;
-  scene_pose_e[0] = scene_pose.x();
-  scene_pose_e[1] = scene_pose.y();
-  scene_pose_e[2] = pose[2];
-  return scene_pose_e;
-}
+
 /**
  * @description: 更新机器人在世界坐标系下的坐标
  * @param {Vector3f&} pose x y theta
@@ -297,28 +290,24 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
   emit robotPoseMap(pose);
   robot_pose_ = pose;
   // 地图图层 更新机器人图元坐标
-  robot_pose_scene_ = MapPose2Scene(pose);
-  GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_scene_);
-  GetDisplay(DISPLAY_MAP)->SetDisplayConfig("RobotPose", robot_pose_scene_);
+  robot_pose_scene_ = wordPose2Scene(pose);
+
+  GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_);
+  if (!is_move_robot_) {
+    DisplayInstance()->SetDisplayScenePose(
+        DISPLAY_ROBOT, QPointF(robot_pose_scene_[0], robot_pose_scene_[1]));
+  }
 }
-Eigen::Vector3f DisplayManager::MapPose2Scene(const Eigen::Vector3f &pose) {
-  Eigen::Vector3f ret;
-  int x, y;
-  map_data_.xy2scene(pose[0], pose[1], x, y);
-  ret[0] = x;
-  ret[1] = y;
-  ret[2] = pose[2];
-  return ret;
-}
+
 void DisplayManager::updateScaled(double value) {
   DisplayInstance()->SetDisplayScaled(DISPLAY_LASER, value);
 }
 void DisplayManager::SetMoveRobot(bool is_move) {
   is_move_robot_ = is_move;
   if (is_move) {
-    DisplayInstance()->SetMouseHandleDisplay(DISPLAY_ROBOT);
+    DisplayInstance()->SetMainDisplay(DISPLAY_ROBOT);
   } else {
-    DisplayInstance()->SetMouseHandleDisplay(DISPLAY_MAP);
+    DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
   }
 }
 void DisplayManager::FocusDisplay(std::string display_name) {
@@ -328,51 +317,85 @@ void DisplayManager::FocusDisplay(std::string display_name) {
   }
 }
 /**
+ *
  * @description: 更新图层间的坐标系关系
  * @return {*}
  */
 void DisplayManager::updateCoordinateSystem() {
   // Robot
   {
-    auto scene_pose =
-        transWord2Scene(Eigen::Vector2f(robot_pose_[0], robot_pose_[1]));
-    QPointF pose = QPointF(scene_pose[0], scene_pose[1]);
-    if (!is_move_robot_) {
-      DisplayInstance()->SetDisplayScenePose(DISPLAY_ROBOT, pose);
-    }
-    // 地图0 0点在view 的坐标
-    QPointF map_zero_view_scene_pose =
-        DisplayInstance()->GetDisplay(DISPLAY_MAP)->mapToScene(0, 0);
+
+    // 地图左上角原点在scene的坐标
+    QPointF map_zero_view_scene_pose = DisplayInstance()
+                                           ->GetDisplay(DISPLAY_MAP)
+                                           ->OccPoseToScene(QPointF(0, 0));
+
     // local cost map
-    Eigen::Vector3f local_cost_map_scene_pose = GetMapPoseInScene(
-        Eigen::Vector3f(local_cost_map_pose_.x, local_cost_map_pose_.y, 0));
-    DisplayInstance()->SetDisplayScenePose(
-        DISPLAY_LOCAL_COST_MAP,
-        QPointF(local_cost_map_scene_pose[0],
-                local_cost_map_scene_pose[1] -
-                    local_cost_map_.height() * global_scal_value_));
+    Eigen::Vector3f local_cost_map_scene_pose = wordPose2Scene(
+        Eigen::Vector3f(local_cost_world_pose_.x, local_cost_world_pose_.y, 0));
+    DisplayInstance()
+        ->GetDisplay(DISPLAY_LOCAL_COST_MAP)
+        ->SetOriginPoseInScene(
+            QPointF(local_cost_map_scene_pose[0],
+                    local_cost_map_scene_pose[1] -
+                        local_cost_map_.height() * global_scal_value_));
     // 图层对齐
     for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
-      if (name == DISPLAY_ROBOT || name == DISPLAY_LOCAL_COST_MAP)
-        continue;
-      DisplayInstance()->SetDisplayScenePose(name, map_zero_view_scene_pose);
+      if (display->GetAlignToMap() &&
+          name != DisplayInstance()->GetMainDisplay()) {
+        std::cout << "set align :" << name << std::endl;
+        DisplayInstance()->GetDisplay(name)->SetOriginPoseInScene(
+            map_zero_view_scene_pose);
+      }
     }
   }
 }
 
 /**
- * @description: 世界坐标系点转为QGriaphicsScence的图层坐标系
+ * @description: 世界坐标系点转为全局scene坐标
  * @param {Vector2f&} point 传入的点坐标
  * @return {*}
  */
-Eigen::Vector2f DisplayManager::transWord2Scene(const Eigen::Vector2f &point) {
+Eigen::Vector3f DisplayManager::wordPose2Scene(const Eigen::Vector3f &point) {
+  // xy在栅格地图上的图元坐标
   int x, y;
-  map_data_.xy2scene(point[0], point[1], x, y);
-  QPointF pose = DisplayInstance()->GetDisplay(DISPLAY_MAP)->mapToScene(x, y);
-  Eigen::Vector2f res;
+  map_data_.xy2occPose(point[0], point[1], x, y);
+  // xy在map图层上的坐标
+  QPointF pose =
+      DisplayInstance()->GetDisplay(DISPLAY_MAP)->OccPoseToScene(QPointF(x, y));
+
+  Eigen::Vector3f res;
   res[0] = pose.x();
   res[1] = pose.y();
+  res[2] = point[2];
   return res;
+}
+/**
+ * @description: 世界坐标系点转为以map图层为基准坐标的图元坐标
+ * @param {Vector2f&} point 传入的点坐标
+ * @return {*}
+ */
+QPointF DisplayManager::wordPose2Scene(const QPointF &point) {
+  // xy在栅格地图上的图元坐标
+  int x, y;
+  map_data_.xy2occPose(point.x(), point.y(), x, y);
+  return DisplayInstance()
+      ->GetDisplay(DISPLAY_MAP)
+      ->OccPoseToScene(QPointF(x, y));
+}
+/**
+ * @description: 世界坐标系点转为以map图层为栅格地图坐标系
+ * @param {Vector2f&} point 传入的点坐标
+ * @return {*}
+ */
+Eigen::Vector3f DisplayManager::wordPose2Map(const Eigen::Vector3f &pose) {
+  Eigen::Vector3f ret;
+  int x, y;
+  map_data_.xy2occPose(pose[0], pose[1], x, y);
+  ret[0] = x;
+  ret[1] = y;
+  ret[2] = pose[2];
+  return ret;
 }
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return DisplayInstance()->GetDisplay(name);

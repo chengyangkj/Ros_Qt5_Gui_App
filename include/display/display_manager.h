@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-29 14:21:31
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-27 15:26:59
+ * @LastEditTime: 2023-10-15 09:31:36
  * @FilePath:
  * ////include/display/display_manager.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
@@ -48,7 +48,7 @@ private:
   Eigen::Vector3f robot_pose_scene_;
   OccupancyMap map_data_;
   std::string focus_display_;
-  RobotPose local_cost_map_pose_;
+  RobotPose local_cost_world_pose_;
   CostMap local_cost_map_;
   double global_scal_value_ = 1;
   bool is_move_robot_{false};
@@ -69,7 +69,8 @@ public slots:
   void start2DGoal();
 
 private:
-  Eigen::Vector2f transWord2Scene(const Eigen::Vector2f &point);
+  Eigen::Vector3f wordPose2Scene(const Eigen::Vector3f &point);
+  QPointF wordPose2Scene(const QPointF &point);
   void FocusDisplay(std::string display_name);
   void InitUi();
   std::vector<Eigen::Vector2f>
@@ -83,8 +84,7 @@ public:
   bool UpdateDisplay(const std::string &display_name, const std::any &data);
   void UpdateRobotPose(const Eigen::Vector3f &pose);
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
-  Eigen::Vector3f MapPose2Scene(const Eigen::Vector3f &pose);
-  Eigen::Vector3f GetMapPoseInScene(const Eigen::Vector3f &pose);
+  Eigen::Vector3f wordPose2Map(const Eigen::Vector3f &pose);
   void SetMoveRobot(bool is_move);
   void SetFocusOn(std::string display_name) { focus_display_ = display_name; }
 };

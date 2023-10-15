@@ -2,7 +2,7 @@
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-04-10 15:38:40
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-09-28 14:40:13
+ * @LastEditTime: 2023-10-14 09:55:52
  * @FilePath: /src/display/laser_points.cpp
  * @Description:
  */
@@ -11,7 +11,6 @@ DisplayPath::DisplayPath(const std::string &display_name, const int &z_value)
     : VirtualDisplay(display_name, z_value) {
   // enable_scale_ = false;
 }
-QRectF DisplayPath::boundingRect() const { return bounding_rect_; }
 void DisplayPath::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
@@ -66,5 +65,5 @@ void DisplayPath::computeBoundRect(const Display::PathData &path) {
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  bounding_rect_ = QRectF(xmin, ymin, xmax - xmin, ymax - ymin);
+  SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
 }

@@ -1,8 +1,8 @@
 /*
  * @Author: chengyang chengyangkj@outlook.com
  * @Date: 2023-03-30 15:38:12
- * @LastEditors: chengyang chengyangkj@outlook.com
- * @LastEditTime: 2023-07-26 16:44:24
+ * @LastEditors: chengyangkj chengyangkj@qq.com
+ * @LastEditTime: 2023-10-10 15:23:33
  * @FilePath: ////include/map/occupancy_map.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -30,53 +30,44 @@
 namespace basic {
 
 class OccupancyMap {
- public:
-  double origin_x{0};      // 地图原点x(栅格地图左下角)
-  double origin_y{0};      // 地图原点y(栅格地图左下角)
-  double origin_theta{0};  // 地图原点theta(栅格地图左下角)
-  double resolution{0};    // 地图分辨率
-  Eigen::Vector3d origin_pose{0, 0, 0};  // 地图原点位置(栅格地图左下角)
-  int rows{0};                           // 行(高)
-  int cols{0};                           // 列(宽)
-  Eigen::MatrixXi map_data;  // 地图数据,数据的地图已经被上下翻转
- public:
+public:
+  double origin_x{0};     // 地图原点x(栅格地图左下角)
+  double origin_y{0};     // 地图原点y(栅格地图左下角)
+  double origin_theta{0}; // 地图原点theta(栅格地图左下角)
+  double resolution{0};   // 地图分辨率
+  Eigen::Vector3d origin_pose{0, 0, 0}; // 地图原点位置(栅格地图左下角)
+  int rows{0};                          // 行(高)
+  int cols{0};                          // 列(宽)
+  Eigen::MatrixXi map_data; // 地图数据,数据的地图已经被上下翻转
+public:
   OccupancyMap() {}
   OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res)
-      : rows(rows_),
-        cols(cols_),
-        origin_pose(origin),
-        origin_x(origin[0]),
-        origin_y(origin[1]),
-        origin_theta(origin[2]),
-        resolution(res),
-        map_data(rows_,cols) {
-        }
-      OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
-               Eigen::MatrixXi data )
-      : rows(rows_),
-        cols(cols_),
-        origin_pose(origin),
-        origin_x(origin[0]),
-        origin_y(origin[1]),
-        origin_theta(origin[2]),
-        resolution(res),
-        map_data(data) {
-        }
+      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]),
+        origin_y(origin[1]), origin_theta(origin[2]), resolution(res),
+        map_data(rows_, cols) {}
+  OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
+               Eigen::MatrixXi data)
+      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]),
+        origin_y(origin[1]), origin_theta(origin[2]), resolution(res),
+        map_data(data) {}
   ~OccupancyMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
   Eigen::MatrixXi flip() { return map_data.colwise().reverse(); }
   void SetFlip() { map_data = flip(); }
-  auto& operator()(int r, int c) {
-     return map_data(r, c); }
+  auto &operator()(int r, int c) { return map_data(r, c); }
   // 输入原始栅格地图数据(地图未翻转)
-  void SetMapData(const Eigen::MatrixXi& data) {
+  void SetMapData(const Eigen::MatrixXi &data) {
     map_data = data;
     map_data = flip();
   }
   int Rows() { return rows; }
-  int height() { return rows; }
   int Cols() { return cols; }
+  //宽高地图坐标系下的长度
   int width() { return cols; }
+  int height() { return rows; }
+  //宽map坐标系下的长度
+  int widthMap() { return cols * resolution; }
+  int heightMap() { return rows * resolution; }
   /**
    * @description: 输入栅格地图的行与列号，返回该位置的全局坐标
    * @param {int&} c 列号
@@ -85,7 +76,7 @@ class OccupancyMap {
    * @param {double&} y y坐标
    * @return {*}
    */
-  void idx2xy(const int& c, const int& r, double& x, double& y) {
+  void idx2xy(const int &c, const int &r, double &x, double &y) {
     x = origin_x + c * resolution;
     y = origin_y + r * resolution;
   }
@@ -97,7 +88,7 @@ class OccupancyMap {
    * @param {int&} r 行号
    * @return {*}
    */
-  void xy2idx(const double& x, const double& y, int& c, int& r) {
+  void xy2idx(const double &x, const double &y, int &c, int &r) {
     c = round(x - origin_x) / resolution;
     r = round(y - origin_y) / resolution;
   }
@@ -107,7 +98,7 @@ class OccupancyMap {
    * @param {double&} y
    * @return {*}
    */
-  bool inMap(const double& x, const double& y) {
+  bool inMap(const double &x, const double &y) {
     int c_idx = round((x - origin_x) / resolution);
     int r_idx = round((y - origin_y) / resolution);
     return (c_idx >= 0 && r_idx >= 0 && c_idx < cols && r_idx < rows);
@@ -125,8 +116,8 @@ class OccupancyMap {
    * @description:输入原始(地图图片)图元坐标,返回世界坐标
    * @return {*}
    */
-  void scene2xy(const int& scene_x, const int& scene_y, double& word_x,
-                double& word_y) {
+  void occPose2xy(const int &scene_x, const int &scene_y, double &word_x,
+                  double &word_y) {
     word_x = scene_x * resolution + origin_x;
     word_y = (height() - scene_y) * resolution + origin_y;
   }
@@ -139,13 +130,13 @@ class OccupancyMap {
    * @param {int&} scene_y
    * @return {*}
    */
-  void xy2scene(const double& word_x, const double& word_y, int& scene_x,
-                int& scene_y) {
+  void xy2occPose(const double &word_x, const double &word_y, int &scene_x,
+                  int &scene_y) {
     scene_x = (word_x - origin_x) / resolution;
     scene_y = height() - (word_y - origin_y) / resolution;
   }
 };
 
-}  // namespace basic
+} // namespace basic
 
 #endif
