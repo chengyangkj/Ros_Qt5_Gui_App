@@ -133,12 +133,7 @@ void DisplayManager::slotDisplaySetScaled(std::string display_name,
     }
   }
   global_scal_value_ = value;
-  // std::cout << "scale:" << value << std::endl;
-  // 地图0 0点在view 的坐标
-  // QPointF map_zero_view_scene_pose =
-  //     DisplayInstance()->GetDisplay(DISPLAY_MAP)->mapToScene(0, 0);
-  // DisplayInstance()->SetDisplayScenePose(DISPLAY_TAG,
-  //                                        map_zero_view_scene_pose * value);
+  updateCoordinateSystem();
 }
 bool DisplayManager::SetDisplayConfig(const std::string &config_name,
                                       const std::any &data) {
@@ -343,7 +338,6 @@ void DisplayManager::updateCoordinateSystem() {
     for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
       if (display->GetAlignToMap() &&
           name != DisplayInstance()->GetMainDisplay()) {
-        std::cout << "set align :" << name << std::endl;
         DisplayInstance()->GetDisplay(name)->SetOriginPoseInScene(
             map_zero_view_scene_pose);
       }
