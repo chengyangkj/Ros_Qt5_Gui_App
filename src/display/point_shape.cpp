@@ -46,8 +46,7 @@ void PointShape::drawRobot(QPainter *painter) {
   painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
   painter->save();
   double deg = robot_pose_[2];
-  double real_angle = rad2deg(-deg) + rotate_value_;
-  painter->rotate(real_angle);
+  painter->rotate(rad2deg(-deg) + rotate_value_);
   painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
                       robot_image_);
 

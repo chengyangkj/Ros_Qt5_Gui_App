@@ -125,7 +125,6 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
       angle = -angle;
     rotate_value_ += angle;
 
-    
     // 设置变化矩阵
     // transform_.rotate(rotate_value_);
     // this->setTransform(transform_);

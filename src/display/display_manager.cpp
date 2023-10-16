@@ -141,8 +141,13 @@ void DisplayManager::slotDisplaySetScaled(std::string display_name,
 void DisplayManager::slotDisplaySetRotate(std::string display_name,
                                           double value) {
   // 只响应主图层的事件
-  // if (DisplayInstance()->GetMainDisplay() != display_name)
-  //   return;
+  if (DisplayInstance()->GetMainDisplay() != display_name)
+    return;
+  //重定位
+  if (display_name == DISPLAY_ROBOT) {
+    robot_pose_ = robot_pose_reloc_init_;
+    robot_pose_[2] = robot_pose_reloc_init_[2] - deg2rad(value);
+  }
   // // 其他所有图层scaled
   // for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
   //   if (name != display_name) {
@@ -304,8 +309,8 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
   // 地图图层 更新机器人图元坐标
   robot_pose_scene_ = wordPose2Scene(pose);
 
-  GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_);
   if (!is_move_robot_) {
+    GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_);
     DisplayInstance()->SetDisplayScenePose(
         DISPLAY_ROBOT, QPointF(robot_pose_scene_[0], robot_pose_scene_[1]));
   }
@@ -318,6 +323,7 @@ void DisplayManager::SetMoveRobot(bool is_move) {
   is_move_robot_ = is_move;
   if (is_move) {
     DisplayInstance()->SetMainDisplay(DISPLAY_ROBOT);
+    robot_pose_reloc_init_ = robot_pose_;
   } else {
     DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
   }
