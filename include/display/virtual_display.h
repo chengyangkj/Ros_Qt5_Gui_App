@@ -132,11 +132,13 @@ public:
   OccupancyMap map_data_;
   QPointF rotate_center_;
   bool align_to_map_{true};
+  bool is_rotate_enable_{false};
 signals:
   void displayUpdated(std::string name);
   void displaySetScaled(std::string name, double value);
   void updateCursorPose(std::string display_name, QPointF pose);
   void scenePoseChanged(std::string display_name, QPointF pose);
+  void displaySetRotate(std::string name, double value);
 
 public:
   VirtualDisplay(const std::string &display_name, const int &z_value);
@@ -148,6 +150,10 @@ public:
   }
   VirtualDisplay *SetAlignToMap(const bool &align) {
     align_to_map_ = align;
+    return this;
+  }
+  VirtualDisplay *SetRotateEnable(const bool &enable) {
+    is_rotate_enable_ = enable;
     return this;
   }
 
@@ -164,10 +170,12 @@ public:
       setFlag(ItemAcceptsInputMethod, true);
     }
   }
+  double GetRotate() { return rotate_value_; }
   virtual bool UpdateData(const std::any &data) = 0;
   virtual bool SetDisplayConfig(const std::string &config_name,
                                 const std::any &config_data);
   bool SetScaled(const double &value);
+  bool SetRotate(const double &value);
   void SetBoundingRect(QRectF rect) { bounding_rect_ = rect; }
   QPointF GetOriginPose() { return bounding_rect_.topLeft(); }
   QPointF GetOriginPoseScene() { return mapToScene(GetOriginPose()); }
@@ -178,7 +186,7 @@ public:
   void SetOriginPoseInScene(const QPointF &pose) {
     setPos(pose - GetOriginPose());
   }
-  void SetRotate(qreal RotateAngle, QPointF ptCenter = QPointF(-999, -999));
+
   QRectF boundingRect() const override { return bounding_rect_; }
   std::string GetDisplayName();
   void SetDisplayName(const std::string &display_name);

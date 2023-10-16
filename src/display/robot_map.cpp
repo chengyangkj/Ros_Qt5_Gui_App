@@ -41,9 +41,7 @@ bool RobotMap::UpdateData(const std::any &data) {
   } break;
   }
   //绘制原点在地图中心
-  SetBoundingRect(QRectF(0 - map_image_.width() / 2,
-                         0 - map_image_.height() / 2, map_image_.width(),
-                         map_image_.height()));
+  SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
   update();
   return true;
 }
@@ -86,8 +84,6 @@ void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   //   draw_y = top_left_y;
   // }
   //以图片中心做原点进行绘制(方便旋转)
-  std::cout << "map origin pose: " << GetOriginPose().x() << " "
-            << GetOriginPose().y() << std::endl;
   painter->drawImage(GetOriginPose().x(), GetOriginPose().y(), map_image_);
 }
 void RobotMap::ParseCostMap() {

@@ -18,21 +18,20 @@
 
 #include "virtual_display.h"
 class PointShape : public VirtualDisplay {
- public:
+public:
   enum ePointType { kRobot, kParticle };
   PointShape(const ePointType &type, const std::string &display_name,
              const int &z_value);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
-  void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 
- private:
+private:
   QPixmap robot_image_;
   ePointType type_;
   Eigen::Vector3f robot_pose_;
 
- private:
+private:
   void drawRobot(QPainter *painter);
   void drawParticle(QPainter *painter);
 
@@ -42,4 +41,4 @@ class PointShape : public VirtualDisplay {
   inline double rad2deg(double x) { return 180.0 * x / M_PI; }
 };
 // NOLINTEND
-#endif  // PointShape_H
+#endif // PointShape_H

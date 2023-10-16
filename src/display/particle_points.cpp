@@ -76,5 +76,5 @@ void ParticlePoints::computeBoundRect(
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  SetBoundingRect(QRectF(xmin, ymin, xmax - xmin, ymax - ymin));
+  SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
 }

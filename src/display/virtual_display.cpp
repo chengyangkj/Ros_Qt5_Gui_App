@@ -7,6 +7,7 @@ VirtualDisplay::VirtualDisplay(const std::string &display_name,
   pose_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   goal_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   move_cursor_ = new QCursor(QPixmap("://images/MoveCamera.png"), 0, 0);
+  transform_ = this->transform();
 }
 VirtualDisplay::~VirtualDisplay() {
   if (pose_cursor_ != nullptr) {
@@ -36,6 +37,12 @@ bool VirtualDisplay::SetScaled(const double &value) {
   update();
   emit displaySetScaled(display_name_, value);
   return true;
+}
+bool VirtualDisplay::SetRotate(const double &value) {
+  transform_ = this->transform();
+  transform_.rotate(value);
+  this->setTransform(transform_);
+  update();
 }
 void VirtualDisplay::Update() { update(); }
 std::string VirtualDisplay::GetDisplayName() { return display_name_; }
@@ -87,7 +94,7 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     end_pose_ = event->pos();
   }
   ////////////////////////// 右健旋转
-  if (pressed_button_ == Qt::RightButton) {
+  if (pressed_button_ == Qt::RightButton && is_rotate_enable_) {
     QPointF loacalPos = event->pos();
 
     // 获取并设置为单位向量
@@ -118,27 +125,18 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
       angle = -angle;
     rotate_value_ += angle;
 
+    
     // 设置变化矩阵
-    transform_.rotate(rotate_value_);
-    this->setTransform(transform_);
+    // transform_.rotate(rotate_value_);
+    // this->setTransform(transform_);
+    emit displaySetRotate(display_name_, rotate_value_);
+
     update();
     pressed_pose_ = loacalPos;
   }
 
   emit scenePoseChanged(display_name_, scenePos());
   emit displayUpdated(display_name_);
-}
-void VirtualDisplay::SetRotate(qreal RotateAngle, QPointF ptCenter) {
-  if (ptCenter.x() == -999 && ptCenter.y() == -999) {
-    rotate_center_ = QPointF(bounding_rect_.x() + bounding_rect_.width() / 2,
-                             bounding_rect_.y() + bounding_rect_.height() / 2);
-  } else {
-    rotate_center_ = ptCenter;
-  }
-  rotate_value_ += RotateAngle;
-  // 设置变化矩阵
-
-  setRotation(rotation() + RotateAngle);
 }
 void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
                                        const QPointF &mousePos) {
@@ -171,7 +169,6 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     curr_cursor_ = move_cursor_;
     this->setCursor(*curr_cursor_);
   } else if (event->button() == Qt::RightButton) {
-    rotate_center_ = event->pos();
     is_rotate_event_ = true;
   }
   transform_ = this->transform();

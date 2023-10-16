@@ -63,6 +63,7 @@ public slots:
   void updateScaled(double value);
   void slotDisplayUpdated(std::string display_name);
   void slotDisplaySetScaled(std::string display_name, double value);
+  void slotDisplaySetRotate(std::string display_name, double value);
   void slotUpdateCursorPose(std::string, QPointF);
   void slotDisplayScenePoseChanged(std::string, QPointF);
   void start2DPose();

@@ -35,7 +35,8 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
   (new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3))
       ->SetAlignToMap(false);
   (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7))
-      ->SetAlignToMap(false);
+      ->SetAlignToMap(false)
+      ->SetRotateEnable(true);
   new LaserPoints(DISPLAY_LASER, 2);
   new ParticlePoints(DISPLAY_PARTICLE, 4);
   new Region(DISPLAY_REGION, 3);
@@ -59,6 +60,8 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
     // 图层放大缩小事件
     connect(display, SIGNAL(displaySetScaled(std::string, double)), this,
             SLOT(slotDisplaySetScaled(std::string, double)));
+    connect(display, SIGNAL(displaySetRotate(std::string, double)), this,
+            SLOT(slotDisplaySetRotate(std::string, double)));
     connect(display, SIGNAL(updateCursorPose(std::string, QPointF)), this,
             SLOT(slotUpdateCursorPose(std::string, QPointF)));
   }
@@ -134,6 +137,20 @@ void DisplayManager::slotDisplaySetScaled(std::string display_name,
   }
   global_scal_value_ = value;
   updateCoordinateSystem();
+}
+void DisplayManager::slotDisplaySetRotate(std::string display_name,
+                                          double value) {
+  // 只响应主图层的事件
+  // if (DisplayInstance()->GetMainDisplay() != display_name)
+  //   return;
+  // // 其他所有图层scaled
+  // for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
+  //   if (name != display_name) {
+  //     display->SetScaled(value);
+  //   }
+  // }
+  // global_scal_value_ = value;
+  // updateCoordinateSystem();
 }
 bool DisplayManager::SetDisplayConfig(const std::string &config_name,
                                       const std::any &data) {
