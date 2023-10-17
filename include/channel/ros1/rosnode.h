@@ -4,16 +4,18 @@
 #include "channel/base/virtual_comm_node.h"
 class rosnode : public VirtualCommNode {
   Q_OBJECT
- private:
+private:
   /* data */
- public:
+public:
   rosnode(/* args */);
   ~rosnode() override;
-  void pub2DPose(QPointF start, QPointF end) override;
-  void pub2DGoal(QPointF start, QPointF end) override;
-  void run() override;
 
- private:
+  void run() override;
+public slots:
+  void pub2DPose(Eigen::Vector3f pose) override;
+  void pub2DGoal(Eigen::Vector3f pose) override;
+
+private:
   int init_argc;
   char **init_argv;
 };

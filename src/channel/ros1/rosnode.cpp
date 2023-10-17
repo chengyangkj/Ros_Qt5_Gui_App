@@ -14,5 +14,5 @@ rosnode::rosnode(/* args */) {
 
 rosnode::~rosnode() {}
 void rosnode::run() {}
-void rosnode::pub2DPose(QPointF start, QPointF end) {}
-void rosnode::pub2DGoal(QPointF start, QPointF end) {}
+void rosnode::pub2DPose(Eigen::Vector3f pose) {}
+void rosnode::pub2DGoal(Eigen::Vector3f pose) {}

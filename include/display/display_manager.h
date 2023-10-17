@@ -56,9 +56,9 @@ private:
 signals:
   void cursorPosMap(QPointF);
   void cursorPosScene(QPointF);
-  void robotPoseMap(Eigen::Vector3f pose);
-  void signalPub2DPose(QPointF, QPointF);
-  void signalPub2DGoal(QPointF, QPointF);
+  void DisplayRobotPoseWorld(Eigen::Vector3f pose);
+  void signalPub2DPose(Eigen::Vector3f pose);
+  void signalPub2DGoal(Eigen::Vector3f pose);
 public slots:
   void updateCoordinateSystem();
   void updateScaled(double value);
@@ -67,8 +67,8 @@ public slots:
   void slotDisplaySetRotate(std::string display_name, double value);
   void slotUpdateCursorPose(std::string, QPointF);
   void slotDisplayScenePoseChanged(std::string, QPointF);
-  void start2DPose();
-  void start2DGoal();
+  void start2DPose(const bool &is_start);
+  void start2DGoal(const bool &is_start);
 
 private:
   Eigen::Vector3f wordPose2Scene(const Eigen::Vector3f &point);

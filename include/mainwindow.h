@@ -79,6 +79,7 @@ public slots:
   void updateGlobalCostMap(CostMap map);
   void updateCurpose(QPointF pos);
 
+
 protected:
   virtual void closeEvent(QCloseEvent *event) override;
 
@@ -94,7 +95,6 @@ private:
   ads::CDockWidget *TimelineDockWidget;
   Display::DisplayManager *display_manager_;
   QPushButton *pushButton_status_;
-
   QProgressBar *battery_bar_;
 
   QLabel *label_power_;

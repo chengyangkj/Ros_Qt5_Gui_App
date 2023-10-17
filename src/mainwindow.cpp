@@ -544,15 +544,22 @@ void CMainWindow::setupUi() {
   //    img){
   //        m_roboItem->updateMap(img);
   //    });
-  connect(display_manager_, SIGNAL(signalPub2DPose(QPointF, QPointF)),
-          CommInstance::Instance(), SLOT(pub2DPose(QPointF, QPointF)));
-  connect(display_manager_, SIGNAL(signalPub2DGoal(QPointF, QPointF)),
-          CommInstance::Instance(), SLOT(pub2DGoal(QPointF, QPointF)));
+  connect(display_manager_, SIGNAL(signalPub2DPose(Eigen::Vector3f)),
+          CommInstance::Instance(), SLOT(pub2DPose(Eigen::Vector3f)));
+  connect(display_manager_, SIGNAL(signalPub2DGoal(Eigen::Vector3f)),
+          CommInstance::Instance(), SLOT(pub2DGoal(Eigen::Vector3f)));
   // ui相关
-  connect(set_pos_btn, &QPushButton::clicked,
-          [=]() { display_manager_->start2DPose(); });
+  connect(set_pos_btn, &QPushButton::clicked, [=]() {
+    if (set_pos_btn->text() == "重定位") {
+      display_manager_->start2DPose(true);
+      set_pos_btn->setText("发送定位坐标");
+    } else {
+      display_manager_->start2DPose(false);
+      set_pos_btn->setText("重定位");
+    }
+  });
   connect(set_goal_btn, &QPushButton::clicked,
-          [=]() { display_manager_->start2DGoal(); });
+          [=]() { display_manager_->start2DGoal(true); });
   connect(display_manager_, SIGNAL(cursorPosScene(QPointF)), this,
           SLOT(updateCurpose(QPointF)));
 }
@@ -626,6 +633,7 @@ void CMainWindow::slotUpdateRobotPose(basic::RobotPose pose) {
   display_manager_->UpdateDisplay(DISPLAY_ROBOT,
                                   Display::Pose3f(pose.x, pose.y, pose.theta));
 }
+
 void CMainWindow::updateOdomInfo(RobotState state) {
   // 转向灯
   //   if (state.w > 0.1) {

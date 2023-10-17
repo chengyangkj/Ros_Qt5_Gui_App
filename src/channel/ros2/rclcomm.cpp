@@ -25,9 +25,9 @@ rclcomm::rclcomm() {
   auto sub_laser_obt = rclcpp::SubscriptionOptions();
   sub_laser_obt.callback_group = callback_group_laser;
 
-  _navPosePublisher =
+  navGoalPublisher_ =
       node->create_publisher<geometry_msgs::msg::PoseStamped>("goal_pose", 10);
-  _initPosePublisher =
+  initPosePublisher_ =
       node->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
           "initialpose", 10);
   _publisher =
@@ -300,31 +300,26 @@ void rclcomm::recv_callback(const std_msgs::msg::Int32::SharedPtr msg) {
   emit emitTopicData("i am listen from topic:" +
                      QString::fromStdString(std::to_string(msg->data)));
 }
-void rclcomm::pub2DPose(QPointF start, QPointF end) {
-  auto start_pose = transScenePoint2Word(basic::Point(start.x(), start.y()));
-  auto end_pose = transScenePoint2Word(basic::Point(end.x(), end.y()));
-  double angle = atan2(end_pose.y - start_pose.y, end_pose.x - start_pose.x);
-  geometry_msgs::msg::PoseWithCovarianceStamped pose;
-  pose.header.frame_id = "map";
-  pose.header.stamp = node->get_clock()->now();
-  pose.pose.pose.position.x = start_pose.x;
-  pose.pose.pose.position.y = start_pose.y;
+void rclcomm::pub2DPose(Eigen::Vector3f pose) {
+
+  geometry_msgs::msg::PoseWithCovarianceStamped geo_pose;
+  geo_pose.header.frame_id = "map";
+  geo_pose.header.stamp = node->get_clock()->now();
+  geo_pose.pose.pose.position.x = pose[0];
+  geo_pose.pose.pose.position.y = pose[1];
   tf2::Quaternion q;
-  q.setRPY(0, 0, angle);
-  pose.pose.pose.orientation = tf2::toMsg(q);
-  _initPosePublisher->publish(pose);
+  q.setRPY(0, 0, pose[2]);
+  geo_pose.pose.pose.orientation = tf2::toMsg(q);
+  initPosePublisher_->publish(geo_pose);
 }
-void rclcomm::pub2DGoal(QPointF start, QPointF end) {
-  auto start_pose = transScenePoint2Word(basic::Point(start.x(), start.y()));
-  auto end_pose = transScenePoint2Word(basic::Point(end.x(), end.y()));
-  double angle = atan2(end_pose.y - start_pose.y, end_pose.x - start_pose.x);
-  geometry_msgs::msg::PoseStamped pose;
-  pose.header.frame_id = "map";
-  pose.header.stamp = node->get_clock()->now();
-  pose.pose.position.x = start_pose.x;
-  pose.pose.position.y = start_pose.y;
+void rclcomm::pub2DGoal(Eigen::Vector3f pose) {
+  geometry_msgs::msg::PoseStamped geo_pose;
+  geo_pose.header.frame_id = "map";
+  geo_pose.header.stamp = node->get_clock()->now();
+  geo_pose.pose.position.x = pose[0];
+  geo_pose.pose.position.y = pose[1];
   tf2::Quaternion q;
-  q.setRPY(0, 0, angle);
-  pose.pose.orientation = tf2::toMsg(q);
-  _navPosePublisher->publish(pose);
+  q.setRPY(0, 0, pose[2]);
+  geo_pose.pose.orientation = tf2::toMsg(q);
+  navGoalPublisher_->publish(geo_pose);
 }

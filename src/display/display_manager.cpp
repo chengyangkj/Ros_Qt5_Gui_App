@@ -138,6 +138,7 @@ void DisplayManager::slotDisplaySetScaled(std::string display_name,
   global_scal_value_ = value;
   updateCoordinateSystem();
 }
+//图层旋转事件
 void DisplayManager::slotDisplaySetRotate(std::string display_name,
                                           double value) {
   // 只响应主图层的事件
@@ -304,7 +305,7 @@ DisplayManager::transLaserPoint(const std::vector<Eigen::Vector2f> &point) {
  * @return {*}
  */
 void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
-  emit robotPoseMap(pose);
+  emit DisplayRobotPoseWorld(pose);
   robot_pose_ = pose;
   // 地图图层 更新机器人图元坐标
   robot_pose_scene_ = wordPose2Scene(pose);
@@ -326,6 +327,7 @@ void DisplayManager::SetMoveRobot(bool is_move) {
     robot_pose_reloc_init_ = robot_pose_;
   } else {
     DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
+    emit signalPub2DPose(robot_pose_);
   }
 }
 void DisplayManager::FocusDisplay(std::string display_name) {
@@ -417,7 +419,9 @@ Eigen::Vector3f DisplayManager::wordPose2Map(const Eigen::Vector3f &pose) {
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return DisplayInstance()->GetDisplay(name);
 }
-void DisplayManager::start2DPose() { SetMoveRobot(true); }
-void DisplayManager::start2DGoal() {}
+void DisplayManager::start2DPose(const bool& is_start) {
+  SetMoveRobot(is_start);
+}
+void DisplayManager::start2DGoal(const bool &is_start) {}
 
 } // namespace Display

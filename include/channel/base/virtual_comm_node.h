@@ -46,11 +46,8 @@ signals:
   void emitUpdatePath(RobotPath points);
   void emitUpdateLocalPath(RobotPath points);
   void emitOdomInfo(basic::RobotState state);
-public slots:
-  void slotPub2DPose(QPointF start, QPointF end) { pub2DPose(start, end); }
-  void slotPub2DGoal(QPointF start, QPointF end) { pub2DGoal(start, end); }
 
-public:
-  virtual void pub2DPose(QPointF start, QPointF end) = 0;
-  virtual void pub2DGoal(QPointF start, QPointF end) = 0;
+public slots:
+  virtual void pub2DPose(Eigen::Vector3f pose) = 0;
+  virtual void pub2DGoal(Eigen::Vector3f pose) = 0;
 };

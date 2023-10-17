@@ -46,19 +46,19 @@ private:
   void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
-  
-public:
-  void pub2DPose(QPointF start, QPointF end) override;
-  void pub2DGoal(QPointF start, QPointF end) override;
+
+public slots:
+  void pub2DPose(Eigen::Vector3f pose) override;
+  void pub2DGoal(Eigen::Vector3f pose) override;
   basic::RobotPose getTrasnsform(std::string from, std::string to);
 public slots:
 
 private:
   rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
-      _initPosePublisher;
+      initPosePublisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr
-      _navPosePublisher;
+      navGoalPublisher_;
   rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr _subscription;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr m_map_sub;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
