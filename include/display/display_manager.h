@@ -36,6 +36,7 @@
 #define DISPLAY_PARTICLE "Particle"
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
+#define DISPLAY_GOAL "GoalPose"
 namespace Display {
 class DisplayManager : public QObject {
   Q_OBJECT
@@ -45,6 +46,7 @@ private:
   QGraphicsView *viewer_ptr_;
   std::function<VirtualDisplay::FactoryDisplay *()> DisplayInstance;
   Eigen::Vector3f robot_pose_{0, 0, 0};
+    Eigen::Vector3f robot_pose_goal_{0, 0, 0};
   Eigen::Vector3f robot_pose_scene_;
   Eigen::Vector3f robot_pose_reloc_init_;
   OccupancyMap map_data_;

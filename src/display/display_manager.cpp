@@ -37,6 +37,9 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
   (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7))
       ->SetAlignToMap(false)
       ->SetRotateEnable(true);
+  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8))
+      ->SetAlignToMap(false)
+      ->SetRotateEnable(true);
   new LaserPoints(DISPLAY_LASER, 2);
   new ParticlePoints(DISPLAY_PARTICLE, 4);
   new Region(DISPLAY_REGION, 3);
@@ -112,6 +115,14 @@ void DisplayManager::slotDisplayScenePoseChanged(std::string display_name,
     robot_pose_new[1] = y;
     robot_pose_new[2] = robot_pose_[2];
     UpdateRobotPose(robot_pose_new);
+  } else if (display_name == DISPLAY_GOAL) {
+    // 机器人的图元坐标转世界坐标
+    DisplayInstance()->SetDisplayScenePose(DISPLAY_GOAL, pose);
+    QPointF occ_pose = GetDisplay(DISPLAY_MAP)->mapFromScene(pose);
+    double x, y;
+    map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
+    robot_pose_goal_[0] = x;
+    robot_pose_goal_[1] = y;
   }
 }
 void DisplayManager::slotUpdateCursorPose(std::string name, QPointF pose) {
@@ -148,6 +159,8 @@ void DisplayManager::slotDisplaySetRotate(std::string display_name,
   if (display_name == DISPLAY_ROBOT) {
     robot_pose_ = robot_pose_reloc_init_;
     robot_pose_[2] = robot_pose_reloc_init_[2] - deg2rad(value);
+  } else if (display_name == DISPLAY_GOAL) {
+    robot_pose_goal_[2] = 0 - deg2rad(value);
   }
   // // 其他所有图层scaled
   // for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
@@ -349,7 +362,6 @@ void DisplayManager::updateCoordinateSystem() {
     QPointF map_zero_view_scene_pose = DisplayInstance()
                                            ->GetDisplay(DISPLAY_MAP)
                                            ->OccPoseToScene(QPointF(0, 0));
-
     // local cost map
     Eigen::Vector3f local_cost_map_scene_pose = wordPose2Scene(
         Eigen::Vector3f(local_cost_world_pose_.x, local_cost_world_pose_.y, 0));
@@ -419,9 +431,17 @@ Eigen::Vector3f DisplayManager::wordPose2Map(const Eigen::Vector3f &pose) {
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return DisplayInstance()->GetDisplay(name);
 }
-void DisplayManager::start2DPose(const bool& is_start) {
+void DisplayManager::start2DPose(const bool &is_start) {
   SetMoveRobot(is_start);
 }
-void DisplayManager::start2DGoal(const bool &is_start) {}
+void DisplayManager::start2DGoal(const bool &is_start) {
+  if (is_start) {
+    DisplayInstance()->SetMainDisplay(DISPLAY_GOAL);
+  } else {
+    DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
+    std::cout << "send goal:"<<robot_pose_goal_ << std::endl;
+    emit signalPub2DGoal(robot_pose_goal_);
+  }
+}
 
 } // namespace Display

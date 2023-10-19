@@ -6,7 +6,7 @@ VirtualDisplay::VirtualDisplay(const std::string &display_name,
   this->setZValue(z_value);
   pose_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   goal_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
-  move_cursor_ = new QCursor(QPixmap("://images/MoveCamera.png"), 0, 0);
+  move_cursor_ = new QCursor(QPixmap("://images/cursor_move.png"), 0, 0);
   transform_ = this->transform();
 }
 VirtualDisplay::~VirtualDisplay() {
@@ -55,6 +55,7 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
     QGraphicsItem::wheelEvent(event);
     return;
   }
+  if(!enable_scale_) return;
 
   this->setCursor(Qt::CrossCursor);
   double beforeScaleValue = scale_value_;

@@ -19,7 +19,7 @@
 #include "virtual_display.h"
 class PointShape : public VirtualDisplay {
 public:
-  enum ePointType { kRobot, kParticle };
+  enum ePointType { kRobot, kParticle, kNavGoal };
   PointShape(const ePointType &type, const std::string &display_name,
              const int &z_value);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -33,6 +33,7 @@ private:
 
 private:
   void drawRobot(QPainter *painter);
+  void drawNavGoal(QPainter *painter);
   void drawParticle(QPainter *painter);
 
   // 角度转弧度

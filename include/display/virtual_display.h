@@ -80,9 +80,10 @@ public:
       }
     }
     void RemoveDisplay(const std::string &name) {
-      if (display_map_.count(name) != 0) {
-        delete display_map_[name];
-        display_map_[name] = nullptr;
+      auto iter =display_map_.find(name);
+      if (iter!= display_map_.end()) {
+        delete iter->second;
+        display_map_.erase(iter);
       }
     }
     int GetDisplaySize() { return display_map_.size(); }

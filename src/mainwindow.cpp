@@ -197,7 +197,7 @@ void CMainWindow::setupUi() {
   horizontalLayout_tools->addWidget(set_pos_btn);
 
   QPushButton *set_goal_btn = new QPushButton();
-  set_goal_btn->setText("发布目标点");
+  set_goal_btn->setText("set goal");
   set_goal_btn->setObjectName(QString::fromUtf8(" set_goal_btn"));
   set_goal_btn->setMinimumSize(QSize(0, 25));
   set_goal_btn->setStyleSheet(
@@ -558,8 +558,17 @@ void CMainWindow::setupUi() {
       set_pos_btn->setText("重定位");
     }
   });
-  connect(set_goal_btn, &QPushButton::clicked,
-          [=]() { display_manager_->start2DGoal(true); });
+  connect(set_goal_btn, &QPushButton::clicked, [=]() {
+    if (set_goal_btn->text() == "set goal") {
+      display_manager_->start2DGoal(true);
+      set_goal_btn->setText("send goal");
+    } else {
+      display_manager_->start2DGoal(false);
+      set_goal_btn->setText("set goal");
+    }
+
+    display_manager_->start2DGoal(true);
+  });
   connect(display_manager_, SIGNAL(cursorPosScene(QPointF)), this,
           SLOT(updateCurpose(QPointF)));
 }

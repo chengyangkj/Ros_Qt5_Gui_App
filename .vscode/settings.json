@@ -71,6 +71,9 @@
         "variant": "cpp",
         "core": "cpp",
         "csignal": "cpp",
-        "codecvt": "cpp"
+        "codecvt": "cpp",
+        "strstream": "cpp",
+        "shared_mutex": "cpp",
+        "cfenv": "cpp"
     }
 }

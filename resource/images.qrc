@@ -161,5 +161,8 @@
         <file>background/loding5.gif</file>
         <file>images/dir.png</file>
         <file>images/dir_16.png</file>
+        <file>images/goal_blue.png</file>
+        <file>images/goal_green.png</file>
+        <file>images/goal_red.png</file>
     </qresource>
 </RCC>

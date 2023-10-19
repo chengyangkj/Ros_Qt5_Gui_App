@@ -17,13 +17,29 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
     : VirtualDisplay(display_name, z_value), type_(type) {
   enable_scale_ = false;
   moveBy(0, 0);
-  robot_image_.load("://images/dir.png");
-  QMatrix matrix;
-  matrix.rotate(45);
-  robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);
-  SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
-                         0 - robot_image_.height() / 2, robot_image_.width(),
-                         robot_image_.height()));
+  switch (type_) {
+  case kRobot: {
+    robot_image_.load("://images/dir.png");
+    QMatrix matrix;
+    matrix.rotate(45);
+    robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);
+    SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
+                           0 - robot_image_.height() / 2, robot_image_.width(),
+                           robot_image_.height()));
+  } break;
+  case kParticle: {
+
+  } break;
+  case kNavGoal: {
+    robot_image_.load("://images/goal_green.png");
+    QMatrix matrix;
+    matrix.rotate(90);
+    robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);
+    SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
+                           0 - robot_image_.height() / 2, robot_image_.width(),
+                           robot_image_.height()));
+  } break;
+  }
 }
 bool PointShape::UpdateData(const std::any &data) {
   GetAnyData(Eigen::Vector3f, data, robot_pose_);
@@ -32,12 +48,16 @@ bool PointShape::UpdateData(const std::any &data) {
 void PointShape::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget) {
+
   switch (type_) {
   case kRobot:
     drawRobot(painter);
     break;
   case kParticle:
     drawParticle(painter);
+    break;
+  case kNavGoal:
+    drawNavGoal(painter);
     break;
   }
 }
@@ -50,6 +70,15 @@ void PointShape::drawRobot(QPainter *painter) {
   painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
                       robot_image_);
 
+  painter->restore();
+}
+void PointShape::drawNavGoal(QPainter *painter) {
+  painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
+  painter->save();
+  double deg = robot_pose_[2];
+  painter->rotate(rad2deg(-deg) + rotate_value_);
+  painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
+                      robot_image_);
   painter->restore();
 }
 

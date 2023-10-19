@@ -85,6 +85,7 @@ void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   // }
   //以图片中心做原点进行绘制(方便旋转)
   painter->drawImage(GetOriginPose().x(), GetOriginPose().y(), map_image_);
+  //std::cout << "map painter event" << std::endl;
 }
 void RobotMap::ParseCostMap() {
   Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> cost_map =
