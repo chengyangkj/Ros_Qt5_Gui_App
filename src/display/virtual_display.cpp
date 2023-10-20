@@ -55,7 +55,8 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
     QGraphicsItem::wheelEvent(event);
     return;
   }
-  if(!enable_scale_) return;
+  if (!enable_scale_)
+    return;
 
   this->setCursor(Qt::CrossCursor);
   double beforeScaleValue = scale_value_;
@@ -95,7 +96,7 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     end_pose_ = event->pos();
   }
   ////////////////////////// 右健旋转
-  if (pressed_button_ == Qt::RightButton && is_rotate_enable_) {
+  if (pressed_button_ == Qt::RightButton && enable_rotate_) {
     QPointF loacalPos = event->pos();
 
     // 获取并设置为单位向量

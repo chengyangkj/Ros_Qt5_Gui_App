@@ -80,8 +80,8 @@ public:
       }
     }
     void RemoveDisplay(const std::string &name) {
-      auto iter =display_map_.find(name);
-      if (iter!= display_map_.end()) {
+      auto iter = display_map_.find(name);
+      if (iter != display_map_.end()) {
         delete iter->second;
         display_map_.erase(iter);
       }
@@ -133,7 +133,7 @@ public:
   OccupancyMap map_data_;
   QPointF rotate_center_;
   bool align_to_map_{true};
-  bool is_rotate_enable_{false};
+  bool enable_rotate_{false};
 signals:
   void displayUpdated(std::string name);
   void displaySetScaled(std::string name, double value);
@@ -154,10 +154,13 @@ public:
     return this;
   }
   VirtualDisplay *SetRotateEnable(const bool &enable) {
-    is_rotate_enable_ = enable;
+    enable_rotate_ = enable;
     return this;
   }
-
+  VirtualDisplay *SetScaleEnable(const bool &enable) {
+    enable_scale_ = enable;
+    return this;
+  }
   bool GetAlignToMap() { return align_to_map_; }
   void UpdateMap(OccupancyMap map) { map_data_ = map; }
   // 设置当前图层是否响应鼠标事件

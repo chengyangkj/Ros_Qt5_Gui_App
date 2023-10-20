@@ -38,12 +38,23 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
     SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
                            0 - robot_image_.height() / 2, robot_image_.width(),
                            robot_image_.height()));
+    enable_ = false;
   } break;
   }
 }
 bool PointShape::UpdateData(const std::any &data) {
   GetAnyData(Eigen::Vector3f, data, robot_pose_);
   update();
+}
+bool PointShape::SetDisplayConfig(const std::string &config_name,
+                                  const std::any &config_data) {
+  if (config_name == "Enable") {
+    GetAnyData(bool, config_data, enable_);
+    setEnable(enable_);
+  } else {
+    return false;
+  }
+  return true;
 }
 void PointShape::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
@@ -61,7 +72,15 @@ void PointShape::paint(QPainter *painter,
     break;
   }
 }
-
+void PointShape::setEnable(const bool &enable) {
+  if (enable_) {
+    rotate_value_ = 0;
+    SetRotateEnable(true);
+  } else {
+    SetRotateEnable(false);
+  }
+  update();
+}
 void PointShape::drawRobot(QPainter *painter) {
   painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
   painter->save();
@@ -73,13 +92,16 @@ void PointShape::drawRobot(QPainter *painter) {
   painter->restore();
 }
 void PointShape::drawNavGoal(QPainter *painter) {
-  painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
-  painter->save();
-  double deg = robot_pose_[2];
-  painter->rotate(rad2deg(-deg) + rotate_value_);
-  painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
-                      robot_image_);
-  painter->restore();
+  if (enable_) {
+    painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
+    painter->save();
+    painter->rotate(0 + rotate_value_);
+    painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
+                        robot_image_);
+    painter->restore();
+  } else {
+    painter->eraseRect(bounding_rect_);
+  }
 }
 
 void PointShape::drawParticle(QPainter *painter) {}

@@ -436,10 +436,12 @@ void DisplayManager::start2DPose(const bool &is_start) {
 }
 void DisplayManager::start2DGoal(const bool &is_start) {
   if (is_start) {
+    SetDisplayConfig(DISPLAY_GOAL "/Enable", true);
     DisplayInstance()->SetMainDisplay(DISPLAY_GOAL);
   } else {
+    SetDisplayConfig(DISPLAY_GOAL "/Enable", false);
     DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
-    std::cout << "send goal:"<<robot_pose_goal_ << std::endl;
+    std::cout << "send goal:" << robot_pose_goal_ << std::endl; 
     emit signalPub2DGoal(robot_pose_goal_);
   }
 }

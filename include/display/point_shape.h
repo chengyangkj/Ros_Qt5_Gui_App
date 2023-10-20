@@ -25,17 +25,20 @@ public:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
+  bool SetDisplayConfig(const std::string &config_name,
+                        const std::any &config_data) override;
 
 private:
   QPixmap robot_image_;
   ePointType type_;
   Eigen::Vector3f robot_pose_;
+  bool enable_{true};
 
 private:
   void drawRobot(QPainter *painter);
   void drawNavGoal(QPainter *painter);
   void drawParticle(QPainter *painter);
-
+  void setEnable(const bool& enable);
   // 角度转弧度
   inline double deg2rad(double x) { return M_PI * x / 180.0; }
   // 弧度转角度
