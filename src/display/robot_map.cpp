@@ -10,9 +10,10 @@
 #include <iostream>
 
 #include "display/robot_map.h"
+namespace Display {
 RobotMap::RobotMap(const MapType &type, const std::string &display_name,
-                   const int &z_value)
-    : VirtualDisplay(display_name, z_value), map_type_(type) {
+                   const int &z_value, std::string group_name)
+    : VirtualDisplay(display_name, z_value, group_name), map_type_(type) {
   this->setCursor(*curr_cursor_);
 }
 bool RobotMap::UpdateData(const std::any &data) {
@@ -85,7 +86,7 @@ void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   // }
   //以图片中心做原点进行绘制(方便旋转)
   painter->drawImage(GetOriginPose().x(), GetOriginPose().y(), map_image_);
-  //std::cout << "map painter event" << std::endl;
+  // std::cout << "map painter event" << std::endl;
 }
 void RobotMap::ParseCostMap() {
   Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> cost_map =
@@ -147,3 +148,4 @@ void RobotMap::ParseGridMap() {
   // painter->drawPoints(QPolygonF(points));
 }
 void RobotMap::ParseTrustMap() {}
+} // namespace Display

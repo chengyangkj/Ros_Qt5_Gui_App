@@ -13,118 +13,85 @@
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
 #include "display/display_manager.h"
-
+#include "common/logger/logger.h"
 #include <Eigen/Eigen>
 #include <fstream>
+
 namespace Display {
 
-DisplayManager::DisplayManager(QGraphicsView *viewer)
-    : viewer_ptr_(viewer),
-      DisplayInstance(VirtualDisplay::FactoryDisplay::Instance) {
-  // 初始化场景类
-  scene_ptr_ = new QGraphicsScene();
-  scene_ptr_->clear();
-  // 初始化item
-  viewer_ptr_->setScene(scene_ptr_);
-  viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+DisplayManager::DisplayManager(QGraphicsView *viewer) {
+  FactoryDisplay::Instance()->Init(viewer);
+
   //------------------------------------start display instace (register
   // display)-----------------------------
-  (new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1))
-      ->SetAlignToMap(false);
-  new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_GLOBAL_COST_MAP, 2);
-  (new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3))
-      ->SetAlignToMap(false);
+  (new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1, GROUP_MAP));
+  new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_GLOBAL_COST_MAP, 2,
+               GROUP_MAP);
+  (new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3,
+                GROUP_MAP));
   (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7))
-      ->SetAlignToMap(false)
       ->SetRotateEnable(true);
-  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8))
-      ->SetAlignToMap(false)
-      ->SetRotateEnable(true);
-  new LaserPoints(DISPLAY_LASER, 2);
-  new ParticlePoints(DISPLAY_PARTICLE, 4);
+  new LaserPoints(DISPLAY_LASER, 2, GROUP_MAP);
+  new ParticlePoints(DISPLAY_PARTICLE, 4, GROUP_MAP);
   new Region(DISPLAY_REGION, 3);
   new DisplayTag(DISPLAY_TAG, 4);
-  new DisplayPath(DISPLAY_GLOBAL_PATH, 6);
-  new DisplayPath(DISPLAY_LOCAL_PATH, 6);
+  new DisplayPath(DISPLAY_GLOBAL_PATH, 6, GROUP_MAP);
+  new DisplayPath(DISPLAY_LOCAL_PATH, 6, GROUP_MAP);
+  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8))
+      ->SetRotateEnable(true)
+      ->SetMouseEventEnable(true)
+      ->setVisible(false);
 
+  connect(GetDisplay(DISPLAY_GOAL),
+          SIGNAL(signalPointScenePoseUpdate(Eigen::Vector3f)), this,
+          SLOT(slotUpdateNavGoalScenePose(Eigen::Vector3f)));
   // defalut display config
 
   SetDisplayConfig(DISPLAY_GLOBAL_PATH "/Color", Display::Color(0, 0, 255));
   SetDisplayConfig(DISPLAY_LOCAL_PATH "/Color", Display::Color(0, 255, 0));
 
-  for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
-    scene_ptr_->addItem(display);
-    // //图层更新时间
-    connect(display, SIGNAL(displayUpdated(std::string)), this,
-            SLOT(slotDisplayUpdated(std::string)));
-    // scene 坐标改变事件
-    connect(display, SIGNAL(scenePoseChanged(std::string, QPointF)), this,
-            SLOT(slotDisplayScenePoseChanged(std::string, QPointF)));
-    // 图层放大缩小事件
-    connect(display, SIGNAL(displaySetScaled(std::string, double)), this,
-            SLOT(slotDisplaySetScaled(std::string, double)));
-    connect(display, SIGNAL(displaySetRotate(std::string, double)), this,
-            SLOT(slotDisplaySetRotate(std::string, double)));
-    connect(display, SIGNAL(updateCursorPose(std::string, QPointF)), this,
-            SLOT(slotUpdateCursorPose(std::string, QPointF)));
-  }
+  // connection
+
+  connect(GetDisplay(DISPLAY_ROBOT),
+          SIGNAL(signalPointScenePoseUpdate(Eigen::Vector3f)), this,
+          SLOT(slotUpdateRobotScenePose(Eigen::Vector3f)));
+
   // 设置默认地图图层响应鼠标事件
-  DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
-  std::cout << "display size:" << DisplayInstance()->GetDisplaySize()
-            << std::endl;
+  FactoryDisplay::Instance()->SetEnableMosuleEvent(DISPLAY_MAP);
   InitUi();
 }
-void DisplayManager::InitUi() {
-  // 跟随车体移动的按钮
-  QPushButton *btn_move_focus_ = new QPushButton(viewer_ptr_);
-  btn_move_focus_->resize(32, 32);
-  btn_move_focus_->setStyleSheet(
-      "background-image:url(://images/robot_track_on.png);");
-  btn_move_focus_->setFlat(true);
-}
-DisplayManager::~DisplayManager() {}
-void DisplayManager::slotDisplayUpdated(std::string display_name) {
-  // 不响应主图层的事件
-  if (DisplayInstance()->GetMainDisplay() != display_name)
-    return;
-  // 其他所有图层update
-  for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
-    if (name != display_name) {
-      display->Update();
-    }
-  }
-  updateCoordinateSystem();
-}
-/**
- * @description: 图层在图元坐标系下的坐标改变的事件
- * @return {*}
- */
-void DisplayManager::slotDisplayScenePoseChanged(std::string display_name,
-                                                 QPointF pose) {
-  // 不响应主图层的事件
-  if (DisplayInstance()->GetMainDisplay() != display_name)
-    return;
-  if (display_name == DISPLAY_ROBOT) {
-    // 机器人的图元坐标转世界坐标
-    QPointF map_scene_pose = GetDisplay(DISPLAY_MAP)->mapFromScene(pose);
+void DisplayManager::slotUpdateRobotScenePose(Eigen::Vector3f pose) {
+  if (is_reloc_mode_) {
+    QPointF occ_pose =
+        GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose[0], pose[1]));
     double x, y;
-    map_data_.occPose2xy(map_scene_pose.x(), map_scene_pose.y(), x, y);
+    map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
     Eigen::Vector3f robot_pose_new;
     // 更新坐标
     robot_pose_new[0] = x;
     robot_pose_new[1] = y;
-    robot_pose_new[2] = robot_pose_[2];
+    robot_pose_new[2] = robot_pose_reloc_init_[2] - deg2rad(pose[2]);
+    std::cout << "move robot pose:" << robot_pose_new << std::endl;
     UpdateRobotPose(robot_pose_new);
-  } else if (display_name == DISPLAY_GOAL) {
-    // 机器人的图元坐标转世界坐标
-    DisplayInstance()->SetDisplayScenePose(DISPLAY_GOAL, pose);
-    QPointF occ_pose = GetDisplay(DISPLAY_MAP)->mapFromScene(pose);
-    double x, y;
-    map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
-    robot_pose_goal_[0] = x;
-    robot_pose_goal_[1] = y;
   }
 }
+void DisplayManager::slotUpdateNavGoalScenePose(Eigen::Vector3f pose) {
+  QPointF occ_pose =
+      GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose[0], pose[1]));
+  double x, y;
+  map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
+  robot_pose_goal_[0] = x;
+  robot_pose_goal_[1] = y;
+  robot_pose_goal_[2] = 0 - deg2rad(pose[2]);
+  // FactoryDisplay::Instance()->SetDisplayPoseInParent(
+  //     DISPLAY_GOAL, DISPLAY_MAP,
+  //     Eigen::Vector3f(occ_pose.x(), occ_pose.y(), 0));
+}
+void DisplayManager::InitUi() {
+  // 跟随车体移动的按钮
+}
+DisplayManager::~DisplayManager() {}
+
 void DisplayManager::slotUpdateCursorPose(std::string name, QPointF pose) {
   if (name == DISPLAY_MAP) {
     int scene_x = pose.x();
@@ -134,42 +101,6 @@ void DisplayManager::slotUpdateCursorPose(std::string name, QPointF pose) {
     map_data_.occPose2xy(scene_x, scene_y, x, y);
     emit cursorPosMap(QPointF(x, y));
   }
-}
-void DisplayManager::slotDisplaySetScaled(std::string display_name,
-                                          double value) {
-  // 只响应主图层的事件
-  if (DisplayInstance()->GetMainDisplay() != display_name)
-    return;
-  // 其他所有图层scaled
-  for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
-    if (name != display_name) {
-      display->SetScaled(value);
-    }
-  }
-  global_scal_value_ = value;
-  updateCoordinateSystem();
-}
-//图层旋转事件
-void DisplayManager::slotDisplaySetRotate(std::string display_name,
-                                          double value) {
-  // 只响应主图层的事件
-  if (DisplayInstance()->GetMainDisplay() != display_name)
-    return;
-  //重定位
-  if (display_name == DISPLAY_ROBOT) {
-    robot_pose_ = robot_pose_reloc_init_;
-    robot_pose_[2] = robot_pose_reloc_init_[2] - deg2rad(value);
-  } else if (display_name == DISPLAY_GOAL) {
-    robot_pose_goal_[2] = 0 - deg2rad(value);
-  }
-  // // 其他所有图层scaled
-  // for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
-  //   if (name != display_name) {
-  //     display->SetScaled(value);
-  //   }
-  // }
-  // global_scal_value_ = value;
-  // updateCoordinateSystem();
 }
 bool DisplayManager::SetDisplayConfig(const std::string &config_name,
                                       const std::any &data) {
@@ -189,7 +120,7 @@ bool DisplayManager::SetDisplayConfig(const std::string &config_name,
   if (config_list[1] == "MouseEvent") {
     bool is_response;
     GetAnyData(bool, data, is_response);
-    display->SetResposeMouseEvent(is_response);
+    display->SetEnableMosuleEvent(is_response);
     std::cout << "config:" << config_name << " res:" << is_response
               << std::endl;
   }
@@ -207,12 +138,13 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
     display->UpdateDisplay(data);
     GetAnyData(OccupancyMap, data, map_data_);
     // 所有图层更新地图数据
-    for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
+    for (auto [name, display] :
+         FactoryDisplay::Instance()->GetTotalDisplayMap()) {
       display->UpdateMap(map_data_);
     }
   } else if (display_name == DISPLAY_ROBOT) {
     //重定位时屏蔽位置更新
-    if (!is_move_robot_) {
+    if (!is_reloc_mode_) {
       GetAnyData(Pose3f, data, robot_pose_);
       UpdateRobotPose(robot_pose_);
     }
@@ -274,9 +206,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
     display->UpdateDisplay(region_tans);
   } else if (display_name == DISPLAY_LOCAL_COST_MAP) {
     if (data.type() == typeid(RobotPose)) {
-
       GetAnyData(RobotPose, data, local_cost_world_pose_);
-
     } else if (data.type() == typeid(CostMap)) {
       GetAnyData(CostMap, data, local_cost_map_);
       display->UpdateDisplay(data);
@@ -287,8 +217,6 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
   } else {
     display->UpdateDisplay(data);
   }
-  // FocusDisplay(focus_display_);
-  updateCoordinateSystem();
   return true;
 }
 /**
@@ -323,63 +251,27 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
   // 地图图层 更新机器人图元坐标
   robot_pose_scene_ = wordPose2Scene(pose);
 
-  if (!is_move_robot_) {
+  if (!is_reloc_mode_) {
     GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_);
-    DisplayInstance()->SetDisplayScenePose(
-        DISPLAY_ROBOT, QPointF(robot_pose_scene_[0], robot_pose_scene_[1]));
+    FactoryDisplay::Instance()->SetDisplayPoseInParent(
+        DISPLAY_ROBOT, DISPLAY_MAP, wordPose2Map(pose));
   }
 }
 
 void DisplayManager::updateScaled(double value) {
-  DisplayInstance()->SetDisplayScaled(DISPLAY_LASER, value);
+  FactoryDisplay::Instance()->SetDisplayScaled(DISPLAY_LASER, value);
 }
 void DisplayManager::SetMoveRobot(bool is_move) {
-  is_move_robot_ = is_move;
+  is_reloc_mode_ = is_move;
   if (is_move) {
-    DisplayInstance()->SetMainDisplay(DISPLAY_ROBOT);
     robot_pose_reloc_init_ = robot_pose_;
   } else {
-    DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
     emit signalPub2DPose(robot_pose_);
   }
+  FactoryDisplay::Instance()->SetEnableMosuleEvent(DISPLAY_ROBOT, is_move);
 }
-void DisplayManager::FocusDisplay(std::string display_name) {
-  auto display = GetDisplay(display_name);
-  if (display != nullptr) {
-    viewer_ptr_->centerOn(display);
-  }
-}
-/**
- *
- * @description: 更新图层间的坐标系关系
- * @return {*}
- */
-void DisplayManager::updateCoordinateSystem() {
-  // Robot
-  {
-
-    // 地图左上角原点在scene的坐标
-    QPointF map_zero_view_scene_pose = DisplayInstance()
-                                           ->GetDisplay(DISPLAY_MAP)
-                                           ->OccPoseToScene(QPointF(0, 0));
-    // local cost map
-    Eigen::Vector3f local_cost_map_scene_pose = wordPose2Scene(
-        Eigen::Vector3f(local_cost_world_pose_.x, local_cost_world_pose_.y, 0));
-    DisplayInstance()
-        ->GetDisplay(DISPLAY_LOCAL_COST_MAP)
-        ->SetOriginPoseInScene(
-            QPointF(local_cost_map_scene_pose[0],
-                    local_cost_map_scene_pose[1] -
-                        local_cost_map_.height() * global_scal_value_));
-    // 图层对齐
-    for (auto [name, display] : DisplayInstance()->GetDisplayMap()) {
-      if (display->GetAlignToMap() &&
-          name != DisplayInstance()->GetMainDisplay()) {
-        DisplayInstance()->GetDisplay(name)->SetOriginPoseInScene(
-            map_zero_view_scene_pose);
-      }
-    }
-  }
+void DisplayManager::FocusDisplay(const std::string &display_name) {
+  FactoryDisplay::Instance()->FocusDisplay(display_name);
 }
 
 /**
@@ -392,8 +284,9 @@ Eigen::Vector3f DisplayManager::wordPose2Scene(const Eigen::Vector3f &point) {
   int x, y;
   map_data_.xy2occPose(point[0], point[1], x, y);
   // xy在map图层上的坐标
-  QPointF pose =
-      DisplayInstance()->GetDisplay(DISPLAY_MAP)->OccPoseToScene(QPointF(x, y));
+  QPointF pose = FactoryDisplay::Instance()
+                     ->GetDisplay(DISPLAY_MAP)
+                     ->PoseToScene(QPointF(x, y));
 
   Eigen::Vector3f res;
   res[0] = pose.x();
@@ -410,9 +303,9 @@ QPointF DisplayManager::wordPose2Scene(const QPointF &point) {
   // xy在栅格地图上的图元坐标
   int x, y;
   map_data_.xy2occPose(point.x(), point.y(), x, y);
-  return DisplayInstance()
+  return FactoryDisplay::Instance()
       ->GetDisplay(DISPLAY_MAP)
-      ->OccPoseToScene(QPointF(x, y));
+      ->PoseToScene(QPointF(x, y));
 }
 /**
  * @description: 世界坐标系点转为以map图层为栅格地图坐标系
@@ -428,20 +321,26 @@ Eigen::Vector3f DisplayManager::wordPose2Map(const Eigen::Vector3f &pose) {
   ret[2] = pose[2];
   return ret;
 }
+QPointF DisplayManager::wordPose2Map(const QPointF &pose) {
+  QPointF ret;
+  int x, y;
+  map_data_.xy2occPose(pose.x(), pose.y(), x, y);
+  ret.setX(x);
+  ret.setY(y);
+  return ret;
+}
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
-  return DisplayInstance()->GetDisplay(name);
+  return FactoryDisplay::Instance()->GetDisplay(name);
 }
 void DisplayManager::start2DPose(const bool &is_start) {
   SetMoveRobot(is_start);
 }
 void DisplayManager::start2DGoal(const bool &is_start) {
   if (is_start) {
-    SetDisplayConfig(DISPLAY_GOAL "/Enable", true);
-    DisplayInstance()->SetMainDisplay(DISPLAY_GOAL);
+    GetDisplay(DISPLAY_GOAL)->setPos(wordPose2Map(QPointF(0, 0)));
+    GetDisplay(DISPLAY_GOAL)->setVisible(true);
   } else {
-    SetDisplayConfig(DISPLAY_GOAL "/Enable", false);
-    DisplayInstance()->SetMainDisplay(DISPLAY_MAP);
-    std::cout << "send goal:" << robot_pose_goal_ << std::endl; 
+    GetDisplay(DISPLAY_GOAL)->setVisible(false);
     emit signalPub2DGoal(robot_pose_goal_);
   }
 }

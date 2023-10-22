@@ -16,18 +16,20 @@
 #include <QGraphicsSceneWheelEvent>
 
 #include "virtual_display.h"
+namespace Display {
 class ParticlePoints : public VirtualDisplay {
 private:
   void drawParticle(QPainter *painter, Display::ParticlePointsType particle);
 
 public:
   Display::ParticlePointsType particle_data_;
-  ParticlePoints(const std::string &display_name, const int &z_value);
+  ParticlePoints(const std::string &display_name, const int &z_value,
+                 std::string group_name = "");
   ~ParticlePoints();
   void computeBoundRect(const Display::ParticlePointsType &particle);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
 };
-
+} // namespace Display
 #endif

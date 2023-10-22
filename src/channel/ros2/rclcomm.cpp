@@ -7,6 +7,7 @@
  * @Description: ros2通讯类
  */
 #include "channel/ros2/rclcomm.h"
+#include "common/logger/logger.h"
 #include <fstream>
 rclcomm::rclcomm() {
   int argc = 0;
@@ -98,8 +99,9 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     ret.theta = yaw;
     return ret;
   } catch (tf2::TransformException &ex) {
-    std ::cout << "getTrasnsform error from:" << from << " to:" << to
-               << " error:" << ex.what() << std::endl;
+   
+    LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
+                                            << " error:" << ex.what());
   }
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {

@@ -7,8 +7,10 @@
  * @Description:
  */
 #include "display/display_path.h"
-DisplayPath::DisplayPath(const std::string &display_name, const int &z_value)
-    : VirtualDisplay(display_name, z_value) {
+namespace Display {
+DisplayPath::DisplayPath(const std::string &display_name, const int &z_value,
+                         std::string group_name)
+    : VirtualDisplay(display_name, z_value, group_name) {
   // enable_scale_ = false;
 }
 void DisplayPath::paint(QPainter *painter,
@@ -67,3 +69,4 @@ void DisplayPath::computeBoundRect(const Display::PathData &path) {
   //           << "ymin:" << ymin << std::endl;
   SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
 }
+} // namespace Display

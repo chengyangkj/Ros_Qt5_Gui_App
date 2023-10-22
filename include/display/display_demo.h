@@ -15,6 +15,7 @@
 #include <QGraphicsSceneWheelEvent>
 
 #include "virtual_display.h"
+namespace Display {
 
 class DisplayDemo : public VirtualDisplay {
 private:
@@ -22,9 +23,11 @@ private:
 
 public:
   Display::ParticlePointsType particle_data_;
-  DisplayDemo(const std::string &display_name, const int &z_value);
+  DisplayDemo(const std::string &display_name, const int &z_value,std::string group_name="");
   ~DisplayDemo();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
 };
+
+} // namespace Display

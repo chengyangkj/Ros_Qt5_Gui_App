@@ -1,18 +1,14 @@
-#include "display/factory_display.h"
+#include "display/display_group.h"
 namespace Display {
 
-VirtualDisplay::VirtualDisplay(const std::string &display_name,
-                               const int &z_value,
-                               const std::string &group_name)
-    : display_name_(display_name), group_name_(group_name) {
-  FactoryDisplay::Instance()->AddDisplay(this, group_name);
-  this->setZValue(z_value);
+DisplayGroup::DisplayGroup(const std::string &display_name)
+    : display_name_(display_name) {
   pose_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   goal_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   move_cursor_ = new QCursor(QPixmap("://images/cursor_move.png"), 0, 0);
   transform_ = this->transform();
 }
-VirtualDisplay::~VirtualDisplay() {
+DisplayGroup::~DisplayGroup() {
   if (pose_cursor_ != nullptr) {
     delete pose_cursor_;
     pose_cursor_ = nullptr;
@@ -30,28 +26,28 @@ VirtualDisplay::~VirtualDisplay() {
     curr_cursor_ = nullptr;
   }
 }
-bool VirtualDisplay::SetDisplayConfig(const std::string &config_name,
-                                      const std::any &config_data) {}
-bool VirtualDisplay::SetScaled(const double &value) {
+
+bool DisplayGroup::SetScaled(const double &value) {
   if (!enable_scale_)
     return false;
   scale_value_ = value;
   setScale(value);
   update();
+  emit displaySetScaled(display_name_, value);
   return true;
 }
-bool VirtualDisplay::SetRotate(const double &value) {
+bool DisplayGroup::SetRotate(const double &value) {
   transform_ = this->transform();
   transform_.rotate(value);
   this->setTransform(transform_);
   update();
 }
-void VirtualDisplay::Update() { update(); }
-std::string VirtualDisplay::GetDisplayName() { return display_name_; }
-void VirtualDisplay::SetDisplayName(const std::string &display_name) {
+void DisplayGroup::Update() { update(); }
+std::string DisplayGroup::GetDisplayName() { return display_name_; }
+void DisplayGroup::SetDisplayName(const std::string &display_name) {
   display_name_ = display_name;
 }
-void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
+void DisplayGroup::wheelEvent(QGraphicsSceneWheelEvent *event) {
   if (!enable_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::wheelEvent(event);
@@ -81,8 +77,10 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
            event->pos().y() * beforeScaleValue * 0.1);
   }
   update();
+  emit scenePoseChanged(display_name_, scenePos());
+  emit displayUpdated(display_name_);
 }
-void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void DisplayGroup::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (!enable_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mouseMoveEvent(event);
@@ -130,14 +128,17 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     // 设置变化矩阵
     // transform_.rotate(rotate_value_);
     // this->setTransform(transform_);
+    emit displaySetRotate(display_name_, rotate_value_);
 
     update();
     pressed_pose_ = loacalPos;
   }
 
+  emit scenePoseChanged(display_name_, scenePos());
+  emit displayUpdated(display_name_);
 }
-void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
-                                       const QPointF &mousePos) {
+void DisplayGroup::mouseMoveOnRotate(const QPointF &oldPoint,
+                                     const QPointF &mousePos) {
   // QPointF center = m_rect.center();
   // qreal angle = 0;
   // QLineF line1(mapToScene(center), m_pressMouse);
@@ -152,7 +153,7 @@ void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
   // this->afterSetRotate(angle);
 }
 
-void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+void DisplayGroup::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (!enable_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mousePressEvent(event);
@@ -171,8 +172,10 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   }
   transform_ = this->transform();
   update();
+  emit scenePoseChanged(display_name_, scenePos());
+  emit displayUpdated(display_name_);
 }
-void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+void DisplayGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   if (!enable_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mouseReleaseEvent(event);
@@ -197,13 +200,17 @@ void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
     end_pose_ = QPointF();
   }
   update();
+  emit scenePoseChanged(display_name_, scenePos());
+  emit displayUpdated(display_name_);
 }
-void VirtualDisplay::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+void DisplayGroup::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
   if (!enable_mouse_event_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::hoverMoveEvent(event);
     return;
   }
   update();
+  emit scenePoseChanged(display_name_, scenePos());
+  emit updateCursorPose(display_name_, event->pos());
 }
 } // namespace Display

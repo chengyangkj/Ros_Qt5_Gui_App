@@ -16,6 +16,7 @@
 
 #include "virtual_display.h"
 
+namespace Display {
 class DisplayPath : public VirtualDisplay {
 private:
   QColor color_;
@@ -27,7 +28,8 @@ private:
   void computeBoundRect(const Display::PathData &path);
 
 public:
-  DisplayPath(const std::string &display_name, const int &z_value);
+  DisplayPath(const std::string &display_name, const int &z_value,
+              std::string group_name = "");
   ~DisplayPath();
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data) override;
@@ -35,3 +37,4 @@ public:
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
 };
+} // namespace Display

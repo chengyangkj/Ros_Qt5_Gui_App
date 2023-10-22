@@ -7,8 +7,10 @@
  * @Description:
  */
 #include "display/laser_points.h"
-LaserPoints::LaserPoints(const std::string &display_name, const int &z_value)
-    : VirtualDisplay(display_name, z_value) {}
+namespace Display {
+LaserPoints::LaserPoints(const std::string &display_name, const int &z_value,
+                         std::string group_name)
+    : VirtualDisplay(display_name, z_value, group_name) {}
 void LaserPoints::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
@@ -106,3 +108,4 @@ void LaserPoints::Id2Color(int id, int &R, int &G, int &B) {
   LocationColorJudge(-20, 0x551A8B);
   LocationColorJudge(10, 0x00FF33);
 }
+} // namespace Display

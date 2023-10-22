@@ -7,9 +7,10 @@
  * @Description:
  */
 #include "display/particle_points.h"
+namespace Display {
 ParticlePoints::ParticlePoints(const std::string &display_name,
-                               const int &z_value)
-    : VirtualDisplay(display_name, z_value) {}
+                               const int &z_value, std::string group_name)
+    : VirtualDisplay(display_name, z_value, group_name) {}
 void ParticlePoints::paint(QPainter *painter,
                            const QStyleOptionGraphicsItem *option,
                            QWidget *widget) {
@@ -78,3 +79,4 @@ void ParticlePoints::computeBoundRect(
   //           << "ymin:" << ymin << std::endl;
   SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
 }
+} // namespace Display

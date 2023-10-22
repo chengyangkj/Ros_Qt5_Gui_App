@@ -36,7 +36,7 @@ using namespace basic;
   }
 namespace Display {
 
-class VirtualDisplay : public QObject, public QGraphicsItem {
+class DisplayGroup : public QObject, public QGraphicsItemGroup {
   Q_OBJECT
 
 public:
@@ -59,31 +59,34 @@ public:
   double rotate_value_{0};
   OccupancyMap map_data_;
   QPointF rotate_center_;
+  bool align_to_map_{true};
   bool enable_rotate_{false};
   std::string group_name_;
-  std::pair<std::string, Eigen::Vector3f> parent_transform_pair_ =
-      std::make_pair("", Eigen::Vector3f());
 signals:
+  void displayUpdated(std::string name);
+  void displaySetScaled(std::string name, double value);
   void updateCursorPose(std::string display_name, QPointF pose);
+  void scenePoseChanged(std::string display_name, QPointF pose);
+  void displaySetRotate(std::string name, double value);
 
 public:
-  VirtualDisplay(const std::string &display_name, const int &z_value,
-                 const std::string &group_name);
-  virtual ~VirtualDisplay();
+  DisplayGroup(const std::string &display_name);
+  virtual ~DisplayGroup();
   void mouseMoveOnRotate(const QPointF &oldPoint, const QPointF &mousePos);
-  bool UpdateDisplay(const std::any &data) { return UpdateData(data); }
-  VirtualDisplay *SetRotateEnable(const bool &enable) {
+
+  DisplayGroup *SetAlignToMap(const bool &align) {
+    align_to_map_ = align;
+    return this;
+  }
+  DisplayGroup *SetRotateEnable(const bool &enable) {
     enable_rotate_ = enable;
     return this;
   }
-  VirtualDisplay *SetScaleEnable(const bool &enable) {
+  DisplayGroup *SetScaleEnable(const bool &enable) {
     enable_scale_ = enable;
     return this;
   }
-  VirtualDisplay *SetMouseEventEnable(const bool &enable) {
-    enable_mouse_event_ = enable;
-    return this;
-  }
+  bool GetAlignToMap() { return align_to_map_; }
   void UpdateMap(OccupancyMap map) { map_data_ = map; }
   // 设置当前图层是否响应鼠标事件
   void SetEnableMosuleEvent(const bool &response) {
@@ -94,13 +97,9 @@ public:
       setAcceptedMouseButtons(Qt::AllButtons);
       setAcceptDrops(true);
       setFlag(ItemAcceptsInputMethod, true);
-      setFlag(ItemSendsGeometryChanges, true);
     }
   }
   double GetRotate() { return rotate_value_; }
-  virtual bool UpdateData(const std::any &data) = 0;
-  virtual bool SetDisplayConfig(const std::string &config_name,
-                                const std::any &config_data);
   bool SetScaled(const double &value);
   bool SetRotate(const double &value);
   void SetBoundingRect(QRectF rect) { bounding_rect_ = rect; }
@@ -108,12 +107,6 @@ public:
   QPointF GetOriginPoseScene() { return mapToScene(GetOriginPose()); }
   QPointF PoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
-  }
-  void SetPoseInParent(const std::string &parent, const Eigen::Vector3f &pose) {
-    parent_transform_pair_ = std::make_pair(parent, pose);
-  }
-  std::pair<std::string, Eigen::Vector3f> GetPoseInParent() {
-    return parent_transform_pair_;
   }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {

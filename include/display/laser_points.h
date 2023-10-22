@@ -6,12 +6,14 @@
 #include <QGraphicsSceneWheelEvent>
 
 #include "virtual_display.h"
+namespace Display {
 class LaserPoints : public VirtualDisplay {
 public:
   QColor laser_color_;
   Display::LaserDataMap laser_data_map_;
   Display::LaserDataMap laser_data_scene_;
-  LaserPoints(const std::string &display_name, const int &z_value);
+  LaserPoints(const std::string &display_name, const int &z_value,
+              std::string group_name = "");
   ~LaserPoints();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
@@ -25,5 +27,5 @@ private:
   void computeBoundRect(const Display::LaserDataMap &laser_scan);
   Display::LaserColorMap location_to_color_;
 };
-
+} // namespace Display
 #endif

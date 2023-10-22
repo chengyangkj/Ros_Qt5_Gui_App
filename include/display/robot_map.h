@@ -10,13 +10,14 @@
 #include "basic/map/cost_map.h"
 #include "virtual_display.h"
 #include <Eigen/Dense>
+namespace Display {
 class RobotMap : public VirtualDisplay {
 private:
   /* data */
 public:
   enum MapType { kGridMap, kOccupyMap, kTrustMap, kCostMap };
   RobotMap(const MapType &type, const std::string &display_name,
-           const int &z_value);
+           const int &z_value, std::string group_name = "");
   ~RobotMap() = default;
   bool UpdateData(const std::any &data) override;
   bool SetDisplayConfig(const std::string &config_name,
@@ -40,4 +41,5 @@ private:
   void ParseTrustMap();
   void ParseOccupyMap();
 };
+} // namespace Display
 #endif

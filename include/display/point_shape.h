@@ -17,11 +17,13 @@
 #include <QPainter>
 
 #include "virtual_display.h"
+namespace Display {
 class PointShape : public VirtualDisplay {
+  Q_OBJECT
 public:
   enum ePointType { kRobot, kParticle, kNavGoal };
   PointShape(const ePointType &type, const std::string &display_name,
-             const int &z_value);
+             const int &z_value, std::string group_name = "");
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
@@ -33,16 +35,19 @@ private:
   ePointType type_;
   Eigen::Vector3f robot_pose_;
   bool enable_{true};
+signals:
+  void signalPointScenePoseUpdate(Eigen::Vector3f);
 
 private:
   void drawRobot(QPainter *painter);
   void drawNavGoal(QPainter *painter);
   void drawParticle(QPainter *painter);
-  void setEnable(const bool& enable);
+  void setEnable(const bool &enable);
   // 角度转弧度
   inline double deg2rad(double x) { return M_PI * x / 180.0; }
   // 弧度转角度
   inline double rad2deg(double x) { return 180.0 * x / M_PI; }
 };
 // NOLINTEND
+} // namespace Display
 #endif // PointShape_H

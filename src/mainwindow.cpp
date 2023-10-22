@@ -566,8 +566,6 @@ void CMainWindow::setupUi() {
       display_manager_->start2DGoal(false);
       set_goal_btn->setText("set goal");
     }
-
-    display_manager_->start2DGoal(true);
   });
   connect(display_manager_, SIGNAL(cursorPosScene(QPointF)), this,
           SLOT(updateCurpose(QPointF)));

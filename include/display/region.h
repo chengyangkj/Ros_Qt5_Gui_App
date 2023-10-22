@@ -16,18 +16,18 @@
 #include <QGraphicsSceneWheelEvent>
 
 #include "virtual_display.h"
-
+namespace Display {
 class Region : public VirtualDisplay {
- 
 
- public:
+public:
   Display::RegionDataMap region_data_;
-  Region(const std::string &display_name, const int &z_value);
+  Region(const std::string &display_name, const int &z_value,
+         std::string group_name = "");
   ~Region();
-  void computeBoundRect(Display::RegionDataMap& data_map);
+  void computeBoundRect(Display::RegionDataMap &data_map);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
 };
-
+} // namespace Display
 #endif

@@ -11,11 +11,12 @@
 #include "display/point_shape.h"
 
 #include "QDebug"
-
+namespace Display {
 PointShape::PointShape(const ePointType &type, const std::string &display_name,
-                       const int &z_value)
-    : VirtualDisplay(display_name, z_value), type_(type) {
-  enable_scale_ = false;
+                       const int &z_value, std::string group_name)
+    : VirtualDisplay(display_name, z_value, group_name), type_(type) {
+  SetRotateEnable(true);
+  SetScaleEnable(false);
   moveBy(0, 0);
   switch (type_) {
   case kRobot: {
@@ -38,7 +39,6 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
     SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
                            0 - robot_image_.height() / 2, robot_image_.width(),
                            robot_image_.height()));
-    enable_ = false;
   } break;
   }
 }
@@ -50,7 +50,6 @@ bool PointShape::SetDisplayConfig(const std::string &config_name,
                                   const std::any &config_data) {
   if (config_name == "Enable") {
     GetAnyData(bool, config_data, enable_);
-    setEnable(enable_);
   } else {
     return false;
   }
@@ -71,16 +70,18 @@ void PointShape::paint(QPainter *painter,
     drawNavGoal(painter);
     break;
   }
-}
-void PointShape::setEnable(const bool &enable) {
-  if (enable_) {
-    rotate_value_ = 0;
-    SetRotateEnable(true);
-  } else {
-    SetRotateEnable(false);
+  static QPointF last_scene_pose = scenePos();
+  QPointF diff = last_scene_pose - scenePos();
+  static double last_rotate_value = rotate_value_;
+  if (fabs(diff.x()) >= 1 || fabs(diff.y()) >= 1 ||
+      fabs(last_rotate_value - rotate_value_) >= 1) {
+    last_scene_pose = scenePos();
+    last_rotate_value = rotate_value_;
+    emit signalPointScenePoseUpdate(
+        Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
   }
-  update();
 }
+void PointShape::setEnable(const bool &enable) {}
 void PointShape::drawRobot(QPainter *painter) {
   painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
   painter->save();
@@ -92,17 +93,14 @@ void PointShape::drawRobot(QPainter *painter) {
   painter->restore();
 }
 void PointShape::drawNavGoal(QPainter *painter) {
-  if (enable_) {
-    painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
-    painter->save();
-    painter->rotate(0 + rotate_value_);
-    painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
-                        robot_image_);
-    painter->restore();
-  } else {
-    painter->eraseRect(bounding_rect_);
-  }
+  painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
+  painter->save();
+  painter->rotate(0 + rotate_value_);
+  painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
+                      robot_image_);
+  painter->restore();
 }
 
 void PointShape::drawParticle(QPainter *painter) {}
 // NOLINTEND
+} // namespace Display

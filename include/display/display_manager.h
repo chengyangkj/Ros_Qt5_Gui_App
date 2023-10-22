@@ -20,12 +20,12 @@
 
 #include "display_path.h"
 #include "display_tag.h"
+#include "factory_display.h"
 #include "laser_points.h"
 #include "particle_points.h"
 #include "point_shape.h"
 #include "region.h"
 #include "robot_map.h"
-
 #define DISPLAY_ROBOT "Robot"
 #define DISPLAY_MAP "OccupyMap"
 #define DISPLAY_LOCAL_COST_MAP "CostMap"
@@ -37,14 +37,16 @@
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
 #define DISPLAY_GOAL "GoalPose"
+
+// group
+#define GROUP_MAP "Group_Map"
+
 namespace Display {
 class DisplayManager : public QObject {
   Q_OBJECT
 private:
   std::map<std::string, std::any> display_map_;
-  QGraphicsScene *scene_ptr_;
-  QGraphicsView *viewer_ptr_;
-  std::function<VirtualDisplay::FactoryDisplay *()> DisplayInstance;
+
   Eigen::Vector3f robot_pose_{0, 0, 0};
   Eigen::Vector3f robot_pose_goal_{0, 0, 0};
   Eigen::Vector3f robot_pose_scene_;
@@ -54,7 +56,7 @@ private:
   RobotPose local_cost_world_pose_;
   CostMap local_cost_map_;
   double global_scal_value_ = 1;
-  bool is_move_robot_{false};
+  bool is_reloc_mode_{false};
 signals:
   void cursorPosMap(QPointF);
   void cursorPosScene(QPointF);
@@ -62,20 +64,18 @@ signals:
   void signalPub2DPose(Eigen::Vector3f pose);
   void signalPub2DGoal(Eigen::Vector3f pose);
 public slots:
-  void updateCoordinateSystem();
   void updateScaled(double value);
-  void slotDisplayUpdated(std::string display_name);
-  void slotDisplaySetScaled(std::string display_name, double value);
-  void slotDisplaySetRotate(std::string display_name, double value);
   void slotUpdateCursorPose(std::string, QPointF);
-  void slotDisplayScenePoseChanged(std::string, QPointF);
   void start2DPose(const bool &is_start);
   void start2DGoal(const bool &is_start);
+  void slotUpdateRobotScenePose(Eigen::Vector3f);
+  void slotUpdateNavGoalScenePose(Eigen::Vector3f);
 
 private:
   Eigen::Vector3f wordPose2Scene(const Eigen::Vector3f &point);
   QPointF wordPose2Scene(const QPointF &point);
-  void FocusDisplay(std::string display_name);
+  QPointF wordPose2Map(const QPointF &pose);
+  void FocusDisplay(const std::string &display_name);
   void InitUi();
   std::vector<Eigen::Vector2f>
   transLaserPoint(const std::vector<Eigen::Vector2f> &point);
@@ -90,7 +90,9 @@ public:
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
   Eigen::Vector3f wordPose2Map(const Eigen::Vector3f &pose);
   void SetMoveRobot(bool is_move);
-  void SetFocusOn(std::string display_name) { focus_display_ = display_name; }
+  void SetFocusOn(const std::string &display_name) {
+    focus_display_ = display_name;
+  }
 };
 
 } // namespace Display

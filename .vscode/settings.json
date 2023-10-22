@@ -74,6 +74,9 @@
         "codecvt": "cpp",
         "strstream": "cpp",
         "shared_mutex": "cpp",
-        "cfenv": "cpp"
-    }
+        "cfenv": "cpp",
+        "qgraphicsscenewheelevent": "cpp",
+        "qgraphicsview": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

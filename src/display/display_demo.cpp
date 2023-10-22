@@ -7,8 +7,10 @@
  * @Description:
  */
 #include "display/display_demo.h"
-DisplayDemo::DisplayDemo(const std::string &display_name, const int &z_value)
-    : VirtualDisplay(display_name, z_value) {}
+namespace Display {
+DisplayDemo::DisplayDemo(const std::string &display_name, const int &z_value,
+                         std::string group_name)
+    : VirtualDisplay(display_name, z_value, group_name) {}
 void DisplayDemo::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
@@ -25,3 +27,4 @@ bool DisplayDemo::UpdateData(const std::any &data) {
   }
 }
 void DisplayDemo::drawFrame(QPainter *painter) {}
+} // namespace Display
