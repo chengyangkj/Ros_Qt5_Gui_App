@@ -8,7 +8,7 @@ set(QT_VERSION_MAJOR 5)
 #############子构建项目
 #dockWidget
 set(VERSION_SHORT "0.0.1")
-add_subdirectory(dockWidget)
+add_subdirectory(3rdpart/dockWidget)
 ##################################1,编译平台设置:自动检查编译平台是ROS1还是ROS2#######################
 if(DEFINED ENV{ROS_VERSION} AND "$ENV{ROS_VERSION}" STREQUAL "1")
     message("USE ROS1")
