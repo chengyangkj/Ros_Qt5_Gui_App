@@ -9,8 +9,8 @@
 #include "display/display_demo.h"
 namespace Display {
 DisplayDemo::DisplayDemo(const std::string &display_name, const int &z_value,
-                         std::string group_name)
-    : VirtualDisplay(display_name, z_value, group_name) {}
+                         std::string parent_name)
+    : VirtualDisplay(display_name, z_value, parent_name) {}
 void DisplayDemo::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {

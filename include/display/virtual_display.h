@@ -60,7 +60,7 @@ public:
   OccupancyMap map_data_;
   QPointF rotate_center_;
   bool enable_rotate_{false};
-  std::string group_name_;
+  std::string parent_name_;
   std::pair<std::string, Eigen::Vector3f> parent_transform_pair_ =
       std::make_pair("", Eigen::Vector3f());
 signals:
@@ -68,7 +68,7 @@ signals:
 
 public:
   VirtualDisplay(const std::string &display_name, const int &z_value,
-                 const std::string &group_name);
+                 const std::string &parent_name);
   virtual ~VirtualDisplay();
   void mouseMoveOnRotate(const QPointF &oldPoint, const QPointF &mousePos);
   bool UpdateDisplay(const std::any &data) { return UpdateData(data); }

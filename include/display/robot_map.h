@@ -17,7 +17,7 @@ private:
 public:
   enum MapType { kGridMap, kOccupyMap, kTrustMap, kCostMap };
   RobotMap(const MapType &type, const std::string &display_name,
-           const int &z_value, std::string group_name = "");
+           const int &z_value, std::string parent_name = "");
   ~RobotMap() = default;
   bool UpdateData(const std::any &data) override;
   bool SetDisplayConfig(const std::string &config_name,

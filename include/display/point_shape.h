@@ -23,7 +23,7 @@ class PointShape : public VirtualDisplay {
 public:
   enum ePointType { kRobot, kParticle, kNavGoal };
   PointShape(const ePointType &type, const std::string &display_name,
-             const int &z_value, std::string group_name = "");
+             const int &z_value, std::string parent_name = "");
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;

@@ -24,7 +24,7 @@ private:
 public:
   Display::ParticlePointsType particle_data_;
   ParticlePoints(const std::string &display_name, const int &z_value,
-                 std::string group_name = "");
+                 std::string parent_name = "");
   ~ParticlePoints();
   void computeBoundRect(const Display::ParticlePointsType &particle);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

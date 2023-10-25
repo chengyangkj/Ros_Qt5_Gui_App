@@ -3,14 +3,15 @@ namespace Display {
 
 VirtualDisplay::VirtualDisplay(const std::string &display_name,
                                const int &z_value,
-                               const std::string &group_name)
-    : display_name_(display_name), group_name_(group_name) {
-  FactoryDisplay::Instance()->AddDisplay(this, group_name);
+                               const std::string &parent_name)
+    : display_name_(display_name), parent_name_(parent_name) {
+  FactoryDisplay::Instance()->AddDisplay(this, parent_name);
   this->setZValue(z_value);
   pose_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   goal_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   move_cursor_ = new QCursor(QPixmap("://images/cursor_move.png"), 0, 0);
   transform_ = this->transform();
+  SetEnableMosuleEvent(true);
 }
 VirtualDisplay::~VirtualDisplay() {
   if (pose_cursor_ != nullptr) {
@@ -134,7 +135,6 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     update();
     pressed_pose_ = loacalPos;
   }
-
 }
 void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
                                        const QPointF &mousePos) {

@@ -14,7 +14,7 @@ public:
   Display::TagDataMap tag_data_;
   QPixmap tag_image_;
   DisplayTag(const std::string &display_name, const int &z_value,
-             std::string group_name = "");
+             std::string parent_name = "");
   ~DisplayTag();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;

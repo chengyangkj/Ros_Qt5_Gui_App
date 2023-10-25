@@ -12,8 +12,8 @@
 #include "display/robot_map.h"
 namespace Display {
 RobotMap::RobotMap(const MapType &type, const std::string &display_name,
-                   const int &z_value, std::string group_name)
-    : VirtualDisplay(display_name, z_value, group_name), map_type_(type) {
+                   const int &z_value, std::string parent_name)
+    : VirtualDisplay(display_name, z_value, parent_name), map_type_(type) {
   this->setCursor(*curr_cursor_);
 }
 bool RobotMap::UpdateData(const std::any &data) {

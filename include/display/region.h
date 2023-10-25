@@ -22,7 +22,7 @@ class Region : public VirtualDisplay {
 public:
   Display::RegionDataMap region_data_;
   Region(const std::string &display_name, const int &z_value,
-         std::string group_name = "");
+         std::string parent_name = "");
   ~Region();
   void computeBoundRect(Display::RegionDataMap &data_map);
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

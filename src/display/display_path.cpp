@@ -9,8 +9,8 @@
 #include "display/display_path.h"
 namespace Display {
 DisplayPath::DisplayPath(const std::string &display_name, const int &z_value,
-                         std::string group_name)
-    : VirtualDisplay(display_name, z_value, group_name) {
+                         std::string parent_name)
+    : VirtualDisplay(display_name, z_value, parent_name) {
   // enable_scale_ = false;
 }
 void DisplayPath::paint(QPainter *painter,

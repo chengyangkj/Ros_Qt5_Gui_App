@@ -29,7 +29,7 @@ private:
 
 public:
   DisplayPath(const std::string &display_name, const int &z_value,
-              std::string group_name = "");
+              std::string parent_name = "");
   ~DisplayPath();
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data) override;

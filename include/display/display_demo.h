@@ -23,7 +23,8 @@ private:
 
 public:
   Display::ParticlePointsType particle_data_;
-  DisplayDemo(const std::string &display_name, const int &z_value,std::string group_name="");
+  DisplayDemo(const std::string &display_name, const int &z_value,
+              std::string parent_name = "");
   ~DisplayDemo();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;

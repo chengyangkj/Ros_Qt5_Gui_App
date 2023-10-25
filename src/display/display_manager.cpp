@@ -24,20 +24,22 @@ DisplayManager::DisplayManager(QGraphicsView *viewer) {
 
   //------------------------------------start display instace (register
   // display)-----------------------------
-  (new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1, GROUP_MAP));
+  (new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1));
   new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_GLOBAL_COST_MAP, 2,
-               GROUP_MAP);
+               DISPLAY_MAP);
   (new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3,
-                GROUP_MAP));
-  (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7))
+                DISPLAY_MAP));
+  (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7,
+                  DISPLAY_MAP))
       ->SetRotateEnable(true);
-  new LaserPoints(DISPLAY_LASER, 2, GROUP_MAP);
-  new ParticlePoints(DISPLAY_PARTICLE, 4, GROUP_MAP);
+  new LaserPoints(DISPLAY_LASER, 2, DISPLAY_MAP);
+  new ParticlePoints(DISPLAY_PARTICLE, 4, DISPLAY_MAP);
   new Region(DISPLAY_REGION, 3);
   new DisplayTag(DISPLAY_TAG, 4);
-  new DisplayPath(DISPLAY_GLOBAL_PATH, 6, GROUP_MAP);
-  new DisplayPath(DISPLAY_LOCAL_PATH, 6, GROUP_MAP);
-  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8))
+  new DisplayPath(DISPLAY_GLOBAL_PATH, 6, DISPLAY_MAP);
+  new DisplayPath(DISPLAY_LOCAL_PATH, 6, DISPLAY_MAP);
+  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8,
+                  DISPLAY_MAP))
       ->SetRotateEnable(true)
       ->SetMouseEventEnable(true)
       ->setVisible(false);
@@ -71,7 +73,6 @@ void DisplayManager::slotUpdateRobotScenePose(Eigen::Vector3f pose) {
     robot_pose_new[0] = x;
     robot_pose_new[1] = y;
     robot_pose_new[2] = robot_pose_reloc_init_[2] - deg2rad(pose[2]);
-    std::cout << "move robot pose:" << robot_pose_new << std::endl;
     UpdateRobotPose(robot_pose_new);
   }
 }
@@ -213,7 +214,11 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
     } else {
       display->UpdateDisplay(data);
     }
-
+    FactoryDisplay::Instance()->SetDisplayPoseInParent(
+        DISPLAY_LOCAL_COST_MAP,
+        wordPose2Map(Eigen::Vector3f(local_cost_world_pose_.x,
+                                     local_cost_world_pose_.y,
+                                     local_cost_world_pose_.theta)));
   } else {
     display->UpdateDisplay(data);
   }
@@ -253,8 +258,8 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
 
   if (!is_reloc_mode_) {
     GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_);
-    FactoryDisplay::Instance()->SetDisplayPoseInParent(
-        DISPLAY_ROBOT, DISPLAY_MAP, wordPose2Map(pose));
+    FactoryDisplay::Instance()->SetDisplayPoseInParent(DISPLAY_ROBOT,
+                                                       wordPose2Map(pose));
   }
 }
 

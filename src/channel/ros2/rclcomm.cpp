@@ -99,9 +99,9 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     ret.theta = yaw;
     return ret;
   } catch (tf2::TransformException &ex) {
-   
+
     LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
-                                            << " error:" << ex.what());
+                                             << " error:" << ex.what());
   }
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -268,12 +268,8 @@ void rclcomm::localCostMapCallback(
 
     basic::RobotPose localCostmapPose;
     localCostmapPose.x = pose_map_frame.pose.position.x;
-    localCostmapPose.y = pose_map_frame.pose.position.y;
+    localCostmapPose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
     localCostmapPose.theta = yaw;
-    //      std::cout<<"odomInMapPose:"<<pose_map_frame.pose.position.x<<"
-    //      "<<pose_map_frame.pose.position.y<<" curr:"<<m_currPose.x<<"
-    //      "<<m_currPose.y<<std::endl; std::cout<<"origin x:"<<origin_x<<"
-    //      y:"<<origin_y<<" theta:"<<origin_theta<<std::endl;
     emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
   } catch (tf2::TransformException &ex) {
     qDebug() << "local cost map pose transform error:" << ex.what();

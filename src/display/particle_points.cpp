@@ -9,8 +9,8 @@
 #include "display/particle_points.h"
 namespace Display {
 ParticlePoints::ParticlePoints(const std::string &display_name,
-                               const int &z_value, std::string group_name)
-    : VirtualDisplay(display_name, z_value, group_name) {}
+                               const int &z_value, std::string parent_name)
+    : VirtualDisplay(display_name, z_value, parent_name) {}
 void ParticlePoints::paint(QPainter *painter,
                            const QStyleOptionGraphicsItem *option,
                            QWidget *widget) {

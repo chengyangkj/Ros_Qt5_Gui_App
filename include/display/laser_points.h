@@ -13,7 +13,7 @@ public:
   Display::LaserDataMap laser_data_map_;
   Display::LaserDataMap laser_data_scene_;
   LaserPoints(const std::string &display_name, const int &z_value,
-              std::string group_name = "");
+              std::string parent_name = "");
   ~LaserPoints();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
