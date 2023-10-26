@@ -9,45 +9,34 @@
 #include <algorithm>
 #include <iostream>
 
-#include "display/robot_map.h"
+#include "display/display_occ_map.h"
 namespace Display {
-RobotMap::RobotMap(const MapType &type, const std::string &display_name,
-                   const int &z_value, std::string parent_name)
-    : VirtualDisplay(display_name, z_value, parent_name), map_type_(type) {
+DisplayOccMap::DisplayOccMap(const std::string &display_name,
+                             const int &z_value, std::string parent_name)
+    : VirtualDisplay(display_name, z_value, parent_name) {
   this->setCursor(*curr_cursor_);
+  SetEnableMosuleEvent(true);
 }
-bool RobotMap::UpdateData(const std::any &data) {
+bool DisplayOccMap::UpdateData(const std::any &data) {
   try {
-    if (data.type() == typeid(OccupancyMap))
+    if (data.type() == typeid(OccupancyMap)) {
       map_data_ = std::any_cast<OccupancyMap>(data);
-    if (data.type() == typeid(CostMap))
-      cost_map_data_ = std::any_cast<CostMap>(data);
+      std::cout << "recv occ map" << std::endl;
+    }
+
   } catch (const std::bad_any_cast &e) {
     std::cout << e.what() << '\n';
     return false;
   }
 
-  switch (map_type_) {
-  case kGridMap: {
-    ParseGridMap();
-  } break;
-  case kOccupyMap: {
-    ParseOccupyMap();
-  } break;
-  case kTrustMap: {
-    ParseTrustMap();
-  } break;
-  case kCostMap: {
-    ParseCostMap();
-  } break;
-  }
+  ParseOccupyMap();
   //绘制原点在地图中心
   SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
   update();
   return true;
 }
-bool RobotMap::SetDisplayConfig(const std::string &config_name,
-                                const std::any &config_data) {
+bool DisplayOccMap::SetDisplayConfig(const std::string &config_name,
+                                     const std::any &config_data) {
   if (config_name == "SubMapValue") {
     GetAnyData(double, config_data, sub_map_value_);
   } else if (config_name == "RobotPose") {
@@ -59,8 +48,9 @@ bool RobotMap::SetDisplayConfig(const std::string &config_name,
   update();
   return true;
 }
-void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget) {
+void DisplayOccMap::paint(QPainter *painter,
+                          const QStyleOptionGraphicsItem *option,
+                          QWidget *widget) {
   // //按照比例裁减地图
   // if (sub_map_value_ != 1) {
   //   //以机器人为中心按比例进行裁剪
@@ -88,22 +78,7 @@ void RobotMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
   painter->drawImage(GetOriginPose().x(), GetOriginPose().y(), map_image_);
   // std::cout << "map painter event" << std::endl;
 }
-void RobotMap::ParseCostMap() {
-  Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> cost_map =
-      cost_map_data_.GetColorMapData();
-  map_image_ = QImage(cost_map_data_.Cols(), cost_map_data_.Rows(),
-                      QImage::Format_ARGB32);
-  for (int i = 0; i < cost_map.cols(); i++)
-    for (int j = 0; j < cost_map.rows(); j++) {
-
-      Eigen::Vector4i color_data = cost_map(j, i);
-      QColor color;
-      color.setRgb(color_data[0], color_data[1], color_data[2]);
-      color.setAlpha(color_data[3]);
-      map_image_.setPixelColor(i, j, color);
-    }
-}
-void RobotMap::ParseOccupyMap() {
+void DisplayOccMap::ParseOccupyMap() {
   // Eigen::matrix 坐标系与QImage坐标系不同,这里行列反着遍历
   map_image_ = QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_RGB32);
   QVector<QPointF> points;
@@ -122,30 +97,5 @@ void RobotMap::ParseOccupyMap() {
       map_image_.setPixel(i, j, qRgb(color.red(), color.green(), color.blue()));
     }
 }
-void RobotMap::ParseGridMap() {
-  // QImage map_image(map_data_.rows(), map_data_.cols(), QImage::Format_RGB32);
-  // QVector<QPointF> points;
-  // for (int i = 0; i < map_data_.rows(); i++)
-  //   for (int j = 0; j < map_data_.cols(); j++) {
-  //     double map_value = map_data_(i, j);
 
-  //     QColor color;
-  //     if (map_value > 100) {
-  //       color = Qt::black;  // black
-  //       points.push_back(QPointF(i, j));
-  //       // std::cout << "map value:" << map_value << std::endl;
-  //     } else if (map_value < 0) {
-  //       color = Qt::gray;  // gray
-  //     } else {
-  //       color = Qt::white;  // white
-  //     }
-  //     // map_image.setPixel(i, j, qRgb(color.red(), color.green(),
-  //     // color.blue()));
-  //   }
-  // std::cout << " map_data_.rows():" << map_data_.rows()
-  //           << " cols:" << map_data_.cols() << std::endl;
-  // painter->setPen(QPen(QColor(0, 255, 0), 1));
-  // painter->drawPoints(QPolygonF(points));
-}
-void RobotMap::ParseTrustMap() {}
 } // namespace Display

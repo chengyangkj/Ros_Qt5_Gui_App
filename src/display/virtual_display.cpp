@@ -11,7 +11,6 @@ VirtualDisplay::VirtualDisplay(const std::string &display_name,
   goal_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   move_cursor_ = new QCursor(QPixmap("://images/cursor_move.png"), 0, 0);
   transform_ = this->transform();
-  SetEnableMosuleEvent(true);
 }
 VirtualDisplay::~VirtualDisplay() {
   if (pose_cursor_ != nullptr) {
@@ -135,21 +134,6 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     update();
     pressed_pose_ = loacalPos;
   }
-}
-void VirtualDisplay::mouseMoveOnRotate(const QPointF &oldPoint,
-                                       const QPointF &mousePos) {
-  // QPointF center = m_rect.center();
-  // qreal angle = 0;
-  // QLineF line1(mapToScene(center), m_pressMouse);
-  // QLineF line2(mapToScene(center), newPoint);
-  // angle = line2.angleTo(line1);
-
-  // QTransform ts;
-  // ts.translate(center.x(), center.y());
-  // ts.rotate(angle);
-  // ts.translate(-center.x(), -center.y());
-  // this->setTransform(ts);
-  // this->afterSetRotate(angle);
 }
 
 void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {

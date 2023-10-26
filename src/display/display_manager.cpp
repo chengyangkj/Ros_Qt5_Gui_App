@@ -24,11 +24,10 @@ DisplayManager::DisplayManager(QGraphicsView *viewer) {
 
   //------------------------------------start display instace (register
   // display)-----------------------------
-  (new RobotMap(RobotMap::MapType::kOccupyMap, DISPLAY_MAP, 1));
-  new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_GLOBAL_COST_MAP, 2,
-               DISPLAY_MAP);
-  (new RobotMap(RobotMap::MapType::kCostMap, DISPLAY_LOCAL_COST_MAP, 3,
-                DISPLAY_MAP));
+  (new DisplayOccMap(DISPLAY_MAP, 1));
+  (new DisplayCostMap(DISPLAY_GLOBAL_COST_MAP, 2, DISPLAY_MAP));
+
+  (new DisplayCostMap(DISPLAY_LOCAL_COST_MAP, 3, DISPLAY_MAP));
   (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7,
                   DISPLAY_MAP))
       ->SetRotateEnable(true);

@@ -61,8 +61,7 @@ public:
   QPointF rotate_center_;
   bool enable_rotate_{false};
   std::string parent_name_;
-  std::pair<std::string, Eigen::Vector3f> parent_transform_pair_ =
-      std::make_pair("", Eigen::Vector3f());
+  Eigen::Vector3f pose_in_parent_{0, 0, 0};
 signals:
   void updateCursorPose(std::string display_name, QPointF pose);
 
@@ -70,7 +69,6 @@ public:
   VirtualDisplay(const std::string &display_name, const int &z_value,
                  const std::string &parent_name);
   virtual ~VirtualDisplay();
-  void mouseMoveOnRotate(const QPointF &oldPoint, const QPointF &mousePos);
   bool UpdateDisplay(const std::any &data) { return UpdateData(data); }
   VirtualDisplay *SetRotateEnable(const bool &enable) {
     enable_rotate_ = enable;
@@ -109,12 +107,8 @@ public:
   QPointF PoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
   }
-  void SetPoseInParent(const std::string &parent, const Eigen::Vector3f &pose) {
-    parent_transform_pair_ = std::make_pair(parent, pose);
-  }
-  std::pair<std::string, Eigen::Vector3f> GetPoseInParent() {
-    return parent_transform_pair_;
-  }
+  void SetPoseInParent(const Eigen::Vector3f &pose) { pose_in_parent_ = pose; }
+  Eigen::Vector3f GetPoseInParent() { return pose_in_parent_; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {
     setPos(pose - GetOriginPose());
@@ -124,6 +118,8 @@ public:
   std::string GetDisplayName();
   void SetDisplayName(const std::string &display_name);
   void Update();
+
+private:
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;

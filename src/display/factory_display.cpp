@@ -1,4 +1,4 @@
-#pragma once
+
 #include "display/factory_display.h"
 #include "common/logger/logger.h"
 namespace Display {
@@ -43,7 +43,7 @@ bool FactoryDisplay::SetDisplayPoseInParent(const std::string &display_name,
   VirtualDisplay *display = GetDisplay(display_name);
   if (display == nullptr)
     return false;
-  display->setPos(QPointF(pose[0], pose[1]));
+  display->SetPoseInParent(pose);
   return true;
 }
 // 设置图层放大缩小
@@ -105,22 +105,9 @@ bool FactoryDisplay::SetEnableMosuleEvent(const std::string &display_name,
  * @return {*}
  */
 void FactoryDisplay::updateCoordinateSystem() {
-  // for (auto &[name, display] : total_display_map_) {
-  //   auto trans_pair = display->GetPoseInParent();
-  //   std::string &parent_name = trans_pair.first;
-  //   Eigen::Vector3f &pose_in_parent = trans_pair.second;
-  //   if (!trans_pair.first.empty()) {
-  //     auto parent_ptr = GetDisplay(parent_name);
-  //     if (parent_ptr != nullptr) {
-  //       QPointF pose_in_scene = parent_ptr->PoseToScene(
-  //           QPointF(pose_in_parent[0], pose_in_parent[1]));
-  //       display->setPos(pose_in_scene);
-  //     } else {
-  //       LOGGER_ERROR("display" << name << "transform to parent:" <<
-  //       parent_name
-  //                              << " failed! not found the parrent");
-  //     }
-  //   }
-  // }
+  for (auto &[name, display] : total_display_map_) {
+    Eigen::Vector3f pose_in_parent = display->GetPoseInParent();
+    display->setPos(QPointF(pose_in_parent[0], pose_in_parent[1]));
+  }
 }
 } // namespace Display

@@ -18,6 +18,8 @@
 #include <functional>
 #include <map>
 
+#include "display_cost_map.h"
+#include "display_occ_map.h"
 #include "display_path.h"
 #include "display_tag.h"
 #include "factory_display.h"
@@ -25,11 +27,10 @@
 #include "particle_points.h"
 #include "point_shape.h"
 #include "region.h"
-#include "robot_map.h"
 #define DISPLAY_ROBOT "Robot"
 #define DISPLAY_MAP "OccupyMap"
-#define DISPLAY_LOCAL_COST_MAP "CostMap"
-#define DISPLAY_GLOBAL_COST_MAP "GlobalMap"
+#define DISPLAY_LOCAL_COST_MAP "LocalCostMap"
+#define DISPLAY_GLOBAL_COST_MAP "GlobalCostMap"
 #define DISPLAY_GLOBAL_PATH "GlobalPath"
 #define DISPLAY_LOCAL_PATH "LocalPath"
 #define DISPLAY_LASER "LaserScan"
