@@ -62,6 +62,7 @@ public:
   bool enable_rotate_{false};
   std::string parent_name_;
   Eigen::Vector3f pose_in_parent_{0, 0, 0};
+  std::vector<VirtualDisplay *> children_;
 signals:
   void updateCursorPose(std::string display_name, QPointF pose);
 
@@ -82,6 +83,8 @@ public:
     enable_mouse_event_ = enable;
     return this;
   }
+  void AddChild(VirtualDisplay *child) { children_.push_back(child); }
+  std::vector<VirtualDisplay *> GetChildren() { return children_; }
   void UpdateMap(OccupancyMap map) { map_data_ = map; }
   // 设置当前图层是否响应鼠标事件
   void SetEnableMosuleEvent(const bool &response) {
@@ -109,11 +112,12 @@ public:
   }
   void SetPoseInParent(const Eigen::Vector3f &pose) { pose_in_parent_ = pose; }
   Eigen::Vector3f GetPoseInParent() { return pose_in_parent_; }
+  std::string GetPraentName() { return parent_name_; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {
     setPos(pose - GetOriginPose());
   }
-
+  void MovedBy(const qreal &x, const qreal &y);
   QRectF boundingRect() const override { return bounding_rect_; }
   std::string GetDisplayName();
   void SetDisplayName(const std::string &display_name);

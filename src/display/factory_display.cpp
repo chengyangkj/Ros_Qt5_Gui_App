@@ -62,7 +62,8 @@ void FactoryDisplay::AddDisplay(VirtualDisplay *display,
   // add group
   if (!parent_name.empty()) {
     auto parent_ptr = GetDisplay(parent_name);
-    display->setParent(parent_ptr);
+    parent_ptr->AddChild(display);
+    // display->setParent(parent_ptr);
   }
   total_display_map_[display->GetDisplayName()] = display;
 
@@ -106,8 +107,15 @@ bool FactoryDisplay::SetEnableMosuleEvent(const std::string &display_name,
  */
 void FactoryDisplay::updateCoordinateSystem() {
   for (auto &[name, display] : total_display_map_) {
-    Eigen::Vector3f pose_in_parent = display->GetPoseInParent();
-    display->setPos(QPointF(pose_in_parent[0], pose_in_parent[1]));
+    if (!display->GetPraentName().empty()) {
+      Eigen::Vector3f pose_in_parent = display->GetPoseInParent();
+      auto parent_ptr = GetDisplay(display->GetPraentName());
+      if (parent_ptr == nullptr)
+        continue;
+      QPointF scene_pose =
+          parent_ptr->mapToScene(QPointF(pose_in_parent[0], pose_in_parent[1]));
+      display->setPos(scene_pose);
+    }
   }
 }
 } // namespace Display

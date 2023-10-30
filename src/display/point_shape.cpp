@@ -44,6 +44,7 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
 }
 bool PointShape::UpdateData(const std::any &data) {
   GetAnyData(Eigen::Vector3f, data, robot_pose_);
+  SetPoseInParent(robot_pose_);
   update();
 }
 bool PointShape::SetDisplayConfig(const std::string &config_name,
@@ -77,6 +78,8 @@ void PointShape::paint(QPainter *painter,
       fabs(last_rotate_value - rotate_value_) >= 1) {
     last_scene_pose = scenePos();
     last_rotate_value = rotate_value_;
+    // std::cout << "pose update:" << scenePos().x() << " y:" << scenePos().y()
+    //           << std::endl;
     emit signalPointScenePoseUpdate(
         Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
   }

@@ -30,22 +30,20 @@ DisplayManager::DisplayManager(QGraphicsView *viewer) {
   (new DisplayCostMap(DISPLAY_LOCAL_COST_MAP, 3, DISPLAY_MAP));
   (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7,
                   DISPLAY_MAP))
-      ->SetRotateEnable(true);
+      ->SetRotateEnable(true)
+      ->SetMouseEventEnable(true);
+  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8,
+                  DISPLAY_MAP))
+      ->SetRotateEnable(true)
+      ->SetMouseEventEnable(true)
+      ->setVisible(false);
   new LaserPoints(DISPLAY_LASER, 2, DISPLAY_MAP);
   new ParticlePoints(DISPLAY_PARTICLE, 4, DISPLAY_MAP);
   new Region(DISPLAY_REGION, 3);
   new DisplayTag(DISPLAY_TAG, 4);
   new DisplayPath(DISPLAY_GLOBAL_PATH, 6, DISPLAY_MAP);
   new DisplayPath(DISPLAY_LOCAL_PATH, 6, DISPLAY_MAP);
-  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8,
-                  DISPLAY_MAP))
-      ->SetRotateEnable(true)
-      ->SetMouseEventEnable(true)
-      ->setVisible(false);
 
-  connect(GetDisplay(DISPLAY_GOAL),
-          SIGNAL(signalPointScenePoseUpdate(Eigen::Vector3f)), this,
-          SLOT(slotUpdateNavGoalScenePose(Eigen::Vector3f)));
   // defalut display config
 
   SetDisplayConfig(DISPLAY_GLOBAL_PATH "/Color", Display::Color(0, 0, 255));
@@ -56,7 +54,9 @@ DisplayManager::DisplayManager(QGraphicsView *viewer) {
   connect(GetDisplay(DISPLAY_ROBOT),
           SIGNAL(signalPointScenePoseUpdate(Eigen::Vector3f)), this,
           SLOT(slotUpdateRobotScenePose(Eigen::Vector3f)));
-
+  connect(GetDisplay(DISPLAY_GOAL),
+          SIGNAL(signalPointScenePoseUpdate(Eigen::Vector3f)), this,
+          SLOT(slotUpdateNavGoalScenePose(Eigen::Vector3f)));
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetEnableMosuleEvent(DISPLAY_MAP);
   InitUi();
@@ -83,9 +83,8 @@ void DisplayManager::slotUpdateNavGoalScenePose(Eigen::Vector3f pose) {
   robot_pose_goal_[0] = x;
   robot_pose_goal_[1] = y;
   robot_pose_goal_[2] = 0 - deg2rad(pose[2]);
-  // FactoryDisplay::Instance()->SetDisplayPoseInParent(
-  //     DISPLAY_GOAL, DISPLAY_MAP,
-  //     Eigen::Vector3f(occ_pose.x(), occ_pose.y(), 0));
+  GetDisplay(DISPLAY_GOAL)
+      ->UpdateDisplay(Eigen::Vector3f(occ_pose.x(), occ_pose.y(), 0));
 }
 void DisplayManager::InitUi() {
   // 跟随车体移动的按钮
@@ -252,14 +251,7 @@ DisplayManager::transLaserPoint(const std::vector<Eigen::Vector2f> &point) {
 void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
   emit DisplayRobotPoseWorld(pose);
   robot_pose_ = pose;
-  // 地图图层 更新机器人图元坐标
-  robot_pose_scene_ = wordPose2Scene(pose);
-
-  if (!is_reloc_mode_) {
-    GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(robot_pose_);
-    FactoryDisplay::Instance()->SetDisplayPoseInParent(DISPLAY_ROBOT,
-                                                       wordPose2Map(pose));
-  }
+  GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(wordPose2Map(pose));
 }
 
 void DisplayManager::updateScaled(double value) {

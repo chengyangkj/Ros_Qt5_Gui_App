@@ -50,7 +50,6 @@ private:
 
   Eigen::Vector3f robot_pose_{0, 0, 0};
   Eigen::Vector3f robot_pose_goal_{0, 0, 0};
-  Eigen::Vector3f robot_pose_scene_;
   Eigen::Vector3f robot_pose_reloc_init_;
   OccupancyMap map_data_;
   std::string focus_display_;

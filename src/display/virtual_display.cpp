@@ -38,18 +38,33 @@ bool VirtualDisplay::SetScaled(const double &value) {
   scale_value_ = value;
   setScale(value);
   update();
+  for (auto child : children_) {
+    child->SetScaled(value);
+  }
   return true;
 }
 bool VirtualDisplay::SetRotate(const double &value) {
+  if (!enable_rotate_)
+    return false;
   transform_ = this->transform();
   transform_.rotate(value);
   this->setTransform(transform_);
   update();
+  for (auto child : children_) {
+    child->SetRotate(value);
+  }
+  return true;
 }
 void VirtualDisplay::Update() { update(); }
 std::string VirtualDisplay::GetDisplayName() { return display_name_; }
 void VirtualDisplay::SetDisplayName(const std::string &display_name) {
   display_name_ = display_name;
+}
+void VirtualDisplay::MovedBy(const qreal &x, const qreal &y ) {
+  moveBy(x, y);
+  for (auto child : children_) {
+    child->MovedBy(x,y);
+  }
 }
 void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
   if (!enable_mouse_event_) {
@@ -74,11 +89,11 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
 
   // 使放大缩小的效果看起来像是以鼠标中心点进行放大缩小
   if (event->delta() > 0) {
-    moveBy(-event->pos().x() * beforeScaleValue * 0.1,
-           -event->pos().y() * beforeScaleValue * 0.1);
+    MovedBy(-event->pos().x() * beforeScaleValue * 0.1,
+            -event->pos().y() * beforeScaleValue * 0.1);
   } else {
-    moveBy(event->pos().x() * beforeScaleValue * 0.1,
-           event->pos().y() * beforeScaleValue * 0.1);
+    MovedBy(event->pos().x() * beforeScaleValue * 0.1,
+            event->pos().y() * beforeScaleValue * 0.1);
   }
   update();
 }
@@ -91,7 +106,7 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (pressed_button_ == Qt::LeftButton) {
     if (curr_cursor_ == move_cursor_) {
       QPointF point = (event->pos() - pressed_pose_) * scale_value_;
-      moveBy(point.x(), point.y());
+      MovedBy(point.x(), point.y());
     }
     end_pose_ = event->pos();
   }
