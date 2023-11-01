@@ -92,10 +92,10 @@ std::map<std::string, VirtualDisplay *> FactoryDisplay::GetTotalDisplayMap() {
   return total_display_map_;
 }
 // 设置响应鼠标事件的图层
-bool FactoryDisplay::SetEnableMosuleEvent(const std::string &display_name,
-                                          bool enable) {
+bool FactoryDisplay::SetMoveEnable(const std::string &display_name,
+                                   bool enable) {
   if (total_display_map_.count(display_name) != 0) {
-    total_display_map_[display_name]->SetEnableMosuleEvent(enable);
+    total_display_map_[display_name]->SetMoveEnable(enable);
     return true;
   }
   return false;
@@ -107,7 +107,7 @@ bool FactoryDisplay::SetEnableMosuleEvent(const std::string &display_name,
  */
 void FactoryDisplay::updateCoordinateSystem() {
   for (auto &[name, display] : total_display_map_) {
-    if (!display->GetPraentName().empty()) {
+    if (!display->GetPraentName().empty() && !display->GetMoveEnable()) {
       Eigen::Vector3f pose_in_parent = display->GetPoseInParent();
       auto parent_ptr = GetDisplay(display->GetPraentName());
       if (parent_ptr == nullptr)

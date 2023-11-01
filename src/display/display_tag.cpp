@@ -21,7 +21,7 @@ void DisplayTag::paint(QPainter *painter,
   for (auto [qr_name, pose] : tag_data_) {
     // std::cout << "paint qr_name:" << qr_name << std::endl;
     // 坐标转换为图元坐标系
-    int x, y;
+    double x, y;
     map_data_.xy2occPose(pose[0], pose[1], x, y);
     painter->drawPixmap(x - tag_image_.width() / 2, y - tag_image_.height() / 2,
                         tag_image_);
@@ -42,7 +42,7 @@ void DisplayTag::computeBoundRect(Display::TagDataMap &data_map) {
   float xmax = -99999, xmin = 99999, ymax = -99999, ymin = 99999;
   // std::cout << "data map size:" << data_map.size() << std::endl;
   for (auto [region_name, pose] : data_map) {
-    int x, y;
+    double x, y;
     map_data_.xy2occPose(pose[0], pose[1], x, y);
     if (xmin > x)
       xmin = x;

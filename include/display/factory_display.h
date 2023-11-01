@@ -28,8 +28,7 @@ public:
   int GetDisplaySize();
   std::map<std::string, VirtualDisplay *> GetTotalDisplayMap();
   // 设置响应鼠标事件的图层
-  bool SetEnableMosuleEvent(const std::string &display_name,
-                            bool enable = true);
+  bool SetMoveEnable(const std::string &display_name, bool enable = true);
   bool SetDisplayPoseInParent(const std::string &display_name,
                               const Eigen::Vector3f &pose);
 

@@ -25,7 +25,7 @@ public:
   virtual ~VirtualCommNode() {}
   basic::Point transWordPoint2Scene(basic::Point point) {
     basic::Point ret;
-    int x, y;
+    double x, y;
     occ_map_.xy2occPose(point.x, point.y, x, y);
     ret.x = x;
     ret.y = y;

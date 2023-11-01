@@ -30,12 +30,11 @@ DisplayManager::DisplayManager(QGraphicsView *viewer) {
   (new DisplayCostMap(DISPLAY_LOCAL_COST_MAP, 3, DISPLAY_MAP));
   (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7,
                   DISPLAY_MAP))
-      ->SetRotateEnable(true)
-      ->SetMouseEventEnable(true);
+      ->SetRotateEnable(true);
   (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8,
                   DISPLAY_MAP))
       ->SetRotateEnable(true)
-      ->SetMouseEventEnable(true)
+      ->SetMoveEnable(true)
       ->setVisible(false);
   new LaserPoints(DISPLAY_LASER, 2, DISPLAY_MAP);
   new ParticlePoints(DISPLAY_PARTICLE, 4, DISPLAY_MAP);
@@ -51,28 +50,26 @@ DisplayManager::DisplayManager(QGraphicsView *viewer) {
 
   // connection
 
-  connect(GetDisplay(DISPLAY_ROBOT),
-          SIGNAL(signalPointScenePoseUpdate(Eigen::Vector3f)), this,
-          SLOT(slotUpdateRobotScenePose(Eigen::Vector3f)));
-  connect(GetDisplay(DISPLAY_GOAL),
-          SIGNAL(signalPointScenePoseUpdate(Eigen::Vector3f)), this,
-          SLOT(slotUpdateNavGoalScenePose(Eigen::Vector3f)));
+  connect(GetDisplay(DISPLAY_ROBOT), SIGNAL(signalPoseUpdate(Eigen::Vector3f)),
+          this, SLOT(slotUpdateRobotScenePose(Eigen::Vector3f)));
+  connect(GetDisplay(DISPLAY_GOAL), SIGNAL(signalPoseUpdate(Eigen::Vector3f)),
+          this, SLOT(slotUpdateNavGoalScenePose(Eigen::Vector3f)));
+
   // 设置默认地图图层响应鼠标事件
-  FactoryDisplay::Instance()->SetEnableMosuleEvent(DISPLAY_MAP);
+  FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
 }
+
 void DisplayManager::slotUpdateRobotScenePose(Eigen::Vector3f pose) {
   if (is_reloc_mode_) {
     QPointF occ_pose =
         GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose[0], pose[1]));
     double x, y;
     map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
-    Eigen::Vector3f robot_pose_new;
     // 更新坐标
-    robot_pose_new[0] = x;
-    robot_pose_new[1] = y;
-    robot_pose_new[2] = robot_pose_reloc_init_[2] - deg2rad(pose[2]);
-    UpdateRobotPose(robot_pose_new);
+    robot_pose_[0] = x;
+    robot_pose_[1] = y;
+    robot_pose_[2] = robot_pose_reloc_init_[2] - deg2rad(pose[2]);
   }
 }
 void DisplayManager::slotUpdateNavGoalScenePose(Eigen::Vector3f pose) {
@@ -119,7 +116,7 @@ bool DisplayManager::SetDisplayConfig(const std::string &config_name,
   if (config_list[1] == "MouseEvent") {
     bool is_response;
     GetAnyData(bool, data, is_response);
-    display->SetEnableMosuleEvent(is_response);
+    display->SetMoveEnable(is_response);
     std::cout << "config:" << config_name << " res:" << is_response
               << std::endl;
   }
@@ -164,7 +161,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
     for (auto one_points : particles) {
       // std::cout << "location:" << one_laser.first << std::endl;
       // 转换为图元坐标系
-      int x, y;
+      double x, y;
       map_data_.xy2occPose(one_points[0], one_points[1], x, y);
       particles_tans.push_back(Eigen::Vector3f(x, y, one_points[2]));
     }
@@ -178,7 +175,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
     for (auto one_points : path_data) {
       // std::cout << "location:" << one_laser.first << std::endl;
       // 转换为图元坐标系
-      int x, y;
+      double x, y;
       map_data_.xy2occPose(one_points[0], one_points[1], x, y);
       path_data_trans.push_back(Display::Point2f(x, y));
     }
@@ -191,7 +188,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       std::vector<Display::RangeVec> range_ve;
       for (auto one_region : region) {
         Display::RangeVec ivec;
-        int xmin, ymin, xmax, ymax;
+        double xmin, ymin, xmax, ymax;
         map_data_.xy2occPose(one_region[0], one_region[1], xmin, ymin);
         map_data_.xy2occPose(one_region[2], one_region[3], xmax, ymax);
         ivec[0] = xmin;
@@ -236,7 +233,7 @@ DisplayManager::transLaserPoint(const std::vector<Eigen::Vector2f> &point) {
         basic::RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]),
         basic::RobotPose(one_point[0], one_point[1], 0));
     // 转换为图元坐标系
-    int x, y;
+    double x, y;
     map_data_.xy2occPose(map_pose.x, map_pose.y, x, y);
     res.push_back(Eigen::Vector2f(x, y));
   }
@@ -259,12 +256,13 @@ void DisplayManager::updateScaled(double value) {
 }
 void DisplayManager::SetMoveRobot(bool is_move) {
   is_reloc_mode_ = is_move;
+  std::cout << "reloc mode:" << is_reloc_mode_ << std::endl;
   if (is_move) {
     robot_pose_reloc_init_ = robot_pose_;
   } else {
     emit signalPub2DPose(robot_pose_);
   }
-  FactoryDisplay::Instance()->SetEnableMosuleEvent(DISPLAY_ROBOT, is_move);
+  FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, is_move);
 }
 void DisplayManager::FocusDisplay(const std::string &display_name) {
   FactoryDisplay::Instance()->FocusDisplay(display_name);
@@ -277,7 +275,7 @@ void DisplayManager::FocusDisplay(const std::string &display_name) {
  */
 Eigen::Vector3f DisplayManager::wordPose2Scene(const Eigen::Vector3f &point) {
   // xy在栅格地图上的图元坐标
-  int x, y;
+  double x, y;
   map_data_.xy2occPose(point[0], point[1], x, y);
   // xy在map图层上的坐标
   QPointF pose = FactoryDisplay::Instance()
@@ -297,7 +295,7 @@ Eigen::Vector3f DisplayManager::wordPose2Scene(const Eigen::Vector3f &point) {
  */
 QPointF DisplayManager::wordPose2Scene(const QPointF &point) {
   // xy在栅格地图上的图元坐标
-  int x, y;
+  double x, y;
   map_data_.xy2occPose(point.x(), point.y(), x, y);
   return FactoryDisplay::Instance()
       ->GetDisplay(DISPLAY_MAP)
@@ -310,7 +308,7 @@ QPointF DisplayManager::wordPose2Scene(const QPointF &point) {
  */
 Eigen::Vector3f DisplayManager::wordPose2Map(const Eigen::Vector3f &pose) {
   Eigen::Vector3f ret;
-  int x, y;
+  double x, y;
   map_data_.xy2occPose(pose[0], pose[1], x, y);
   ret[0] = x;
   ret[1] = y;
@@ -319,7 +317,7 @@ Eigen::Vector3f DisplayManager::wordPose2Map(const Eigen::Vector3f &pose) {
 }
 QPointF DisplayManager::wordPose2Map(const QPointF &pose) {
   QPointF ret;
-  int x, y;
+  double x, y;
   map_data_.xy2occPose(pose.x(), pose.y(), x, y);
   ret.setX(x);
   ret.setY(y);

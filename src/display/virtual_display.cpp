@@ -46,28 +46,52 @@ bool VirtualDisplay::SetScaled(const double &value) {
 bool VirtualDisplay::SetRotate(const double &value) {
   if (!enable_rotate_)
     return false;
-  transform_ = this->transform();
-  transform_.rotate(value);
-  this->setTransform(transform_);
+  // transform_ = this->transform();
+  // auto trans = transform_;
+  // trans.rotate(value);
+  // this->setTransform(trans);
+  // setRotation(value);
   update();
   for (auto child : children_) {
     child->SetRotate(value);
   }
   return true;
 }
+QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
+                                    const QVariant &value) {
+  switch (change) {
+  case ItemPositionHasChanged:
+    emit signalPoseUpdate(
+        Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+    break;
+  // case ItemTransformHasChanged:
+  //   emit signalPoseUpdate(
+  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+  //   break;
+  // case ItemRotationHasChanged:
+  //   emit signalPoseUpdate(
+  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+  //   break;
+  default:
+    break;
+  };
+  return QGraphicsItem::itemChange(change, value);
+}
+
 void VirtualDisplay::Update() { update(); }
 std::string VirtualDisplay::GetDisplayName() { return display_name_; }
 void VirtualDisplay::SetDisplayName(const std::string &display_name) {
   display_name_ = display_name;
 }
-void VirtualDisplay::MovedBy(const qreal &x, const qreal &y ) {
+void VirtualDisplay::MovedBy(const qreal &x, const qreal &y) {
   moveBy(x, y);
   for (auto child : children_) {
-    child->MovedBy(x,y);
+    child->MovedBy(x, y);
   }
+  update();
 }
 void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
-  if (!enable_mouse_event_) {
+  if (!move_enable_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::wheelEvent(event);
     return;
@@ -98,7 +122,7 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
   update();
 }
 void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
-  if (!enable_mouse_event_) {
+  if (!move_enable_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mouseMoveEvent(event);
     return;
@@ -141,18 +165,20 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     if (crossValue.z() < 0)
       angle = -angle;
     rotate_value_ += angle;
+    static double last_rotate_value = rotate_value_;
 
-    // 设置变化矩阵
-    // transform_.rotate(rotate_value_);
-    // this->setTransform(transform_);
-
-    update();
+    if (fabs(rotate_value_ - last_rotate_value) > 1) {
+      emit signalPoseUpdate(
+          Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+    }
+    // SetRotate(rotate_value_);
     pressed_pose_ = loacalPos;
   }
+  update();
 }
 
 void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-  if (!enable_mouse_event_) {
+  if (!move_enable_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mousePressEvent(event);
     return;
@@ -168,11 +194,10 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   } else if (event->button() == Qt::RightButton) {
     is_rotate_event_ = true;
   }
-  transform_ = this->transform();
   update();
 }
 void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-  if (!enable_mouse_event_) {
+  if (!move_enable_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::mouseReleaseEvent(event);
     return;
@@ -198,7 +223,7 @@ void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   update();
 }
 void VirtualDisplay::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-  if (!enable_mouse_event_) {
+  if (!move_enable_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::hoverMoveEvent(event);
     return;

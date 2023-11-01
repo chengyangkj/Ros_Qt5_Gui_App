@@ -35,8 +35,7 @@ private:
   ePointType type_;
   Eigen::Vector3f robot_pose_;
   bool enable_{true};
-signals:
-  void signalPointScenePoseUpdate(Eigen::Vector3f);
+
 
 private:
   void drawRobot(QPainter *painter);

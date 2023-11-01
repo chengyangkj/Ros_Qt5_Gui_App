@@ -15,7 +15,7 @@ DisplayOccMap::DisplayOccMap(const std::string &display_name,
                              const int &z_value, std::string parent_name)
     : VirtualDisplay(display_name, z_value, parent_name) {
   this->setCursor(*curr_cursor_);
-  SetEnableMosuleEvent(true);
+  SetMoveEnable(true);
 }
 bool DisplayOccMap::UpdateData(const std::any &data) {
   try {

@@ -169,7 +169,7 @@ public:
    * @description:输入原始(地图图片)图元坐标,返回世界坐标
    * @return {*}
    */
-  void occPose2xy(const int &scene_x, const int &scene_y, double &word_x,
+  void occPose2xy(const double &scene_x, const double &scene_y, double &word_x,
                   double &word_y) {
     word_x = scene_x * resolution + origin_x;
     word_y = (height() - scene_y) * resolution + origin_y;
@@ -183,8 +183,8 @@ public:
    * @param {int&} scene_y
    * @return {*}
    */
-  void xy2occPose(const double &word_x, const double &word_y, int &scene_x,
-                  int &scene_y) {
+  void xy2occPose(const double &word_x, const double &word_y, double &scene_x,
+                  double &scene_y) {
     scene_x = (word_x - origin_x) / resolution;
     scene_y = height() - (word_y - origin_y) / resolution;
   }

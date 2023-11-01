@@ -51,7 +51,7 @@ public:
   QCursor *pose_cursor_ = nullptr;
   QCursor *goal_cursor_ = nullptr;
   double scale_value_ = 1;
-  bool enable_mouse_event_{false};
+  bool move_enable_{false};
   bool is_rotate_event_{false};
   bool enable_scale_{true};
   QRectF bounding_rect_;
@@ -65,6 +65,7 @@ public:
   std::vector<VirtualDisplay *> children_;
 signals:
   void updateCursorPose(std::string display_name, QPointF pose);
+  void signalPoseUpdate(Eigen::Vector3f);
 
 public:
   VirtualDisplay(const std::string &display_name, const int &z_value,
@@ -79,17 +80,9 @@ public:
     enable_scale_ = enable;
     return this;
   }
-  VirtualDisplay *SetMouseEventEnable(const bool &enable) {
-    enable_mouse_event_ = enable;
-    return this;
-  }
-  void AddChild(VirtualDisplay *child) { children_.push_back(child); }
-  std::vector<VirtualDisplay *> GetChildren() { return children_; }
-  void UpdateMap(OccupancyMap map) { map_data_ = map; }
-  // 设置当前图层是否响应鼠标事件
-  void SetEnableMosuleEvent(const bool &response) {
-    enable_mouse_event_ = response;
-    if (response) {
+  VirtualDisplay *SetMoveEnable(const bool &enable) {
+    move_enable_ = enable;
+    if (enable) {
       // 只有响应的图层才响应鼠标事件
       setAcceptHoverEvents(true);
       setAcceptedMouseButtons(Qt::AllButtons);
@@ -97,7 +90,14 @@ public:
       setFlag(ItemAcceptsInputMethod, true);
       setFlag(ItemSendsGeometryChanges, true);
     }
+    update();
+    return this;
   }
+  bool GetMoveEnable() { return move_enable_; }
+  void AddChild(VirtualDisplay *child) { children_.push_back(child); }
+  std::vector<VirtualDisplay *> GetChildren() { return children_; }
+  void UpdateMap(OccupancyMap map) { map_data_ = map; }
+
   double GetRotate() { return rotate_value_; }
   virtual bool UpdateData(const std::any &data) = 0;
   virtual bool SetDisplayConfig(const std::string &config_name,
@@ -110,7 +110,9 @@ public:
   QPointF PoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
   }
-  void SetPoseInParent(const Eigen::Vector3f &pose) { pose_in_parent_ = pose; }
+  void SetPoseInParent(const Eigen::Vector3f &pose) {
+    pose_in_parent_ = pose;
+  }
   Eigen::Vector3f GetPoseInParent() { return pose_in_parent_; }
   std::string GetPraentName() { return parent_name_; }
   //设置原点在全局的坐标
@@ -129,5 +131,7 @@ private:
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant &value) override;
 };
 } // namespace Display

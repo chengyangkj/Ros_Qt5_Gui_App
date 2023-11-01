@@ -71,18 +71,6 @@ void PointShape::paint(QPainter *painter,
     drawNavGoal(painter);
     break;
   }
-  static QPointF last_scene_pose = scenePos();
-  QPointF diff = last_scene_pose - scenePos();
-  static double last_rotate_value = rotate_value_;
-  if (fabs(diff.x()) >= 1 || fabs(diff.y()) >= 1 ||
-      fabs(last_rotate_value - rotate_value_) >= 1) {
-    last_scene_pose = scenePos();
-    last_rotate_value = rotate_value_;
-    // std::cout << "pose update:" << scenePos().x() << " y:" << scenePos().y()
-    //           << std::endl;
-    emit signalPointScenePoseUpdate(
-        Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
-  }
 }
 void PointShape::setEnable(const bool &enable) {}
 void PointShape::drawRobot(QPainter *painter) {
