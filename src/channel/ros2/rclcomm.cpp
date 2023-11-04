@@ -34,11 +34,13 @@ rclcomm::rclcomm() {
           GET_TOPIC_NAME("Reloc"), 10);
   _publisher =
       node->create_publisher<std_msgs::msg::Int32>("ros2_qt_dmeo_publish", 10);
+  speed_publisher_ = node->create_publisher<geometry_msgs::msg::Twist>(
+      GET_TOPIC_NAME("Speed"), 10);
   _subscription = node->create_subscription<std_msgs::msg::Int32>(
       "ros2_qt_dmeo_publish", 10,
       std::bind(&rclcomm::recv_callback, this, std::placeholders::_1),
       sub1_obt);
-  m_map_sub = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
+  map_sub_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
       GET_TOPIC_NAME("Map"),
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
       std::bind(&rclcomm::map_callback, this, std::placeholders::_1), sub1_obt);
@@ -56,7 +58,7 @@ rclcomm::rclcomm() {
       GET_TOPIC_NAME("LaserScan"), 20,
       std::bind(&rclcomm::laser_callback, this, std::placeholders::_1),
       sub_laser_obt);
-  m_path_sub = node->create_subscription<nav_msgs::msg::Path>(
+  path_sub_ = node->create_subscription<nav_msgs::msg::Path>(
       GET_TOPIC_NAME("GlobalPlan"), 20,
       std::bind(&rclcomm::path_callback, this, std::placeholders::_1),
       sub1_obt);
@@ -68,9 +70,9 @@ rclcomm::rclcomm() {
       GET_TOPIC_NAME("Odometry"), 20,
       std::bind(&rclcomm::odom_callback, this, std::placeholders::_1),
       sub1_obt);
-  m_tf_buffer = std::make_unique<tf2_ros::Buffer>(node->get_clock());
-  m_transform_listener =
-      std::make_shared<tf2_ros::TransformListener>(*m_tf_buffer);
+  tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node->get_clock());
+  transform_listener_ =
+      std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 }
 void rclcomm::getRobotPose() {
   emit emitUpdateRobotPose(getTrasnsform("base_link", "map"));
@@ -84,7 +86,7 @@ void rclcomm::getRobotPose() {
 basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
   try {
     geometry_msgs::msg::TransformStamped transform =
-        m_tf_buffer->lookupTransform(to, from, tf2::TimePointZero);
+        tf_buffer_->lookupTransform(to, from, tf2::TimePointZero);
     geometry_msgs::msg::Quaternion msg_quat = transform.transform.rotation;
     // 转换类型
     tf2::Quaternion q;
@@ -127,7 +129,7 @@ void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
 void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   try {
     //        geometry_msgs::msg::TransformStamped laser_transform =
-    //        m_tf_buffer->lookupTransform("map","base_scan",tf2::TimePointZero);
+    //        tf_buffer_->lookupTransform("map","base_scan",tf2::TimePointZero);
     geometry_msgs::msg::PointStamped point_map_frame;
     geometry_msgs::msg::PointStamped point_odom_frame;
     basic::RobotPath path;
@@ -137,7 +139,7 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
       point_odom_frame.point.x = x;
       point_odom_frame.point.y = y;
       point_odom_frame.header.frame_id = msg->header.frame_id;
-      m_tf_buffer->transform(point_odom_frame, point_map_frame, "map");
+      tf_buffer_->transform(point_odom_frame, point_map_frame, "map");
       basic::Point point;
       point.x = point_map_frame.point.x;
       point.y = point_map_frame.point.y;
@@ -149,6 +151,19 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   } catch (tf2::TransformException &ex) {
     qDebug() << "local path transform error:" << ex.what();
   }
+}
+void rclcomm::pubSpeed(Eigen::Vector3f speed) {
+  geometry_msgs::msg::Twist twist;
+  twist.linear.x = speed[0];
+  twist.linear.y = speed[1];
+  twist.linear.z = 0;
+
+  twist.angular.x = 0;
+  twist.angular.y = 0;
+  twist.angular.z = speed[2];
+
+  // Publish it and resolve any remaining callbacks
+  speed_publisher_->publish(twist);
 }
 void rclcomm::run() {
   std_msgs::msg::Int32 pub_msg;
@@ -184,7 +199,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
   double angle_increment = msg->angle_increment;
   try {
     //        geometry_msgs::msg::TransformStamped laser_transform =
-    //        m_tf_buffer->lookupTransform("map","base_scan",tf2::TimePointZero);
+    //        tf_buffer_->lookupTransform("map","base_scan",tf2::TimePointZero);
     geometry_msgs::msg::PointStamped point_map_frame;
     geometry_msgs::msg::PointStamped point_laser_frame;
     basic::LaserScan laser_points;
@@ -199,7 +214,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-      m_tf_buffer->transform(point_laser_frame, point_map_frame, "base_link");
+      tf_buffer_->transform(point_laser_frame, point_map_frame, "base_link");
       basic::Point p;
       p.x = point_map_frame.point.x;
       p.y = point_map_frame.point.y;
@@ -262,7 +277,7 @@ void rclcomm::localCostMapCallback(
     q.setRPY(0, 0, origin_theta);
     pose_curr_frame.pose.orientation = tf2::toMsg(q);
     pose_curr_frame.header.frame_id = msg->header.frame_id;
-    m_tf_buffer->transform(pose_curr_frame, pose_map_frame, "map");
+    tf_buffer_->transform(pose_curr_frame, pose_map_frame, "map");
     tf2::fromMsg(pose_map_frame.pose.orientation, q);
     tf2::Matrix3x3 mat(q);
     double roll, pitch, yaw;
@@ -293,7 +308,6 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   }
   occ_map_.SetFlip();
   emit emitUpdateMap(occ_map_);
-  std::cout << "recv map" << std::endl;
 }
 void rclcomm::recv_callback(const std_msgs::msg::Int32::SharedPtr msg) {
   //     qDebug()<<msg->data;

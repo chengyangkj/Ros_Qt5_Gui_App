@@ -21,6 +21,7 @@
 #include "channel/base/virtual_comm_node.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
+#include "geometry_msgs/msg/twist.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "nav_msgs/msg/path.hpp"
@@ -50,17 +51,18 @@ private:
 public slots:
   void pub2DPose(Eigen::Vector3f pose) override;
   void pub2DGoal(Eigen::Vector3f pose) override;
+  void pubSpeed(Eigen::Vector3f speed) override;
   basic::RobotPose getTrasnsform(std::string from, std::string to);
-public slots:
 
 private:
   rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
+  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr speed_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
       initPosePublisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr
       navGoalPublisher_;
   rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr _subscription;
-  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr m_map_sub;
+  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
       m_localCostMapSub;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
@@ -68,9 +70,9 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr m_laser_sub;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr m_odom_sub;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _local_path_sub;
-  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr m_path_sub;
-  std::unique_ptr<tf2_ros::Buffer> m_tf_buffer;
-  std::shared_ptr<tf2_ros::TransformListener> m_transform_listener;
+  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub_;
+  std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> transform_listener_;
   std::shared_ptr<rclcpp::Node> node;
 
   double m_resolution;

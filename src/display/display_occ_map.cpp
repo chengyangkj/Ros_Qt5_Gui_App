@@ -21,7 +21,6 @@ bool DisplayOccMap::UpdateData(const std::any &data) {
   try {
     if (data.type() == typeid(OccupancyMap)) {
       map_data_ = std::any_cast<OccupancyMap>(data);
-      std::cout << "recv occ map" << std::endl;
     }
 
   } catch (const std::bad_any_cast &e) {

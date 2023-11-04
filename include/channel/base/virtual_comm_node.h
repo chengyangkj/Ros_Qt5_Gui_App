@@ -39,15 +39,16 @@ public:
   }
 signals:
   void emitUpdateMap(OccupancyMap map);
-  void emitUpdateLocalCostMap(CostMap img, basic::RobotPose pose);
+  void emitUpdateLocalCostMap(CostMap img, RobotPose pose);
   void emitUpdateGlobalCostMap(CostMap img);
-  void emitUpdateRobotPose(basic::RobotPose pose);
+  void emitUpdateRobotPose(RobotPose pose);
   void emitUpdateLaserPoint(LaserScan laser_scan); //发布车身坐标系下的激光点
   void emitUpdatePath(RobotPath points);
   void emitUpdateLocalPath(RobotPath points);
-  void emitOdomInfo(basic::RobotState state);
+  void emitOdomInfo(RobotState state);
 
 public slots:
   virtual void pub2DPose(Eigen::Vector3f pose) = 0;
   virtual void pub2DGoal(Eigen::Vector3f pose) = 0;
+  virtual void pubSpeed(Eigen::Vector3f speed) = 0;
 };

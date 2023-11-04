@@ -71,14 +71,15 @@ public:
 public slots:
   void onRecvData(QString);
   void updateOdomInfo(RobotState);
-  void slotUpdateRobotPose(basic::RobotPose pose);
+  void slotUpdateRobotPose(RobotPose pose);
   void slotUpdateLaserPoint(LaserScan scan);
   void updateGlobalPath(RobotPath path);
   void updateLocalPath(RobotPath path);
-  void updateLocalCostMap(CostMap, basic::RobotPose);
+  void updateLocalCostMap(CostMap, RobotPose);
   void updateGlobalCostMap(CostMap map);
   void updateCurpose(QPointF pos);
-
+  void slotSpeedControl();
+  void slotJoyStickKeyChange(int value);
 
 protected:
   virtual void closeEvent(QCloseEvent *event) override;
@@ -95,8 +96,10 @@ private:
   ads::CDockWidget *TimelineDockWidget;
   Display::DisplayManager *display_manager_;
   QPushButton *pushButton_status_;
+  QCheckBox *checkBox_use_all_;
   QProgressBar *battery_bar_;
-
+  QSlider *horizontalSlider_linear_;
+  QSlider *horizontalSlider_raw_;
   QLabel *label_power_;
   QLabel *label_pos_map_;
   QLabel *label_pos_scene_;

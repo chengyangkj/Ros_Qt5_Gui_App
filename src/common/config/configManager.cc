@@ -18,6 +18,7 @@ void configManager::Init(const QString &config_path) {
     setting.setValue("GlobalPlan/Topic", "/plan");
     setting.setValue("LocalPlan/Topic", "/local_plan");
     setting.setValue("Odometry/Topic", "/odom");
+    setting.setValue("Speed/Topic", "/cmd_vel");
   }
 }
 configManager::~configManager() {}

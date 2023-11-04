@@ -41,7 +41,8 @@ CMainWindow::CMainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::CMainWindow) {
   LOG(INFO) << " CMainWindow init";
   qRegisterMetaType<std::string>("std::string");
-  qRegisterMetaType<basic::RobotPose>("basic::RobotPose");
+  qRegisterMetaType<RobotPose>("RobotPose");
+  qRegisterMetaType<RobotState>("RobotState");
   qRegisterMetaType<OccupancyMap>("OccupancyMap");
   qRegisterMetaType<CostMap>("CostMap");
   qRegisterMetaType<LaserScan>("LaserScan");
@@ -321,6 +322,7 @@ void CMainWindow::setupUi() {
   QVBoxLayout *verticalLayout_speed_ctrl = new QVBoxLayout();
   verticalLayout_speed_ctrl->setObjectName(
       QString::fromUtf8("verticalLayout_speed_ctrl"));
+  QVBoxLayout *verticalLayout_cmd_btn = new QVBoxLayout();
   QHBoxLayout *horizontalLayout_2 = new QHBoxLayout();
   horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
   QPushButton *pushButton_u = new QPushButton();
@@ -356,7 +358,7 @@ void CMainWindow::setupUi() {
 
   horizontalLayout_2->addWidget(pushButton_o);
 
-  verticalLayout_speed_ctrl->addLayout(horizontalLayout_2);
+  verticalLayout_cmd_btn->addLayout(horizontalLayout_2);
 
   QHBoxLayout *horizontalLayout_18 = new QHBoxLayout();
   horizontalLayout_18->setObjectName(QString::fromUtf8("horizontalLayout_18"));
@@ -371,11 +373,11 @@ void CMainWindow::setupUi() {
 
   horizontalLayout_18->addWidget(pushButton_j);
 
-  QCheckBox *checkBox_use_all = new QCheckBox();
-  checkBox_use_all->setObjectName(QString::fromUtf8("checkBox_use_all"));
-  checkBox_use_all->setMaximumSize(QSize(90, 16777215));
-  checkBox_use_all->setText("全向模式:");
-  horizontalLayout_18->addWidget(checkBox_use_all);
+  checkBox_use_all_ = new QCheckBox();
+  checkBox_use_all_->setObjectName(QString::fromUtf8("checkBox_use_all_"));
+  checkBox_use_all_->setMaximumSize(QSize(90, 16777215));
+  checkBox_use_all_->setText("全向模式:");
+  horizontalLayout_18->addWidget(checkBox_use_all_);
 
   QPushButton *pushButton_l = new QPushButton();
   pushButton_l->setObjectName(QString::fromUtf8("pushButton_l"));
@@ -388,7 +390,7 @@ void CMainWindow::setupUi() {
 
   horizontalLayout_18->addWidget(pushButton_l);
 
-  verticalLayout_speed_ctrl->addLayout(horizontalLayout_18);
+  verticalLayout_cmd_btn->addLayout(horizontalLayout_18);
 
   QHBoxLayout *horizontalLayout_19 = new QHBoxLayout();
   horizontalLayout_19->setObjectName(QString::fromUtf8("horizontalLayout_19"));
@@ -404,7 +406,7 @@ void CMainWindow::setupUi() {
   horizontalLayout_19->addWidget(pushButton_m);
 
   QPushButton *pushButton_back = new QPushButton();
-  pushButton_back->setObjectName(QString::fromUtf8("pushButton_back"));
+  pushButton_back->setObjectName(QString::fromUtf8("pushButton_,"));
   pushButton_back->setMinimumSize(QSize(64, 64));
   pushButton_back->setMaximumSize(QSize(64, 64));
   pushButton_back->setStyleSheet(QString::fromUtf8(
@@ -415,7 +417,7 @@ void CMainWindow::setupUi() {
   horizontalLayout_19->addWidget(pushButton_back);
 
   QPushButton *pushButton_backr = new QPushButton();
-  pushButton_backr->setObjectName(QString::fromUtf8("pushButton_backr"));
+  pushButton_backr->setObjectName(QString::fromUtf8("pushButton_."));
   pushButton_backr->setMinimumSize(QSize(64, 64));
   pushButton_backr->setMaximumSize(QSize(64, 64));
   pushButton_backr->setStyleSheet(QString::fromUtf8(
@@ -423,9 +425,41 @@ void CMainWindow::setupUi() {
       "QPushButton{border:none;}\n"
       "QPushButton:pressed{border-image: url(://images/down_right_2.png);}"));
 
+  connect(pushButton_i, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+  connect(pushButton_u, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+  connect(pushButton_o, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+  connect(pushButton_j, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+  connect(pushButton_l, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+  connect(pushButton_m, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+  connect(pushButton_back, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+  connect(pushButton_backr, SIGNAL(clicked()), this, SLOT(slotSpeedControl()));
+
   horizontalLayout_19->addWidget(pushButton_backr);
 
-  verticalLayout_speed_ctrl->addLayout(horizontalLayout_19);
+  verticalLayout_cmd_btn->addLayout(horizontalLayout_19);
+
+  QWidget *cmdCtrlWidget = new QWidget();
+  cmdCtrlWidget->setLayout(verticalLayout_cmd_btn);
+
+  QTabWidget *tabWidget = new QTabWidget;
+
+  tabWidget->addTab(cmdCtrlWidget, "CmdCtl");
+  verticalLayout_speed_ctrl->addWidget(tabWidget);
+  //////////////////////////////////////////////////////遥杆控制
+  QWidget *widget_joyStick = new QWidget();
+  QHBoxLayout *horizontalLayout_joyStick = new QHBoxLayout();
+  joyStick_widget_ = new JoyStick();
+  joyStick_widget_->setMinimumSize(QSize(200, 200));
+
+  connect(joyStick_widget_, SIGNAL(keyNumchanged(int)), this,
+          SLOT(slotJoyStickKeyChange(int)));
+
+  horizontalLayout_joyStick->addStretch();
+  horizontalLayout_joyStick->addWidget(joyStick_widget_);
+  horizontalLayout_joyStick->addStretch();
+  widget_joyStick->setLayout(horizontalLayout_joyStick);
+
+  tabWidget->addTab(widget_joyStick, "JoyStickCtl");
 
   QHBoxLayout *horizontalLayout_20 = new QHBoxLayout();
   horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
@@ -434,14 +468,14 @@ void CMainWindow::setupUi() {
   label_14->setText("角速度:");
   horizontalLayout_20->addWidget(label_14);
 
-  QSlider *horizontalSlider_raw = new QSlider();
-  horizontalSlider_raw->setObjectName(
-      QString::fromUtf8("horizontalSlider_raw"));
-  horizontalSlider_raw->setMaximum(100);
-  horizontalSlider_raw->setValue(100);
-  horizontalSlider_raw->setOrientation(Qt::Horizontal);
+  horizontalSlider_raw_ = new QSlider();
+  horizontalSlider_raw_->setObjectName(
+      QString::fromUtf8("horizontalSlider_raw_"));
+  horizontalSlider_raw_->setMaximum(100);
+  horizontalSlider_raw_->setValue(10);
+  horizontalSlider_raw_->setOrientation(Qt::Horizontal);
 
-  horizontalLayout_20->addWidget(horizontalSlider_raw);
+  horizontalLayout_20->addWidget(horizontalSlider_raw_);
 
   QLabel *label_raw = new QLabel();
   label_raw->setObjectName(QString::fromUtf8("label_raw"));
@@ -450,6 +484,7 @@ void CMainWindow::setupUi() {
 
   verticalLayout_speed_ctrl->addLayout(horizontalLayout_20);
 
+  // linear anglur
   QHBoxLayout *horizontalLayout_21 = new QHBoxLayout();
   horizontalLayout_21->setObjectName(QString::fromUtf8("horizontalLayout_21"));
   QLabel *label_9 = new QLabel();
@@ -457,15 +492,15 @@ void CMainWindow::setupUi() {
   label_9->setText("线速度:");
   horizontalLayout_21->addWidget(label_9);
 
-  QSlider *horizontalSlider_linear = new QSlider();
-  horizontalSlider_linear->setObjectName(
-      QString::fromUtf8("horizontalSlider_linear"));
-  horizontalSlider_linear->setMaximum(100);
-  horizontalSlider_linear->setSingleStep(1);
-  horizontalSlider_linear->setValue(50);
-  horizontalSlider_linear->setOrientation(Qt::Horizontal);
+  horizontalSlider_linear_ = new QSlider();
+  horizontalSlider_linear_->setObjectName(
+      QString::fromUtf8("horizontalSlider_linear_"));
+  horizontalSlider_linear_->setMaximum(100);
+  horizontalSlider_linear_->setSingleStep(1);
+  horizontalSlider_linear_->setValue(10);
+  horizontalSlider_linear_->setOrientation(Qt::Horizontal);
 
-  horizontalLayout_21->addWidget(horizontalSlider_linear);
+  horizontalLayout_21->addWidget(horizontalSlider_linear_);
 
   QLabel *label_linear = new QLabel();
   label_linear->setObjectName(QString::fromUtf8("label_linear"));
@@ -501,14 +536,6 @@ void CMainWindow::setupUi() {
       dock_manager_->addDockWidget(ads::DockWidgetArea::BottomDockWidgetArea,
                                    SpeedCtrlDockWidget, dashboard_area);
   ui->menuView->addAction(SpeedCtrlDockWidget->toggleViewAction());
-  //////////////////////////////////////////////////////遥杆控制
-  joyStick_widget_ = new JoyStick();
-  joyStick_widget_->setMinimumSize(QSize(200, 200));
-  ads::CDockWidget *JoystickDockWidget = new ads::CDockWidget("JoyStick");
-  JoystickDockWidget->setWidget(joyStick_widget_);
-  dock_manager_->addDockWidget(ads::DockWidgetArea::BottomDockWidgetArea,
-                               JoystickDockWidget, speed_ctrl_area);
-  ui->menuView->addAction(JoystickDockWidget->toggleViewAction());
 
   //////////////////////////////////////////////////////槽链接
   QObject::connect(timer_current_time, &QTimer::timeout, [=]() {
@@ -522,13 +549,12 @@ void CMainWindow::setupUi() {
             display_manager_->UpdateDisplay(DISPLAY_MAP, map);
           });
   connect(CommInstance::Instance(),
-          SIGNAL(emitUpdateLocalCostMap(CostMap, basic::RobotPose)), this,
-          SLOT(updateLocalCostMap(CostMap, basic::RobotPose)));
+          SIGNAL(emitUpdateLocalCostMap(CostMap, RobotPose)), this,
+          SLOT(updateLocalCostMap(CostMap, RobotPose)));
   connect(CommInstance::Instance(), SIGNAL(emitUpdateGlobalCostMap(CostMap)),
           this, SLOT(updateGlobalCostMap(CostMap)));
-  connect(CommInstance::Instance(),
-          SIGNAL(emitUpdateRobotPose(basic::RobotPose)), this,
-          SLOT(slotUpdateRobotPose(basic::RobotPose)));
+  connect(CommInstance::Instance(), SIGNAL(emitUpdateRobotPose(RobotPose)),
+          this, SLOT(slotUpdateRobotPose(RobotPose)));
 
   connect(CommInstance::Instance(), SIGNAL(emitUpdateLaserPoint(LaserScan)),
           this, SLOT(slotUpdateLaserPoint(LaserScan)));
@@ -569,6 +595,113 @@ void CMainWindow::setupUi() {
   });
   connect(display_manager_, SIGNAL(cursorPosScene(QPointF)), this,
           SLOT(updateCurpose(QPointF)));
+}
+void CMainWindow::slotJoyStickKeyChange(int value) {
+  //速度
+  float liner = horizontalSlider_linear_->value() * 0.01;
+  float turn = horizontalSlider_raw_->value() * 0.01;
+  bool is_all = checkBox_use_all_->isChecked();
+  char key;
+  std::cout << "joy stic value:" << value << std::endl;
+  switch (value) {
+  case JoyStick::Direction::upleft:
+    key = is_all ? 'U' : 'u';
+    break;
+  case JoyStick::Direction::up:
+    key = is_all ? 'I' : 'i';
+    break;
+  case JoyStick::Direction::upright:
+    key = is_all ? 'O' : 'o';
+    break;
+  case JoyStick::Direction::left:
+    key = is_all ? 'J' : 'j';
+    break;
+  case JoyStick::Direction::right:
+    key = is_all ? 'L' : 'l';
+    break;
+  case JoyStick::Direction::down:
+    key = is_all ? 'M' : 'm';
+    break;
+  case JoyStick::Direction::downleft:
+    key = is_all ? '<' : ',';
+    break;
+  case JoyStick::Direction::downright:
+    key = is_all ? '>' : '.';
+    break;
+  default:
+    return;
+  }
+  std::map<char, std::vector<float>> moveBindings{
+      {'i', {1, 0, 0, 0}},  {'o', {1, 0, 0, -1}},  {'j', {0, 0, 0, 1}},
+      {'l', {0, 0, 0, -1}}, {'u', {1, 0, 0, 1}},   {',', {-1, 0, 0, 0}},
+      {'.', {-1, 0, 0, 1}}, {'m', {-1, 0, 0, -1}}, {'O', {1, -1, 0, 0}},
+      {'I', {1, 0, 0, 0}},  {'J', {0, 1, 0, 0}},   {'L', {0, -1, 0, 0}},
+      {'U', {1, 1, 0, 0}},  {'<', {-1, 0, 0, 0}},  {'>', {-1, -1, 0, 0}},
+      {'M', {-1, 1, 0, 0}}, {'t', {0, 0, 1, 0}},   {'b', {0, 0, -1, 0}},
+      {'k', {0, 0, 0, 0}},  {'K', {0, 0, 0, 0}}};
+  //计算是往哪个方向
+  float x = moveBindings[key][0];
+  float y = moveBindings[key][1];
+  float z = moveBindings[key][2];
+  float th = moveBindings[key][3];
+  CommInstance::Instance()->pubSpeed(
+      Eigen::Vector3f(x * liner, y * liner, th * turn));
+}
+void CMainWindow::slotSpeedControl() {
+  QPushButton *btn = qobject_cast<QPushButton *>(sender());
+  std::string button_name = btn->objectName().toStdString();
+  char button_key = button_name.at(button_name.size() - 1);
+  //速度
+  float liner = horizontalSlider_linear_->value() * 0.01;
+  float turn = horizontalSlider_raw_->value() * 0.01;
+  bool is_all = checkBox_use_all_->isChecked();
+  char key;
+
+  switch (button_key) {
+  case 'u':
+    key = is_all ? 'U' : 'u';
+    break;
+  case 'i':
+    key = is_all ? 'I' : 'i';
+    break;
+  case 'o':
+    key = is_all ? 'O' : 'o';
+    break;
+  case 'j':
+    key = is_all ? 'J' : 'j';
+    break;
+  case 'l':
+    key = is_all ? 'L' : 'l';
+    break;
+  case 'm':
+    key = is_all ? 'M' : 'm';
+    break;
+  case ',':
+    key = is_all ? '<' : ',';
+    break;
+  case '.':
+    key = is_all ? '>' : '.';
+    break;
+  default:
+    return;
+  }
+
+  std::map<char, std::vector<float>> moveBindings{
+      {'i', {1, 0, 0, 0}},  {'o', {1, 0, 0, -1}},  {'j', {0, 0, 0, 1}},
+      {'l', {0, 0, 0, -1}}, {'u', {1, 0, 0, 1}},   {',', {-1, 0, 0, 0}},
+      {'.', {-1, 0, 0, 1}}, {'m', {-1, 0, 0, -1}}, {'O', {1, -1, 0, 0}},
+      {'I', {1, 0, 0, 0}},  {'J', {0, 1, 0, 0}},   {'L', {0, -1, 0, 0}},
+      {'U', {1, 1, 0, 0}},  {'<', {-1, 0, 0, 0}},  {'>', {-1, -1, 0, 0}},
+      {'M', {-1, 1, 0, 0}}, {'t', {0, 0, 1, 0}},   {'b', {0, 0, -1, 0}},
+      {'k', {0, 0, 0, 0}},  {'K', {0, 0, 0, 0}}};
+  //计算是往哪个方向
+  std::cout << "key:" << key << std::endl;
+  float x = moveBindings[key][0];
+  float y = moveBindings[key][1];
+  float z = moveBindings[key][2];
+  float th = moveBindings[key][3];
+  CommInstance::Instance()->pubSpeed(
+      Eigen::Vector3f(x * liner, y * liner, th * turn));
 }
 void CMainWindow::updateCurpose(QPointF pos) {
   basic::Point mapPos = CommInstance::Instance()->transScenePoint2Word(
@@ -656,14 +789,14 @@ void CMainWindow::updateOdomInfo(RobotState state) {
   //         QPixmap::fromImage(QImage("://images/turnRight_l.png")));
   //   }
   //   // 仪表盘
-  //   speed_dash_board_->set_speed(abs(state.vx * 100));
-  //   if (state.vx > 0.001) {
-  //     speed_dash_board_->set_gear(DashBoard::kGear_D);
-  //   } else if (state.vx < -0.001) {
-  //     speed_dash_board_->set_gear(DashBoard::kGear_R);
-  //   } else {
-  //     speed_dash_board_->set_gear(DashBoard::kGear_N);
-  //   }
+  speed_dash_board_->set_speed(abs(state.vx * 100));
+  if (state.vx > 0.001) {
+    speed_dash_board_->set_gear(DashBoard::kGear_D);
+  } else if (state.vx < -0.001) {
+    speed_dash_board_->set_gear(DashBoard::kGear_R);
+  } else {
+    speed_dash_board_->set_gear(DashBoard::kGear_N);
+  }
   //   QString number = QString::number(abs(state.vx * 100)).mid(0, 2);
   //   if (number[1] == ".") {
   //     number = number.mid(0, 1);
