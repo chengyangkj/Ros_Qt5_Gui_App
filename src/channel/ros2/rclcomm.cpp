@@ -7,6 +7,7 @@
  * @Description: ros2通讯类
  */
 #include "channel/ros2/rclcomm.h"
+#include "common/config/configManager.h"
 #include "common/logger/logger.h"
 #include <fstream>
 rclcomm::rclcomm() {
@@ -26,11 +27,11 @@ rclcomm::rclcomm() {
   auto sub_laser_obt = rclcpp::SubscriptionOptions();
   sub_laser_obt.callback_group = callback_group_laser;
 
-  navGoalPublisher_ =
-      node->create_publisher<geometry_msgs::msg::PoseStamped>("goal_pose", 10);
+  navGoalPublisher_ = node->create_publisher<geometry_msgs::msg::PoseStamped>(
+      GET_TOPIC_NAME("NavGoal"), 10);
   initPosePublisher_ =
       node->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
-          "initialpose", 10);
+          GET_TOPIC_NAME("Reloc"), 10);
   _publisher =
       node->create_publisher<std_msgs::msg::Int32>("ros2_qt_dmeo_publish", 10);
   _subscription = node->create_subscription<std_msgs::msg::Int32>(
@@ -38,32 +39,33 @@ rclcomm::rclcomm() {
       std::bind(&rclcomm::recv_callback, this, std::placeholders::_1),
       sub1_obt);
   m_map_sub = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-      "/map", rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
+      GET_TOPIC_NAME("Map"),
+      rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
       std::bind(&rclcomm::map_callback, this, std::placeholders::_1), sub1_obt);
   m_localCostMapSub = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-      "/local_costmap/costmap",
+      GET_TOPIC_NAME("LocalCostMap"),
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
       std::bind(&rclcomm::localCostMapCallback, this, std::placeholders::_1),
       sub1_obt);
   m_globalCostMapSub = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-      "/global_costmap/costmap",
+      GET_TOPIC_NAME("GlobalCostMap"),
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
       std::bind(&rclcomm::globalCostMapCallback, this, std::placeholders::_1),
       sub1_obt);
   m_laser_sub = node->create_subscription<sensor_msgs::msg::LaserScan>(
-      "/scan", 20,
+      GET_TOPIC_NAME("LaserScan"), 20,
       std::bind(&rclcomm::laser_callback, this, std::placeholders::_1),
       sub_laser_obt);
   m_path_sub = node->create_subscription<nav_msgs::msg::Path>(
-      "/plan", 20,
+      GET_TOPIC_NAME("GlobalPlan"), 20,
       std::bind(&rclcomm::path_callback, this, std::placeholders::_1),
       sub1_obt);
   _local_path_sub = node->create_subscription<nav_msgs::msg::Path>(
-      "/local_plan", 20,
+      GET_TOPIC_NAME("LocalPlan"), 20,
       std::bind(&rclcomm::local_path_callback, this, std::placeholders::_1),
       sub1_obt);
   m_odom_sub = node->create_subscription<nav_msgs::msg::Odometry>(
-      "/odom", 20,
+      GET_TOPIC_NAME("Odometry"), 20,
       std::bind(&rclcomm::odom_callback, this, std::placeholders::_1),
       sub1_obt);
   m_tf_buffer = std::make_unique<tf2_ros::Buffer>(node->get_clock());
