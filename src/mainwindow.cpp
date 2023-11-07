@@ -19,21 +19,6 @@
 #include "FloatingDockContainer.h"
 #include "basic/algorithm.h"
 #include "common/logger/easylogging++.h"
-#include <QCalendarWidget>
-#include <QFileDialog>
-#include <QFileSystemModel>
-#include <QHBoxLayout>
-#include <QInputDialog>
-#include <QLabel>
-#include <QMessageBox>
-#include <QPlainTextEdit>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QSettings>
-#include <QTableWidget>
-#include <QToolBar>
-#include <QTreeView>
-#include <QWidgetAction>
 
 using namespace ads;
 
@@ -57,6 +42,10 @@ void CMainWindow::setupUi() {
   CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
   CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
   CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+  CDockManager::setConfigFlag(CDockManager::DockAreaHasUndockButton, false);
+  CDockManager::setConfigFlag(CDockManager::DockAreaHasTabsMenuButton, false);
+  CDockManager::setConfigFlag(CDockManager::MiddleMouseButtonClosesTab, true);
+  CDockManager::setConfigFlag(CDockManager::MiddleMouseButtonClosesTab, true);
   dock_manager_ = new CDockManager(this);
 
   QVBoxLayout *central_layout = new QVBoxLayout();
@@ -309,15 +298,14 @@ void CMainWindow::setupUi() {
   //////////////////////////////////////////////////////////速度仪表盘
   ads::CDockWidget *DashBoardDockWidget = new ads::CDockWidget("DashBoard");
   QWidget *speed_dashboard_widget = new QWidget();
+  // speed_dashboard_widget->setMinimumSize(QSize(300, 300));
   DashBoardDockWidget->setWidget(speed_dashboard_widget);
   speed_dash_board_ = new DashBoard(speed_dashboard_widget);
   auto dashboard_area =
       dock_manager_->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea,
                                    DashBoardDockWidget, CentralDockArea);
   ui->menuView->addAction(DashBoardDockWidget->toggleViewAction());
-  QTimer *timer_current_time = new QTimer;
-  timer_current_time->setInterval(100);
-  timer_current_time->start();
+
   ////////////////////////////////////////////////////////速度控制
   QVBoxLayout *verticalLayout_speed_ctrl = new QVBoxLayout();
   verticalLayout_speed_ctrl->setObjectName(
@@ -327,6 +315,8 @@ void CMainWindow::setupUi() {
   horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
   QPushButton *pushButton_u = new QPushButton();
   pushButton_u->setObjectName(QString::fromUtf8("pushButton_u"));
+  pushButton_u->setText("u");
+  pushButton_u->setShortcut(QApplication::translate("Widget", "u", nullptr));
   pushButton_u->setMinimumSize(QSize(64, 64));
   pushButton_u->setMaximumSize(QSize(64, 64));
   pushButton_u->setStyleSheet(QString::fromUtf8(
@@ -338,6 +328,8 @@ void CMainWindow::setupUi() {
 
   QPushButton *pushButton_i = new QPushButton();
   pushButton_i->setObjectName(QString::fromUtf8("pushButton_i"));
+  pushButton_i->setText("i");
+  pushButton_i->setShortcut(QApplication::translate("Widget", "i", nullptr));
   pushButton_i->setMinimumSize(QSize(64, 64));
   pushButton_i->setMaximumSize(QSize(64, 64));
   pushButton_i->setStyleSheet(QString::fromUtf8(
@@ -349,6 +341,8 @@ void CMainWindow::setupUi() {
 
   QPushButton *pushButton_o = new QPushButton();
   pushButton_o->setObjectName(QString::fromUtf8("pushButton_o"));
+  pushButton_o->setText("o");
+  pushButton_o->setShortcut(QApplication::translate("Widget", "o", nullptr));
   pushButton_o->setMinimumSize(QSize(64, 64));
   pushButton_o->setMaximumSize(QSize(64, 64));
   pushButton_o->setStyleSheet(QString::fromUtf8(
@@ -363,6 +357,8 @@ void CMainWindow::setupUi() {
   QHBoxLayout *horizontalLayout_18 = new QHBoxLayout();
   horizontalLayout_18->setObjectName(QString::fromUtf8("horizontalLayout_18"));
   QPushButton *pushButton_j = new QPushButton();
+  pushButton_j->setText("j");
+  pushButton_j->setShortcut(QApplication::translate("Widget", "j", nullptr));
   pushButton_j->setObjectName(QString::fromUtf8("pushButton_j"));
   pushButton_j->setMinimumSize(QSize(64, 64));
   pushButton_j->setMaximumSize(QSize(64, 64));
@@ -381,6 +377,8 @@ void CMainWindow::setupUi() {
 
   QPushButton *pushButton_l = new QPushButton();
   pushButton_l->setObjectName(QString::fromUtf8("pushButton_l"));
+  pushButton_l->setText("l");
+  pushButton_l->setShortcut(QApplication::translate("Widget", "l", nullptr));
   pushButton_l->setMinimumSize(QSize(64, 64));
   pushButton_l->setMaximumSize(QSize(64, 64));
   pushButton_l->setStyleSheet(QString::fromUtf8(
@@ -396,6 +394,8 @@ void CMainWindow::setupUi() {
   horizontalLayout_19->setObjectName(QString::fromUtf8("horizontalLayout_19"));
   QPushButton *pushButton_m = new QPushButton();
   pushButton_m->setObjectName(QString::fromUtf8("pushButton_m"));
+  pushButton_m->setText("m");
+  pushButton_m->setShortcut(QApplication::translate("Widget", "m", nullptr));
   pushButton_m->setMinimumSize(QSize(64, 64));
   pushButton_m->setMaximumSize(QSize(64, 64));
   pushButton_m->setStyleSheet(QString::fromUtf8(
@@ -407,6 +407,8 @@ void CMainWindow::setupUi() {
 
   QPushButton *pushButton_back = new QPushButton();
   pushButton_back->setObjectName(QString::fromUtf8("pushButton_,"));
+  pushButton_back->setText(",");
+  pushButton_back->setShortcut(QApplication::translate("Widget", ",", nullptr));
   pushButton_back->setMinimumSize(QSize(64, 64));
   pushButton_back->setMaximumSize(QSize(64, 64));
   pushButton_back->setStyleSheet(QString::fromUtf8(
@@ -418,6 +420,9 @@ void CMainWindow::setupUi() {
 
   QPushButton *pushButton_backr = new QPushButton();
   pushButton_backr->setObjectName(QString::fromUtf8("pushButton_."));
+  pushButton_backr->setText(".");
+  pushButton_backr->setShortcut(
+      QApplication::translate("Widget", ".", nullptr));
   pushButton_backr->setMinimumSize(QSize(64, 64));
   pushButton_backr->setMaximumSize(QSize(64, 64));
   pushButton_backr->setStyleSheet(QString::fromUtf8(
@@ -443,7 +448,7 @@ void CMainWindow::setupUi() {
 
   QTabWidget *tabWidget = new QTabWidget;
 
-  tabWidget->addTab(cmdCtrlWidget, "CmdCtl");
+  tabWidget->addTab(cmdCtrlWidget, "CmdCtrl");
   verticalLayout_speed_ctrl->addWidget(tabWidget);
   //////////////////////////////////////////////////////遥杆控制
   QWidget *widget_joyStick = new QWidget();
@@ -459,7 +464,7 @@ void CMainWindow::setupUi() {
   horizontalLayout_joyStick->addStretch();
   widget_joyStick->setLayout(horizontalLayout_joyStick);
 
-  tabWidget->addTab(widget_joyStick, "JoyStickCtl");
+  tabWidget->addTab(widget_joyStick, "JoyStickCtrl");
 
   QHBoxLayout *horizontalLayout_20 = new QHBoxLayout();
   horizontalLayout_20->setObjectName(QString::fromUtf8("horizontalLayout_20"));
@@ -479,7 +484,12 @@ void CMainWindow::setupUi() {
 
   QLabel *label_raw = new QLabel();
   label_raw->setObjectName(QString::fromUtf8("label_raw"));
-
+  label_raw->setText(QString::number(horizontalSlider_raw_->value() * 0.01) +
+                     " deg/s");
+  connect(
+      horizontalSlider_raw_, &QSlider::valueChanged, [label_raw](qreal value) {
+        label_raw->setText(QString::number(rad2deg(value * 0.01)) + " deg/s");
+      });
   horizontalLayout_20->addWidget(label_raw);
 
   verticalLayout_speed_ctrl->addLayout(horizontalLayout_20);
@@ -504,10 +514,26 @@ void CMainWindow::setupUi() {
 
   QLabel *label_linear = new QLabel();
   label_linear->setObjectName(QString::fromUtf8("label_linear"));
-
+  label_linear->setText(
+      QString::number(horizontalSlider_linear_->value() * 0.01) + " m/s");
+  connect(horizontalSlider_linear_, &QSlider::valueChanged,
+          [label_linear](qreal value) {
+            label_linear->setText(QString::number(value * 0.01) + " m/s");
+          });
   horizontalLayout_21->addWidget(label_linear);
-
   verticalLayout_speed_ctrl->addLayout(horizontalLayout_21);
+  QHBoxLayout *horizontalLayout_stop_button = new QHBoxLayout();
+  QPushButton *btn_stop = new QPushButton();
+  btn_stop->setObjectName(QString::fromUtf8("btn_stop"));
+  btn_stop->setText("停止(s)");
+  btn_stop->setShortcut(QApplication::translate("Widget", "s", nullptr));
+  connect(btn_stop, &QPushButton::clicked, [this]() {
+    CommInstance::Instance()->pubSpeed(Eigen::Vector3f(0, 0, 0));
+  });
+  horizontalLayout_stop_button->addStretch();
+  horizontalLayout_stop_button->addWidget(btn_stop);
+  horizontalLayout_stop_button->addStretch();
+  verticalLayout_speed_ctrl->addLayout(horizontalLayout_stop_button);
 
   QHBoxLayout *horizontalLayout_23 = new QHBoxLayout();
   horizontalLayout_23->setObjectName(QString::fromUtf8("horizontalLayout_23"));
@@ -538,6 +564,9 @@ void CMainWindow::setupUi() {
   ui->menuView->addAction(SpeedCtrlDockWidget->toggleViewAction());
 
   //////////////////////////////////////////////////////槽链接
+  QTimer *timer_current_time = new QTimer;
+  timer_current_time->setInterval(100);
+  timer_current_time->start();
   QObject::connect(timer_current_time, &QTimer::timeout, [=]() {
     label_time->setText(QDateTime::currentDateTime().toString("  hh:mm:ss  "));
   });
@@ -649,8 +678,7 @@ void CMainWindow::slotJoyStickKeyChange(int value) {
 }
 void CMainWindow::slotSpeedControl() {
   QPushButton *btn = qobject_cast<QPushButton *>(sender());
-  std::string button_name = btn->objectName().toStdString();
-  char button_key = button_name.at(button_name.size() - 1);
+  char button_key = btn->text().toStdString()[0];
   //速度
   float liner = horizontalSlider_linear_->value() * 0.01;
   float turn = horizontalSlider_raw_->value() * 0.01;
