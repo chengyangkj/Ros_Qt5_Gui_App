@@ -1,12 +1,3 @@
-/*
- * @Author: chengyangkj chengyangkj@qq.com
- * @Date: 2023-10-01 06:31:04
- * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-06 12:09:12
- * @FilePath: /examples/centralwidget/mainwindow.h
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
- * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -15,9 +6,9 @@
 #include "DockWidget.h"
 #include "basic/point_type.h"
 #include "channel/base/comm_instance.h"
-#include "dashboard.h"
 #include "display/display_manager.h"
-#include "joystick.h"
+#include "widgets/dashboard.h"
+#include "widgets/joystick.h"
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QFileDialog>

@@ -1,4 +1,4 @@
-#include "joystick.h"
+#include "widgets/joystick.h"
 
 #include <QDebug>
 JoyStick::JoyStick(QWidget *parent) : QWidget(parent) {

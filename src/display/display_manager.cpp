@@ -19,7 +19,8 @@
 
 namespace Display {
 
-DisplayManager::DisplayManager(QGraphicsView *viewer) {
+DisplayManager::DisplayManager(QGraphicsView *viewer)
+    : graphics_view_ptr_(viewer) {
   FactoryDisplay::Instance()->Init(viewer);
 
   //------------------------------------start display instace (register
@@ -83,7 +84,11 @@ void DisplayManager::slotUpdateNavGoalScenePose(Eigen::Vector3f pose) {
       ->UpdateDisplay(Eigen::Vector3f(occ_pose.x(), occ_pose.y(), 0));
 }
 void DisplayManager::InitUi() {
-  // 跟随车体移动的按钮
+  QWidget *widget = new QWidget(graphics_view_ptr_);
+  QHBoxLayout *layout = new QHBoxLayout();
+  QLabel *label = new QLabel("txt");
+  layout->addWidget(label);
+  widget->setLayout(layout);
 }
 DisplayManager::~DisplayManager() {}
 

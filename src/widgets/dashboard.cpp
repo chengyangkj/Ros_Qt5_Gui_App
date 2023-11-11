@@ -1,4 +1,4 @@
-#include "dashboard.h"
+#include "widgets/dashboard.h"
 
 #include <qapplication.h>
 #include <qpainter.h>

@@ -27,6 +27,8 @@
 #include "particle_points.h"
 #include "point_shape.h"
 #include "region.h"
+#include <QLabel>
+#include <QtWidgets/QVBoxLayout>
 #define DISPLAY_ROBOT "Robot"
 #define DISPLAY_MAP "OccupyMap"
 #define DISPLAY_LOCAL_COST_MAP "LocalCostMap"
@@ -57,6 +59,7 @@ private:
   CostMap local_cost_map_;
   double global_scal_value_ = 1;
   bool is_reloc_mode_{false};
+  QGraphicsView *graphics_view_ptr_;
 signals:
   void cursorPosMap(QPointF);
   void DisplayRobotPoseWorld(Eigen::Vector3f pose);
