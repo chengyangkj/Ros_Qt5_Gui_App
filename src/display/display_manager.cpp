@@ -54,7 +54,6 @@ DisplayManager::DisplayManager(QGraphicsView *viewer) {
           this, SLOT(slotUpdateRobotScenePose(Eigen::Vector3f)));
   connect(GetDisplay(DISPLAY_GOAL), SIGNAL(signalPoseUpdate(Eigen::Vector3f)),
           this, SLOT(slotUpdateNavGoalScenePose(Eigen::Vector3f)));
-
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
@@ -88,16 +87,6 @@ void DisplayManager::InitUi() {
 }
 DisplayManager::~DisplayManager() {}
 
-void DisplayManager::slotUpdateCursorPose(std::string name, QPointF pose) {
-  if (name == DISPLAY_MAP) {
-    int scene_x = pose.x();
-    int scene_y = pose.y();
-    emit cursorPosScene(QPointF(scene_x, scene_y));
-    double x, y;
-    map_data_.occPose2xy(scene_x, scene_y, x, y);
-    emit cursorPosMap(QPointF(x, y));
-  }
-}
 bool DisplayManager::SetDisplayConfig(const std::string &config_name,
                                       const std::any &data) {
   QString q_config_name = QString::fromStdString(config_name);

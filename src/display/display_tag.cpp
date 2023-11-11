@@ -57,6 +57,6 @@ void DisplayTag::computeBoundRect(Display::TagDataMap &data_map) {
     // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
     //           << "ymin:" << ymin <<" x:"<<x<<" y:"<<pose[1]<< std::endl;
   }
-  SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
+  SetBoundingRect(QRectF(xmin, ymin, xmax, ymax));
 }
 } // namespace Display

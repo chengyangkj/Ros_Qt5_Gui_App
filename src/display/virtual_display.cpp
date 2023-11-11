@@ -223,11 +223,13 @@ void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   update();
 }
 void VirtualDisplay::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+  emit signalCursorPose(event->pos());
   if (!move_enable_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::hoverMoveEvent(event);
     return;
   }
+
   update();
 }
 } // namespace Display

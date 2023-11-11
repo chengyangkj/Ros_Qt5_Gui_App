@@ -77,7 +77,7 @@ public slots:
   void updateLocalPath(RobotPath path);
   void updateLocalCostMap(CostMap, RobotPose);
   void updateGlobalCostMap(CostMap map);
-  void updateCurpose(QPointF pos);
+  void signalCursorPose(QPointF pos);
   void slotSpeedControl();
   void slotJoyStickKeyChange(int value);
 

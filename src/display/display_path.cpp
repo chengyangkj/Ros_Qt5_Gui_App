@@ -67,6 +67,6 @@ void DisplayPath::computeBoundRect(const Display::PathData &path) {
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
+  SetBoundingRect(QRectF(xmin, ymin, xmax, ymax));
 }
 } // namespace Display

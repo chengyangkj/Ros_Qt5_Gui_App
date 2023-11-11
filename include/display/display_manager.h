@@ -59,13 +59,11 @@ private:
   bool is_reloc_mode_{false};
 signals:
   void cursorPosMap(QPointF);
-  void cursorPosScene(QPointF);
   void DisplayRobotPoseWorld(Eigen::Vector3f pose);
   void signalPub2DPose(Eigen::Vector3f pose);
   void signalPub2DGoal(Eigen::Vector3f pose);
 public slots:
   void updateScaled(double value);
-  void slotUpdateCursorPose(std::string, QPointF);
   void start2DPose(const bool &is_start);
   void start2DGoal(const bool &is_start);
   void slotUpdateRobotScenePose(Eigen::Vector3f);

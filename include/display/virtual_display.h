@@ -64,7 +64,7 @@ public:
   Eigen::Vector3f pose_in_parent_{0, 0, 0};
   std::vector<VirtualDisplay *> children_;
 signals:
-  void updateCursorPose(std::string display_name, QPointF pose);
+  void signalCursorPose(QPointF pose);
   void signalPoseUpdate(Eigen::Vector3f);
 
 public:
@@ -110,9 +110,7 @@ public:
   QPointF PoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
   }
-  void SetPoseInParent(const Eigen::Vector3f &pose) {
-    pose_in_parent_ = pose;
-  }
+  void SetPoseInParent(const Eigen::Vector3f &pose) { pose_in_parent_ = pose; }
   Eigen::Vector3f GetPoseInParent() { return pose_in_parent_; }
   std::string GetPraentName() { return parent_name_; }
   //设置原点在全局的坐标

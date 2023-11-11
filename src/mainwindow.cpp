@@ -253,7 +253,7 @@ void CMainWindow::setupUi() {
   QHBoxLayout *horizontalLayout_12 = new QHBoxLayout();
   horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
   QLabel *label = new QLabel();
-  label->setText("scene:");
+  label->setText("map:");
   label->setObjectName(QString::fromUtf8("label"));
   label->setMinimumSize(QSize(80, 40));
 
@@ -268,7 +268,7 @@ void CMainWindow::setupUi() {
   horizontalLayout_12->addWidget(label_pos_map_);
 
   QLabel *label_5 = new QLabel();
-  label_5->setText("map:");
+  label_5->setText("scene:");
 
   label_5->setObjectName(QString::fromUtf8("label_5"));
   label_5->setMinimumSize(QSize(80, 40));
@@ -622,8 +622,9 @@ void CMainWindow::setupUi() {
       set_goal_btn->setText("set goal");
     }
   });
-  connect(display_manager_, SIGNAL(cursorPosScene(QPointF)), this,
-          SLOT(updateCurpose(QPointF)));
+  connect(display_manager_->GetDisplay(DISPLAY_MAP),
+          SIGNAL(signalCursorPose(QPointF)), this,
+          SLOT(signalCursorPose(QPointF)));
 }
 void CMainWindow::slotJoyStickKeyChange(int value) {
   //速度
@@ -731,7 +732,7 @@ void CMainWindow::slotSpeedControl() {
   CommInstance::Instance()->pubSpeed(
       Eigen::Vector3f(x * liner, y * liner, th * turn));
 }
-void CMainWindow::updateCurpose(QPointF pos) {
+void CMainWindow::signalCursorPose(QPointF pos) {
   basic::Point mapPos = CommInstance::Instance()->transScenePoint2Word(
       basic::Point(pos.x(), pos.y()));
   label_pos_map_->setText("x: " + QString::number(mapPos.x).mid(0, 4) +

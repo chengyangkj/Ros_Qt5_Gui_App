@@ -45,7 +45,7 @@ void LaserPoints::computeBoundRect(const Display::LaserDataMap &laser_scan) {
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  SetBoundingRect(QRectF(0, 0, xmax - xmin, ymax - ymin));
+  SetBoundingRect(QRectF(xmin, ymin, xmax, ymax));
 }
 bool LaserPoints::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {
@@ -76,6 +76,8 @@ void LaserPoints::drawLaser(QPainter *painter, int id,
     // std::cout<<"point:"<<point.x() <<" "<<point.y()<<std::endl;
     painter->drawPoint(point);
   }
+  // std::cout << "paint laser" << std::endl;
+  // qDebug() << "boundRet:" << bounding_rect_ << std::endl;
 }
 void LaserPoints::Id2Color(int id, int &R, int &G, int &B) {
 #define LocationColorJudge(JudegeId, color)                                    \
