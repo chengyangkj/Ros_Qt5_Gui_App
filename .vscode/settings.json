@@ -76,7 +76,8 @@
         "shared_mutex": "cpp",
         "cfenv": "cpp",
         "qgraphicsscenewheelevent": "cpp",
-        "qgraphicsview": "cpp"
+        "qgraphicsview": "cpp",
+        "qsettings": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

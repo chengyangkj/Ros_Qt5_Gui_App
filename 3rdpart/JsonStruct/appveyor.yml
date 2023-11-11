@@ -1,0 +1,68 @@
+version: 1.0.{build}
+
+image:
+  - Ubuntu2004
+  - Visual Studio 2015
+  - Visual Studio 2017
+  - Visual Studio 2019
+    # - macos
+
+platform:
+  - x86
+  - x64
+
+configuration:
+- Debug
+
+for:
+-
+  matrix:
+    only:
+      - image: Visual Studio 2019
+        platform: x86
+  before_build: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
+-
+  matrix:
+    only:
+      - image: Visual Studio 2019
+        platform: x64
+  before_build: call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+-
+  matrix:
+    only:
+      - image: Visual Studio 2017
+        platform: x86
+  before_build: call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+-
+  matrix:
+    only:
+      - image: Visual Studio 2017
+        platform: x64
+  before_build: call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+-
+  matrix:
+    only:
+      - image: Visual Studio 2015
+        platform: x86
+  before_build:
+    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
+-
+  matrix:
+    only:
+      - image: Visual Studio 2015
+        platform: x64
+  before_build:
+    - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+    - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
+
+matrix:
+  exclude:
+    - image: Ubuntu2004
+      platform: x86
+
+build_script:
+- cmake -H. -B./build -DJSON_STRUCT_OPT_BUILD_BENCHMARKS=OFF -GNinja
+- ninja -C build
+
+test_script:
+  - ctest --test-dir build

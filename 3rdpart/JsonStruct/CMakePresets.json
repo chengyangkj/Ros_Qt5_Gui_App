@@ -1,0 +1,93 @@
+{
+    "version": 2,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 20,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+            }
+        },
+        {
+            "name": "single_config",
+            "inherits": "base",
+            "generator": "Ninja",
+            "hidden": true
+        },
+        {
+            "name": "homebrew_clang",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/local/opt/llvm/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/local/opt/llvm/bin/clang++",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "debug",
+            "inherits": "single_config",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "debug_brew",
+            "inherits": [
+                "single_config",
+                "homebrew_clang"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release_brew",
+            "inherits": [
+                "single_config",
+                "homebrew_clang"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "release",
+            "inherits": "single_config",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "multi_config",
+            "generator": "Ninja Multi-Config",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_CONFIGURATION_TYPES": "Release;Debug",
+                "CMAKE_CROSS_CONFIGS": "all",
+                "CMAKE_DEFAULT_CONFIGS": "all"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug_brew",
+            "description": "",
+            "displayName": "",
+            "configurePreset": "debug_brew"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "debug_brew",
+            "description": "",
+            "displayName": "",
+            "configurePreset": "debug_brew"
+        }
+    ]
+}

@@ -10,13 +10,13 @@
 #ifndef PointShape_H
 #define PointShape_H
 // NOLINTBEGIN
+#include "virtual_display.h"
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsSceneWheelEvent>
+#include <QMenu>
 #include <QObject>
 #include <QPainter>
-
-#include "virtual_display.h"
 namespace Display {
 class PointShape : public VirtualDisplay {
   Q_OBJECT
@@ -29,13 +29,13 @@ public:
   bool UpdateData(const std::any &data) override;
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data) override;
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
 private:
   QPixmap robot_image_;
   ePointType type_;
   Eigen::Vector3f robot_pose_;
   bool enable_{true};
-
 
 private:
   void drawRobot(QPainter *painter);

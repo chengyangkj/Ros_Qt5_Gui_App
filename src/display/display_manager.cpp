@@ -246,6 +246,7 @@ DisplayManager::transLaserPoint(const std::vector<Eigen::Vector2f> &point) {
  * @return {*}
  */
 void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
+  // FocusDisplay(DISPLAY_ROBOT);
   emit DisplayRobotPoseWorld(pose);
   robot_pose_ = pose;
   GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(wordPose2Map(pose));

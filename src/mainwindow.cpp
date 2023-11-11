@@ -209,7 +209,7 @@ void CMainWindow::setupUi() {
                         "margin:0px 0px 0px 0px;\n"
                         "}"));
   QIcon icon5;
-  icon5.addFile(QString::fromUtf8(":/images/classes/SetGoal.png"), QSize(),
+  icon5.addFile(QString::fromUtf8("://images/mutil_pose.png"), QSize(),
                 QIcon::Normal, QIcon::Off);
   set_goal_btn->setIcon(icon5);
 
@@ -217,7 +217,7 @@ void CMainWindow::setupUi() {
 
   QPushButton *set_mutil_goal_btn = new QPushButton();
   set_mutil_goal_btn->setObjectName(QString::fromUtf8(" set_mutil_goal_btn"));
-  set_mutil_goal_btn->setText("发布多目标点");
+  set_mutil_goal_btn->setText("Focus Robot");
   set_mutil_goal_btn->setStyleSheet(
       QString::fromUtf8("QPushButton:hover{\n"
                         "background-color:rgb(186, 189, 182);\n"
