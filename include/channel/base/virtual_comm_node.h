@@ -50,5 +50,5 @@ signals:
 public slots:
   virtual void pub2DPose(Eigen::Vector3f pose) = 0;
   virtual void pub2DGoal(Eigen::Vector3f pose) = 0;
-  virtual void pubSpeed(Eigen::Vector3f speed) = 0;
+  virtual void pubSpeed(const RobotSpeed& speed) = 0;
 };

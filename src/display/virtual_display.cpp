@@ -1,3 +1,4 @@
+#include "basic/algorithm.h"
 #include "display/factory_display.h"
 namespace Display {
 
@@ -156,7 +157,7 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
       dotValue = 0.0;
 
     // 获取角度
-    qreal angle = dotValue * 1.0 / (PI / 180);
+    qreal angle = basic::rad2deg(dotValue);
 
     // 向量叉乘获取方向
     QVector3D crossValue = QVector3D::crossProduct(QVector3D(startVec, 1.0),

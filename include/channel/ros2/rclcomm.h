@@ -51,7 +51,7 @@ private:
 public slots:
   void pub2DPose(Eigen::Vector3f pose) override;
   void pub2DGoal(Eigen::Vector3f pose) override;
-  void pubSpeed(Eigen::Vector3f speed) override;
+  void pubSpeed(const RobotSpeed &speed) override;
   basic::RobotPose getTrasnsform(std::string from, std::string to);
 
 private:

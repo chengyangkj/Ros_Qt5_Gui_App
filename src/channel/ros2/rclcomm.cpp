@@ -152,15 +152,15 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
     qDebug() << "local path transform error:" << ex.what();
   }
 }
-void rclcomm::pubSpeed(Eigen::Vector3f speed) {
+void rclcomm::pubSpeed(const RobotSpeed &speed) {
   geometry_msgs::msg::Twist twist;
-  twist.linear.x = speed[0];
-  twist.linear.y = speed[1];
+  twist.linear.x = speed.vx;
+  twist.linear.y = speed.vy;
   twist.linear.z = 0;
 
   twist.angular.x = 0;
   twist.angular.y = 0;
-  twist.angular.z = speed[2];
+  twist.angular.z = speed.w;
 
   // Publish it and resolve any remaining callbacks
   speed_publisher_->publish(twist);

@@ -8,7 +8,8 @@
 #include "channel/base/comm_instance.h"
 #include "display/display_manager.h"
 #include "widgets/dashboard.h"
-#include "widgets/joystick.h"
+
+#include "widgets/speed_ctrl.h"
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QFileDialog>
@@ -28,25 +29,6 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QWidgetAction>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QFrame>
-#include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QListView>
-#include <QtWidgets/QListWidget>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QProgressBar>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QSlider>
-#include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class CMainWindow;
@@ -69,8 +51,8 @@ public slots:
   void updateLocalCostMap(CostMap, RobotPose);
   void updateGlobalCostMap(CostMap map);
   void signalCursorPose(QPointF pos);
-  void slotSpeedControl();
-  void slotJoyStickKeyChange(int value);
+
+
 
 protected:
   virtual void closeEvent(QCloseEvent *event) override;
@@ -94,7 +76,8 @@ private:
   QLabel *label_power_;
   QLabel *label_pos_map_;
   QLabel *label_pos_scene_;
-  JoyStick *joyStick_widget_;
+
+  SpeedCtrlWidget *speed_ctrl_widget_;
 
 private:
   void setupUi();

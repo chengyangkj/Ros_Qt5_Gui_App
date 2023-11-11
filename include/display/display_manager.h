@@ -18,6 +18,7 @@
 #include <functional>
 #include <map>
 
+#include "basic/algorithm.h"
 #include "display_cost_map.h"
 #include "display_occ_map.h"
 #include "display_path.h"
