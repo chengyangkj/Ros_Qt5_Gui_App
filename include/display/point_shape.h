@@ -29,7 +29,7 @@ public:
   bool UpdateData(const std::any &data) override;
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data) override;
-  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+  // void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
 private:
   QPixmap robot_image_;

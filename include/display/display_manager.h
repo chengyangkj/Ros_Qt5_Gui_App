@@ -10,14 +10,6 @@
  */
 #ifndef DISPLAY_MANAGER_H
 #define DISPLAY_MANAGER_H
-#include <Eigen/Dense>
-#include <QGraphicsScene>
-#include <QGraphicsView>
-#include <QPushButton>
-#include <any>
-#include <functional>
-#include <map>
-
 #include "basic/algorithm.h"
 #include "display_cost_map.h"
 #include "display_occ_map.h"
@@ -28,8 +20,16 @@
 #include "particle_points.h"
 #include "point_shape.h"
 #include "region.h"
+#include "widgets/set_pose_widget.h"
+#include <Eigen/Dense>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QLabel>
+#include <QPushButton>
 #include <QtWidgets/QVBoxLayout>
+#include <any>
+#include <functional>
+#include <map>
 #define DISPLAY_ROBOT "Robot"
 #define DISPLAY_MAP "OccupyMap"
 #define DISPLAY_LOCAL_COST_MAP "LocalCostMap"
@@ -61,17 +61,18 @@ private:
   double global_scal_value_ = 1;
   bool is_reloc_mode_{false};
   QGraphicsView *graphics_view_ptr_;
+  SetPoseWidget *set_reloc_pose_widget_;
 signals:
   void cursorPosMap(QPointF);
   void DisplayRobotPoseWorld(Eigen::Vector3f pose);
-  void signalPub2DPose(Eigen::Vector3f pose);
-  void signalPub2DGoal(Eigen::Vector3f pose);
+  void signalPub2DPose(const RobotPose& pose);
+  void signalPub2DGoal(const RobotPose &pose);
 public slots:
   void updateScaled(double value);
-  void start2DPose(const bool &is_start);
-  void start2DGoal(const bool &is_start);
-  void slotUpdateRobotScenePose(Eigen::Vector3f);
-  void slotUpdateNavGoalScenePose(Eigen::Vector3f);
+  void SetRelocPose();
+  void SetNavPose();
+  void slotUpdateRobotScenePose(const RobotPose &pose);
+  void slotUpdateNavGoalScenePose(const RobotPose &pose);
 
 private:
   Eigen::Vector3f wordPose2Scene(const Eigen::Vector3f &point);
@@ -91,7 +92,7 @@ public:
   void UpdateRobotPose(const Eigen::Vector3f &pose);
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
   Eigen::Vector3f wordPose2Map(const Eigen::Vector3f &pose);
-  void SetMoveRobot(bool is_move);
+  void SetRelocMode(bool is_move);
   void SetFocusOn(const std::string &display_name) {
     focus_display_ = display_name;
   }

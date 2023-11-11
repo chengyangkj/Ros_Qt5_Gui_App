@@ -49,8 +49,8 @@ private:
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
 
 public slots:
-  void pub2DPose(Eigen::Vector3f pose) override;
-  void pub2DGoal(Eigen::Vector3f pose) override;
+  void pub2DPose(const RobotPose &pose) override;
+  void pub2DGoal(const RobotPose &pose) override;
   void pubSpeed(const RobotSpeed &speed) override;
   basic::RobotPose getTrasnsform(std::string from, std::string to);
 

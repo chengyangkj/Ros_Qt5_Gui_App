@@ -48,7 +48,7 @@ signals:
   void emitOdomInfo(RobotState state);
 
 public slots:
-  virtual void pub2DPose(Eigen::Vector3f pose) = 0;
-  virtual void pub2DGoal(Eigen::Vector3f pose) = 0;
-  virtual void pubSpeed(const RobotSpeed& speed) = 0;
+  virtual void pub2DPose(const RobotPose &pose) = 0;
+  virtual void pub2DGoal(const RobotPose &pose) = 0;
+  virtual void pubSpeed(const RobotSpeed &speed) = 0;
 };

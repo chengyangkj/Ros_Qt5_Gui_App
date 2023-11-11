@@ -159,7 +159,7 @@ private slots:
   }
 
 public:
-  SpeedCtrlWidget(QWidget *parent = 0) {
+  SpeedCtrlWidget(QWidget *parent = 0) : QWidget(parent) {
     QVBoxLayout *verticalLayout_speed_ctrl = new QVBoxLayout();
     verticalLayout_speed_ctrl->setObjectName(
         QString::fromUtf8("verticalLayout_speed_ctrl"));

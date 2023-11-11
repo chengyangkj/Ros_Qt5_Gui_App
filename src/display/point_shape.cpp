@@ -92,13 +92,13 @@ void PointShape::drawNavGoal(QPainter *painter) {
                       robot_image_);
   painter->restore();
 }
-void PointShape::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
-  QMenu menu;
-  QAction *removeAction = menu.addAction("Navigation");
-  QAction *selectedAction = menu.addAction("Delete");
-  menu.exec(event->screenPos());
-  connect(removeAction, SIGNAL(triggered()), this, SLOT(slotRemoveItem()));
-}
+// void PointShape::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+//   QMenu menu;
+//   QAction *removeAction = menu.addAction("Navigation");
+//   QAction *selectedAction = menu.addAction("Delete");
+//   menu.exec(event->screenPos());
+//   connect(removeAction, SIGNAL(triggered()), this, SLOT(slotRemoveItem()));
+// }
 void PointShape::drawParticle(QPainter *painter) {}
 // NOLINTEND
 } // namespace Display

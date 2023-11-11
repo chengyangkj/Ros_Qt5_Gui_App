@@ -65,7 +65,7 @@ public:
   std::vector<VirtualDisplay *> children_;
 signals:
   void signalCursorPose(QPointF pose);
-  void signalPoseUpdate(Eigen::Vector3f);
+  void signalPoseUpdate(const RobotPose& pose);
 
 public:
   VirtualDisplay(const std::string &display_name, const int &z_value,

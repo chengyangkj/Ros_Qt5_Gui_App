@@ -314,26 +314,26 @@ void rclcomm::recv_callback(const std_msgs::msg::Int32::SharedPtr msg) {
   emit emitTopicData("i am listen from topic:" +
                      QString::fromStdString(std::to_string(msg->data)));
 }
-void rclcomm::pub2DPose(Eigen::Vector3f pose) {
+void rclcomm::pub2DPose(const RobotPose &pose) {
 
   geometry_msgs::msg::PoseWithCovarianceStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = node->get_clock()->now();
-  geo_pose.pose.pose.position.x = pose[0];
-  geo_pose.pose.pose.position.y = pose[1];
+  geo_pose.pose.pose.position.x = pose.x;
+  geo_pose.pose.pose.position.y = pose.y;
   tf2::Quaternion q;
-  q.setRPY(0, 0, pose[2]);
+  q.setRPY(0, 0, pose.theta);
   geo_pose.pose.pose.orientation = tf2::toMsg(q);
   initPosePublisher_->publish(geo_pose);
 }
-void rclcomm::pub2DGoal(Eigen::Vector3f pose) {
+void rclcomm::pub2DGoal(const RobotPose &pose) {
   geometry_msgs::msg::PoseStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = node->get_clock()->now();
-  geo_pose.pose.position.x = pose[0];
-  geo_pose.pose.position.y = pose[1];
+  geo_pose.pose.position.x = pose.x;
+  geo_pose.pose.position.y = pose.y;
   tf2::Quaternion q;
-  q.setRPY(0, 0, pose[2]);
+  q.setRPY(0, 0, pose.theta);
   geo_pose.pose.orientation = tf2::toMsg(q);
   navGoalPublisher_->publish(geo_pose);
 }

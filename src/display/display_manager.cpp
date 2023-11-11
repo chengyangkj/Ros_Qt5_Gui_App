@@ -14,9 +14,9 @@
 // 4,机器人全局地图坐标系 wordPose
 #include "display/display_manager.h"
 #include "common/logger/logger.h"
+
 #include <Eigen/Eigen>
 #include <fstream>
-
 namespace Display {
 
 DisplayManager::DisplayManager(QGraphicsView *viewer)
@@ -51,44 +51,51 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
 
   // connection
 
-  connect(GetDisplay(DISPLAY_ROBOT), SIGNAL(signalPoseUpdate(Eigen::Vector3f)),
-          this, SLOT(slotUpdateRobotScenePose(Eigen::Vector3f)));
-  connect(GetDisplay(DISPLAY_GOAL), SIGNAL(signalPoseUpdate(Eigen::Vector3f)),
-          this, SLOT(slotUpdateNavGoalScenePose(Eigen::Vector3f)));
+  connect(GetDisplay(DISPLAY_ROBOT),
+          SIGNAL(signalPoseUpdate(const RobotPose &)), this,
+          SLOT(slotUpdateRobotScenePose(const RobotPose &)));
+  connect(GetDisplay(DISPLAY_GOAL), SIGNAL(signalPoseUpdate(const RobotPose &)),
+          this, SLOT(slotUpdateNavGoalScenePose(const RobotPose &)));
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
 }
 
-void DisplayManager::slotUpdateRobotScenePose(Eigen::Vector3f pose) {
+void DisplayManager::slotUpdateRobotScenePose(const RobotPose &pose) {
   if (is_reloc_mode_) {
     QPointF occ_pose =
-        GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose[0], pose[1]));
+        GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose.x, pose.y));
     double x, y;
     map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
     // 更新坐标
     robot_pose_[0] = x;
     robot_pose_[1] = y;
-    robot_pose_[2] = robot_pose_reloc_init_[2] - deg2rad(pose[2]);
+    robot_pose_[2] = robot_pose_reloc_init_[2] - deg2rad(pose.theta);
+    set_reloc_pose_widget_->SetPose(
+        RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]));
   }
 }
-void DisplayManager::slotUpdateNavGoalScenePose(Eigen::Vector3f pose) {
+void DisplayManager::slotUpdateNavGoalScenePose(const RobotPose &pose) {
   QPointF occ_pose =
-      GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose[0], pose[1]));
+      GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose.x, pose.y));
   double x, y;
   map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
   robot_pose_goal_[0] = x;
   robot_pose_goal_[1] = y;
-  robot_pose_goal_[2] = 0 - deg2rad(pose[2]);
+  robot_pose_goal_[2] = 0 - deg2rad(pose.theta);
   GetDisplay(DISPLAY_GOAL)
       ->UpdateDisplay(Eigen::Vector3f(occ_pose.x(), occ_pose.y(), 0));
 }
 void DisplayManager::InitUi() {
-  QWidget *widget = new QWidget(graphics_view_ptr_);
-  QHBoxLayout *layout = new QHBoxLayout();
-  QLabel *label = new QLabel("txt");
-  layout->addWidget(label);
-  widget->setLayout(layout);
+  set_reloc_pose_widget_ = new SetPoseWidget(graphics_view_ptr_);
+  set_reloc_pose_widget_->hide();
+  connect(set_reloc_pose_widget_, &SetPoseWidget::SignalHandleOver,
+          [this](const bool &is_submit, const RobotPose &pose) {
+            set_reloc_pose_widget_->hide();
+            if (is_submit) {
+              emit signalPub2DPose(pose);
+            }
+          });
 }
 DisplayManager::~DisplayManager() {}
 
@@ -249,13 +256,11 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
 void DisplayManager::updateScaled(double value) {
   FactoryDisplay::Instance()->SetDisplayScaled(DISPLAY_LASER, value);
 }
-void DisplayManager::SetMoveRobot(bool is_move) {
+void DisplayManager::SetRelocMode(bool is_move) {
   is_reloc_mode_ = is_move;
   std::cout << "reloc mode:" << is_reloc_mode_ << std::endl;
   if (is_move) {
     robot_pose_reloc_init_ = robot_pose_;
-  } else {
-    emit signalPub2DPose(robot_pose_);
   }
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, is_move);
 }
@@ -321,17 +326,20 @@ QPointF DisplayManager::wordPose2Map(const QPointF &pose) {
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return FactoryDisplay::Instance()->GetDisplay(name);
 }
-void DisplayManager::start2DPose(const bool &is_start) {
-  SetMoveRobot(is_start);
-}
-void DisplayManager::start2DGoal(const bool &is_start) {
-  if (is_start) {
-    GetDisplay(DISPLAY_GOAL)->setPos(wordPose2Map(QPointF(0, 0)));
-    GetDisplay(DISPLAY_GOAL)->setVisible(true);
-  } else {
-    GetDisplay(DISPLAY_GOAL)->setVisible(false);
-    emit signalPub2DGoal(robot_pose_goal_);
+void DisplayManager::SetRelocPose() {
+  if (!set_reloc_pose_widget_->isVisible()) {
+    set_reloc_pose_widget_->show();
+    SetRelocMode(true);
   }
+}
+void DisplayManager::SetNavPose() {
+  // if (is_start) {
+  //   GetDisplay(DISPLAY_GOAL)->setPos(wordPose2Map(QPointF(0, 0)));
+  //   GetDisplay(DISPLAY_GOAL)->setVisible(true);
+  // } else {
+  //   GetDisplay(DISPLAY_GOAL)->setVisible(false);
+  //   emit signalPub2DGoal(robot_pose_goal_);
+  // }
 }
 
 } // namespace Display

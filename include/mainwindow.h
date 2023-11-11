@@ -8,8 +8,10 @@
 #include "channel/base/comm_instance.h"
 #include "display/display_manager.h"
 #include "widgets/dashboard.h"
-
+#include "widgets/set_pose_widget.h"
 #include "widgets/speed_ctrl.h"
+#include "widgets/status_bar.h"
+#include "widgets/tools_bar.h"
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QFileDialog>
@@ -52,8 +54,6 @@ public slots:
   void updateGlobalCostMap(CostMap map);
   void signalCursorPose(QPointF pos);
 
-
-
 protected:
   virtual void closeEvent(QCloseEvent *event) override;
 
@@ -68,16 +68,13 @@ private:
   ads::CDockAreaWidget *StatusDockArea;
   ads::CDockWidget *TimelineDockWidget;
   Display::DisplayManager *display_manager_;
-  QPushButton *pushButton_status_;
-  QCheckBox *checkBox_use_all_;
-  QProgressBar *battery_bar_;
-  QSlider *horizontalSlider_linear_;
-  QSlider *horizontalSlider_raw_;
-  QLabel *label_power_;
+
   QLabel *label_pos_map_;
   QLabel *label_pos_scene_;
 
   SpeedCtrlWidget *speed_ctrl_widget_;
+  StatusBarWidget *status_bar_widget_;
+  ToolsBarWidget *tools_bar_widget_;
 
 private:
   void setupUi();
