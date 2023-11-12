@@ -1,20 +1,10 @@
-/*
- * @Author: chengyang chengyangkj@outlook.com
- * @Date: 2023-03-29 14:21:31
- * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-15 09:50:01
- * @FilePath:
- * ////src/display/display_manager.cpp
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
- * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
 // 1,图元坐标系 scenPose 对应所有图层的外部全局坐标系
 // 2, 图层坐标系 每个图层的单独坐标系
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
 #include "display/display_manager.h"
+#include "basic/algorithm.h"
 #include "common/logger/logger.h"
-
 #include <Eigen/Eigen>
 #include <fstream>
 namespace Display {
@@ -61,23 +51,21 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
   InitUi();
 }
 void DisplayManager::slotSetRobotPose(const RobotPose &pose) {
-  bool pre_move = FactoryDisplay::Instance()->GetMoveEnable(DISPLAY_ROBOT);
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, false);
   UpdateRobotPose(Eigen::Vector3f(pose.x, pose.y, pose.theta));
   // enable move after 300ms
-  QTimer::singleShot(300, [this, pre_move]() {
-    FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, pre_move);
+  QTimer::singleShot(300, [this]() {
+    FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, true);
   });
 }
 void DisplayManager::slotSetNavPose(const RobotPose &pose) {
-  bool pre_move = FactoryDisplay::Instance()->GetMoveEnable(DISPLAY_GOAL);
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, false);
   GetDisplay(DISPLAY_GOAL)
       ->UpdateDisplay(
           wordPose2Map(Eigen::Vector3f(pose.x, pose.y, pose.theta)));
   // enable move after 300ms
-  QTimer::singleShot(300, [this, pre_move]() {
-    FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, pre_move);
+  QTimer::singleShot(300, [this]() {
+    FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, true);
   });
 }
 void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
@@ -89,7 +77,7 @@ void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
     // 更新坐标
     robot_pose_[0] = x;
     robot_pose_[1] = y;
-    robot_pose_[2] = robot_pose_reloc_init_[2] - pose.theta;
+    robot_pose_[2] =  pose.theta;
 
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]));
@@ -102,7 +90,7 @@ void DisplayManager::slotNavGoalScenePoseChanged(const RobotPose &pose) {
   map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
   robot_pose_goal_[0] = x;
   robot_pose_goal_[1] = y;
-  robot_pose_goal_[2] = 0 - pose.theta;
+  robot_pose_goal_[2] = pose.theta;
   set_nav_pose_widget_->SetPose(
       RobotPose(robot_pose_goal_[0], robot_pose_goal_[1], robot_pose_goal_[2]));
 }
@@ -293,7 +281,6 @@ void DisplayManager::updateScaled(double value) {
 void DisplayManager::SetRelocMode(bool is_start) {
   is_reloc_mode_ = is_start;
   if (is_start) {
-    robot_pose_reloc_init_ = robot_pose_;
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]));
     set_reloc_pose_widget_->show();

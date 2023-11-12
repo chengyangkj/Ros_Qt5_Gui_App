@@ -68,6 +68,7 @@ template <class T, class A> struct orientedpoint : public point<T> {
     return orientedpoint(c * this->x - s * this->y, s * this->x + c * this->y,
                          a);
   }
+  inline double mod() { return sqrt(this->x * this->x + this->y * this->y); }
   A theta;
 };
 

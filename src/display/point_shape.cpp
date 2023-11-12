@@ -9,8 +9,10 @@
  */
 // NOLINTBEGIN
 #include "display/point_shape.h"
-
 #include "QDebug"
+#include "basic/algorithm.h"
+using namespace basic;
+
 namespace Display {
 PointShape::PointShape(const ePointType &type, const std::string &display_name,
                        const int &z_value, std::string parent_name)
@@ -43,8 +45,29 @@ PointShape::PointShape(const ePointType &type, const std::string &display_name,
   }
   // this->setCursor(Qt::);
 }
+QVariant PointShape::itemChange(GraphicsItemChange change,
+                                const QVariant &value) {
+  switch (change) {
+  case ItemPositionHasChanged:
+    emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
+                                    normalize(robot_pose_[2] + rotate_value_)));
+    break;
+  // case ItemTransformHasChanged:
+  //   emit signalPoseUpdate(
+  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+  //   break;
+  // case ItemRotationHasChanged:
+  //   emit signalPoseUpdate(
+  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+  //   break;
+  default:
+    break;
+  };
+  return QGraphicsItem::itemChange(change, value);
+}
 bool PointShape::UpdateData(const std::any &data) {
   GetAnyData(Eigen::Vector3f, data, robot_pose_);
+  rotate_value_ = 0;
   SetPoseInParent(robot_pose_);
   update();
 }
@@ -72,13 +95,18 @@ void PointShape::paint(QPainter *painter,
     drawNavGoal(painter);
     break;
   }
+  static double last_rotate_value = rotate_value_;
+
+  if (fabs(rotate_value_ - last_rotate_value) > deg2rad(0.1)) {
+    emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
+                                    normalize(robot_pose_[2] + rotate_value_)));
+  }
 }
 void PointShape::setEnable(const bool &enable) {}
 void PointShape::drawRobot(QPainter *painter) {
   painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
   painter->save();
-  double deg = robot_pose_[2];
-  painter->rotate(rad2deg(-deg) + rotate_value_);
+  painter->rotate(-rad2deg(robot_pose_[2]) - rad2deg(rotate_value_));
   painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
                       robot_image_);
 
@@ -87,7 +115,7 @@ void PointShape::drawRobot(QPainter *painter) {
 void PointShape::drawNavGoal(QPainter *painter) {
   painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
   painter->save();
-  painter->rotate(0 + rotate_value_);
+  painter->rotate(-rad2deg(rotate_value_));
   painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
                       robot_image_);
   painter->restore();

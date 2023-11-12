@@ -46,6 +46,8 @@ private:
   inline double deg2rad(double x) { return M_PI * x / 180.0; }
   // 弧度转角度
   inline double rad2deg(double x) { return 180.0 * x / M_PI; }
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant &value) override;
 };
 // NOLINTEND
 } // namespace Display

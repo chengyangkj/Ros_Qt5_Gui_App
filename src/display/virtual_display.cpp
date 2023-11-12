@@ -58,26 +58,6 @@ bool VirtualDisplay::SetRotate(const double &value) {
   }
   return true;
 }
-QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
-                                    const QVariant &value) {
-  switch (change) {
-  case ItemPositionHasChanged:
-    emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
-                                    normalize(deg2rad(rotate_value_))));
-    break;
-  // case ItemTransformHasChanged:
-  //   emit signalPoseUpdate(
-  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
-  //   break;
-  // case ItemRotationHasChanged:
-  //   emit signalPoseUpdate(
-  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
-  //   break;
-  default:
-    break;
-  };
-  return QGraphicsItem::itemChange(change, value);
-}
 
 void VirtualDisplay::Update() { update(); }
 std::string VirtualDisplay::GetDisplayName() { return display_name_; }
@@ -165,13 +145,8 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
     if (crossValue.z() < 0)
       angle = -angle;
-    rotate_value_ += angle;
-    static double last_rotate_value = rotate_value_;
+    rotate_value_ -= deg2rad(angle);
 
-    if (fabs(rotate_value_ - last_rotate_value) > 1) {
-      emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
-                                      normalize(deg2rad(rotate_value_))));
-    }
     // SetRotate(rotate_value_);
     pressed_pose_ = loacalPos;
   }

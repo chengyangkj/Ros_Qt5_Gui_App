@@ -129,7 +129,6 @@ private:
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
-  QVariant itemChange(GraphicsItemChange change,
-                      const QVariant &value) override;
+ 
 };
 } // namespace Display
