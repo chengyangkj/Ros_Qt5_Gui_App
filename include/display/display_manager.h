@@ -62,17 +62,20 @@ private:
   bool is_reloc_mode_{false};
   QGraphicsView *graphics_view_ptr_;
   SetPoseWidget *set_reloc_pose_widget_;
+  SetPoseWidget *set_nav_pose_widget_;
 signals:
   void cursorPosMap(QPointF);
   void DisplayRobotPoseWorld(Eigen::Vector3f pose);
-  void signalPub2DPose(const RobotPose& pose);
+  void signalPub2DPose(const RobotPose &pose);
   void signalPub2DGoal(const RobotPose &pose);
 public slots:
   void updateScaled(double value);
   void SetRelocPose();
   void SetNavPose();
-  void slotUpdateRobotScenePose(const RobotPose &pose);
-  void slotUpdateNavGoalScenePose(const RobotPose &pose);
+  void slotRobotScenePoseChanged(const RobotPose &pose);
+  void slotNavGoalScenePoseChanged(const RobotPose &pose);
+  void slotSetRobotPose(const RobotPose &pose);
+  void slotSetNavPose(const RobotPose &pose);
 
 private:
   Eigen::Vector3f wordPose2Scene(const Eigen::Vector3f &point);
@@ -93,6 +96,8 @@ public:
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
   Eigen::Vector3f wordPose2Map(const Eigen::Vector3f &pose);
   void SetRelocMode(bool is_move);
+  void SetNavGoalMode(bool is_start);
+
   void SetFocusOn(const std::string &display_name) {
     focus_display_ = display_name;
   }

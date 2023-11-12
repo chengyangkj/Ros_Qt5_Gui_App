@@ -53,15 +53,34 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
 
   connect(GetDisplay(DISPLAY_ROBOT),
           SIGNAL(signalPoseUpdate(const RobotPose &)), this,
-          SLOT(slotUpdateRobotScenePose(const RobotPose &)));
+          SLOT(slotRobotScenePoseChanged(const RobotPose &)));
   connect(GetDisplay(DISPLAY_GOAL), SIGNAL(signalPoseUpdate(const RobotPose &)),
-          this, SLOT(slotUpdateNavGoalScenePose(const RobotPose &)));
+          this, SLOT(slotNavGoalScenePoseChanged(const RobotPose &)));
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
 }
-
-void DisplayManager::slotUpdateRobotScenePose(const RobotPose &pose) {
+void DisplayManager::slotSetRobotPose(const RobotPose &pose) {
+  bool pre_move = FactoryDisplay::Instance()->GetMoveEnable(DISPLAY_ROBOT);
+  FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, false);
+  UpdateRobotPose(Eigen::Vector3f(pose.x, pose.y, pose.theta));
+  // enable move after 300ms
+  QTimer::singleShot(300, [this, pre_move]() {
+    FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, pre_move);
+  });
+}
+void DisplayManager::slotSetNavPose(const RobotPose &pose) {
+  bool pre_move = FactoryDisplay::Instance()->GetMoveEnable(DISPLAY_GOAL);
+  FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, false);
+  GetDisplay(DISPLAY_GOAL)
+      ->UpdateDisplay(
+          wordPose2Map(Eigen::Vector3f(pose.x, pose.y, pose.theta)));
+  // enable move after 300ms
+  QTimer::singleShot(300, [this, pre_move]() {
+    FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, pre_move);
+  });
+}
+void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
   if (is_reloc_mode_) {
     QPointF occ_pose =
         GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose.x, pose.y));
@@ -70,32 +89,47 @@ void DisplayManager::slotUpdateRobotScenePose(const RobotPose &pose) {
     // 更新坐标
     robot_pose_[0] = x;
     robot_pose_[1] = y;
-    robot_pose_[2] = robot_pose_reloc_init_[2] - deg2rad(pose.theta);
+    robot_pose_[2] = robot_pose_reloc_init_[2] - pose.theta;
+
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]));
   }
 }
-void DisplayManager::slotUpdateNavGoalScenePose(const RobotPose &pose) {
+void DisplayManager::slotNavGoalScenePoseChanged(const RobotPose &pose) {
   QPointF occ_pose =
       GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose.x, pose.y));
   double x, y;
   map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
   robot_pose_goal_[0] = x;
   robot_pose_goal_[1] = y;
-  robot_pose_goal_[2] = 0 - deg2rad(pose.theta);
-  GetDisplay(DISPLAY_GOAL)
-      ->UpdateDisplay(Eigen::Vector3f(occ_pose.x(), occ_pose.y(), 0));
+  robot_pose_goal_[2] = 0 - pose.theta;
+  set_nav_pose_widget_->SetPose(
+      RobotPose(robot_pose_goal_[0], robot_pose_goal_[1], robot_pose_goal_[2]));
 }
 void DisplayManager::InitUi() {
   set_reloc_pose_widget_ = new SetPoseWidget(graphics_view_ptr_);
   set_reloc_pose_widget_->hide();
   connect(set_reloc_pose_widget_, &SetPoseWidget::SignalHandleOver,
           [this](const bool &is_submit, const RobotPose &pose) {
-            set_reloc_pose_widget_->hide();
+            SetRelocMode(false);
             if (is_submit) {
               emit signalPub2DPose(pose);
             }
           });
+  connect(set_reloc_pose_widget_, SIGNAL(SignalPoseChanged(const RobotPose &)),
+          this, SLOT(slotSetRobotPose(const RobotPose &)));
+
+  set_nav_pose_widget_ = new SetPoseWidget(graphics_view_ptr_);
+  set_nav_pose_widget_->hide();
+  connect(set_nav_pose_widget_, &SetPoseWidget::SignalHandleOver,
+          [this](const bool &is_submit, const RobotPose &pose) {
+            SetNavGoalMode(false);
+            if (is_submit) {
+              emit signalPub2DGoal(pose);
+            }
+          });
+  connect(set_nav_pose_widget_, SIGNAL(SignalPoseChanged(const RobotPose &)),
+          this, SLOT(slotSetNavPose(const RobotPose &)));
 }
 DisplayManager::~DisplayManager() {}
 
@@ -256,13 +290,28 @@ void DisplayManager::UpdateRobotPose(const Eigen::Vector3f &pose) {
 void DisplayManager::updateScaled(double value) {
   FactoryDisplay::Instance()->SetDisplayScaled(DISPLAY_LASER, value);
 }
-void DisplayManager::SetRelocMode(bool is_move) {
-  is_reloc_mode_ = is_move;
-  std::cout << "reloc mode:" << is_reloc_mode_ << std::endl;
-  if (is_move) {
+void DisplayManager::SetRelocMode(bool is_start) {
+  is_reloc_mode_ = is_start;
+  if (is_start) {
     robot_pose_reloc_init_ = robot_pose_;
+    set_reloc_pose_widget_->SetPose(
+        RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]));
+    set_reloc_pose_widget_->show();
+  } else {
+    set_reloc_pose_widget_->hide();
   }
-  FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, is_move);
+  FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, is_start);
+}
+void DisplayManager::SetNavGoalMode(bool is_start) {
+  if (is_start) {
+    slotSetNavPose(RobotPose(0, 0, 0));
+    GetDisplay(DISPLAY_GOAL)->setVisible(true);
+    GetDisplay(DISPLAY_GOAL)->SetMoveEnable(true);
+    set_nav_pose_widget_->show();
+  } else {
+    GetDisplay(DISPLAY_GOAL)->setVisible(false);
+    set_nav_pose_widget_->hide();
+  }
 }
 void DisplayManager::FocusDisplay(const std::string &display_name) {
   FactoryDisplay::Instance()->FocusDisplay(display_name);
@@ -328,18 +377,13 @@ VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
 }
 void DisplayManager::SetRelocPose() {
   if (!set_reloc_pose_widget_->isVisible()) {
-    set_reloc_pose_widget_->show();
     SetRelocMode(true);
   }
 }
 void DisplayManager::SetNavPose() {
-  // if (is_start) {
-  //   GetDisplay(DISPLAY_GOAL)->setPos(wordPose2Map(QPointF(0, 0)));
-  //   GetDisplay(DISPLAY_GOAL)->setVisible(true);
-  // } else {
-  //   GetDisplay(DISPLAY_GOAL)->setVisible(false);
-  //   emit signalPub2DGoal(robot_pose_goal_);
-  // }
+  if (!set_nav_pose_widget_->isVisible()) {
+    SetNavGoalMode(true);
+  }
 }
 
 } // namespace Display

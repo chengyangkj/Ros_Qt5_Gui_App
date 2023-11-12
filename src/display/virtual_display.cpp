@@ -62,8 +62,8 @@ QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
                                     const QVariant &value) {
   switch (change) {
   case ItemPositionHasChanged:
-    emit signalPoseUpdate(
-        RobotPose(scenePos().x(), scenePos().y(), rotate_value_));
+    emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
+                                    normalize(deg2rad(rotate_value_))));
     break;
   // case ItemTransformHasChanged:
   //   emit signalPoseUpdate(
@@ -169,8 +169,8 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     static double last_rotate_value = rotate_value_;
 
     if (fabs(rotate_value_ - last_rotate_value) > 1) {
-      emit signalPoseUpdate(
-          RobotPose(scenePos().x(), scenePos().y(), rotate_value_));
+      emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
+                                      normalize(deg2rad(rotate_value_))));
     }
     // SetRotate(rotate_value_);
     pressed_pose_ = loacalPos;

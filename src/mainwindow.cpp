@@ -170,7 +170,7 @@ void CMainWindow::setupUi() {
   // ui相关
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetRelocPose,
           [=]() { display_manager_->SetRelocPose(); });
-  connect(tools_bar_widget_, &ToolsBarWidget::SignalSetRelocPose,
+  connect(tools_bar_widget_, &ToolsBarWidget::SignalSetNavPose,
           [=]() { display_manager_->SetNavPose(); });
   connect(display_manager_->GetDisplay(DISPLAY_MAP),
           SIGNAL(signalCursorPose(QPointF)), this,

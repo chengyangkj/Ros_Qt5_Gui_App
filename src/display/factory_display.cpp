@@ -13,7 +13,7 @@ bool FactoryDisplay::Init(QGraphicsView *viewer) {
     run_flag_ = true;
     connect(&timer_coordinate_system_, SIGNAL(timeout()), this,
             SLOT(updateCoordinateSystem()));
-    timer_coordinate_system_.setInterval(50);
+    timer_coordinate_system_.setInterval(10);
     timer_coordinate_system_.start();
     return true;
   }
@@ -97,6 +97,12 @@ bool FactoryDisplay::SetMoveEnable(const std::string &display_name,
   if (total_display_map_.count(display_name) != 0) {
     total_display_map_[display_name]->SetMoveEnable(enable);
     return true;
+  }
+  return false;
+}
+bool FactoryDisplay::GetMoveEnable(const std::string &display_name) {
+  if (total_display_map_.count(display_name) != 0) {
+    return total_display_map_[display_name]->GetMoveEnable();
   }
   return false;
 }
