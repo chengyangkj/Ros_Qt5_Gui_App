@@ -77,7 +77,10 @@
         "cfenv": "cpp",
         "qgraphicsscenewheelevent": "cpp",
         "qgraphicsview": "cpp",
-        "qsettings": "cpp"
+        "qsettings": "cpp",
+        "regex": "cpp",
+        "ranges": "cpp",
+        "valarray": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
