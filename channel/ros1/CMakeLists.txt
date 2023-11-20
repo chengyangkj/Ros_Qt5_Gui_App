@@ -1,4 +1,5 @@
-set(TARGET_NAME channel)
+include(TargetNameHelper)
+GetTargetName()
 
 find_package(catkin REQUIRED COMPONENTS roscpp 
     tf

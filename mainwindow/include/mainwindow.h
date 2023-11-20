@@ -1,11 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "point_type.h"
 #include "DockAreaWidget.h"
 #include "DockManager.h"
 #include "DockWidget.h"
-#include "basic/point_type.h"
-#include "channel/base/comm_instance.h"
+#include "channel_instance.h"
 #include "display/display_manager.h"
 #include "widgets/dashboard.h"
 #include "widgets/set_pose_widget.h"

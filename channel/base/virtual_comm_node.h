@@ -11,9 +11,9 @@
 #include <QThread>
 
 #include "QPointF"
-#include "basic/map/cost_map.h"
-#include "basic/map/occupancy_map.h"
-#include "basic/point_type.h"
+#include "cost_map.h"
+#include "occupancy_map.h"
+#include "point_type.h"
 using namespace basic;
 class VirtualCommNode : public QThread {
   Q_OBJECT

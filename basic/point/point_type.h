@@ -3,7 +3,7 @@
  * @Date: 2023-07-26 10:07:32
  * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-26 16:30:38
- * @FilePath: /ros_qt5_gui_app/include/basic/point_type.h
+ * @FilePath: /ros_qt5_gui_app/include/ point_type.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */

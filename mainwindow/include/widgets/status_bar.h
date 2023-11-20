@@ -1,6 +1,6 @@
 #pragma once
-#include "basic/algorithm.h"
-#include "basic/point_type.h"
+#include "algorithm.h"
+#include "point_type.h"
 #include "widgets/joystick.h"
 #include <QCalendarWidget>
 #include <QCheckBox>
@@ -52,9 +52,9 @@ private:
 signals:
   void signalControlSpeed(const RobotSpeed &speed);
 public slots:
- void SlotSetBatteryStatus(double percent, double voltage);
+  void SlotSetBatteryStatus(double percent, double voltage);
 
 public:
- StatusBarWidget(QWidget *parent = 0);
- ~StatusBarWidget() {}
+  StatusBarWidget(QWidget *parent = 0);
+  ~StatusBarWidget() {}
 };

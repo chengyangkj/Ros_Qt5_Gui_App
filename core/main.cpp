@@ -5,7 +5,7 @@
  * @LastEditTime: 2023-10-05 11:39:01
  * @FilePath: /ROS2_Qt5_Gui_App/src/main.cpp
  */
-#include "common/logger/easylogging++.h"
+#include "logger/easylogging++.h"
 #include "mainwindow.h"
 #include <QApplication>
 #include <QLabel>

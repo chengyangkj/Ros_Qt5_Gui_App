@@ -6,7 +6,7 @@
  * @FilePath: ////include/display/DisplayCostMap.h
  */
 #pragma once
-#include "basic/map/cost_map.h"
+#include "cost_map.h"
 #include "virtual_display.h"
 #include <Eigen/Dense>
 namespace Display {

@@ -1,6 +1,6 @@
 #pragma once
-#include "basic/algorithm.h"
-#include "basic/point_type.h"
+#include "algorithm.h"
+#include "point_type.h"
 #include "widgets/joystick.h"
 #include <QCalendarWidget>
 #include <QCheckBox>

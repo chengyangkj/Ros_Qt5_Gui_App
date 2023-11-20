@@ -22,8 +22,8 @@
 #include <any>
 #include <iostream>
 
-#include "basic/map/occupancy_map.h"
-#include "basic/point_type.h"
+#include "occupancy_map.h"
+#include "point_type.h"
 #include "display_defines.h"
 using namespace basic;
 #define GetAnyData(type, data, res_data)                                       \

@@ -10,7 +10,7 @@
 // NOLINTBEGIN
 #include "display/point_shape.h"
 #include "QDebug"
-#include "basic/algorithm.h"
+#include "algorithm.h"
 using namespace basic;
 
 namespace Display {

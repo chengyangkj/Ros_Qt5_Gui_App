@@ -1,4 +1,4 @@
-#include "common/config/configManager.h"
+#include "config/configManager.h"
 #include <QFile>
 namespace Config {
 // #define CHECK_DEFALUT

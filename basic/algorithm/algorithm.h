@@ -3,7 +3,7 @@
  * @Date: 2023-07-25 16:06:32
  * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-26 10:13:06
- * @FilePath: /ros_qt5_gui_app/include/basic/algorithm.h
+ * @FilePath: /ros_qt5_gui_app/include/ algorithm.h
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */

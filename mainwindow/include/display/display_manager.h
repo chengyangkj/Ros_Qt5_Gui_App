@@ -10,7 +10,7 @@
  */
 #ifndef DISPLAY_MANAGER_H
 #define DISPLAY_MANAGER_H
-#include "basic/algorithm.h"
+#include "algorithm.h"
 #include "display_cost_map.h"
 #include "display_occ_map.h"
 #include "display_path.h"

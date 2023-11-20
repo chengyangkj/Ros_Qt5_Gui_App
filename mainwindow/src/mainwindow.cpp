@@ -11,14 +11,14 @@
 #include "ui_mainwindow.h"
 #include "widgets/speed_ctrl.h"
 
+#include "algorithm.h"
 #include "DockAreaTabBar.h"
 #include "DockAreaTitleBar.h"
 #include "DockAreaWidget.h"
 #include "DockComponentsFactory.h"
 #include "Eigen/Dense"
 #include "FloatingDockContainer.h"
-#include "basic/algorithm.h"
-#include "common/logger/easylogging++.h"
+#include "logger/easylogging++.h"
 
 using namespace ads;
 

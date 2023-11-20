@@ -3,7 +3,7 @@
  * @Date: 2023-07-26 10:06:31
  * @LastEditors: chengyang chengyangkj@outlook.com
  * @LastEditTime: 2023-07-26 14:51:40
- * @FilePath: /ros_qt5_gui_app/include/basic/point.h
+ * @FilePath: /ros_qt5_gui_app/include/ point.h
  * @Description: this Code reference from: openslam_gmapping,
  * "openslam_gmapping", commit d3f4c1b,
  * https://github.com/OpenSLAM-org/openslam_gmapping

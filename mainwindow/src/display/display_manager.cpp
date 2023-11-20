@@ -3,8 +3,8 @@
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
 #include "display/display_manager.h"
-#include "basic/algorithm.h"
-#include "common/logger/logger.h"
+#include "algorithm.h"
+#include "logger/logger.h"
 #include <Eigen/Eigen>
 #include <fstream>
 namespace Display {
@@ -77,7 +77,7 @@ void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
     // 更新坐标
     robot_pose_[0] = x;
     robot_pose_[1] = y;
-    robot_pose_[2] =  pose.theta;
+    robot_pose_[2] = pose.theta;
 
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_[0], robot_pose_[1], robot_pose_[2]));

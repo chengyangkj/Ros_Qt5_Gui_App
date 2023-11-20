@@ -1,6 +1,6 @@
 #pragma once
-#include "basic/algorithm.h"
-#include "basic/point_type.h"
+#include "algorithm.h"
+#include "point_type.h"
 #include "widgets/joystick.h"
 #include <QCalendarWidget>
 #include <QCheckBox>
@@ -50,12 +50,11 @@ private:
   QProgressBar *battery_bar_;
   QLabel *label_power_;
 signals:
- void SignalSetRelocPose();
- void SignalSetNavPose();
+  void SignalSetRelocPose();
+  void SignalSetNavPose();
 public slots:
 
-
 public:
- ToolsBarWidget(QWidget *parent = 0);
- ~ToolsBarWidget() {}
+  ToolsBarWidget(QWidget *parent = 0);
+  ~ToolsBarWidget() {}
 };

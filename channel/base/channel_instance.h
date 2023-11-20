@@ -8,14 +8,15 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 #pragma once
-
+#include "virtual_comm_node.h"
 // 这两个宏在cmakelist中设置
+#define ROS2_NODE 1
 #ifdef ROS2_NODE
 #define COMM_NODE_NAME rclcomm
-#include "channel/ros2/rclcomm.h"
+#include "ros2/rclcomm.h"
 #elif ROS1_NODE
 #define COMM_NODE_NAME rosnode
-#include "channel/ros1/rosnode.h"
+#include "ros1/rosnode.h"
 #endif
 
 class CommInstance {

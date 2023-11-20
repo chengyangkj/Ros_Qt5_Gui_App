@@ -1,6 +1,6 @@
 
 #include "display/factory_display.h"
-#include "common/logger/logger.h"
+#include "logger/logger.h"
 namespace Display {
 
 bool FactoryDisplay::Init(QGraphicsView *viewer) {

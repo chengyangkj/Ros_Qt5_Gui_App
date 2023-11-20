@@ -13,13 +13,6 @@ qt5_wrap_ui(QT_UI_HPP ${UI_FILE})
 qt5_wrap_cpp(QT_MOC_HPP ${INCLUDE_FILE})
 qt5_add_resources(QT_RESOUCE_HPP ${QRC_FILE})
 
-#项目包含的头文件路径
-include_directories(
-	include/
- ${CMAKE_CURRENT_BINARY_DIR}
-  ${catkin_INCLUDE_DIRS}
-)
-
 #向可执行程序添加源文件
 add_library(${TARGET_NAME} STATIC
     ${SOURCE_FILE}
@@ -28,5 +21,12 @@ add_library(${TARGET_NAME} STATIC
     ${QT_MOC_HPP}
     ${QT_RESOUCE_HPP}
   )
-target_link_libraries(${TARGET_NAME} Qt5::Widgets  qt${QT_VERSION_MAJOR}advanceddocking json_struct)
+  #项目包含的头文件路径
+target_include_directories(
+  ${TARGET_NAME}
+  PUBLIC
+	include/
+ ${CMAKE_CURRENT_BINARY_DIR}
+)
+target_link_libraries(${TARGET_NAME} Qt5::Widgets  qt${QT_VERSION_MAJOR}advanceddocking json_struct common basic channel)
 

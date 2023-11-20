@@ -6,9 +6,9 @@
  * @FilePath: /ros_qt5_gui_app/src/channel/ros1/rosnode.cpp
  * @Description: ros2通讯类
  */
-#include "channel/ros2/rclcomm.h"
-#include "common/config/configManager.h"
-#include "common/logger/logger.h"
+#include "rclcomm.h"
+#include "config/configManager.h"
+#include "logger/logger.h"
 #include <fstream>
 rclcomm::rclcomm() {
   int argc = 0;
@@ -149,7 +149,6 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
     }
     emit emitUpdateLocalPath(path);
   } catch (tf2::TransformException &ex) {
-    qDebug() << "local path transform error:" << ex.what();
   }
 }
 void rclcomm::pubSpeed(const RobotSpeed &speed) {
@@ -227,7 +226,6 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
     //           << std::endl;
     emit emitUpdateLaserPoint(laser_points);
   } catch (tf2::TransformException &ex) {
-    qDebug() << "laser pose transform error:" << ex.what();
   }
 }
 
@@ -289,7 +287,6 @@ void rclcomm::localCostMapCallback(
     localCostmapPose.theta = yaw;
     emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
   } catch (tf2::TransformException &ex) {
-    qDebug() << "local cost map pose transform error:" << ex.what();
   }
 }
 void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
@@ -315,7 +312,6 @@ void rclcomm::recv_callback(const std_msgs::msg::Int32::SharedPtr msg) {
                      QString::fromStdString(std::to_string(msg->data)));
 }
 void rclcomm::pub2DPose(const RobotPose &pose) {
-
   geometry_msgs::msg::PoseWithCovarianceStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = node->get_clock()->now();
