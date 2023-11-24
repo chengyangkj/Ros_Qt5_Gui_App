@@ -8,7 +8,7 @@
  */
 #include "rclcomm.h"
 #include "config/configManager.h"
-#include "logger/logger.h"
+// #include "logger/logger.h"
 #include <fstream>
 rclcomm::rclcomm() {
   int argc = 0;
@@ -36,10 +36,6 @@ rclcomm::rclcomm() {
       node->create_publisher<std_msgs::msg::Int32>("ros2_qt_dmeo_publish", 10);
   speed_publisher_ = node->create_publisher<geometry_msgs::msg::Twist>(
       GET_TOPIC_NAME("Speed"), 10);
-  _subscription = node->create_subscription<std_msgs::msg::Int32>(
-      "ros2_qt_dmeo_publish", 10,
-      std::bind(&rclcomm::recv_callback, this, std::placeholders::_1),
-      sub1_obt);
   map_sub_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
       GET_TOPIC_NAME("Map"),
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
@@ -73,9 +69,11 @@ rclcomm::rclcomm() {
   tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node->get_clock());
   transform_listener_ =
       std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+  init_flag_ = true;
 }
+void rclcomm::SendMessage(const Msg::MsgId &msg_id, const std::any &msg) {}
 void rclcomm::getRobotPose() {
-  emit emitUpdateRobotPose(getTrasnsform("base_link", "map"));
+  OnDataCallback(MsgId::kRobotPose, getTrasnsform("base_link", "map"));
 }
 /**
  * @description: 获取坐标变化
@@ -104,8 +102,8 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     return ret;
   } catch (tf2::TransformException &ex) {
 
-    LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
-                                             << " error:" << ex.what());
+    // LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
+    //                                          << " error:" << ex.what());
   }
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -124,7 +122,7 @@ void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   double roll, pitch, yaw;
   mat.getRPY(roll, pitch, yaw);
   state.theta = yaw;
-  emit emitOdomInfo(state);
+  OnDataCallback(MsgId::kOdomPose, state);
 }
 void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   try {
@@ -147,11 +145,11 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
       //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<"
       //        "<<point.y();
     }
-    emit emitUpdateLocalPath(path);
+    OnDataCallback(MsgId::kLocalPath, path);
   } catch (tf2::TransformException &ex) {
   }
 }
-void rclcomm::pubSpeed(const RobotSpeed &speed) {
+void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
   geometry_msgs::msg::Twist twist;
   twist.linear.x = speed.vx;
   twist.linear.y = speed.vy;
@@ -164,15 +162,14 @@ void rclcomm::pubSpeed(const RobotSpeed &speed) {
   // Publish it and resolve any remaining callbacks
   speed_publisher_->publish(twist);
 }
-void rclcomm::run() {
-  std_msgs::msg::Int32 pub_msg;
-  pub_msg.data = 0;
-  rclcpp::WallRate loop_rate(20);
-  while (rclcpp::ok()) {
-    pub_msg.data++;
-    m_executor->spin_some();
-    getRobotPose();
-    loop_rate.sleep();
+void rclcomm::Process() {
+  while (init_flag_.load()) {
+    rclcpp::WallRate loop_rate(20);
+    while (rclcpp::ok()) {
+      m_executor->spin_some();
+      getRobotPose();
+      loop_rate.sleep();
+    }
   }
   rclcpp::shutdown();
 }
@@ -186,9 +183,10 @@ void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
     point.x = x;
     point.y = y;
     path.push_back(point);
-    //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<" "<<point.y();
+    //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<"
+    //        "<<point.y();
   }
-  emit emitUpdatePath(path);
+  OnDataCallback(MsgId::kGlobalPath, path);
 }
 void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
   // qDebug()<<"订阅到激光话题";
@@ -220,11 +218,11 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       laser_points.push_back(p);
     }
     laser_points.id = 0;
-    // basic::RobotPose pose = getTrasnsform(msg->header.frame_id, "base_link");
-    // std::cout << "get transform" << pose.x << " " << pose.y << " " <<
-    // pose.theta
+    // basic::RobotPose pose = getTrasnsform(msg->header.frame_id,
+    // "base_link"); std::cout << "get transform" << pose.x << " " << pose.y
+    // << " " << pose.theta
     //           << std::endl;
-    emit emitUpdateLaserPoint(laser_points);
+    OnDataCallback(MsgId::kLaserScan, laser_points);
   } catch (tf2::TransformException &ex) {
   }
 }
@@ -243,7 +241,7 @@ void rclcomm::globalCostMapCallback(
     cost_map(x, y) = msg->data[i];
   }
   cost_map.SetFlip();
-  emit emitUpdateGlobalCostMap(cost_map);
+  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
 }
 void rclcomm::localCostMapCallback(
     const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
@@ -285,7 +283,7 @@ void rclcomm::localCostMapCallback(
     localCostmapPose.x = pose_map_frame.pose.position.x;
     localCostmapPose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
     localCostmapPose.theta = yaw;
-    emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
+    // emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
   } catch (tf2::TransformException &ex) {
   }
 }
@@ -304,14 +302,10 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
     occ_map_(x, y) = msg->data[i];
   }
   occ_map_.SetFlip();
-  emit emitUpdateMap(occ_map_);
+  OnDataCallback(MsgId::kOccupancyMap, occ_map_);
 }
-void rclcomm::recv_callback(const std_msgs::msg::Int32::SharedPtr msg) {
-  //     qDebug()<<msg->data;
-  emit emitTopicData("i am listen from topic:" +
-                     QString::fromStdString(std::to_string(msg->data)));
-}
-void rclcomm::pub2DPose(const RobotPose &pose) {
+
+void rclcomm::PubRelocPose(const RobotPose &pose) {
   geometry_msgs::msg::PoseWithCovarianceStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = node->get_clock()->now();
@@ -322,7 +316,7 @@ void rclcomm::pub2DPose(const RobotPose &pose) {
   geo_pose.pose.pose.orientation = tf2::toMsg(q);
   initPosePublisher_->publish(geo_pose);
 }
-void rclcomm::pub2DGoal(const RobotPose &pose) {
+void rclcomm::PubNavGoal(const RobotPose &pose) {
   geometry_msgs::msg::PoseStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = node->get_clock()->now();

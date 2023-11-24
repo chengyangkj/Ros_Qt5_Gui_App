@@ -11,13 +11,13 @@
 #include "ui_mainwindow.h"
 #include "widgets/speed_ctrl.h"
 
-#include "algorithm.h"
 #include "DockAreaTabBar.h"
 #include "DockAreaTitleBar.h"
 #include "DockAreaWidget.h"
 #include "DockComponentsFactory.h"
 #include "Eigen/Dense"
 #include "FloatingDockContainer.h"
+#include "algorithm.h"
 #include "logger/easylogging++.h"
 
 using namespace ads;
@@ -124,7 +124,7 @@ void CMainWindow::setupUi() {
   speed_ctrl_widget_ = new SpeedCtrlWidget();
   connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,
           [this](const RobotSpeed &speed) {
-            CommInstance::Instance()->pubSpeed(speed);
+            CommInstance::Instance()->PubRobotSpeed(speed);
           });
   ads::CDockWidget *SpeedCtrlDockWidget = new ads::CDockWidget("SpeedCtrl");
   SpeedCtrlDockWidget->setWidget(speed_ctrl_widget_);
@@ -137,7 +137,7 @@ void CMainWindow::setupUi() {
 
   connect(CommInstance::Instance(), SIGNAL(emitTopicData(QString)), this,
           SLOT(onRecvData(QString)));
-  connect(CommInstance::Instance(), &VirtualCommNode::emitUpdateMap,
+  connect(CommInstance::Instance(), &VirtualChannelNode::emitUpdateMap,
           [this](OccupancyMap map) {
             display_manager_->UpdateDisplay(DISPLAY_MAP, map);
           });
@@ -164,9 +164,9 @@ void CMainWindow::setupUi() {
   //        m_roboItem->updateMap(img);
   //    });
   connect(display_manager_, SIGNAL(signalPub2DPose(const RobotPose &)),
-          CommInstance::Instance(), SLOT(pub2DPose(const RobotPose &)));
+          CommInstance::Instance(), SLOT(PubRelocPose(const RobotPose &)));
   connect(display_manager_, SIGNAL(signalPub2DGoal(const RobotPose &)),
-          CommInstance::Instance(), SLOT(pub2DGoal(const RobotPose &)));
+          CommInstance::Instance(), SLOT(PubNavGoal(const RobotPose &)));
   // ui相关
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetRelocPose,
           [=]() { display_manager_->SetRelocPose(); });

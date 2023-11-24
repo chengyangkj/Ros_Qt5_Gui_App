@@ -1,8 +1,8 @@
 #pragma once
 #include <ros/ros.h>
 
-#include "channel/base/virtual_comm_node.h"
-class rosnode : public VirtualCommNode {
+#include "channel/base/virtual_channel_node.h"
+class rosnode : public VirtualChannelNode {
   Q_OBJECT
 private:
   /* data */
@@ -12,8 +12,8 @@ public:
 
   void run() override;
 public slots:
-  void pub2DPose(Eigen::Vector3f pose) override;
-  void pub2DGoal(Eigen::Vector3f pose) override;
+  void PubRelocPose(Eigen::Vector3f pose) override;
+  void PubNavGoal(Eigen::Vector3f pose) override;
 
 private:
   int init_argc;

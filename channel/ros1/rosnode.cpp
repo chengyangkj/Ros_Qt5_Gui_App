@@ -14,5 +14,5 @@ rosnode::rosnode(/* args */) {
 
 rosnode::~rosnode() {}
 void rosnode::run() {}
-void rosnode::pub2DPose(const RobotPose &pose) {}
-void rosnode::pub2DGoal(const RobotPose &pose) {}
+void rosnode::PubRelocPose(const RobotPose &pose) {}
+void rosnode::PubNavGoal(const RobotPose &pose) {}

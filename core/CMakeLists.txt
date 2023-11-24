@@ -6,4 +6,4 @@ file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  include/*
 add_executable(
     ${PROJECT_NAME} main.cpp)
 
-target_link_libraries(${PROJECT_NAME}  common)
+target_link_libraries(${PROJECT_NAME}  common mainwindow)

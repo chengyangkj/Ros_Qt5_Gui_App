@@ -11,7 +11,6 @@
 #define RCLCOMM_H
 
 #include "algorithm.h"
-#include "base/virtual_comm_node.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "geometry_msgs/msg/twist.hpp"
@@ -25,13 +24,13 @@
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
+#include "virtual_channel_node.h"
 #include <rclcpp/rclcpp.hpp>
-class rclcomm : public VirtualCommNode {
-  Q_OBJECT
+class rclcomm : public VirtualChannelNode {
+
 public:
   rclcomm();
   ~rclcomm() override = default;
-  void run() override;
 
 private:
   void recv_callback(const std_msgs::msg::Int32::SharedPtr msg);
@@ -43,12 +42,14 @@ private:
   void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
+  void Process() override;
 
-public slots:
-  void pub2DPose(const RobotPose &pose) override;
-  void pub2DGoal(const RobotPose &pose) override;
-  void pubSpeed(const RobotSpeed &speed) override;
+public:
+  void PubRelocPose(const RobotPose &pose) override;
+  void PubNavGoal(const RobotPose &pose) override;
+  void PubRobotSpeed(const RobotSpeed &speed) override;
   basic::RobotPose getTrasnsform(std::string from, std::string to);
+  void SendMessage(const Msg::MsgId &msg_id, const std::any &msg) override;
 
 private:
   rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
@@ -57,7 +58,6 @@ private:
       initPosePublisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr
       navGoalPublisher_;
-  rclcpp::Subscription<std_msgs::msg::Int32>::SharedPtr _subscription;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
       m_localCostMapSub;
@@ -76,10 +76,9 @@ private:
   rclcpp::executors::MultiThreadedExecutor *m_executor;
   rclcpp::CallbackGroup::SharedPtr callback_group_laser;
   rclcpp::CallbackGroup::SharedPtr callback_group_other;
+  std::atomic_bool init_flag_{false};
 
 private:
-signals:
-  void emitTopicData(QString);
 };
 
 #endif // RCLCOMM_H

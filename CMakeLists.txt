@@ -12,6 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(BUILD_WITH_CHANNEL_ROS1 OFF)
 option(BUILD_WITH_CHANNEL_ROS2 OFF)
 option(BUILD_WITH_CHANNEL_PROTOBUF OFF)
+option(BUILD_WITH_TEST ON)
 
 #依赖
 set(QT_VERSION_MAJOR 5)
@@ -23,7 +24,7 @@ add_subdirectory(3rdpart/JsonStruct)
 add_subdirectory(common)
 add_subdirectory(basic)
 add_subdirectory(channel)
-add_subdirectory(mainwindow)
-add_subdirectory(core)
+# add_subdirectory(mainwindow)
+# add_subdirectory(core)
 
 
