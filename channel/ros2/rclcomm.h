@@ -42,9 +42,12 @@ private:
   void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
-  void Process() override;
 
 public:
+  bool Start() override;
+  bool Stop() override;
+  void Process() override;
+  std::string Name() override { return "ROS2"; };
   void PubRelocPose(const RobotPose &pose) override;
   void PubNavGoal(const RobotPose &pose) override;
   void PubRobotSpeed(const RobotSpeed &speed) override;

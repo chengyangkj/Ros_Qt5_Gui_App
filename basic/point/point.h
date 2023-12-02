@@ -118,7 +118,11 @@ template <class T, class A>
 orientedpoint<T, A> operator*(const T &v, const orientedpoint<T, A> &p) {
   return orientedpoint<T, A>(p.x * v, p.y * v, p.theta * v);
 }
-
+template <class T, class A>
+std::ostream &operator<<(std::ostream &os, const orientedpoint<T, A> &p) {
+  os << "x:" << p.x << " y:" << p.y << " theta:" << p.theta;
+  return os;
+}
 /*
 @desc 两个位姿的差值，算出来P1在以P2为原点的坐标系里面的坐标。
 */

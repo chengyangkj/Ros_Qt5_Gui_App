@@ -10,10 +10,9 @@
 #include "config/configManager.h"
 // #include "logger/logger.h"
 #include <fstream>
-rclcomm::rclcomm() {
-  int argc = 0;
-  char **argv = NULL;
-  rclcpp::init(argc, argv);
+rclcomm::rclcomm() {}
+bool rclcomm::Start() {
+  rclcpp::init(0, nullptr);
   m_executor = new rclcpp::executors::MultiThreadedExecutor;
   node = rclcpp::Node::make_shared("ros_qt5_gui_app");
   m_executor->add_node(node);
@@ -70,8 +69,32 @@ rclcomm::rclcomm() {
   transform_listener_ =
       std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   init_flag_ = true;
+  return true;
 }
-void rclcomm::SendMessage(const Msg::MsgId &msg_id, const std::any &msg) {}
+bool rclcomm::Stop() {
+  rclcpp::shutdown();
+  return true;
+}
+void rclcomm::SendMessage(const Msg::MsgId &msg_id, const std::any &msg) {
+  switch (msg_id) {
+  case Msg::MsgId::kSetNavGoalPose: {
+    auto pose = std::any_cast<basic::RobotPose>(msg);
+    std::cout << "recv nav goal pose:" << pose << std::endl;
+
+    PubNavGoal(pose);
+
+  } break;
+  case Msg::MsgId::kSetRelocPose: {
+    auto pose = std::any_cast<basic::RobotPose>(msg);
+    std::cout << "recv reloc pose:" << pose << std::endl;
+    PubRelocPose(pose);
+
+  } break;
+
+  default:
+    break;
+  }
+}
 void rclcomm::getRobotPose() {
   OnDataCallback(MsgId::kRobotPose, getTrasnsform("base_link", "map"));
 }
@@ -163,15 +186,11 @@ void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
   speed_publisher_->publish(twist);
 }
 void rclcomm::Process() {
-  while (init_flag_.load()) {
-    rclcpp::WallRate loop_rate(20);
-    while (rclcpp::ok()) {
-      m_executor->spin_some();
-      getRobotPose();
-      loop_rate.sleep();
-    }
+  while (rclcpp::ok()) {
+    m_executor->spin_some();
+    getRobotPose();
+    // std::cout << "loop" << std::endl;
   }
-  rclcpp::shutdown();
 }
 
 void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {

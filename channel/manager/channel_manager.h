@@ -10,18 +10,28 @@
 #pragma once
 #include "msg/msg_info.h"
 #include "virtual_channel_node.h"
-#include <QLibrary>
 #include <any>
+#include <boost/dll/import.hpp>
+#include <boost/filesystem.hpp>
 using namespace Msg;
 class ChannelManager {
 private:
   VirtualChannelNode *channel_ptr_{nullptr};
-  QLibrary *library_channel_;
+  boost::dll::shared_library *library_channel_;
 
 public:
   explicit ChannelManager();
   ~ChannelManager();
-  bool OpenChannel(const QString &name);
+  /// @brief 传入channel so路径，打开对应的通信channel
+  /// @param name 
+  /// @return 
+  bool OpenChannel(const std::string &name);
+  /// @brief 自动查找当前可执行程序陆军下的lib目录中的channel并打开
+  /// @return 
+  bool OpenChannelAuto();
+  /// @brief 查找lib路径下所有channel
+  /// @return channel list
+  std::vector<std::string> DiscoveryAllChannel();
   void RegisterOnDataCallback(
       std::function<void(const MsgId &id, const std::any &data)> &&func) {
     if (channel_ptr_ != nullptr) {

@@ -8,6 +8,8 @@ enum MsgId {
   kLaserScan = 4,
   kLocalPath,
   kGlobalPath,
-  kOdomPose
+  kOdomPose,
+  kSetNavGoalPose,
+  kSetRelocPose,
 };
 } // namespace Msg

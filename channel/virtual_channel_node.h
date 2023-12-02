@@ -24,21 +24,42 @@ private:
   std::thread process_thread_;
 
 public:
-  VirtualChannelNode(/* args */) {
-    process_thread_ = std::thread([this]() { Process(); });
-  }
+  VirtualChannelNode(/* args */) {}
   void RegisterOnDataCallback(
       std::function<void(const MsgId &id, const std::any &data)> &&func) {
     OnDataCallback = func;
   }
-  virtual ~VirtualChannelNode() { process_thread_.join(); }
+  bool Init() {
+    if (Start()) {
+      std::cout << "start channel success" << std::endl;
+      run_flag_ = true;
+      process_thread_ = std::thread([this]() {
+        while (run_flag_) {
+          Process();
+          std::this_thread::sleep_for(
+              std::chrono::milliseconds(1000 / loop_rate_));
+        }
+      });
+    }
+    return false;
+  }
+  void ShutDown() {
+    run_flag_ = false;
+    Stop();
+    process_thread_.join();
+  }
+  virtual ~VirtualChannelNode() {}
   virtual void Process() {}
+  virtual bool Start() = 0;
+  virtual bool Stop() = 0;
+  virtual std::string Name() = 0;
 
 public:
   virtual void PubRelocPose(const RobotPose &pose){};
   virtual void PubNavGoal(const RobotPose &pose){};
   virtual void PubRobotSpeed(const RobotSpeed &speed){};
   std::function<void(const MsgId &id, const std::any &data)> OnDataCallback;
-
+  int loop_rate_{30};
+  std::atomic_bool run_flag_{false};
   virtual void SendMessage(const Msg::MsgId &msg_id, const std::any &msg){};
 };
