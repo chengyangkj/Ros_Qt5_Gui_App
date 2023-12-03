@@ -3,7 +3,7 @@
  * @Date: 2023-10-06 07:12:50
  * @LastEditors: chengyangkj chengyangkj@qq.com
  * @LastEditTime: 2023-10-06 14:02:27
- * @FilePath: /ROS2_Qt5_Gui_App/src/ CMainWindow.cpp
+ * @FilePath: /ROS2_Qt5_Gui_App/src/ MainWindow.cpp
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,10 +21,9 @@
 #include "logger/easylogging++.h"
 
 using namespace ads;
-
-CMainWindow::CMainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::CMainWindow) {
-  LOG(INFO) << " CMainWindow init";
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow) {
+  LOG(INFO) << " MainWindow init";
   qRegisterMetaType<std::string>("std::string");
   qRegisterMetaType<RobotPose>("RobotPose");
   qRegisterMetaType<RobotSpeed>("RobotSpeed");
@@ -33,12 +32,44 @@ CMainWindow::CMainWindow(QWidget *parent)
   qRegisterMetaType<CostMap>("CostMap");
   qRegisterMetaType<LaserScan>("LaserScan");
   qRegisterMetaType<RobotPath>("RobotPath");
+  qRegisterMetaType<MsgId>("MsgId");
+  qRegisterMetaType<std::any>("std::any");
   setupUi();
-  CommInstance::Instance()->start();
 }
+bool MainWindow::openChannel() {
+  if (channel_manager_.OpenChannelAuto()) {
+    registerChannel();
+    return true;
+  }
+  return false;
+}
+bool MainWindow::openChannel(const std::string &channel_name) {
+  if (channel_manager_.OpenChannel(channel_name)) {
+    registerChannel();
+    return true;
+  }
+  return false;
+}
+void MainWindow::registerChannel() {
+  channel_manager_.RegisterOnDataCallback(
+      std::move([=](const MsgId &id, const std::any &data) {
+        switch (id) {
+        case MsgId::kOdomPose:
+          updateOdomInfo(std::any_cast<RobotState>(data));
+          break;
 
-CMainWindow::~CMainWindow() { delete ui; }
-void CMainWindow::setupUi() {
+        default:
+          break;
+        }
+        emit OnRecvChannelData(id, data);
+      }));
+}
+void MainWindow::SendChannelMsg(const MsgId &id, const std::any &data) {
+  channel_manager_.SendMessage(id, data);
+}
+void MainWindow::closeChannel() { channel_manager_.CloseChannel(); }
+MainWindow::~MainWindow() { delete ui; }
+void MainWindow::setupUi() {
   ui->setupUi(this);
   CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
   CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
@@ -124,7 +155,7 @@ void CMainWindow::setupUi() {
   speed_ctrl_widget_ = new SpeedCtrlWidget();
   connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,
           [this](const RobotSpeed &speed) {
-            CommInstance::Instance()->PubRobotSpeed(speed);
+            SendChannelMsg(MsgId::kSetRobotSpeed, speed);
           });
   ads::CDockWidget *SpeedCtrlDockWidget = new ads::CDockWidget("SpeedCtrl");
   SpeedCtrlDockWidget->setWidget(speed_ctrl_widget_);
@@ -135,38 +166,17 @@ void CMainWindow::setupUi() {
 
   //////////////////////////////////////////////////////槽链接
 
-  connect(CommInstance::Instance(), SIGNAL(emitTopicData(QString)), this,
-          SLOT(onRecvData(QString)));
-  connect(CommInstance::Instance(), &VirtualChannelNode::emitUpdateMap,
-          [this](OccupancyMap map) {
-            display_manager_->UpdateDisplay(DISPLAY_MAP, map);
+  connect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
+          display_manager_,
+          SLOT(UpdateTopicData(const MsgId &, const std::any &)));
+  connect(display_manager_, &Display::DisplayManager::signalPub2DPose,
+          [this](const RobotPose &pose) {
+            SendChannelMsg(MsgId::kSetNavGoalPose, pose);
           });
-  connect(CommInstance::Instance(),
-          SIGNAL(emitUpdateLocalCostMap(CostMap, RobotPose)), this,
-          SLOT(updateLocalCostMap(CostMap, RobotPose)));
-  connect(CommInstance::Instance(), SIGNAL(emitUpdateGlobalCostMap(CostMap)),
-          this, SLOT(updateGlobalCostMap(CostMap)));
-  connect(CommInstance::Instance(), SIGNAL(emitUpdateRobotPose(RobotPose)),
-          this, SLOT(slotUpdateRobotPose(RobotPose)));
-
-  connect(CommInstance::Instance(), SIGNAL(emitUpdateLaserPoint(LaserScan)),
-          this, SLOT(slotUpdateLaserPoint(LaserScan)));
-  connect(CommInstance::Instance(), SIGNAL(emitUpdatePath(RobotPath)), this,
-          SLOT(updateGlobalPath(RobotPath)));
-  connect(CommInstance::Instance(), SIGNAL(emitUpdateLocalPath(RobotPath)),
-          this, SLOT(updateLocalPath(RobotPath)));
-  connect(CommInstance::Instance(), SIGNAL(emitOdomInfo(RobotState)), this,
-          SLOT(updateOdomInfo(RobotState)));
-  // connect(m_roboItem, SIGNAL(signalRunMap(OccupancyMap)), m_roboGLWidget,
-  //         SLOT(updateRunMap(QPixmap)));
-  //    connect(CommInstance::Instance(),&rclcomm::emitUpdateMap,[this](QImage
-  //    img){
-  //        m_roboItem->updateMap(img);
-  //    });
-  connect(display_manager_, SIGNAL(signalPub2DPose(const RobotPose &)),
-          CommInstance::Instance(), SLOT(PubRelocPose(const RobotPose &)));
-  connect(display_manager_, SIGNAL(signalPub2DGoal(const RobotPose &)),
-          CommInstance::Instance(), SLOT(PubNavGoal(const RobotPose &)));
+  connect(display_manager_, &Display::DisplayManager::signalPub2DGoal,
+          [this](const RobotPose &pose) {
+            SendChannelMsg(MsgId::kSetRelocPose, pose);
+          });
   // ui相关
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetRelocPose,
           [=]() { display_manager_->SetRelocPose(); });
@@ -177,15 +187,15 @@ void CMainWindow::setupUi() {
           SLOT(signalCursorPose(QPointF)));
 }
 
-void CMainWindow::signalCursorPose(QPointF pos) {
-  basic::Point mapPos = CommInstance::Instance()->transScenePoint2Word(
-      basic::Point(pos.x(), pos.y()));
-  label_pos_map_->setText("x: " + QString::number(mapPos.x).mid(0, 4) +
-                          "  y: " + QString::number(mapPos.y).mid(0, 4));
+void MainWindow::signalCursorPose(QPointF pos) {
+  // basic::Point mapPos = display_manager_->transScenePoint2Word(
+  //     basic::Point(pos.x(), pos.y()));
+  // label_pos_map_->setText("x: " + QString::number(mapPos.x).mid(0, 4) +
+  //                         "  y: " + QString::number(mapPos.y).mid(0, 4));
   label_pos_scene_->setText("x: " + QString::number(pos.x()).mid(0, 4) +
                             "  y: " + QString::number(pos.y()).mid(0, 4));
 }
-void CMainWindow::savePerspective() {
+void MainWindow::savePerspective() {
   QString PerspectiveName =
       QInputDialog::getText(this, "Save Perspective", "Enter unique name:");
   if (PerspectiveName.isEmpty()) {
@@ -200,55 +210,13 @@ void CMainWindow::savePerspective() {
 }
 
 //============================================================================
-void CMainWindow::closeEvent(QCloseEvent *event) {
+void MainWindow::closeEvent(QCloseEvent *event) {
   // Delete dock manager here to delete all floating widgets. This ensures
   // that all top level windows of the dock manager are properly closed
   dock_manager_->deleteLater();
   QMainWindow::closeEvent(event);
 }
-void CMainWindow::onRecvData(QString msg) {}
-void CMainWindow::updateLocalCostMap(CostMap map, basic::RobotPose pose) {
-  display_manager_->UpdateDisplay(DISPLAY_LOCAL_COST_MAP, map);
-  display_manager_->UpdateDisplay(DISPLAY_LOCAL_COST_MAP, pose);
-}
-void CMainWindow::updateGlobalCostMap(CostMap map) {
-  display_manager_->UpdateDisplay(DISPLAY_GLOBAL_COST_MAP, map);
-}
-void CMainWindow::updateGlobalPath(RobotPath path) {
-  Display::PathData data;
-  for (auto one_point : path) {
-    data.push_back(Display::Point2f(one_point.x, one_point.y));
-  }
-  display_manager_->UpdateDisplay(DISPLAY_GLOBAL_PATH, data);
-}
-void CMainWindow::updateLocalPath(RobotPath path) {
-  Display::PathData data;
-  for (auto one_point : path) {
-    data.push_back(Display::Point2f(one_point.x, one_point.y));
-  }
-  display_manager_->UpdateDisplay(DISPLAY_LOCAL_PATH, data);
-}
-void CMainWindow::slotUpdateLaserPoint(LaserScan scan) {
-  // 数据转换
-  Display::LaserDataMap laser_data;
-
-  Display::LaserData vector_scan;
-  for (auto one_point : scan.data) {
-    Eigen::Vector2f point;
-    point[0] = one_point.x;
-    point[1] = one_point.y;
-    vector_scan.push_back(point);
-  }
-  laser_data[scan.id] = vector_scan;
-
-  display_manager_->UpdateDisplay(DISPLAY_LASER, laser_data);
-}
-void CMainWindow::slotUpdateRobotPose(basic::RobotPose pose) {
-  display_manager_->UpdateDisplay(DISPLAY_ROBOT,
-                                  Display::Pose3f(pose.x, pose.y, pose.theta));
-}
-
-void CMainWindow::updateOdomInfo(RobotState state) {
+void MainWindow::updateOdomInfo(RobotState state) {
   // 转向灯
   //   if (state.w > 0.1) {
   //     ui->label_turnLeft->setPixmap(

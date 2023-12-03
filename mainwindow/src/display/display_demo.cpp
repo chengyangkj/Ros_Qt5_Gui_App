@@ -20,7 +20,7 @@ void DisplayDemo::paint(QPainter *painter,
 DisplayDemo::~DisplayDemo() {}
 bool DisplayDemo::UpdateData(const std::any &data) {
   try {
-    particle_data_ = std::any_cast<Display::ParticlePointsType>(data);
+
     update();
   } catch (const std::bad_any_cast &e) {
     std::cout << e.what() << '\n';

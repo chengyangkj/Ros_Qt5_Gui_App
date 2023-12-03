@@ -52,7 +52,7 @@ public:
   void PubNavGoal(const RobotPose &pose) override;
   void PubRobotSpeed(const RobotSpeed &speed) override;
   basic::RobotPose getTrasnsform(std::string from, std::string to);
-  void SendMessage(const Msg::MsgId &msg_id, const std::any &msg) override;
+  void SendMessage(const MsgId &msg_id, const std::any &msg) override;
 
 private:
   rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;

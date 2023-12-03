@@ -23,8 +23,8 @@ DisplayPath::~DisplayPath() {}
 bool DisplayPath::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {
   if (config_name == "Color") {
-    Display::Color color;
-    GetAnyData(Display::Color, config_data, color);
+    Color color;
+    GetAnyData(Color, config_data, color);
     color_ = QColor(color[0], color[1], color[2]);
   } else {
     return false;
@@ -33,11 +33,11 @@ bool DisplayPath::SetDisplayConfig(const std::string &config_name,
 }
 bool DisplayPath::UpdateData(const std::any &data) {
   try {
-    auto path_data = std::any_cast<Display::PathData>(data);
+    auto path_data = std::any_cast<RobotPath>(data);
     computeBoundRect(path_data);
     path_points_.clear();
     for (auto one_path : path_data) {
-      path_points_.push_back(QPointF(one_path[0], one_path[1]));
+      path_points_.push_back(QPointF(one_path.x, one_path.y));
     }
     update();
   } catch (const std::bad_any_cast &e) {
@@ -52,18 +52,18 @@ void DisplayPath::drawPath(QPainter *painter) {
   // }
   painter->drawPoints(path_points_);
 }
-void DisplayPath::computeBoundRect(const Display::PathData &path) {
+void DisplayPath::computeBoundRect(const RobotPath &path) {
   if (path.empty())
     return;
   float xmax, xmin, ymax, ymin;
 
-  xmax = xmin = path[0][0];
-  ymax = ymin = path[0][1];
+  xmax = xmin = path[0].x;
+  ymax = ymin = path[0].y;
   for (auto p : path) {
-    xmax = xmax > p[0] ? xmax : p[0];
-    xmin = xmin < p[0] ? xmin : p[0];
-    ymax = ymax > p[1] ? ymax : p[1];
-    ymin = ymin < p[1] ? ymin : p[1];
+    xmax = xmax > p.x ? xmax : p.x;
+    xmin = xmin < p.x ? xmin : p.x;
+    ymax = ymax > p.y ? ymax : p.y;
+    ymin = ymin < p.y ? ymin : p.y;
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;

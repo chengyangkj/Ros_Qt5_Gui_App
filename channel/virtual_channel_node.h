@@ -14,7 +14,6 @@
 #include <any>
 #include <thread>
 using namespace basic;
-using namespace Msg;
 class VirtualChannelNode {
 
 public:
@@ -61,5 +60,5 @@ public:
   std::function<void(const MsgId &id, const std::any &data)> OnDataCallback;
   int loop_rate_{30};
   std::atomic_bool run_flag_{false};
-  virtual void SendMessage(const Msg::MsgId &msg_id, const std::any &msg){};
+  virtual void SendMessage(const MsgId &msg_id, const std::any &msg){};
 };

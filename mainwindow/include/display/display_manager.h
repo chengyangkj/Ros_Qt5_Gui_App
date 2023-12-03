@@ -14,12 +14,10 @@
 #include "display_cost_map.h"
 #include "display_occ_map.h"
 #include "display_path.h"
-#include "display_tag.h"
 #include "factory_display.h"
 #include "laser_points.h"
-#include "particle_points.h"
+#include "msg/msg_info.h"
 #include "point_shape.h"
-#include "region.h"
 #include "widgets/set_pose_widget.h"
 #include <Eigen/Dense>
 #include <QGraphicsScene>
@@ -30,13 +28,13 @@
 #include <any>
 #include <functional>
 #include <map>
-#define DISPLAY_ROBOT "Robot"
-#define DISPLAY_MAP "OccupyMap"
-#define DISPLAY_LOCAL_COST_MAP "LocalCostMap"
-#define DISPLAY_GLOBAL_COST_MAP "GlobalCostMap"
-#define DISPLAY_GLOBAL_PATH "GlobalPath"
-#define DISPLAY_LOCAL_PATH "LocalPath"
-#define DISPLAY_LASER "LaserScan"
+#define DISPLAY_ROBOT ToString(MsgId::kRobotPose)
+#define DISPLAY_MAP ToString(MsgId::kOccupancyMap)
+#define DISPLAY_LOCAL_COST_MAP ToString(MsgId::kLocalCostMap)
+#define DISPLAY_GLOBAL_COST_MAP ToString(MsgId::kGlobalCostMap)
+#define DISPLAY_GLOBAL_PATH ToString(MsgId::kGlobalPath)
+#define DISPLAY_LOCAL_PATH ToString(MsgId::kLocalPath)
+#define DISPLAY_LASER ToString(MsgId::kLaserScan)
 #define DISPLAY_PARTICLE "Particle"
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
@@ -44,15 +42,14 @@
 
 // group
 #define GROUP_MAP "Group_Map"
-
 namespace Display {
 class DisplayManager : public QObject {
   Q_OBJECT
 private:
   std::map<std::string, std::any> display_map_;
 
-  Eigen::Vector3f robot_pose_{0, 0, 0};
-  Eigen::Vector3f robot_pose_goal_{0, 0, 0};
+  RobotPose robot_pose_{0, 0, 0};
+  RobotPose robot_pose_goal_{0, 0, 0};
   OccupancyMap map_data_;
   std::string focus_display_;
   RobotPose local_cost_world_pose_;
@@ -64,7 +61,6 @@ private:
   SetPoseWidget *set_nav_pose_widget_;
 signals:
   void cursorPosMap(QPointF);
-  void DisplayRobotPoseWorld(Eigen::Vector3f pose);
   void signalPub2DPose(const RobotPose &pose);
   void signalPub2DGoal(const RobotPose &pose);
 public slots:
@@ -75,25 +71,25 @@ public slots:
   void slotNavGoalScenePoseChanged(const RobotPose &pose);
   void slotSetRobotPose(const RobotPose &pose);
   void slotSetNavPose(const RobotPose &pose);
+  void UpdateTopicData(const MsgId &id, const std::any &data);
 
 private:
-  Eigen::Vector3f wordPose2Scene(const Eigen::Vector3f &point);
-  QPointF wordPose2Scene(const QPointF &point);
-  QPointF wordPose2Map(const QPointF &pose);
   void FocusDisplay(const std::string &display_name);
   void InitUi();
-  std::vector<Eigen::Vector2f>
-  transLaserPoint(const std::vector<Eigen::Vector2f> &point);
+  std::vector<Point> transLaserPoint(const std::vector<Point> &point);
   QPushButton *btn_move_focus_;
 
 public:
   DisplayManager(QGraphicsView *viewer);
   ~DisplayManager();
   VirtualDisplay *GetDisplay(const std::string &name);
+  QPointF wordPose2Scene(const QPointF &point);
+  RobotPose wordPose2Scene(const RobotPose &point);
+  QPointF wordPose2Map(const QPointF &pose);
+  RobotPose wordPose2Map(const RobotPose &pose);
   bool UpdateDisplay(const std::string &display_name, const std::any &data);
-  void UpdateRobotPose(const Eigen::Vector3f &pose);
+  void UpdateRobotPose(const RobotPose &pose);
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
-  Eigen::Vector3f wordPose2Map(const Eigen::Vector3f &pose);
   void SetRelocMode(bool is_move);
   void SetNavGoalMode(bool is_start);
 

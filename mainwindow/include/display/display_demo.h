@@ -22,7 +22,6 @@ private:
   void drawFrame(QPainter *painter);
 
 public:
-  Display::ParticlePointsType particle_data_;
   DisplayDemo(const std::string &display_name, const int &z_value,
               std::string parent_name = "");
   ~DisplayDemo();

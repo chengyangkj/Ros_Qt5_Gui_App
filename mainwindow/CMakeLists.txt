@@ -28,5 +28,5 @@ target_include_directories(
 	include/
  ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(${TARGET_NAME} Qt5::Widgets  qt${QT_VERSION_MAJOR}advanceddocking json_struct common basic channel channel_ros2)
+target_link_libraries(${TARGET_NAME} Qt5::Widgets  qt${QT_VERSION_MAJOR}advanceddocking json_struct common basic channel)
 

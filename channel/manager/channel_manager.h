@@ -13,7 +13,6 @@
 #include <any>
 #include <boost/dll/import.hpp>
 #include <boost/filesystem.hpp>
-using namespace Msg;
 class ChannelManager {
 private:
   VirtualChannelNode *channel_ptr_{nullptr};
@@ -23,11 +22,11 @@ public:
   explicit ChannelManager();
   ~ChannelManager();
   /// @brief 传入channel so路径，打开对应的通信channel
-  /// @param name 
-  /// @return 
+  /// @param name
+  /// @return
   bool OpenChannel(const std::string &name);
   /// @brief 自动查找当前可执行程序陆军下的lib目录中的channel并打开
-  /// @return 
+  /// @return
   bool OpenChannelAuto();
   /// @brief 查找lib路径下所有channel
   /// @return channel list
@@ -40,6 +39,5 @@ public:
   }
   void CloseChannel();
 
-  void SendMessage(const Msg::MsgId &msg_id, 
-                   const std::any &msg);
+  void SendMessage(const MsgId &msg_id, const std::any &msg);
 };

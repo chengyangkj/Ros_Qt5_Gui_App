@@ -75,16 +75,16 @@ bool rclcomm::Stop() {
   rclcpp::shutdown();
   return true;
 }
-void rclcomm::SendMessage(const Msg::MsgId &msg_id, const std::any &msg) {
+void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
   switch (msg_id) {
-  case Msg::MsgId::kSetNavGoalPose: {
+  case MsgId::kSetNavGoalPose: {
     auto pose = std::any_cast<basic::RobotPose>(msg);
     std::cout << "recv nav goal pose:" << pose << std::endl;
 
     PubNavGoal(pose);
 
   } break;
-  case Msg::MsgId::kSetRelocPose: {
+  case MsgId::kSetRelocPose: {
     auto pose = std::any_cast<basic::RobotPose>(msg);
     std::cout << "recv reloc pose:" << pose << std::endl;
     PubRelocPose(pose);
@@ -282,29 +282,30 @@ void rclcomm::localCostMapCallback(
     cost_map(x, y) = msg->data[i];
   }
   cost_map.SetFlip();
+  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
   //      map_image.save("/home/chengyangkj/test.jpg");
-  try {
-    // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
-    geometry_msgs::msg::PoseStamped pose_map_frame;
-    geometry_msgs::msg::PoseStamped pose_curr_frame;
-    pose_curr_frame.pose.position.x = origin_x;
-    pose_curr_frame.pose.position.y = origin_y;
-    q.setRPY(0, 0, origin_theta);
-    pose_curr_frame.pose.orientation = tf2::toMsg(q);
-    pose_curr_frame.header.frame_id = msg->header.frame_id;
-    tf_buffer_->transform(pose_curr_frame, pose_map_frame, "map");
-    tf2::fromMsg(pose_map_frame.pose.orientation, q);
-    tf2::Matrix3x3 mat(q);
-    double roll, pitch, yaw;
-    mat.getRPY(roll, pitch, yaw);
+  // try {
+  //   // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
+  //   geometry_msgs::msg::PoseStamped pose_map_frame;
+  //   geometry_msgs::msg::PoseStamped pose_curr_frame;
+  //   pose_curr_frame.pose.position.x = origin_x;
+  //   pose_curr_frame.pose.position.y = origin_y;
+  //   q.setRPY(0, 0, origin_theta);
+  //   pose_curr_frame.pose.orientation = tf2::toMsg(q);
+  //   pose_curr_frame.header.frame_id = msg->header.frame_id;
+  //   tf_buffer_->transform(pose_curr_frame, pose_map_frame, "map");
+  //   tf2::fromMsg(pose_map_frame.pose.orientation, q);
+  //   tf2::Matrix3x3 mat(q);
+  //   double roll, pitch, yaw;
+  //   mat.getRPY(roll, pitch, yaw);
 
-    basic::RobotPose localCostmapPose;
-    localCostmapPose.x = pose_map_frame.pose.position.x;
-    localCostmapPose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
-    localCostmapPose.theta = yaw;
-    // emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
-  } catch (tf2::TransformException &ex) {
-  }
+  //   basic::RobotPose localCostmapPose;
+  //   localCostmapPose.x = pose_map_frame.pose.position.x;
+  //   localCostmapPose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
+  //   localCostmapPose.theta = yaw;
+  //   // emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
+  // } catch (tf2::TransformException &ex) {
+  // }
 }
 void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   double origin_x = msg->info.origin.position.x;

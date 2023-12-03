@@ -1,9 +1,12 @@
 
-file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} src/*.cpp src/*.cc)
-file(GLOB_RECURSE UI_FILE CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}  ui/*.ui)
-file(GLOB_RECURSE QRC_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}  resource/*.qrc)
-file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  include/*.h *.hpp)
+file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} ./*.cpp ./*.cc)
+file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  ./*.h ./*.hpp)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
 add_executable(
-    ${PROJECT_NAME} main.cpp)
+    ${PROJECT_NAME} ${SOURCE_FILE})
 
-target_link_libraries(${PROJECT_NAME}  common mainwindow)
+target_link_libraries(${PROJECT_NAME}  common mainwindow Qt5::Core Qt5::Widgets)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)

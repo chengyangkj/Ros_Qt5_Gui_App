@@ -14,6 +14,7 @@
 namespace basic {
 typedef OrientedPoint RobotPose;
 typedef std::vector<Point> RobotPath;
+typedef Eigen::Vector3d Color;
 struct RobotSpeed {
   double vx{0};
   double vy{0};

@@ -15,7 +15,7 @@
 #include <QGraphicsSceneWheelEvent>
 
 #include "virtual_display.h"
-
+using namespace basic;
 namespace Display {
 class DisplayPath : public VirtualDisplay {
 private:
@@ -25,7 +25,7 @@ private:
 private:
   void drawPath(QPainter *painter);
 
-  void computeBoundRect(const Display::PathData &path);
+  void computeBoundRect(const RobotPath &path);
 
 public:
   DisplayPath(const std::string &display_name, const int &z_value,

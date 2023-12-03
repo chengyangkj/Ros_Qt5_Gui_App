@@ -22,25 +22,27 @@ void LaserPoints::paint(QPainter *painter,
 LaserPoints::~LaserPoints() {}
 
 bool LaserPoints::UpdateData(const std::any &data) {
-  if (data.type() == typeid(Display::LaserDataMap)) {
-    laser_data_scene_ = std::any_cast<Display::LaserDataMap>(data);
+  if (data.type() == typeid(LaserScan)) {
+    auto laser_scan = std::any_cast<LaserScan>(data);
+    laser_data_scene_[laser_scan.id] = laser_scan.data;
     computeBoundRect(laser_data_scene_);
   }
   update();
 }
-void LaserPoints::computeBoundRect(const Display::LaserDataMap &laser_scan) {
+void LaserPoints::computeBoundRect(
+    const std::map<int, std::vector<Point>> &laser_scan) {
   float xmax, xmin, ymax, ymin;
   for (auto [id, points] : laser_scan) {
     if (points.empty())
       continue;
-    xmax = xmin = points[0][0];
-    ymax = ymin = points[0][1];
+    xmax = xmin = points[0].x;
+    ymax = ymin = points[0].y;
     for (int i = 1; i < points.size(); ++i) {
-      Eigen::Vector2f p = points[i];
-      xmax = xmax > p[0] ? xmax : p[0];
-      xmin = xmin < p[0] ? xmin : p[0];
-      ymax = ymax > p[1] ? ymax : p[1];
-      ymin = ymin < p[1] ? ymin : p[1];
+      Point p = points[i];
+      xmax = xmax > p.x ? xmax : p.x;
+      xmin = xmin < p.x ? xmin : p.x;
+      ymax = ymax > p.y ? ymax : p.y;
+      ymin = ymin < p.y ? ymin : p.y;
     }
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
@@ -49,19 +51,11 @@ void LaserPoints::computeBoundRect(const Display::LaserDataMap &laser_scan) {
 }
 bool LaserPoints::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {
-  if (config_name == "Color") {
-    Display::LaserColorMap new_map;
-    GetAnyData(Display::LaserColorMap, config_data, new_map);
-    for (auto item : new_map) {
-      location_to_color_[item.first] = item.second;
-    }
-  } else {
-    return false;
-  }
+
   return true;
 }
 void LaserPoints::drawLaser(QPainter *painter, int id,
-                            std::vector<Eigen::Vector2f> data) {
+                            std::vector<Point> data) {
   QColor color;
   if (!location_to_color_.count(id)) {
     int r, g, b;
@@ -72,7 +66,7 @@ void LaserPoints::drawLaser(QPainter *painter, int id,
   }
   painter->setPen(QPen(color));
   for (auto one_point : data) {
-    QPointF point = QPointF(one_point[0], one_point[1]);
+    QPointF point = QPointF(one_point.x, one_point.y);
     // std::cout<<"point:"<<point.x() <<" "<<point.y()<<std::endl;
     painter->drawPoint(point);
   }
