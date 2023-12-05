@@ -54,14 +54,20 @@ bool ChannelManager::OpenChannel(const std::string &path) {
     typedef VirtualChannelNode *(*GetChannelInstanceFunc)();
     GetChannelInstanceFunc func_get =
         (GetChannelInstanceFunc)library_channel_->get<VirtualChannelNode *()>(
-            "GetChannelInstance"); //取出该符号
+            "GetChannelInstance"); // 取出该符号
     channel_ptr_ = func_get();
     if (channel_ptr_ == nullptr) {
       std::cout << "get channel instance failed!" << std::endl;
       return false;
     }
-    channel_ptr_->Init();
-    std::cout << "open channel:" << channel_ptr_->Name() << std::endl;
+    if (!channel_ptr_->Init()) {
+      std::cout << "channel init failed!" << std::endl;
+      return false;
+    } else {
+      std::cout << "open channel:" << channel_ptr_->Name() << std::endl;
+      return true;
+    }
+
   } catch (const boost::system::system_error &e) {
     std::cout << "Failed to load dynamic library: " << e.what() << std::endl;
     return false;

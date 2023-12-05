@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<RobotPath>("RobotPath");
   qRegisterMetaType<MsgId>("MsgId");
   qRegisterMetaType<std::any>("std::any");
+  openChannel();
   setupUi();
 }
 bool MainWindow::openChannel() {

@@ -16,8 +16,7 @@
 using namespace basic;
 class VirtualChannelNode {
 
-public:
-  basic::OccupancyMap occ_map_;
+
 
 private:
   std::thread process_thread_;
@@ -39,6 +38,7 @@ public:
               std::chrono::milliseconds(1000 / loop_rate_));
         }
       });
+      return true;
     }
     return false;
   }
@@ -52,13 +52,10 @@ public:
   virtual bool Start() = 0;
   virtual bool Stop() = 0;
   virtual std::string Name() = 0;
+  virtual void SendMessage(const MsgId &msg_id, const std::any &msg) = 0;
 
 public:
-  virtual void PubRelocPose(const RobotPose &pose){};
-  virtual void PubNavGoal(const RobotPose &pose){};
-  virtual void PubRobotSpeed(const RobotSpeed &speed){};
   std::function<void(const MsgId &id, const std::any &data)> OnDataCallback;
   int loop_rate_{30};
   std::atomic_bool run_flag_{false};
-  virtual void SendMessage(const MsgId &msg_id, const std::any &msg){};
 };
