@@ -48,14 +48,13 @@ public:
   bool Stop() override;
   void Process() override;
   std::string Name() override { return "ROS2"; };
-  void PubRelocPose(const RobotPose &pose) override;
-  void PubNavGoal(const RobotPose &pose) override;
-  void PubRobotSpeed(const RobotSpeed &speed) override;
+  void PubRelocPose(const RobotPose &pose);
+  void PubNavGoal(const RobotPose &pose);
+  void PubRobotSpeed(const RobotSpeed &speed);
   basic::RobotPose getTrasnsform(std::string from, std::string to);
   void SendMessage(const MsgId &msg_id, const std::any &msg) override;
 
 private:
- 
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr speed_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
       reloc_pose_publisher_;

@@ -79,7 +79,7 @@ bool rclcomm::Stop() {
   return true;
 }
 void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
-switch (msg_id) {
+  switch (msg_id) {
   case MsgId::kSetNavGoalPose: {
     auto pose = std::any_cast<basic::RobotPose>(msg);
     std::cout << "recv nav goal pose:" << pose << std::endl;
@@ -95,7 +95,7 @@ switch (msg_id) {
   } break;
   case MsgId::kSetRobotSpeed: {
     auto speed = std::any_cast<basic::RobotSpeed>(msg);
-    std::cout << "recv reloc pose:" << pose << std::endl;
+    std::cout << "recv reloc pose:" << speed << std::endl;
     PubRobotSpeed(speed);
 
   } break;
