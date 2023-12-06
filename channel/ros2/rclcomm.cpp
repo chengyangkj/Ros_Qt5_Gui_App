@@ -79,7 +79,7 @@ bool rclcomm::Stop() {
   return true;
 }
 void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
-  switch (msg_id) {
+switch (msg_id) {
   case MsgId::kSetNavGoalPose: {
     auto pose = std::any_cast<basic::RobotPose>(msg);
     std::cout << "recv nav goal pose:" << pose << std::endl;
@@ -93,7 +93,12 @@ void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
     PubRelocPose(pose);
 
   } break;
+  case MsgId::kSetRobotSpeed: {
+    auto speed = std::any_cast<basic::RobotSpeed>(msg);
+    std::cout << "recv reloc pose:" << pose << std::endl;
+    PubRobotSpeed(speed);
 
+  } break;
   default:
     break;
   }
@@ -175,19 +180,7 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   } catch (tf2::TransformException &ex) {
   }
 }
-void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
-  geometry_msgs::msg::Twist twist;
-  twist.linear.x = speed.vx;
-  twist.linear.y = speed.vy;
-  twist.linear.z = 0;
 
-  twist.angular.x = 0;
-  twist.angular.y = 0;
-  twist.angular.z = speed.w;
-
-  // Publish it and resolve any remaining callbacks
-  speed_publisher_->publish(twist);
-}
 /// @brief loop for rate
 void rclcomm::Process() {
   if (rclcpp::ok()) {
@@ -220,7 +213,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
   try {
     //        geometry_msgs::msg::TransformStamped laser_transform =
     //        tf_buffer_->lookupTransform("map","base_scan",tf2::TimePointZero);
-    geometry_msgs::msg::PointStamped point_map_frame;
+    geometry_msgs::msg::PointStamped point_base_frame;
     geometry_msgs::msg::PointStamped point_laser_frame;
     basic::LaserScan laser_points;
     for (int i = 0; i < msg->ranges.size(); i++) {
@@ -234,10 +227,10 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-      tf_buffer_->transform(point_laser_frame, point_map_frame, "base_link");
+      tf_buffer_->transform(point_laser_frame, point_base_frame, "base_link");
       basic::Point p;
-      p.x = point_map_frame.point.x;
-      p.y = point_map_frame.point.y;
+      p.x = point_base_frame.point.x;
+      p.y = point_base_frame.point.y;
       laser_points.push_back(p);
     }
     laser_points.id = 0;
@@ -350,4 +343,17 @@ void rclcomm::PubNavGoal(const RobotPose &pose) {
   q.setRPY(0, 0, pose.theta);
   geo_pose.pose.orientation = tf2::toMsg(q);
   nav_goal_publisher_->publish(geo_pose);
+}
+void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
+  geometry_msgs::msg::Twist twist;
+  twist.linear.x = speed.vx;
+  twist.linear.y = speed.vy;
+  twist.linear.z = 0;
+
+  twist.angular.x = 0;
+  twist.angular.y = 0;
+  twist.angular.z = speed.w;
+
+  // Publish it and resolve any remaining callbacks
+  speed_publisher_->publish(twist);
 }

@@ -14,7 +14,8 @@ RosNode::~RosNode() {}
 /// @brief loop for rate
 void RosNode::Process() {
   if (ros::ok()) {
-    // updateRobotPose();
+    GetRobotPose();
+    ros::spinOnce();
     std::cout << "process" << std::endl;
   }
 }
@@ -48,19 +49,63 @@ void RosNode::init() {
                    &RosNode::GlobalCostMapCallback, this);
   laser_scan_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LaserScan"), 20,
                                         &RosNode::LaserScanCallback, this);
-  global_path_subscriber_ = nh.subscribe(
-      GET_TOPIC_NAME("GlobalPlan"), 20,&RosNode::GlobalPathCallback, this);
+  global_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("GlobalPlan"), 20,
+                                         &RosNode::GlobalPathCallback, this);
   local_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LocalPlan"), 20,
                                         &RosNode::LocalPathCallback, this);
   odometry_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Odometry"), 200,
                                       &RosNode::OdometryCallback, this);
+
+  tf_listener_ = new tf::TransformListener();
 }
 bool RosNode::Stop() {
   ros::shutdown();
   return true;
 }
-void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {}
-void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {}
+void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
+  switch (msg_id) {
+  case MsgId::kSetNavGoalPose: {
+    auto pose = std::any_cast<basic::RobotPose>(msg);
+    std::cout << "recv nav goal pose:" << pose << std::endl;
+
+    PubNavGoal(pose);
+
+  } break;
+  case MsgId::kSetRelocPose: {
+    auto pose = std::any_cast<basic::RobotPose>(msg);
+    std::cout << "recv reloc pose:" << pose << std::endl;
+    PubRelocPose(pose);
+
+  } break;
+  case MsgId::kSetRobotSpeed: {
+    auto speed = std::any_cast<basic::RobotSpeed>(msg);
+    std::cout << "recv reloc pose:" << speed << std::endl;
+    PubRobotSpeed(speed);
+
+  } break;
+  default:
+    break;
+  }
+}
+void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
+
+  basic::RobotState state;
+  state.vx = (double)msg->twist.twist.linear.x;
+  state.vy = (double)msg->twist.twist.linear.y;
+  state.w = (double)msg->twist.twist.angular.z;
+  state.x = (double)msg->pose.pose.position.x;
+  state.y = (double)msg->pose.pose.position.y;
+
+  geometry_msgs::Quaternion msg_quat = msg->pose.pose.orientation;
+  // 转换类型
+  tf::Quaternion q;
+  tf2::fromMsg(msg_quat, q);
+  tf::Matrix3x3 mat(q);
+  double roll, pitch, yaw;
+  mat.getRPY(roll, pitch, yaw);
+  state.theta = yaw;
+  OnDataCallback(MsgId::kOdomPose, state);
+}
 void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   double origin_x = msg->info.origin.position.x;
   double origin_y = msg->info.origin.position.y;
@@ -78,44 +123,168 @@ void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   occ_map_.SetFlip();
   OnDataCallback(MsgId::kOccupancyMap, occ_map_);
 }
-void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {}
+void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
+  int width = msg->info.width;
+  int height = msg->info.height;
+  double origin_x = msg->info.origin.position.x;
+  double origin_y = msg->info.origin.position.y;
+  tf::Quaternion q;
+  tf2::fromMsg(msg->info.origin.orientation, q);
+  tf::Matrix3x3 mat(q);
+  double roll, pitch, yaw;
+  mat.getRPY(roll, pitch, yaw);
+  double origin_theta = yaw;
+  basic::CostMap cost_map(height, width, Eigen::Vector3d(origin_x, origin_y, 0),
+                          msg->info.resolution);
+  for (int i = 0; i < msg->data.size(); i++) {
+    int x = (int)i / width;
+    int y = i % width;
+    cost_map(x, y) = msg->data[i];
+  }
+  cost_map.SetFlip();
+  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
+}
 void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {}
 // 激光雷达点云话题回调
-void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr laser_msg) {
-  geometry_msgs::PointStamped laser_point;
-  geometry_msgs::PointStamped map_point;
-  laser_point.header.frame_id = laser_msg->header.frame_id;
-  std::vector<float> ranges = laser_msg->ranges;
-  // // 转换到二维XY平面坐标系下;
-  // for (int i = 0; i < ranges.size(); i++) {
-  //   // scan_laser坐标系下
-  //   double angle = laser_msg->angle_min + i * laser_msg->angle_increment;
-  //   double X = ranges[i] * cos(angle);
-  //   double Y = ranges[i] * sin(angle);
-  //   laser_point.point.x = X;
-  //   laser_point.point.y = Y;
-  //   laser_point.point.z = 0.0;
-  //   // change to map frame
-  //   try {
-  //     m_Laserlistener->transformPoint(map_frame, laser_point, map_point);
-  //   } catch (tf::TransformException &ex) {
-  //     try {
-  //       m_robotPoselistener->waitForTransform(map_frame, base_frame,
-  //                                             ros::Time(0),
-  //                                             ros::Duration(0.4));
-  //       m_Laserlistener->waitForTransform(map_frame, laser_frame,
-  //       ros::Time(0),
-  //                                         ros::Duration(0.4));
-  //     } catch (tf::TransformException &ex) {
-  //       log(Error, ("laser tf transform: " +
-  //       QString(ex.what())).toStdString());
-  //     }
-  //   }
-  //   // 转化为图元坐标系
-  //   QPointF roboPos =
-  //       transWordPoint2Scene(QPointF(map_point.point.x, map_point.point.y));
+void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
+  double angle_min = msg->angle_min;
+  double angle_max = msg->angle_max;
+  double angle_increment = msg->angle_increment;
+  try {
+    geometry_msgs::PointStamped point_base_frame;
+    geometry_msgs::PointStamped point_laser_frame;
+    basic::LaserScan laser_points;
+    for (int i = 0; i < msg->ranges.size(); i++) {
+      // 计算当前偏移角度
+      double angle = angle_min + i * angle_increment;
+      double dist = msg->ranges[i];
+      if (isinf(dist))
+        continue;
+      double x = dist * cos(angle);
+      double y = dist * sin(angle);
+      point_laser_frame.point.x = x;
+      point_laser_frame.point.y = y;
+      point_laser_frame.header.frame_id = msg->header.frame_id;
 
-  // }
+      tf_listener_->transformPoint("base_link", point_laser_frame,
+                                   point_base_frame);
+      basic::Point p;
+      p.x = point_base_frame.point.x;
+      p.y = point_base_frame.point.y;
+      laser_points.push_back(p);
+    }
+    laser_points.id = 0;
+    // basic::RobotPose pose = getTrasnsform(msg->header.frame_id,
+    // "base_link"); std::cout << "get transform" << pose.x << " " << pose.y
+    // << " " << pose.theta
+    //           << std::endl;
+    OnDataCallback(MsgId::kLaserScan, laser_points);
+  } catch (tf2::TransformException &ex) {
+  }
 }
-void RosNode::GlobalPathCallback(nav_msgs::Path::ConstPtr path){}
-void RosNode::LocalPathCallback(nav_msgs::Path::ConstPtr path){}
+void RosNode::GlobalPathCallback(nav_msgs::Path::ConstPtr msg) {
+  basic::RobotPath path;
+  for (int i = 0; i < msg->poses.size(); i++) {
+    double x = msg->poses.at(i).pose.position.x;
+    double y = msg->poses.at(i).pose.position.y;
+    basic::Point point;
+    point.x = x;
+    point.y = y;
+    path.push_back(point);
+    //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<"
+    //        "<<point.y();
+  }
+  OnDataCallback(MsgId::kGlobalPath, path);
+}
+void RosNode::LocalPathCallback(nav_msgs::Path::ConstPtr msg) {
+  try {
+    //        geometry_msgs::msg::TransformStamped laser_transform =
+    //        tf_buffer_->lookupTransform("map","base_scan",tf2::TimePointZero);
+    geometry_msgs::PointStamped point_map_frame;
+    geometry_msgs::PointStamped point_odom_frame;
+    basic::RobotPath path;
+    for (int i = 0; i < msg->poses.size(); i++) {
+      double x = msg->poses.at(i).pose.position.x;
+      double y = msg->poses.at(i).pose.position.y;
+      point_odom_frame.point.x = x;
+      point_odom_frame.point.y = y;
+      point_odom_frame.header.frame_id = msg->header.frame_id;
+      tf_listener_->transformPoint("map", point_odom_frame, point_map_frame);
+      basic::Point point;
+      point.x = point_map_frame.point.x;
+      point.y = point_map_frame.point.y;
+      path.push_back(point);
+    }
+    OnDataCallback(MsgId::kLocalPath, path);
+  } catch (tf2::TransformException &ex) {
+  }
+}
+void RosNode::PubRelocPose(const RobotPose &pose) {
+  geometry_msgs::PoseWithCovarianceStamped geo_pose;
+  geo_pose.header.frame_id = "map";
+  geo_pose.header.stamp = ros::Time(0);
+  geo_pose.pose.pose.position.x = pose.x;
+  geo_pose.pose.pose.position.y = pose.y;
+  geometry_msgs::Quaternion q; // 初始化四元数（geometry_msgs类型）
+  q = tf::createQuaternionMsgFromRollPitchYaw(
+      0, 0, pose.theta); // 欧拉角转四元数（geometry_msgs::Quaternion）
+  geo_pose.pose.pose.orientation = q;
+  reloc_pose_publisher_.publish(geo_pose);
+}
+void RosNode::PubNavGoal(const RobotPose &pose) {
+  geometry_msgs::PoseStamped geo_pose;
+  geo_pose.header.frame_id = "map";
+  geo_pose.header.stamp = ros::Time(0);
+  geo_pose.pose.position.x = pose.x;
+  geo_pose.pose.position.y = pose.y;
+  geometry_msgs::Quaternion q; // 初始化四元数（geometry_msgs类型）
+  q = tf::createQuaternionMsgFromRollPitchYaw(
+      0, 0, pose.theta); // 欧拉角转四元数（geometry_msgs::Quaternion）
+  geo_pose.pose.orientation = q;
+  nav_goal_publisher_.publish(geo_pose);
+}
+void RosNode::PubRobotSpeed(const RobotSpeed &speed) {
+  geometry_msgs::Twist twist;
+  twist.linear.x = speed.vx;
+  twist.linear.y = speed.vy;
+  twist.linear.z = 0;
+
+  twist.angular.x = 0;
+  twist.angular.y = 0;
+  twist.angular.z = speed.w;
+
+  // Publish it and resolve any remaining callbacks
+  speed_publisher_.publish(twist);
+}
+void RosNode::GetRobotPose() {
+  OnDataCallback(MsgId::kRobotPose, GetTrasnsform("base_link", "map"));
+}
+/**
+ * @description: 获取坐标变化
+ * @param {string} from 要变换的坐标系
+ * @param {string} to 基坐标系
+ * @return {basic::RobotPose}from变换到to坐标系下，需要变换的坐标
+ */
+basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
+  try {
+    tf::StampedTransform transform;
+    tf_listener_->lookupTransform(to, from, ros::Time(0), transform);
+    tf::Quaternion quat = transform.getRotation();
+
+    // 将四元数转换为欧拉角
+    double roll, pitch, yaw;
+    tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+    // x y
+    double x = transform.getOrigin().x();
+    double y = transform.getOrigin().y();
+    basic::RobotPose ret;
+    ret.x = x;
+    ret.y = y;
+    ret.theta = yaw;
+    return ret;
+  } catch (tf2::TransformException &ex) {
+
+    // LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
+    //                                          << " error:" << ex.what());
+  }
+}

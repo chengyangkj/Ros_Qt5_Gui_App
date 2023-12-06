@@ -33,6 +33,11 @@ private:
   void LaserScanCallback(sensor_msgs::LaserScan::ConstPtr laser_msg);
   void GlobalPathCallback(nav_msgs::Path::ConstPtr path);
   void LocalPathCallback(nav_msgs::Path::ConstPtr path);
+  void PubRobotSpeed(const RobotSpeed &speed);
+  void PubNavGoal(const RobotPose &pose);
+  void PubRelocPose(const RobotPose &pose);
+  void GetRobotPose();
+  basic::RobotPose GetTrasnsform(std::string from, std::string to);
 
 private:
   ros::Publisher nav_goal_publisher_;
@@ -48,4 +53,6 @@ private:
   ros::Subscriber local_path_subscriber_;
 
   basic::OccupancyMap occ_map_;
+
+  tf::TransformListener *tf_listener_;
 };
