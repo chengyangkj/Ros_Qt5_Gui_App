@@ -21,8 +21,13 @@ struct RobotSpeed {
   double w{0};
   RobotSpeed() {}
   RobotSpeed(double vx, double vy, double w) : vx(vx), vy(vy), w(w) {}
+
 };
 
+ inline std::ostream &operator<<(std::ostream &os, const RobotSpeed &p) {
+    os << "x:" << p.vx << " y:" << p.vy << " theta:" << p.w;
+    return os;
+  }
 struct RobotState : public RobotPose, RobotSpeed {};
 // 激光点云数据结构
 struct LaserScan {

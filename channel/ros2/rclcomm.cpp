@@ -26,42 +26,45 @@ bool rclcomm::Start() {
   auto sub_laser_obt = rclcpp::SubscriptionOptions();
   sub_laser_obt.callback_group = callback_group_laser;
 
-  navGoalPublisher_ = node->create_publisher<geometry_msgs::msg::PoseStamped>(
+  nav_goal_publisher_ = node->create_publisher<geometry_msgs::msg::PoseStamped>(
       GET_TOPIC_NAME("NavGoal"), 10);
-  initPosePublisher_ =
+  reloc_pose_publisher_ =
       node->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
           GET_TOPIC_NAME("Reloc"), 10);
-  _publisher =
-      node->create_publisher<std_msgs::msg::Int32>("ros2_qt_dmeo_publish", 10);
   speed_publisher_ = node->create_publisher<geometry_msgs::msg::Twist>(
       GET_TOPIC_NAME("Speed"), 10);
-  map_sub_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
+  map_subscriber_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
       GET_TOPIC_NAME("Map"),
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
       std::bind(&rclcomm::map_callback, this, std::placeholders::_1), sub1_obt);
-  m_localCostMapSub = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-      GET_TOPIC_NAME("LocalCostMap"),
-      rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
-      std::bind(&rclcomm::localCostMapCallback, this, std::placeholders::_1),
-      sub1_obt);
-  m_globalCostMapSub = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-      GET_TOPIC_NAME("GlobalCostMap"),
-      rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
-      std::bind(&rclcomm::globalCostMapCallback, this, std::placeholders::_1),
-      sub1_obt);
-  m_laser_sub = node->create_subscription<sensor_msgs::msg::LaserScan>(
-      GET_TOPIC_NAME("LaserScan"), 20,
-      std::bind(&rclcomm::laser_callback, this, std::placeholders::_1),
-      sub_laser_obt);
-  path_sub_ = node->create_subscription<nav_msgs::msg::Path>(
+  local_cost_map_subscriber_ =
+      node->create_subscription<nav_msgs::msg::OccupancyGrid>(
+          GET_TOPIC_NAME("LocalCostMap"),
+          rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
+          std::bind(&rclcomm::localCostMapCallback, this,
+                    std::placeholders::_1),
+          sub1_obt);
+  global_cost_map_subscriber_ =
+      node->create_subscription<nav_msgs::msg::OccupancyGrid>(
+          GET_TOPIC_NAME("GlobalCostMap"),
+          rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
+          std::bind(&rclcomm::globalCostMapCallback, this,
+                    std::placeholders::_1),
+          sub1_obt);
+  laser_scan_subscriber_ =
+      node->create_subscription<sensor_msgs::msg::LaserScan>(
+          GET_TOPIC_NAME("LaserScan"), 20,
+          std::bind(&rclcomm::laser_callback, this, std::placeholders::_1),
+          sub_laser_obt);
+  global_path_subscriber_ = node->create_subscription<nav_msgs::msg::Path>(
       GET_TOPIC_NAME("GlobalPlan"), 20,
       std::bind(&rclcomm::path_callback, this, std::placeholders::_1),
       sub1_obt);
-  _local_path_sub = node->create_subscription<nav_msgs::msg::Path>(
+  local_path_subscriber_ = node->create_subscription<nav_msgs::msg::Path>(
       GET_TOPIC_NAME("LocalPlan"), 20,
       std::bind(&rclcomm::local_path_callback, this, std::placeholders::_1),
       sub1_obt);
-  m_odom_sub = node->create_subscription<nav_msgs::msg::Odometry>(
+  odometry_subscriber_ = node->create_subscription<nav_msgs::msg::Odometry>(
       GET_TOPIC_NAME("Odometry"), 20,
       std::bind(&rclcomm::odom_callback, this, std::placeholders::_1),
       sub1_obt);
@@ -90,7 +93,12 @@ void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
     PubRelocPose(pose);
 
   } break;
+  case MsgId::kSetRobotSpeed: {
+    auto speed = std::any_cast<basic::RobotSpeed>(msg);
+    std::cout << "recv reloc pose:" << speed << std::endl;
+    PubRobotSpeed(speed);
 
+  } break;
   default:
     break;
   }
@@ -172,25 +180,14 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   } catch (tf2::TransformException &ex) {
   }
 }
-void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
-  geometry_msgs::msg::Twist twist;
-  twist.linear.x = speed.vx;
-  twist.linear.y = speed.vy;
-  twist.linear.z = 0;
 
-  twist.angular.x = 0;
-  twist.angular.y = 0;
-  twist.angular.z = speed.w;
-
-  // Publish it and resolve any remaining callbacks
-  speed_publisher_->publish(twist);
-}
+/// @brief loop for rate
 void rclcomm::Process() {
-  while (rclcpp::ok()) {
+  if (rclcpp::ok()) {
     m_executor->spin_some();
     getRobotPose();
-    // std::cout << "loop" << std::endl;
   }
+  // std::cout << "loop" << std::endl;
 }
 
 void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
@@ -216,7 +213,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
   try {
     //        geometry_msgs::msg::TransformStamped laser_transform =
     //        tf_buffer_->lookupTransform("map","base_scan",tf2::TimePointZero);
-    geometry_msgs::msg::PointStamped point_map_frame;
+    geometry_msgs::msg::PointStamped point_base_frame;
     geometry_msgs::msg::PointStamped point_laser_frame;
     basic::LaserScan laser_points;
     for (int i = 0; i < msg->ranges.size(); i++) {
@@ -230,10 +227,10 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-      tf_buffer_->transform(point_laser_frame, point_map_frame, "base_link");
+      tf_buffer_->transform(point_laser_frame, point_base_frame, "base_link");
       basic::Point p;
-      p.x = point_map_frame.point.x;
-      p.y = point_map_frame.point.y;
+      p.x = point_base_frame.point.x;
+      p.y = point_base_frame.point.y;
       laser_points.push_back(p);
     }
     laser_points.id = 0;
@@ -301,8 +298,8 @@ void rclcomm::localCostMapCallback(
 
   //   basic::RobotPose localCostmapPose;
   //   localCostmapPose.x = pose_map_frame.pose.position.x;
-  //   localCostmapPose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
-  //   localCostmapPose.theta = yaw;
+  //   localCostmapPose.y = pose_map_frame.pose.position.y +
+  //   cost_map.heightMap(); localCostmapPose.theta = yaw;
   //   // emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
   // } catch (tf2::TransformException &ex) {
   // }
@@ -312,9 +309,9 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   double origin_y = msg->info.origin.position.y;
   int width = msg->info.width;
   int height = msg->info.height;
-  m_resolution = msg->info.resolution;
+  double resolution = msg->info.resolution;
   occ_map_ = basic::OccupancyMap(
-      height, width, Eigen::Vector3d(origin_x, origin_y, 0), m_resolution);
+      height, width, Eigen::Vector3d(origin_x, origin_y, 0), resolution);
 
   for (int i = 0; i < msg->data.size(); i++) {
     int x = int(i / width);
@@ -334,7 +331,7 @@ void rclcomm::PubRelocPose(const RobotPose &pose) {
   tf2::Quaternion q;
   q.setRPY(0, 0, pose.theta);
   geo_pose.pose.pose.orientation = tf2::toMsg(q);
-  initPosePublisher_->publish(geo_pose);
+  reloc_pose_publisher_->publish(geo_pose);
 }
 void rclcomm::PubNavGoal(const RobotPose &pose) {
   geometry_msgs::msg::PoseStamped geo_pose;
@@ -345,5 +342,18 @@ void rclcomm::PubNavGoal(const RobotPose &pose) {
   tf2::Quaternion q;
   q.setRPY(0, 0, pose.theta);
   geo_pose.pose.orientation = tf2::toMsg(q);
-  navGoalPublisher_->publish(geo_pose);
+  nav_goal_publisher_->publish(geo_pose);
+}
+void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
+  geometry_msgs::msg::Twist twist;
+  twist.linear.x = speed.vx;
+  twist.linear.y = speed.vy;
+  twist.linear.z = 0;
+
+  twist.angular.x = 0;
+  twist.angular.y = 0;
+  twist.angular.z = speed.w;
+
+  // Publish it and resolve any remaining callbacks
+  speed_publisher_->publish(twist);
 }

@@ -48,33 +48,32 @@ public:
   bool Stop() override;
   void Process() override;
   std::string Name() override { return "ROS2"; };
-  void PubRelocPose(const RobotPose &pose) override;
-  void PubNavGoal(const RobotPose &pose) override;
-  void PubRobotSpeed(const RobotSpeed &speed) override;
+  void PubRelocPose(const RobotPose &pose);
+  void PubNavGoal(const RobotPose &pose);
+  void PubRobotSpeed(const RobotSpeed &speed);
   basic::RobotPose getTrasnsform(std::string from, std::string to);
   void SendMessage(const MsgId &msg_id, const std::any &msg) override;
 
 private:
-  rclcpp::Publisher<std_msgs::msg::Int32>::SharedPtr _publisher;
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr speed_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
-      initPosePublisher_;
+      reloc_pose_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr
-      navGoalPublisher_;
-  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
+      nav_goal_publisher_;
+  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
-      m_localCostMapSub;
+      local_cost_map_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
-      m_globalCostMapSub;
-  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr m_laser_sub;
-  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr m_odom_sub;
-  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr _local_path_sub;
-  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr path_sub_;
+      global_cost_map_subscriber_;
+  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr
+      laser_scan_subscriber_;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;
+  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr local_path_subscriber_;
+  rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr global_path_subscriber_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> transform_listener_;
   std::shared_ptr<rclcpp::Node> node;
-
-  double m_resolution;
+  basic::OccupancyMap occ_map_;
   basic::RobotPose m_currPose;
   rclcpp::executors::MultiThreadedExecutor *m_executor;
   rclcpp::CallbackGroup::SharedPtr callback_group_laser;
