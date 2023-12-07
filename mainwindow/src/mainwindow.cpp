@@ -18,7 +18,7 @@
 #include "Eigen/Dense"
 #include "FloatingDockContainer.h"
 #include "algorithm.h"
-#include "logger/easylogging++.h"
+#include "logger/logger.h"
 
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<MsgId>("MsgId");
   qRegisterMetaType<std::any>("std::any");
   setupUi();
+  openChannel();
 }
 bool MainWindow::openChannel() {
   if (channel_manager_.OpenChannelAuto()) {

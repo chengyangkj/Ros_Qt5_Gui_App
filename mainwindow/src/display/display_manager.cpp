@@ -60,9 +60,7 @@ void DisplayManager::slotSetRobotPose(const RobotPose &pose) {
 }
 void DisplayManager::slotSetNavPose(const RobotPose &pose) {
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, false);
-  GetDisplay(DISPLAY_GOAL)
-      ->UpdateDisplay(
-          wordPose2Map(pose));
+  GetDisplay(DISPLAY_GOAL)->UpdateDisplay(wordPose2Map(pose));
   // enable move after 300ms
   QTimer::singleShot(300, [this]() {
     FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, true);
@@ -91,8 +89,8 @@ void DisplayManager::slotNavGoalScenePoseChanged(const RobotPose &pose) {
   robot_pose_goal_.x = x;
   robot_pose_goal_.y = y;
   robot_pose_goal_.theta = pose.theta;
-  set_nav_pose_widget_->SetPose(
-      RobotPose(robot_pose_goal_.x, robot_pose_goal_.y, robot_pose_goal_.theta));
+  set_nav_pose_widget_->SetPose(RobotPose(
+      robot_pose_goal_.x, robot_pose_goal_.y, robot_pose_goal_.theta));
 }
 void DisplayManager::InitUi() {
   set_reloc_pose_widget_ = new SetPoseWidget(graphics_view_ptr_);
@@ -147,6 +145,7 @@ bool DisplayManager::SetDisplayConfig(const std::string &config_name,
 }
 bool DisplayManager::UpdateDisplay(const std::string &display_name,
                                    const std::any &data) {
+  std::cout << "update display:" << display_name << std::endl;
   VirtualDisplay *display = GetDisplay(display_name);
   if (!display) {
     // std::cout << "error current display not find on update:" << display_name
@@ -156,6 +155,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
   if (display_name == DISPLAY_MAP) {
     display->UpdateDisplay(data);
     GetAnyData(OccupancyMap, data, map_data_);
+
     // 所有图层更新地图数据
     for (auto [name, display] :
          FactoryDisplay::Instance()->GetTotalDisplayMap()) {
@@ -175,7 +175,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
         laser_scan.data = transLaserPoint(laser_scan.data);
 
     display->UpdateDisplay(laser_scan);
-  }else if (display_name == DISPLAY_GLOBAL_PATH ||
+  } else if (display_name == DISPLAY_GLOBAL_PATH ||
              display_name == DISPLAY_LOCAL_PATH) {
     // 激光坐标转换为地图的图元坐标
     RobotPath path_data;
