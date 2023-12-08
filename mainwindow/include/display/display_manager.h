@@ -53,7 +53,7 @@ private:
   OccupancyMap map_data_;
   std::string focus_display_;
   RobotPose local_cost_world_pose_;
-  CostMap local_cost_map_;
+  OccupancyMap local_cost_map_;
   double global_scal_value_ = 1;
   bool is_reloc_mode_{false};
   QGraphicsView *graphics_view_ptr_;
@@ -80,8 +80,9 @@ private:
   QPushButton *btn_move_focus_;
 
 public:
-  DisplayManager(QGraphicsView *viewer);
+  DisplayManager();
   ~DisplayManager();
+  QGraphicsView *GetViewPtr() { return graphics_view_ptr_; }
   VirtualDisplay *GetDisplay(const std::string &name);
   QPointF wordPose2Scene(const QPointF &point);
   RobotPose wordPose2Scene(const RobotPose &point);

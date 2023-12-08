@@ -134,8 +134,9 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   double roll, pitch, yaw;
   mat.getRPY(roll, pitch, yaw);
   double origin_theta = yaw;
-  basic::CostMap cost_map(height, width, Eigen::Vector3d(origin_x, origin_y, 0),
-                          msg->info.resolution);
+  basic::OccupancyMap cost_map(height, width,
+                               Eigen::Vector3d(origin_x, origin_y, 0),
+                               msg->info.resolution);
   for (int i = 0; i < msg->data.size(); i++) {
     int x = (int)i / width;
     int y = i % width;

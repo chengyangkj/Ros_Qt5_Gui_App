@@ -49,8 +49,9 @@ QVariant PointShape::itemChange(GraphicsItemChange change,
                                 const QVariant &value) {
   switch (change) {
   case ItemPositionHasChanged:
-    emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
-                                    normalize(robot_pose_[2] + rotate_value_)));
+    emit signalPoseUpdate(
+        RobotPose(scenePos().x(), scenePos().y(),
+                  normalize(robot_pose_.theta + rotate_value_)));
     break;
   // case ItemTransformHasChanged:
   //   emit signalPoseUpdate(
@@ -66,7 +67,7 @@ QVariant PointShape::itemChange(GraphicsItemChange change,
   return QGraphicsItem::itemChange(change, value);
 }
 bool PointShape::UpdateData(const std::any &data) {
-  GetAnyData(Eigen::Vector3f, data, robot_pose_);
+  GetAnyData(RobotPose, data, robot_pose_);
   rotate_value_ = 0;
   SetPoseInParent(robot_pose_);
   update();
@@ -83,6 +84,7 @@ bool PointShape::SetDisplayConfig(const std::string &config_name,
 void PointShape::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget) {
+  // std::cout << "paint event" << std::endl;
 
   switch (type_) {
   case kRobot:
@@ -98,15 +100,16 @@ void PointShape::paint(QPainter *painter,
   static double last_rotate_value = rotate_value_;
 
   if (fabs(rotate_value_ - last_rotate_value) > deg2rad(0.1)) {
-    emit signalPoseUpdate(RobotPose(scenePos().x(), scenePos().y(),
-                                    normalize(robot_pose_[2] + rotate_value_)));
+    emit signalPoseUpdate(
+        RobotPose(scenePos().x(), scenePos().y(),
+                  normalize(robot_pose_.theta + rotate_value_)));
   }
 }
 void PointShape::setEnable(const bool &enable) {}
 void PointShape::drawRobot(QPainter *painter) {
   painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
   painter->save();
-  painter->rotate(-rad2deg(robot_pose_[2]) - rad2deg(rotate_value_));
+  painter->rotate(-rad2deg(robot_pose_.theta) - rad2deg(rotate_value_));
   painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
                       robot_image_);
 

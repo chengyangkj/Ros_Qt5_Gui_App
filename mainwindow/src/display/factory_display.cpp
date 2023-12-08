@@ -39,7 +39,7 @@ bool FactoryDisplay::SetDisplayScenePose(const std::string &display_name,
 }
 // 设置图层的scene坐标
 bool FactoryDisplay::SetDisplayPoseInParent(const std::string &display_name,
-                                            const Eigen::Vector3f &pose) {
+                                            const RobotPose &pose) {
   VirtualDisplay *display = GetDisplay(display_name);
   if (display == nullptr)
     return false;
@@ -114,12 +114,12 @@ bool FactoryDisplay::GetMoveEnable(const std::string &display_name) {
 void FactoryDisplay::updateCoordinateSystem() {
   for (auto &[name, display] : total_display_map_) {
     if (!display->GetPraentName().empty() && !display->GetMoveEnable()) {
-      Eigen::Vector3f pose_in_parent = display->GetPoseInParent();
+      RobotPose pose_in_parent = display->GetPoseInParent();
       auto parent_ptr = GetDisplay(display->GetPraentName());
       if (parent_ptr == nullptr)
         continue;
       QPointF scene_pose =
-          parent_ptr->mapToScene(QPointF(pose_in_parent[0], pose_in_parent[1]));
+          parent_ptr->mapToScene(QPointF(pose_in_parent.x, pose_in_parent.y));
       display->setPos(scene_pose);
     }
   }

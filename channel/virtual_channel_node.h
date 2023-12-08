@@ -7,7 +7,6 @@
  * /ros_qt5_gui_app/include/channel/base/virtual_communcation_node.h
  */
 #pragma once
-#include "cost_map.h"
 #include "msg/msg_info.h"
 #include "occupancy_map.h"
 #include "point_type.h"
@@ -15,8 +14,6 @@
 #include <thread>
 using namespace basic;
 class VirtualChannelNode {
-
-
 
 private:
   std::thread process_thread_;

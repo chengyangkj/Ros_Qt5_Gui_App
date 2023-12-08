@@ -135,6 +135,56 @@ public:
     scene_x = (word_x - origin_x) / resolution;
     scene_y = height() - (word_y - origin_y) / resolution;
   }
+  /**
+   * @description: 获取带rgba颜色值的代价地图
+   * @return {*}
+   */
+  Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic>
+  GetCostMapData() {
+    Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> res =
+        Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic>(
+            map_data.rows(), map_data.cols());
+    for (int x = 0; x < map_data.rows(); x++) {
+      for (int y = 0; y < map_data.cols(); y++) {
+        // 计算像素值
+        Eigen::Vector4i color_rgba;
+        int data = map_data(x, y);
+        if (data >= 100) {
+          color_rgba = Eigen::Vector4i(0xff, 0x00, 0xff, 50);
+
+        } else if (data >= 90 && data < 100) {
+          color_rgba = Eigen::Vector4i(0x66, 0xff, 0xff, 50);
+
+        } else if (data >= 70 && data <= 90) {
+          color_rgba = Eigen::Vector4i(0xff, 0x00, 0x33, 50);
+
+        } else if (data >= 60 && data <= 70) {
+          color_rgba = Eigen::Vector4i(0xbe, 0x28, 0x1a, 50);
+
+        } else if (data >= 50 && data < 60) {
+          color_rgba = Eigen::Vector4i(0xBE, 0x1F, 0x58, 50);
+
+        } else if (data >= 40 && data < 50) {
+          color_rgba = Eigen::Vector4i(0xBE, 0x25, 0x76, 50);
+
+        } else if (data >= 30 && data < 40) {
+          color_rgba = Eigen::Vector4i(0xBE, 0x2A, 0x99, 50);
+
+        } else if (data >= 20 && data < 30) {
+          color_rgba = Eigen::Vector4i(0xBE, 0x35, 0xB3, 50);
+
+        } else if (data >= 10 && data < 20) {
+          color_rgba = Eigen::Vector4i(0xB0, 0x3C, 0xbE, 50);
+
+        } else {
+          // 其他 透明
+          color_rgba = Eigen::Vector4i(0, 0, 0, 0);
+        }
+        res(x, y) = color_rgba;
+      }
+    }
+    return res;
+  }
 };
 
 } // namespace basic

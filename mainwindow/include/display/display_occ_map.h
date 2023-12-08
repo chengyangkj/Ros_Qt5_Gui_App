@@ -7,7 +7,7 @@
  */
 #ifndef ROBO_MAP_H
 #define ROBO_MAP_H
-#include "cost_map.h"
+#include "occupancy_map.h"
 #include "virtual_display.h"
 #include <Eigen/Dense>
 namespace Display {

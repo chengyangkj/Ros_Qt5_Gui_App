@@ -61,7 +61,7 @@ public:
   QPointF rotate_center_;
   bool enable_rotate_{false};
   std::string parent_name_;
-  Eigen::Vector3f pose_in_parent_{0, 0, 0};
+  RobotPose pose_in_parent_{0, 0, 0};
   std::vector<VirtualDisplay *> children_;
 signals:
   void signalCursorPose(QPointF pose);
@@ -110,8 +110,8 @@ public:
   QPointF PoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
   }
-  void SetPoseInParent(const Eigen::Vector3f &pose) { pose_in_parent_ = pose; }
-  Eigen::Vector3f GetPoseInParent() { return pose_in_parent_; }
+  void SetPoseInParent(const RobotPose &pose) { pose_in_parent_ = pose; }
+  RobotPose GetPoseInParent() { return pose_in_parent_; }
   std::string GetPraentName() { return parent_name_; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {

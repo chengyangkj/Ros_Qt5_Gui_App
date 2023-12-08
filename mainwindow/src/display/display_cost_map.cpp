@@ -12,19 +12,19 @@
 #include "display/display_cost_map.h"
 namespace Display {
 DisplayCostMap::DisplayCostMap(const std::string &display_name,
-                   const int &z_value, std::string parent_name)
+                               const int &z_value, std::string parent_name)
     : VirtualDisplay(display_name, z_value, parent_name) {
   this->setCursor(*curr_cursor_);
 }
 bool DisplayCostMap::UpdateData(const std::any &data) {
   try {
-    if (data.type() == typeid(CostMap))
-      cost_map_data_ = std::any_cast<CostMap>(data);
+    if (data.type() == typeid(OccupancyMap))
+      cost_map_data_ = std::any_cast<OccupancyMap>(data);
   } catch (const std::bad_any_cast &e) {
     std::cout << e.what() << '\n';
     return false;
   }
-    ParseCostMap();
+  ParseCostMap();
 
   //绘制原点在地图中心
   SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
@@ -32,19 +32,19 @@ bool DisplayCostMap::UpdateData(const std::any &data) {
   return true;
 }
 bool DisplayCostMap::SetDisplayConfig(const std::string &config_name,
-                                const std::any &config_data) {
+                                      const std::any &config_data) {
   update();
   return true;
 }
-void DisplayCostMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget) {
+void DisplayCostMap::paint(QPainter *painter,
+                           const QStyleOptionGraphicsItem *option,
+                           QWidget *widget) {
   //以图片中心做原点进行绘制(方便旋转)
-  painter->drawImage(GetOriginPose().x(), GetOriginPose().y(), map_image_);
-
+  painter->drawImage(0, 0, map_image_);
 }
 void DisplayCostMap::ParseCostMap() {
   Eigen::Matrix<Eigen::Vector4i, Eigen::Dynamic, Eigen::Dynamic> cost_map =
-      cost_map_data_.GetColorMapData();
+      cost_map_data_.GetCostMapData();
   map_image_ = QImage(cost_map_data_.Cols(), cost_map_data_.Rows(),
                       QImage::Format_ARGB32);
   for (int i = 0; i < cost_map.cols(); i++)

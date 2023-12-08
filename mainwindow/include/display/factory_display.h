@@ -31,7 +31,7 @@ public:
   bool SetMoveEnable(const std::string &display_name, bool enable = true);
   bool GetMoveEnable(const std::string &display_name);
   bool SetDisplayPoseInParent(const std::string &display_name,
-                              const Eigen::Vector3f &pose);
+                              const RobotPose &pose);
 
 private slots:
   void updateCoordinateSystem();

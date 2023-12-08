@@ -65,7 +65,7 @@ private:
 
   QLabel *label_pos_map_;
   QLabel *label_pos_scene_;
-
+  QThread display_manager_thread_;
   SpeedCtrlWidget *speed_ctrl_widget_;
   StatusBarWidget *status_bar_widget_;
   ToolsBarWidget *tools_bar_widget_;

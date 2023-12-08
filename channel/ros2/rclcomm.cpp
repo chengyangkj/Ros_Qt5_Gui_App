@@ -8,7 +8,7 @@
  */
 #include "rclcomm.h"
 #include "config/configManager.h"
-// #include "logger/logger.h"
+#include "logger/logger.h"
 #include <fstream>
 rclcomm::rclcomm() {}
 bool rclcomm::Start() {
@@ -133,8 +133,8 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     return ret;
   } catch (tf2::TransformException &ex) {
 
-    // LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
-    //                                          << " error:" << ex.what());
+    LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
+                                             << " error:" << ex.what());
   }
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
@@ -249,8 +249,9 @@ void rclcomm::globalCostMapCallback(
   int height = msg->info.height;
   double origin_x = msg->info.origin.position.x;
   double origin_y = msg->info.origin.position.y;
-  basic::CostMap cost_map(height, width, Eigen::Vector3d(origin_x, origin_y, 0),
-                          msg->info.resolution);
+  basic::OccupancyMap cost_map(height, width,
+                               Eigen::Vector3d(origin_x, origin_y, 0),
+                               msg->info.resolution);
   for (int i = 0; i < msg->data.size(); i++) {
     int x = int(i / width);
     int y = i % width;
@@ -261,6 +262,8 @@ void rclcomm::globalCostMapCallback(
 }
 void rclcomm::localCostMapCallback(
     const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
+  if (occ_map_.cols == 0 || occ_map_.rows == 0)
+    return;
   int width = msg->info.width;
   int height = msg->info.height;
   double origin_x = msg->info.origin.position.x;
@@ -271,15 +274,28 @@ void rclcomm::localCostMapCallback(
   double roll, pitch, yaw;
   mat.getRPY(roll, pitch, yaw);
   double origin_theta = yaw;
-  basic::CostMap cost_map(height, width, Eigen::Vector3d(origin_x, origin_y, 0),
-                          msg->info.resolution);
+  basic::OccupancyMap cost_map(height, width,
+                               Eigen::Vector3d(origin_x, origin_y, 0),
+                               msg->info.resolution);
   for (int i = 0; i < msg->data.size(); i++) {
     int x = (int)i / width;
     int y = i % width;
     cost_map(x, y) = msg->data[i];
   }
   cost_map.SetFlip();
-  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
+  basic::OccupancyMap sized_cost_map = occ_map_;
+  double map_x, map_y;
+  occ_map_.xy2occPose(origin_x,origin_y, map_x, map_y);
+  for (int i = 0; i < cost_map.rows; i++)
+    for (int j = 0; j < cost_map.cols; j++) {
+      if (i > map_y && j > map_x && i < map_y + cost_map.rows &&
+          j < map_x + cost_map.cols) {
+        sized_cost_map(i, j) = cost_map(i - map_y, j - map_x);
+      } else {
+        sized_cost_map(i, j) = 0;
+      }
+    }
+  OnDataCallback(MsgId::kLocalCostMap, sized_cost_map);
   //      map_image.save("/home/chengyangkj/test.jpg");
   // try {
   //   // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示

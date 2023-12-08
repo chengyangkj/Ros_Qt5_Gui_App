@@ -23,18 +23,18 @@
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
-  LOG(INFO) << " MainWindow init";
+
+  LOG(INFO) << " MainWindow init thread id" << QThread::currentThreadId();
   qRegisterMetaType<std::string>("std::string");
   qRegisterMetaType<RobotPose>("RobotPose");
   qRegisterMetaType<RobotSpeed>("RobotSpeed");
   qRegisterMetaType<RobotState>("RobotState");
   qRegisterMetaType<OccupancyMap>("OccupancyMap");
-  qRegisterMetaType<CostMap>("CostMap");
+  qRegisterMetaType<OccupancyMap>("OccupancyMap");
   qRegisterMetaType<LaserScan>("LaserScan");
   qRegisterMetaType<RobotPath>("RobotPath");
   qRegisterMetaType<MsgId>("MsgId");
   qRegisterMetaType<std::any>("std::any");
-  openChannel();
   setupUi();
   openChannel();
 }
@@ -63,6 +63,8 @@ void MainWindow::registerChannel() {
         default:
           break;
         }
+        std::cout << "channel thread id:" << QThread::currentThreadId()
+                  << std::endl;
         emit OnRecvChannelData(id, data);
       }));
 }
@@ -91,9 +93,9 @@ void MainWindow::setupUi() {
   tools_bar_widget_ = new ToolsBarWidget();
   central_layout->addWidget(tools_bar_widget_);
   /////////////////////////////////////////////////////////////////////////地图显示
-  QGraphicsView *graphicsView = new QGraphicsView();
-  display_manager_ = new Display::DisplayManager(graphicsView);
-  central_layout->addWidget(graphicsView);
+
+  display_manager_ = new Display::DisplayManager();
+  central_layout->addWidget(display_manager_->GetViewPtr());
 
   //////////////////////////////////////////////////////////////////////////坐标显示
   QHBoxLayout *horizontalLayout_12 = new QHBoxLayout();
@@ -170,7 +172,8 @@ void MainWindow::setupUi() {
 
   connect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
           display_manager_,
-          SLOT(UpdateTopicData(const MsgId &, const std::any &)));
+          SLOT(UpdateTopicData(const MsgId &, const std::any &)),
+          Qt::BlockingQueuedConnection);
   connect(display_manager_, &Display::DisplayManager::signalPub2DPose,
           [this](const RobotPose &pose) {
             SendChannelMsg(MsgId::kSetNavGoalPose, pose);

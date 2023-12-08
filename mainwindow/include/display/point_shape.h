@@ -34,7 +34,7 @@ public:
 private:
   QPixmap robot_image_;
   ePointType type_;
-  Eigen::Vector3f robot_pose_;
+  RobotPose robot_pose_;
   bool enable_{true};
 
 private:

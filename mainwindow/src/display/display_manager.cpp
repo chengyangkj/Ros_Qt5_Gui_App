@@ -9,9 +9,9 @@
 #include <fstream>
 namespace Display {
 
-DisplayManager::DisplayManager(QGraphicsView *viewer)
-    : graphics_view_ptr_(viewer) {
-  FactoryDisplay::Instance()->Init(viewer);
+DisplayManager::DisplayManager() {
+  graphics_view_ptr_ = new QGraphicsView();
+  FactoryDisplay::Instance()->Init(graphics_view_ptr_);
 
   //------------------------------------start display instace (register
   // display)-----------------------------
@@ -48,6 +48,7 @@ DisplayManager::DisplayManager(QGraphicsView *viewer)
   InitUi();
 }
 void DisplayManager::UpdateTopicData(const MsgId &id, const std::any &data) {
+  std::cout << "update thread id:" << QThread::currentThreadId() << std::endl;
   UpdateDisplay(ToString(id), data);
 }
 void DisplayManager::slotSetRobotPose(const RobotPose &pose) {
@@ -145,7 +146,7 @@ bool DisplayManager::SetDisplayConfig(const std::string &config_name,
 }
 bool DisplayManager::UpdateDisplay(const std::string &display_name,
                                    const std::any &data) {
-  std::cout << "update display:" << display_name << std::endl;
+  // std::cout << "update display:" << display_name << std::endl;/
   VirtualDisplay *display = GetDisplay(display_name);
   if (!display) {
     // std::cout << "error current display not find on update:" << display_name
@@ -189,11 +190,6 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       path_data_trans.push_back(Point(x, y));
     }
     display->UpdateDisplay(path_data_trans);
-  } else if (display_name == DISPLAY_LOCAL_COST_MAP) {
-    if (data.type() == typeid(CostMap)) {
-      GetAnyData(CostMap, data, local_cost_map_);
-      display->UpdateDisplay(data);
-    }
   } else {
     display->UpdateDisplay(data);
   }
