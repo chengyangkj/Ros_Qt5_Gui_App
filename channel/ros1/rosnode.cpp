@@ -149,24 +149,19 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   basic::RobotPose origin_pose;
   try {
     // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
-    geometry_msgs::PoseStamped pose_map_frame;
-    geometry_msgs::PoseStamped pose_curr_frame;
-    pose_curr_frame.pose.position.x = origin_x;
-    pose_curr_frame.pose.position.y = origin_y;
-    q.setRPY(0, 0, origin_theta);
-    pose_curr_frame.pose.orientation = tf2::toMsg(q);
+    geometry_msgs::PointStamped pose_map_frame;
+    geometry_msgs::PointStamped pose_curr_frame;
+    pose_curr_frame.point.x = origin_x;
+    pose_curr_frame.point.y = origin_y;
     pose_curr_frame.header.frame_id = msg->header.frame_id;
     tf_listener_->transformPoint("map", pose_curr_frame, pose_map_frame);
-    tf2::fromMsg(pose_map_frame.pose.orientation, q);
-    tf::Matrix3x3 mat(q);
-    double roll, pitch, yaw;
-    mat.getRPY(roll, pitch, yaw);
 
-    origin_pose.x = pose_map_frame.pose.position.x;
-    origin_pose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
-    origin_pose.theta = yaw;
+
+    origin_pose.x = pose_map_frame.point.x;
+    origin_pose.y = pose_map_frame.point.y + cost_map.heightMap();
+    origin_pose.theta = 0;
   } catch (tf2::TransformException &ex) {
-    LOGGER_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
+    // LOGGER_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
   }
 
   double map_o_x, map_o_y;
