@@ -240,6 +240,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
     //           << std::endl;
     OnDataCallback(MsgId::kLaserScan, laser_points);
   } catch (tf2::TransformException &ex) {
+    tf_buffer_->lookupTransform("map", "base_scan", tf2::TimePointZero);
   }
 }
 
@@ -284,41 +285,42 @@ void rclcomm::localCostMapCallback(
   }
   cost_map.SetFlip();
   basic::OccupancyMap sized_cost_map = occ_map_;
-  double map_x, map_y;
-  occ_map_.xy2occPose(origin_x,origin_y, map_x, map_y);
-  for (int i = 0; i < cost_map.rows; i++)
-    for (int j = 0; j < cost_map.cols; j++) {
-      if (i > map_y && j > map_x && i < map_y + cost_map.rows &&
-          j < map_x + cost_map.cols) {
-        sized_cost_map(i, j) = cost_map(i - map_y, j - map_x);
+  basic::RobotPose origin_pose;
+  try {
+    // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
+    geometry_msgs::msg::PoseStamped pose_map_frame;
+    geometry_msgs::msg::PoseStamped pose_curr_frame;
+    pose_curr_frame.pose.position.x = origin_x;
+    pose_curr_frame.pose.position.y = origin_y;
+    q.setRPY(0, 0, origin_theta);
+    pose_curr_frame.pose.orientation = tf2::toMsg(q);
+    pose_curr_frame.header.frame_id = msg->header.frame_id;
+    tf_buffer_->transform(pose_curr_frame, pose_map_frame, "map");
+    tf2::fromMsg(pose_map_frame.pose.orientation, q);
+    tf2::Matrix3x3 mat(q);
+    double roll, pitch, yaw;
+    mat.getRPY(roll, pitch, yaw);
+
+    origin_pose.x = pose_map_frame.pose.position.x;
+    origin_pose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
+    origin_pose.theta = yaw;
+  } catch (tf2::TransformException &ex) {
+    LOGGER_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
+  }
+
+  double map_o_x, map_o_y;
+  occ_map_.xy2OccPose(origin_pose.x, origin_pose.y, map_o_x, map_o_y);
+  sized_cost_map.map_data.setZero();
+  for (int x = 0; x < occ_map_.rows; x++)
+    for (int y = 0; y < occ_map_.cols; y++) {
+      if (x > map_o_x && y > map_o_y && y < map_o_y + cost_map.rows &&
+          x < map_o_x + cost_map.cols) {
+        sized_cost_map(x, y) = cost_map(x - map_o_x, y - map_o_y);
       } else {
-        sized_cost_map(i, j) = 0;
+        sized_cost_map(x, y) = 0;
       }
     }
   OnDataCallback(MsgId::kLocalCostMap, sized_cost_map);
-  //      map_image.save("/home/chengyangkj/test.jpg");
-  // try {
-  //   // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
-  //   geometry_msgs::msg::PoseStamped pose_map_frame;
-  //   geometry_msgs::msg::PoseStamped pose_curr_frame;
-  //   pose_curr_frame.pose.position.x = origin_x;
-  //   pose_curr_frame.pose.position.y = origin_y;
-  //   q.setRPY(0, 0, origin_theta);
-  //   pose_curr_frame.pose.orientation = tf2::toMsg(q);
-  //   pose_curr_frame.header.frame_id = msg->header.frame_id;
-  //   tf_buffer_->transform(pose_curr_frame, pose_map_frame, "map");
-  //   tf2::fromMsg(pose_map_frame.pose.orientation, q);
-  //   tf2::Matrix3x3 mat(q);
-  //   double roll, pitch, yaw;
-  //   mat.getRPY(roll, pitch, yaw);
-
-  //   basic::RobotPose localCostmapPose;
-  //   localCostmapPose.x = pose_map_frame.pose.position.x;
-  //   localCostmapPose.y = pose_map_frame.pose.position.y +
-  //   cost_map.heightMap(); localCostmapPose.theta = yaw;
-  //   // emit emitUpdateLocalCostMap(cost_map, localCostmapPose);
-  // } catch (tf2::TransformException &ex) {
-  // }
 }
 void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   double origin_x = msg->info.origin.position.x;

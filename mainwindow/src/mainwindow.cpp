@@ -54,7 +54,7 @@ bool MainWindow::openChannel(const std::string &channel_name) {
 }
 void MainWindow::registerChannel() {
   channel_manager_.RegisterOnDataCallback(
-      std::move([=](const MsgId &id, const std::any &data) {
+      std::move([=,this](const MsgId &id, const std::any &data) {
         switch (id) {
         case MsgId::kOdomPose:
           updateOdomInfo(std::any_cast<RobotState>(data));
@@ -66,6 +66,7 @@ void MainWindow::registerChannel() {
         std::cout << "channel thread id:" << QThread::currentThreadId()
                   << std::endl;
         emit OnRecvChannelData(id, data);
+        // display_manager_->UpdateTopicData(id, data);
       }));
 }
 void MainWindow::SendChannelMsg(const MsgId &id, const std::any &data) {
@@ -172,8 +173,7 @@ void MainWindow::setupUi() {
 
   connect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
           display_manager_,
-          SLOT(UpdateTopicData(const MsgId &, const std::any &)),
-          Qt::BlockingQueuedConnection);
+          SLOT(UpdateTopicData(const MsgId &, const std::any &)));
   connect(display_manager_, &Display::DisplayManager::signalPub2DPose,
           [this](const RobotPose &pose) {
             SendChannelMsg(MsgId::kSetNavGoalPose, pose);

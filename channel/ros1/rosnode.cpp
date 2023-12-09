@@ -124,6 +124,8 @@ void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   OnDataCallback(MsgId::kOccupancyMap, occ_map_);
 }
 void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
+  if (occ_map_.cols == 0 || occ_map_.rows == 0)
+    return;
   int width = msg->info.width;
   int height = msg->info.height;
   double origin_x = msg->info.origin.position.x;
@@ -143,7 +145,43 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     cost_map(x, y) = msg->data[i];
   }
   cost_map.SetFlip();
-  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
+  basic::OccupancyMap sized_cost_map = occ_map_;
+  basic::RobotPose origin_pose;
+  try {
+    // 坐标变换 将局部代价地图的基础坐标转换为map下 进行绘制显示
+    geometry_msgs::PoseStamped pose_map_frame;
+    geometry_msgs::PoseStamped pose_curr_frame;
+    pose_curr_frame.pose.position.x = origin_x;
+    pose_curr_frame.pose.position.y = origin_y;
+    q.setRPY(0, 0, origin_theta);
+    pose_curr_frame.pose.orientation = tf2::toMsg(q);
+    pose_curr_frame.header.frame_id = msg->header.frame_id;
+    tf_listener_->transformPoint("map", pose_curr_frame, pose_map_frame);
+    tf2::fromMsg(pose_map_frame.pose.orientation, q);
+    tf::Matrix3x3 mat(q);
+    double roll, pitch, yaw;
+    mat.getRPY(roll, pitch, yaw);
+
+    origin_pose.x = pose_map_frame.pose.position.x;
+    origin_pose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
+    origin_pose.theta = yaw;
+  } catch (tf2::TransformException &ex) {
+    LOGGER_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
+  }
+
+  double map_o_x, map_o_y;
+  occ_map_.xy2OccPose(origin_pose.x, origin_pose.y, map_o_x, map_o_y);
+  sized_cost_map.map_data.setZero();
+  for (int x = 0; x < occ_map_.rows; x++)
+    for (int y = 0; y < occ_map_.cols; y++) {
+      if (x > map_o_x && y > map_o_y && y < map_o_y + cost_map.rows &&
+          x < map_o_x + cost_map.cols) {
+        sized_cost_map(x, y) = cost_map(x - map_o_x, y - map_o_y);
+      } else {
+        sized_cost_map(x, y) = 0;
+      }
+    }
+  OnDataCallback(MsgId::kLocalCostMap, sized_cost_map);
 }
 void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {}
 // 激光雷达点云话题回调

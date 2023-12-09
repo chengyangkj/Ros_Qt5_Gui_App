@@ -48,7 +48,8 @@ DisplayManager::DisplayManager() {
   InitUi();
 }
 void DisplayManager::UpdateTopicData(const MsgId &id, const std::any &data) {
-  std::cout << "update thread id:" << QThread::currentThreadId() << std::endl;
+  std::cout << "update thread id:" << QThread::currentThreadId() << " id:" << id
+            << std::endl;
   UpdateDisplay(ToString(id), data);
 }
 void DisplayManager::slotSetRobotPose(const RobotPose &pose) {
@@ -72,7 +73,7 @@ void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
     QPointF occ_pose =
         GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose.x, pose.y));
     double x, y;
-    map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
+    map_data_.ScenePose2xy(occ_pose.x(), occ_pose.y(), x, y);
     // 更新坐标
     robot_pose_.x = x;
     robot_pose_.y = y;
@@ -86,7 +87,7 @@ void DisplayManager::slotNavGoalScenePoseChanged(const RobotPose &pose) {
   QPointF occ_pose =
       GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose.x, pose.y));
   double x, y;
-  map_data_.occPose2xy(occ_pose.x(), occ_pose.y(), x, y);
+  map_data_.ScenePose2xy(occ_pose.x(), occ_pose.y(), x, y);
   robot_pose_goal_.x = x;
   robot_pose_goal_.y = y;
   robot_pose_goal_.theta = pose.theta;
@@ -186,7 +187,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
       // std::cout << "location:" << one_laser.first << std::endl;
       // 转换为图元坐标系
       double x, y;
-      map_data_.xy2occPose(one_points.x, one_points.y, x, y);
+      map_data_.xy2ScenePose(one_points.x, one_points.y, x, y);
       path_data_trans.push_back(Point(x, y));
     }
     display->UpdateDisplay(path_data_trans);
@@ -210,7 +211,7 @@ DisplayManager::transLaserPoint(const std::vector<Point> &point) {
         basic::RobotPose(one_point.x, one_point.y, 0));
     // 转换为图元坐标系
     double x, y;
-    map_data_.xy2occPose(map_pose.x, map_pose.y, x, y);
+    map_data_.xy2ScenePose(map_pose.x, map_pose.y, x, y);
     res.push_back(Point(x, y));
   }
   return res;
@@ -264,7 +265,7 @@ void DisplayManager::FocusDisplay(const std::string &display_name) {
 RobotPose DisplayManager::wordPose2Scene(const RobotPose &point) {
   // xy在栅格地图上的图元坐标
   double x, y;
-  map_data_.xy2occPose(point.x, point.y, x, y);
+  map_data_.xy2ScenePose(point.x, point.y, x, y);
   // xy在map图层上的坐标
   QPointF pose = FactoryDisplay::Instance()
                      ->GetDisplay(DISPLAY_MAP)
@@ -284,7 +285,7 @@ RobotPose DisplayManager::wordPose2Scene(const RobotPose &point) {
 QPointF DisplayManager::wordPose2Scene(const QPointF &point) {
   // xy在栅格地图上的图元坐标
   double x, y;
-  map_data_.xy2occPose(point.x(), point.y(), x, y);
+  map_data_.xy2ScenePose(point.x(), point.y(), x, y);
   return FactoryDisplay::Instance()
       ->GetDisplay(DISPLAY_MAP)
       ->PoseToScene(QPointF(x, y));
@@ -292,7 +293,7 @@ QPointF DisplayManager::wordPose2Scene(const QPointF &point) {
 RobotPose DisplayManager::wordPose2Map(const RobotPose &pose) {
   RobotPose ret = pose;
   double x, y;
-  map_data_.xy2occPose(pose.x, pose.y, x, y);
+  map_data_.xy2ScenePose(pose.x, pose.y, x, y);
   ret.x = x;
   ret.y = y;
   return ret;
@@ -300,7 +301,7 @@ RobotPose DisplayManager::wordPose2Map(const RobotPose &pose) {
 QPointF DisplayManager::wordPose2Map(const QPointF &pose) {
   QPointF ret;
   double x, y;
-  map_data_.xy2occPose(pose.x(), pose.y(), x, y);
+  map_data_.xy2ScenePose(pose.x(), pose.y(), x, y);
   ret.setX(x);
   ret.setY(y);
   return ret;

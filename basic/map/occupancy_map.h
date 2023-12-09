@@ -68,6 +68,12 @@ public:
   //宽map坐标系下的长度
   int widthMap() { return cols * resolution; }
   int heightMap() { return rows * resolution; }
+
+  Eigen::Vector3d GetOriginPoseBottomLeft() { return origin_pose; }
+  Eigen::Vector3d GetOriginPoseTopLeft() {
+    return Eigen::Vector3d(origin_x, origin_y + height() * resolution,
+                           origin_pose[2]);
+  }
   /**
    * @description: 输入栅格地图的行与列号，返回该位置的全局坐标
    * @param {int&} c 列号
@@ -84,7 +90,7 @@ public:
    * @description: 输入全局坐标，返回栅格地图的行与列号
    * @param {double&} x
    * @param {double&} y
-   * @param {int&} c 列号
+   * @param {int&} c 列号map_y
    * @param {int&} r 行号
    * @return {*}
    */
@@ -116,10 +122,19 @@ public:
    * @description:输入原始(地图图片)图元坐标,返回世界坐标
    * @return {*}
    */
-  void occPose2xy(const double &scene_x, const double &scene_y, double &word_x,
-                  double &word_y) {
+  void ScenePose2xy(const double &scene_x, const double &scene_y,
+                    double &word_x, double &word_y) {
     word_x = scene_x * resolution + origin_x;
     word_y = (height() - scene_y) * resolution + origin_y;
+  }
+  /**
+   * @description:输入栅格坐标,返回世界坐标
+   * @return {*}
+   */
+  void OccPose2xy(const double &scene_x, const double &scene_y,
+                    double &word_x, double &word_y) {
+    word_y = scene_x * resolution + origin_x;
+    word_x = (height() - scene_y) * resolution + origin_y;
   }
   /**
    * @description:
@@ -130,10 +145,24 @@ public:
    * @param {int&} scene_y
    * @return {*}
    */
-  void xy2occPose(const double &word_x, const double &word_y, double &scene_x,
-                  double &scene_y) {
+  void xy2ScenePose(const double &word_x, const double &word_y, double &scene_x,
+                    double &scene_y) {
     scene_x = (word_x - origin_x) / resolution;
     scene_y = height() - (word_y - origin_y) / resolution;
+  }
+  /**
+   * @description:
+   * 输入世界坐标,返回栅格坐标。坐标已经进行了上下翻转
+   * @param {double&} word_x
+   * @param {double&} word_x
+   * @param {int&} scene_x
+   * @param {int&} scene_y
+   * @return {*}
+   */
+  void xy2OccPose(const double &word_x, const double &word_y, double &scene_x,
+                  double &scene_y) {
+    scene_y = (word_x - origin_x) / resolution;
+    scene_x = height() - (word_y - origin_y) / resolution;
   }
   /**
    * @description: 获取带rgba颜色值的代价地图

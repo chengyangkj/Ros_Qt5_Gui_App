@@ -47,9 +47,9 @@ void DisplayCostMap::ParseCostMap() {
       cost_map_data_.GetCostMapData();
   map_image_ = QImage(cost_map_data_.Cols(), cost_map_data_.Rows(),
                       QImage::Format_ARGB32);
+  // map_image_.save("./test.png");
   for (int i = 0; i < cost_map.cols(); i++)
     for (int j = 0; j < cost_map.rows(); j++) {
-
       Eigen::Vector4i color_data = cost_map(j, i);
       QColor color;
       color.setRgb(color_data[0], color_data[1], color_data[2]);
