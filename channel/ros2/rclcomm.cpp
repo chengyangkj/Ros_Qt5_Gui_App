@@ -234,10 +234,6 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       laser_points.push_back(p);
     }
     laser_points.id = 0;
-    // basic::RobotPose pose = getTrasnsform(msg->header.frame_id,
-    // "base_link"); std::cout << "get transform" << pose.x << " " << pose.y
-    // << " " << pose.theta
-    //           << std::endl;
     OnDataCallback(MsgId::kLaserScan, laser_points);
   } catch (tf2::TransformException &ex) {
     tf_buffer_->lookupTransform("map", "base_scan", tf2::TimePointZero);

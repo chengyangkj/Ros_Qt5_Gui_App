@@ -48,8 +48,6 @@ DisplayManager::DisplayManager() {
   InitUi();
 }
 void DisplayManager::UpdateTopicData(const MsgId &id, const std::any &data) {
-  std::cout << "update thread id:" << QThread::currentThreadId() << " id:" << id
-            << std::endl;
   UpdateDisplay(ToString(id), data);
 }
 void DisplayManager::slotSetRobotPose(const RobotPose &pose) {

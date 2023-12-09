@@ -46,6 +46,7 @@ public:
 public slots:
   void signalCursorPose(QPointF pos);
   void SendChannelMsg(const MsgId &id, const std::any &data);
+  void RecvChannelMsg(const MsgId &id, const std::any &data);
   void updateOdomInfo(RobotState state);
 
 protected:

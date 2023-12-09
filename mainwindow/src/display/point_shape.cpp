@@ -84,8 +84,6 @@ bool PointShape::SetDisplayConfig(const std::string &config_name,
 void PointShape::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget) {
-  // std::cout << "paint event" << std::endl;
-  std::cout << "robot dispaly thread id:" << QThread::currentThreadId() << std::endl;
   switch (type_) {
   case kRobot:
     drawRobot(painter);

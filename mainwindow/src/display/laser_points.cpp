@@ -14,8 +14,6 @@ LaserPoints::LaserPoints(const std::string &display_name, const int &z_value,
 void LaserPoints::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
-  std::cout << "laser dispaly thread id:" << QThread::currentThreadId()
-            << std::endl;
   for (auto [id, data] : laser_data_scene_) {
     drawLaser(painter, id, data);
   }
@@ -29,8 +27,6 @@ bool LaserPoints::UpdateData(const std::any &data) {
     laser_data_scene_[laser_scan.id] = laser_scan.data;
     computeBoundRect(laser_data_scene_);
   }
-  std::cout << "laser data thread id:" << QThread::currentThreadId()
-            << std::endl;
   update();
 }
 void LaserPoints::computeBoundRect(
