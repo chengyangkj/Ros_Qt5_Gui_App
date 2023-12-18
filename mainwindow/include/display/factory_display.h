@@ -44,5 +44,6 @@ private:
   bool initlizated_ = false;
   QGraphicsView *viewer_ptr_;
   std::atomic_bool run_flag_ = false;
+  std::string focus_display_name_="";
 };
 } // namespace Display

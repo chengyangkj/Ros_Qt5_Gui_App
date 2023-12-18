@@ -70,10 +70,8 @@ void FactoryDisplay::AddDisplay(VirtualDisplay *display,
   scene_ptr_->addItem(display);
 }
 void FactoryDisplay::FocusDisplay(const std::string &display_name) {
-  auto display = GetDisplay(display_name);
-  if (display != nullptr) {
-    viewer_ptr_->centerOn(display);
-  }
+
+  focus_display_name_ = display_name;
 }
 void FactoryDisplay::RemoveDisplay(const std::string &name) {
   auto iter = total_display_map_.find(name);
@@ -122,6 +120,11 @@ void FactoryDisplay::updateCoordinateSystem() {
           parent_ptr->mapToScene(QPointF(pose_in_parent.x, pose_in_parent.y));
       display->setPos(scene_pose);
     }
+  }
+  // focus on
+  auto display = GetDisplay(focus_display_name_);
+  if (display != nullptr) {
+    viewer_ptr_->centerOn(display);
   }
 }
 } // namespace Display

@@ -185,6 +185,10 @@ void MainWindow::setupUi() {
           [=]() { display_manager_->SetRelocPose(); });
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetNavPose,
           [=]() { display_manager_->SetNavPose(); });
+  connect(tools_bar_widget_, &ToolsBarWidget::SignalFocusRobot,
+          [=](bool is_focus) {
+            display_manager_->FocusDisplay(is_focus ? DISPLAY_ROBOT : "");
+          });
   connect(display_manager_->GetDisplay(DISPLAY_MAP),
           SIGNAL(signalCursorPose(QPointF)), this,
           SLOT(signalCursorPose(QPointF)));

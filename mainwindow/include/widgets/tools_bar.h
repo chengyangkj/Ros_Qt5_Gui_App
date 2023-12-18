@@ -52,6 +52,7 @@ private:
 signals:
   void SignalSetRelocPose();
   void SignalSetNavPose();
+  void SignalFocusRobot(bool);
 public slots:
 
 public:

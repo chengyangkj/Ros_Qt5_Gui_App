@@ -72,9 +72,9 @@ public slots:
   void slotSetRobotPose(const RobotPose &pose);
   void slotSetNavPose(const RobotPose &pose);
   void UpdateTopicData(const MsgId &id, const std::any &data);
+  void FocusDisplay(const std::string &display_name);
 
 private:
-  void FocusDisplay(const std::string &display_name);
   void InitUi();
   std::vector<Point> transLaserPoint(const std::vector<Point> &point);
   QPushButton *btn_move_focus_;
