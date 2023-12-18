@@ -74,7 +74,7 @@ void DisplayOccMap::paint(QPainter *painter,
   //   draw_y = top_left_y;
   // }
   //以图片中心做原点进行绘制(方便旋转)
-  painter->drawImage(GetOriginPose().x(), GetOriginPose().y(), map_image_);
+  painter->drawImage(0, 0, map_image_);
   // std::cout << "map painter event" << std::endl;
 }
 void DisplayOccMap::ParseOccupyMap() {

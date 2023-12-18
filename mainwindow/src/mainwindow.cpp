@@ -174,11 +174,11 @@ void MainWindow::setupUi() {
           this, SLOT(RecvChannelMsg(const MsgId &, const std::any &)));
   connect(display_manager_, &Display::DisplayManager::signalPub2DPose,
           [this](const RobotPose &pose) {
-            SendChannelMsg(MsgId::kSetNavGoalPose, pose);
+            SendChannelMsg(MsgId::kSetRelocPose, pose);
           });
   connect(display_manager_, &Display::DisplayManager::signalPub2DGoal,
           [this](const RobotPose &pose) {
-            SendChannelMsg(MsgId::kSetRelocPose, pose);
+            SendChannelMsg(MsgId::kSetNavGoalPose, pose);
           });
   // ui相关
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetRelocPose,
