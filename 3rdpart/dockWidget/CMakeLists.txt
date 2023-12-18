@@ -122,12 +122,7 @@ install(FILES ${ads_HEADERS}
     DESTINATION include/${library_name}
     COMPONENT headers
 )
-install(FILES
-    "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../gnu-lgpl-v2.1.md"
-    DESTINATION license/ads
-    COMPONENT license
-)
+
 install(TARGETS ${library_name}
     EXPORT adsTargets
     RUNTIME DESTINATION bin
@@ -144,9 +139,7 @@ install(EXPORT adsTargets
 install(FILES qtadvanceddockingConfig.cmake RENAME ${library_name}Config.cmake
     DESTINATION lib/cmake/${library_name}
 )
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${library_name}ConfigVersion.cmake"
-    DESTINATION lib/cmake/${library_name}
-)
+
 
 target_include_directories(${library_name} PUBLIC
     $<INSTALL_INTERFACE:include>

@@ -25,6 +25,7 @@ bool DisplayDemo::UpdateData(const std::any &data) {
   } catch (const std::bad_any_cast &e) {
     std::cout << e.what() << '\n';
   }
+  return true;
 }
 void DisplayDemo::drawFrame(QPainter *painter) {}
 } // namespace Display

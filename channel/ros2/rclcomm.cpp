@@ -113,6 +113,7 @@ void rclcomm::getRobotPose() {
  * @return {basic::RobotPose}from变换到to坐标系下，需要变换的坐标
  */
 basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
+  basic::RobotPose ret;
   try {
     geometry_msgs::msg::TransformStamped transform =
         tf_buffer_->lookupTransform(to, from, tf2::TimePointZero);
@@ -126,16 +127,17 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     // x y
     double x = transform.transform.translation.x;
     double y = transform.transform.translation.y;
-    basic::RobotPose ret;
+
     ret.x = x;
     ret.y = y;
     ret.theta = yaw;
-    return ret;
+
   } catch (tf2::TransformException &ex) {
 
     LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
                                              << " error:" << ex.what());
   }
+  return ret;
 }
 void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   basic::RobotState state;
@@ -236,7 +238,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
     laser_points.id = 0;
     OnDataCallback(MsgId::kLaserScan, laser_points);
   } catch (tf2::TransformException &ex) {
-    tf_buffer_->lookupTransform("map", "base_scan", tf2::TimePointZero);
+    // tf_buffer_->lookupTransform("map", "base_scan", tf2::TimePointZero);
   }
 }
 

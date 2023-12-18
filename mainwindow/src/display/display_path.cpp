@@ -43,9 +43,10 @@ bool DisplayPath::UpdateData(const std::any &data) {
   } catch (const std::bad_any_cast &e) {
     std::cout << e.what() << '\n';
   }
+  return true;
 }
 void DisplayPath::drawPath(QPainter *painter) {
-  
+
   painter->setRenderHint(QPainter::Antialiasing, true);
   painter->setPen(QPen(color_, 1));
   // for (int i = 1; i < path_points_.size(); i++) {

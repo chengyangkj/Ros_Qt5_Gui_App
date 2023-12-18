@@ -28,6 +28,7 @@ bool LaserPoints::UpdateData(const std::any &data) {
     computeBoundRect(laser_data_scene_);
   }
   update();
+  return true;
 }
 void LaserPoints::computeBoundRect(
     const std::map<int, std::vector<Point>> &laser_scan) {

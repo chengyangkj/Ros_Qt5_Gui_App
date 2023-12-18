@@ -71,6 +71,7 @@ bool PointShape::UpdateData(const std::any &data) {
   rotate_value_ = 0;
   SetPoseInParent(robot_pose_);
   update();
+  return true;
 }
 bool PointShape::SetDisplayConfig(const std::string &config_name,
                                   const std::any &config_data) {

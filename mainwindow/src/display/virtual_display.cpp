@@ -32,7 +32,9 @@ VirtualDisplay::~VirtualDisplay() {
   }
 }
 bool VirtualDisplay::SetDisplayConfig(const std::string &config_name,
-                                      const std::any &config_data) {}
+                                      const std::any &config_data) {
+  return true;
+}
 bool VirtualDisplay::SetScaled(const double &value) {
   if (!enable_scale_)
     return false;
