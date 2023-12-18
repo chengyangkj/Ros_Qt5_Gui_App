@@ -47,7 +47,8 @@ bool DisplayPath::UpdateData(const std::any &data) {
 }
 void DisplayPath::drawPath(QPainter *painter) {
 
-  painter->setRenderHint(QPainter::Antialiasing, true);
+  painter->setRenderHints(QPainter::Antialiasing |
+                          QPainter::SmoothPixmapTransform);
   painter->setPen(QPen(color_, 1));
   // for (int i = 1; i < path_points_.size(); i++) {
   //   painter->drawLine(path_points_[i - 1], path_points_[i]);

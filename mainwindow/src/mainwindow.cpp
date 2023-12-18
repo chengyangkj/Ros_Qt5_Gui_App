@@ -195,10 +195,10 @@ void MainWindow::setupUi() {
 }
 
 void MainWindow::signalCursorPose(QPointF pos) {
-  // basic::Point mapPos = display_manager_->transScenePoint2Word(
-  //     basic::Point(pos.x(), pos.y()));
-  // label_pos_map_->setText("x: " + QString::number(mapPos.x).mid(0, 4) +
-  //                         "  y: " + QString::number(mapPos.y).mid(0, 4));
+  basic::Point mapPos =
+      display_manager_->mapPose2Word(basic::Point(pos.x(), pos.y()));
+  label_pos_map_->setText("x: " + QString::number(mapPos.x).mid(0, 4) +
+                          "  y: " + QString::number(mapPos.y).mid(0, 4));
   label_pos_scene_->setText("x: " + QString::number(pos.x()).mid(0, 4) +
                             "  y: " + QString::number(pos.y()).mid(0, 4));
 }

@@ -85,6 +85,8 @@ bool PointShape::SetDisplayConfig(const std::string &config_name,
 void PointShape::paint(QPainter *painter,
                        const QStyleOptionGraphicsItem *option,
                        QWidget *widget) {
+  painter->setRenderHints(QPainter::Antialiasing |
+                        QPainter::SmoothPixmapTransform);
   switch (type_) {
   case kRobot:
     drawRobot(painter);

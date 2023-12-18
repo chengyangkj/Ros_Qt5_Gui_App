@@ -6,6 +6,8 @@
 #include "algorithm.h"
 #include "logger/logger.h"
 #include <Eigen/Eigen>
+#include <QOpenGLWidget>
+
 #include <fstream>
 namespace Display {
 
@@ -302,6 +304,14 @@ QPointF DisplayManager::wordPose2Map(const QPointF &pose) {
   map_data_.xy2ScenePose(pose.x(), pose.y(), x, y);
   ret.setX(x);
   ret.setY(y);
+  return ret;
+}
+RobotPose DisplayManager::mapPose2Word(const RobotPose &pose) {
+  RobotPose ret = pose;
+  double x, y;
+  map_data_.ScenePose2xy(pose.x, pose.y, x, y);
+  ret.x = x;
+  ret.y = y;
   return ret;
 }
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {

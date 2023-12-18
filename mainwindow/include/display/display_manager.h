@@ -88,6 +88,7 @@ public:
   RobotPose wordPose2Scene(const RobotPose &point);
   QPointF wordPose2Map(const QPointF &pose);
   RobotPose wordPose2Map(const RobotPose &pose);
+  RobotPose mapPose2Word(const RobotPose &pose);
   bool UpdateDisplay(const std::string &display_name, const std::any &data);
   void UpdateRobotPose(const RobotPose &pose);
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
