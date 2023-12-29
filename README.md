@@ -105,7 +105,7 @@ cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 
 ```
 
-软件配置文件路径:
+软件配置文件路径(运行一次软件后会自动生成在可执行程序相对路径下):
 
 ```
 
@@ -118,9 +118,13 @@ cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 ### 3.1,多机通信配置
 
 ROS1/ROS2的多机通信完全依赖ROS原生(环境变量添加ROS_MASTER_URI与ROS_IP/ROS_DOMAINID),不再由用户手动指定,减轻新手使用负担
+
 ROS1:
+
 配置参考：多机通讯教程[csdn 博客](https://blog.csdn.net/qq_38441692/article/details/98205852)
+
 ROS2:
+
 环境变量多机配置相同的ROS_DOMAINID
 
 ### 3.2,Topic名称配置
