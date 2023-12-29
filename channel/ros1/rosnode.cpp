@@ -9,6 +9,24 @@
 #include "rosnode.h"
 #include "config/configManager.h"
 RosNode::RosNode(/* args */) { std::cout << "ros node start" << std::endl; }
+basic::RobotPose Convert(const geometry_msgs::Pose& pose)
+{
+    RobotPose robot_pose;
+
+    // 提取位置信息
+    robot_pose.x = pose.position.x;
+    robot_pose.y = pose.position.y;
+
+    // 提取姿态信息
+    tf::Quaternion quat(pose.orientation.x,
+                        pose.orientation.y,
+                        pose.orientation.z,
+                        pose.orientation.w);
+    double r,p;
+    tf::Matrix3x3(quat).getRPY(r, p, robot_pose.theta);
+
+    return robot_pose;
+}
 
 RosNode::~RosNode() {}
 /// @brief loop for rate
@@ -16,7 +34,6 @@ void RosNode::Process() {
   if (ros::ok()) {
     GetRobotPose();
     ros::spinOnce();
-    std::cout << "process" << std::endl;
   }
 }
 bool RosNode::Start() {
@@ -89,21 +106,10 @@ void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
 }
 void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
 
-  basic::RobotState state;
+  basic::RobotState state=static_cast<basic::RobotState>(Convert(msg->pose.pose));
   state.vx = (double)msg->twist.twist.linear.x;
   state.vy = (double)msg->twist.twist.linear.y;
   state.w = (double)msg->twist.twist.angular.z;
-  state.x = (double)msg->pose.pose.position.x;
-  state.y = (double)msg->pose.pose.position.y;
-
-  geometry_msgs::Quaternion msg_quat = msg->pose.pose.orientation;
-  // 转换类型
-  tf::Quaternion q;
-  tf2::fromMsg(msg_quat, q);
-  tf::Matrix3x3 mat(q);
-  double roll, pitch, yaw;
-  mat.getRPY(roll, pitch, yaw);
-  state.theta = yaw;
   OnDataCallback(MsgId::kOdomPose, state);
 }
 void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
@@ -130,12 +136,7 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   int height = msg->info.height;
   double origin_x = msg->info.origin.position.x;
   double origin_y = msg->info.origin.position.y;
-  tf::Quaternion q;
-  tf2::fromMsg(msg->info.origin.orientation, q);
-  tf::Matrix3x3 mat(q);
-  double roll, pitch, yaw;
-  mat.getRPY(roll, pitch, yaw);
-  double origin_theta = yaw;
+  double origin_theta = 0;
   basic::OccupancyMap cost_map(height, width,
                                Eigen::Vector3d(origin_x, origin_y, 0),
                                msg->info.resolution);
@@ -300,6 +301,7 @@ void RosNode::GetRobotPose() {
  * @return {basic::RobotPose}from变换到to坐标系下，需要变换的坐标
  */
 basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
+  basic::RobotPose ret;
   try {
     tf::StampedTransform transform;
     tf_listener_->lookupTransform(to, from, ros::Time(0), transform);
@@ -311,14 +313,14 @@ basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
     // x y
     double x = transform.getOrigin().x();
     double y = transform.getOrigin().y();
-    basic::RobotPose ret;
     ret.x = x;
     ret.y = y;
     ret.theta = yaw;
-    return ret;
+   
   } catch (tf2::TransformException &ex) {
 
     // LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
     //                                          << " error:" << ex.what());
   }
+ return ret;
 }

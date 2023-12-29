@@ -12,6 +12,7 @@
 #include "point_type.h"
 #include <any>
 #include <thread>
+#include <atomic>
 using namespace basic;
 class VirtualChannelNode {
 
@@ -54,5 +55,5 @@ public:
 public:
   std::function<void(const MsgId &id, const std::any &data)> OnDataCallback;
   int loop_rate_{30};
-  std::atomic_bool run_flag_{false};
+  std::atomic<bool> run_flag_{false};
 };

@@ -28,7 +28,12 @@ struct RobotSpeed {
     os << "x:" << p.vx << " y:" << p.vy << " theta:" << p.w;
     return os;
   }
-struct RobotState : public RobotPose, RobotSpeed {};
+struct RobotState : public RobotPose, RobotSpeed {
+   public:
+    RobotState() = default;
+    RobotState(const RobotPose &p, const RobotSpeed &s) : RobotPose(p), RobotSpeed(s) {}
+    RobotState(const OrientedPoint &p):RobotPose(p){}
+};
 // 激光点云数据结构
 struct LaserScan {
   LaserScan() = default;

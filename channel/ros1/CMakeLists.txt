@@ -3,7 +3,7 @@ gettargetname()
 file(GLOB_RECURSE SOURCE_FILE CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} *.cpp *.cc)
 file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} *.h *.hpp)
 
-find_package(catkin REQUIRED COMPONENTS roscpp tf sensor_msgs cv_bridge
+find_package(catkin REQUIRED COMPONENTS roscpp tf tf2 sensor_msgs cv_bridge
                                         std_msgs image_transport)
 
 add_library(${TARGET_NAME} SHARED ${SOURCE_FILE} ${INCLUDE_FILE})

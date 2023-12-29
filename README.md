@@ -13,7 +13,7 @@
 
 ![image.png](./doc/images/main.png)
 
-# 环境安装 install
+# 环境安装 
 
 ```
 sudo apt-get install qtbase5-private-dev
