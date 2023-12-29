@@ -25,6 +25,8 @@
 
 ![image.png](./doc/images/main.png)
 
+![image.png](./doc/images/main.gif)
+
 <!-- TOC -->
 
 - [项目介绍](#项目介绍)
@@ -140,6 +142,8 @@ ROS2:
 
 ![image.png](./doc/images/reloc.jpg)
 
+![image.png](./doc/images/reloc.gif)
+
 注意:如果设置无效,需要检查config.ini中设置：
 
 ```
@@ -157,6 +161,7 @@ Topic=/initialpose
 
 ![image.png](./doc/images/nav_goal_send2.jpg)
 
+![image.png](./doc/images/set_nav_goal.gif)
 
 注意:如果设置无效,需要检查config.ini中设置：
 
