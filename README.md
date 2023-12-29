@@ -4,22 +4,23 @@
  * @LastEditors: chengyangkj chengyangkj@qq.com
  * @LastEditTime: 2023-10-06 14:03:03
  * @FilePath: /ROS2_Qt5_Gui_App/README.md
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%B
 -->
-# ROS2 Qt5 Gui App
+# ROS Qt5 Gui App
 ## 轻量级ROS人机交互软件
 
 本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时兼容ROS1/ROS2，在编译时自动识别环境变量中的ROS1/ROS2环境并进行构建，在运行时自动加载对应的插件
 
 ![image.png](./doc/images/main.png)
 
-# 环境安装 
+[TOC]
+
+# 一，环境安装 
 
 ```
 sudo apt-get install qtbase5-private-dev
 ```
 
-# 编译
+# 二，编译
 
 注意，为了保证此项目同时兼容ROS1与ROS2，此项目不使用ROS1/ROS2的catkin_make/colcon构建系统进行够建，而是使用标准CMake进行构建，这也就意味着，本项目不会被ROS自动识别为功能包
 可以参考以下教程从0开始构建/运行此项目:
@@ -69,3 +70,119 @@ cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 ./ros_qt5_gui_app
 
 ```
+
+# 三,使用说明
+
+### 5.1,多机通信配置
+
+ROS1/ROS2的多机通信完全依赖ROS原生(环境变量添加ROS_MASTER_URI与ROS_IP/ROS_DOMAINID),不再由用户手动指定,减轻新手使用负担
+ROS1:
+配置参考：多机通讯教程[csdn 博客](https://blog.csdn.net/qq_38441692/article/details/98205852)
+ROS2:
+环境变量多机配置相同的ROS_DOMAINID
+
+### 5.2,Topic名称配置
+
+第一次运行后，会在可执行程序同级目录生成config.ini,修改此配置文件即可,修改后重启生效,具体配置说明详见[配置文件说明](./doc/config.md)
+
+
+### 5.3，重定位位姿态发布
+
+程序可以拖动式的设置机器人初始位置（重定位）,相对于Rviz,拖动时可以实时查看激光匹配情况,重定位更加精准
+
+![image.png](./doc/images/reloc.jpg)
+
+注意:如果设置无效,需要检查config.ini中设置：
+
+```
+[Reloc]
+Topic=/initialpose  
+```
+为自己机器人监听的重定位Topic名称
+
+
+### 5.4，导航目标点设置
+
+程序可以拖动式的设置机器人导航目标点（导航）使用图文说明如下:
+
+![image.png](./doc/images/nav_goal_send.jpg)
+
+![image.png](./doc/images/nav_goal_send2.jpg)
+
+
+注意:如果设置无效,需要检查config.ini中设置：
+
+```
+[NavGoal]
+Topic=/move_base_simple/goal
+```
+为自己机器人监听的导航目标点Topic名称
+
+
+### 5.5,手动控制
+
+软件支持发布实时速度到底盘:
+
+[!image.png(./doc/images/manual_control.jpg)]
+
+对应按钮上的文字，可以由键盘对应按钮同步调用
+
+注意:如果设置无效,需要检查config.ini中设置：
+
+```
+[Speed]
+Topic=/cmd_vel
+
+```
+为实际机器人监听的速度控制话题
+
+### 5.6 速度仪表盘
+
+软件支持实时显示机器人速度:
+
+[!image.png(./doc/images/speed_dashboard.jpg)]
+
+注意:如果设置无效,需要检查config.ini中设置：
+
+```
+[Odometry]
+Topic=/odom
+```
+
+为机器人时机发布的里程计话题
+
+
+....其他功能逐步完善
+
+
+# 四，相关链接
+
+
+| 友链名                                                                             | 支持平台                  | 功能                                                                                                   |
+| ---------------------------------------------------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------ |
+| [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master)               | Win10 Ubuntu              | ROS + QWidget + QGraphicsview自绘制可视化界面显示                                                      |
+| [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)             | Win10 Ubuntu              | ROS + QML + C++混合编程，qml自绘制地图，激光雷达可视化显示等demo                                       |
+| [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)               | Win10 Ubuntu              | ROS + QWidget + Librviz进行可视化显示，为《ROS人机交互软件开发》系列课程中实现的版本，CSDN博客例程版本 |
+| [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)         | Win10 Ubuntu              | ROS + QWidget + Librviz原生图层Api实现图层管理，不需手动创建图层                                       |
+| [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)     | Win10 Ubuntu              | cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行                       |
+| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo)                        | ROS2                      | 在ROS2平台上运行的qt demo包，cmakelist.txt已配置好改为qt5，可以直接colcon build 编译使用               |
+| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)                | ROS2                      | 在ROS2平台上实现自绘制话题消息显示的功能包，近期上线....                                               |
+| [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app) | 基于flutter实现多平台运行 | 逐步推进.....                                                                                          |
+
+
+# 五,相关教程及交流群
+
+ **本系列教程文章专栏:**
+
+[ROS机器人GUI程序开发](https://blog.csdn.net/qq_38441692/category_9863968.html)
+
+ **本系列课程已上线古月学院，欢迎感兴趣的小伙伴订阅：**
+
+ 1. [ROS Qt开发环境搭建以及基础知识介绍](https://class.guyuehome.com/detail/p_5eba414d58533_Uh4XTbPi/6)
+ 2. [ROS人机交互软件的界面开发](https://class.guyuehome.com/detail/p_5ec490a8d7bd7_b7ucPqUs/6)
+ 3. [ROS Rviz组件开发方法](https://class.guyuehome.com/detail/p_5edf2d27a1942_foy4nqci/6)
+ 4. [如何实现ROS windows人机交互软件](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
+ 
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612194143186.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
+
+**开发交流QQ群：** 797497206
