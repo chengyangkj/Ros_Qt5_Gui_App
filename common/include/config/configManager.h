@@ -5,6 +5,18 @@
 #define GET_TOPIC_NAME(frame_name)                                             \
   Config::configManager::Instacnce()->GetTopicName(frame_name)
 #endif
+
+#ifndef SET_DEFAULT_TOPIC_NAME
+#define SET_DEFAULT_TOPIC_NAME(frame_name, topic_name)                         \
+  Config::configManager::Instacnce()->SetDefaultTopicName(frame_name,          \
+                                                          topic_name);
+#endif
+
+#ifndef SET_DEFAULT_CONFIG
+#define SET_DEFAULT_CONFIG(key, value)                                         \
+  Config::configManager::Instacnce()->SetDefaultConfig(key, value);
+#endif
+
 namespace Config {
 
 class configManager {
@@ -20,5 +32,8 @@ public:
     return &config;
   }
   std::string GetTopicName(const std::string &frame_name);
+  void SetDefaultConfig(const std::string &name, const std::string &value);
+  void SetDefaultTopicName(const std::string &frame_name,
+                           const std::string &topic_name);
 };
 } // namespace Config

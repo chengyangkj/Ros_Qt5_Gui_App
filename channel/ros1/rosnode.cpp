@@ -9,23 +9,20 @@
 #include "rosnode.h"
 #include "config/configManager.h"
 RosNode::RosNode(/* args */) { std::cout << "ros node start" << std::endl; }
-basic::RobotPose Convert(const geometry_msgs::Pose& pose)
-{
-    RobotPose robot_pose;
+basic::RobotPose Convert(const geometry_msgs::Pose &pose) {
+  RobotPose robot_pose;
 
-    // 提取位置信息
-    robot_pose.x = pose.position.x;
-    robot_pose.y = pose.position.y;
+  // 提取位置信息
+  robot_pose.x = pose.position.x;
+  robot_pose.y = pose.position.y;
 
-    // 提取姿态信息
-    tf::Quaternion quat(pose.orientation.x,
-                        pose.orientation.y,
-                        pose.orientation.z,
-                        pose.orientation.w);
-    double r,p;
-    tf::Matrix3x3(quat).getRPY(r, p, robot_pose.theta);
+  // 提取姿态信息
+  tf::Quaternion quat(pose.orientation.x, pose.orientation.y,
+                      pose.orientation.z, pose.orientation.w);
+  double r, p;
+  tf::Matrix3x3(quat).getRPY(r, p, robot_pose.theta);
 
-    return robot_pose;
+  return robot_pose;
 }
 
 RosNode::~RosNode() {}
@@ -48,6 +45,17 @@ bool RosNode::Start() {
   return true;
 }
 void RosNode::init() {
+  // 设置默认的topic名称
+  SET_DEFAULT_TOPIC_NAME("NavGoal", "/move_base_simple/goal")
+  SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
+  SET_DEFAULT_TOPIC_NAME("Map", "/map")
+  SET_DEFAULT_TOPIC_NAME("LocalCostMap", "/move_base/local_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME("GlobalCostMap", "/move_base/global_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME("LaserScan", "/scan")
+  SET_DEFAULT_TOPIC_NAME("GlobalPlan", "/move_base/DWAPlannerROS/global_plan")
+  SET_DEFAULT_TOPIC_NAME("LocalPlan", "/move_base/DWAPlannerROS/local_plan")
+  SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
+  SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   ros::NodeHandle nh;
   nav_goal_publisher_ =
       nh.advertise<geometry_msgs::PoseStamped>(GET_TOPIC_NAME("NavGoal"), 10);
@@ -106,7 +114,8 @@ void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
 }
 void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
 
-  basic::RobotState state=static_cast<basic::RobotState>(Convert(msg->pose.pose));
+  basic::RobotState state =
+      static_cast<basic::RobotState>(Convert(msg->pose.pose));
   state.vx = (double)msg->twist.twist.linear.x;
   state.vy = (double)msg->twist.twist.linear.y;
   state.w = (double)msg->twist.twist.angular.z;
@@ -156,7 +165,6 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     pose_curr_frame.point.y = origin_y;
     pose_curr_frame.header.frame_id = msg->header.frame_id;
     tf_listener_->transformPoint("map", pose_curr_frame, pose_map_frame);
-
 
     origin_pose.x = pose_map_frame.point.x;
     origin_pose.y = pose_map_frame.point.y + cost_map.heightMap();
@@ -331,11 +339,11 @@ basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
     ret.x = x;
     ret.y = y;
     ret.theta = yaw;
-   
+
   } catch (tf2::TransformException &ex) {
 
     // LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
     //                                          << " error:" << ex.what());
   }
- return ret;
+  return ret;
 }

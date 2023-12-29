@@ -223,7 +223,6 @@ DisplayManager::transLaserPoint(const std::vector<Point> &point) {
  * @return {*}
  */
 void DisplayManager::UpdateRobotPose(const RobotPose &pose) {
-  // FocusDisplay(DISPLAY_ROBOT);
   robot_pose_ = pose;
   GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(wordPose2Map(pose));
 }
@@ -248,6 +247,8 @@ void DisplayManager::SetNavGoalMode(bool is_start) {
     GetDisplay(DISPLAY_GOAL)->setVisible(true);
     GetDisplay(DISPLAY_GOAL)->SetMoveEnable(true);
     set_nav_pose_widget_->show();
+    FocusDisplay(DISPLAY_GOAL);
+    QTimer::singleShot(100, this, [=]() { FocusDisplay(""); });
   } else {
     GetDisplay(DISPLAY_GOAL)->setVisible(false);
     set_nav_pose_widget_->hide();

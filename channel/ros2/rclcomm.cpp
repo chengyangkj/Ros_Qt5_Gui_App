@@ -10,10 +10,22 @@
 #include "config/configManager.h"
 #include "logger/logger.h"
 #include <fstream>
-rclcomm::rclcomm() {}
+rclcomm::rclcomm() {
+  SET_DEFAULT_TOPIC_NAME("NavGoal", "/goal_pose")
+  SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
+  SET_DEFAULT_TOPIC_NAME("Map", "/map")
+  SET_DEFAULT_TOPIC_NAME("LocalCostMap", "/local_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME("GlobalCostMap", "/global_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME("LaserScan", "/scan")
+  SET_DEFAULT_TOPIC_NAME("GlobalPlan", "/plan")
+  SET_DEFAULT_TOPIC_NAME("LocalPlan", "/local_plan")
+  SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
+  SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
+}
 bool rclcomm::Start() {
   rclcpp::init(0, nullptr);
   m_executor = new rclcpp::executors::MultiThreadedExecutor;
+
   node = rclcpp::Node::make_shared("ros_qt5_gui_app");
   m_executor->add_node(node);
   callback_group_laser =

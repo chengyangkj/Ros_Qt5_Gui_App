@@ -9,16 +9,7 @@ void configManager::Init(const QString &config_path) {
   QSettings setting(config_path_, QSettings::IniFormat);
   // init
   if (!file.exists()) {
-    setting.setValue("NavGoal/Topic", "/goal_pose");
-    setting.setValue("Reloc/Topic", "/initialpose");
-    setting.setValue("Map/Topic", "/map");
-    setting.setValue("LocalCostMap/Topic", "/local_costmap/costmap");
-    setting.setValue("GlobalCostMap/Topic", "/global_costmap/costmap");
-    setting.setValue("LaserScan/Topic", "/scan");
-    setting.setValue("GlobalPlan/Topic", "/plan");
-    setting.setValue("LocalPlan/Topic", "/local_plan");
-    setting.setValue("Odometry/Topic", "/odom");
-    setting.setValue("Speed/Topic", "/cmd_vel");
+    setting.setValue("core/version", "");
   }
 }
 configManager::~configManager() {}
@@ -28,4 +19,18 @@ std::string configManager::GetTopicName(const std::string &frame_name) {
       .toString()
       .toStdString();
 }
+
+void configManager::SetDefaultConfig(const std::string &name,
+                                     const std::string &value) {
+  QSettings setting(config_path_, QSettings::IniFormat);
+  if (!setting.contains(QString::fromStdString(name))) {
+    setting.setValue(QString::fromStdString(name),
+                     QString::fromStdString(value));
+  }
+}
+void configManager::SetDefaultTopicName(const std::string &frame_name,
+                                        const std::string &topic_name) {
+  SetDefaultConfig(frame_name + "/Topic", topic_name);
+}
+
 } // namespace Config
