@@ -179,7 +179,22 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     }
   OnDataCallback(MsgId::kLocalCostMap, sized_cost_map);
 }
-void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {}
+void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
+  int width = msg->info.width;
+  int height = msg->info.height;
+  double origin_x = msg->info.origin.position.x;
+  double origin_y = msg->info.origin.position.y;
+  basic::OccupancyMap cost_map(height, width,
+                               Eigen::Vector3d(origin_x, origin_y, 0),
+                               msg->info.resolution);
+  for (int i = 0; i < msg->data.size(); i++) {
+    int x = int(i / width);
+    int y = i % width;
+    cost_map(x, y) = msg->data[i];
+  }
+  cost_map.SetFlip();
+  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
+}
 // 激光雷达点云话题回调
 void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
   double angle_min = msg->angle_min;
