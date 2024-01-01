@@ -81,7 +81,7 @@ class CDockAreaLayout
 {
 private:
 	QBoxLayout* m_ParentLayout;
-	QList<QWidget*> m_Widgets;
+	QList<QPointer<QWidget>> m_Widgets;
 	int m_CurrentIndex = -1;
 	QWidget* m_CurrentWidget = nullptr;
 
@@ -390,20 +390,29 @@ void DockAreaWidgetPrivate::updateTitleBarButtonVisibility(bool IsTopLevel)
 		return;
 	}
 
-	if (IsTopLevel)
+	bool IsAutoHide = _this->isAutoHide();
+	if (IsAutoHide)
+	{
+		bool ShowCloseButton = CDockManager::autoHideConfigFlags().testFlag(CDockManager::AutoHideHasCloseButton);
+		TitleBar->button(TitleBarButtonClose)->setVisible(ShowCloseButton);
+		TitleBar->button(TitleBarButtonAutoHide)->setVisible(true);
+		TitleBar->button(TitleBarButtonUndock)->setVisible(false);
+        TitleBar->button(TitleBarButtonTabsMenu)->setVisible(false);
+	}
+	else if (IsTopLevel)
 	{
 		TitleBar->button(TitleBarButtonClose)->setVisible(!container->isFloating());
 		TitleBar->button(TitleBarButtonAutoHide)->setVisible(!container->isFloating());
         // Undock and tabs should never show when auto hidden
-		TitleBar->button(TitleBarButtonUndock)->setVisible(!container->isFloating() && !_this->isAutoHide());
-        TitleBar->button(TitleBarButtonTabsMenu)->setVisible(!_this->isAutoHide());
+		TitleBar->button(TitleBarButtonUndock)->setVisible(!container->isFloating());
+        TitleBar->button(TitleBarButtonTabsMenu)->setVisible(true);
 	}
 	else
 	{
 		TitleBar->button(TitleBarButtonClose)->setVisible(true);
 		TitleBar->button(TitleBarButtonAutoHide)->setVisible(true);
-		TitleBar->button(TitleBarButtonUndock)->setVisible(!_this->isAutoHide());
-        TitleBar->button(TitleBarButtonTabsMenu)->setVisible(!_this->isAutoHide());
+		TitleBar->button(TitleBarButtonUndock)->setVisible(true);
+        TitleBar->button(TitleBarButtonTabsMenu)->setVisible(true);
 	}
 }
 
@@ -453,6 +462,13 @@ CDockContainerWidget* CDockAreaWidget::dockContainer() const
 CAutoHideDockContainer* CDockAreaWidget::autoHideDockContainer() const
 {
 	return d->AutoHideDockContainer;
+}
+
+
+//============================================================================
+CDockSplitter* CDockAreaWidget::parentSplitter() const
+{
+	return internal::findParent<CDockSplitter*>(this);
 }
 
 //============================================================================
@@ -591,7 +607,7 @@ void CDockAreaWidget::hideAreaWithNoVisibleContent()
 	this->toggleView(false);
 
 	// Hide empty parent splitters
-	auto Splitter = internal::findParent<CDockSplitter*>(this);
+	auto Splitter = parentSplitter();
 	internal::hideEmptyParentSplitters(Splitter);
 
 	//Hide empty floating widget
@@ -740,7 +756,7 @@ int CDockAreaWidget::openDockWidgetsCount() const
 	int Count = 0;
 	for (int i = 0; i < d->ContentsLayout->count(); ++i)
 	{
-		if (!dockWidget(i)->isClosed())
+		if (dockWidget(i) && !dockWidget(i)->isClosed())
 		{
 			++Count;
 		}
@@ -756,7 +772,7 @@ QList<CDockWidget*> CDockAreaWidget::openedDockWidgets() const
 	for (int i = 0; i < d->ContentsLayout->count(); ++i)
 	{
 		CDockWidget* DockWidget = dockWidget(i);
-		if (!DockWidget->isClosed())
+		if (DockWidget && !DockWidget->isClosed())
 		{
 			DockWidgetList.append(dockWidget(i));
 		}
@@ -770,7 +786,7 @@ int CDockAreaWidget::indexOfFirstOpenDockWidget() const
 {
 	for (int i = 0; i < d->ContentsLayout->count(); ++i)
 	{
-		if (!dockWidget(i)->isClosed())
+		if (dockWidget(i) && !dockWidget(i)->isClosed())
 		{
 			return i;
 		}
@@ -792,7 +808,6 @@ CDockWidget* CDockAreaWidget::dockWidget(int Index) const
 {
 	return qobject_cast<CDockWidget*>(d->ContentsLayout->widget(Index));
 }
-
 
 //============================================================================
 void CDockAreaWidget::reorderDockWidget(int fromIndex, int toIndex)
@@ -847,9 +862,7 @@ void CDockAreaWidget::updateTitleBarVisibility()
 
 	if (isAutoHideFeatureEnabled())
 	{
-		auto tabBar = d->TitleBar->tabBar();
-		tabBar->setVisible(!IsAutoHide);  // Never show tab bar when auto hidden
-		d->TitleBar->autoHideTitleLabel()->setVisible(IsAutoHide);  // Always show when auto hidden, never otherwise
+		d->TitleBar->showAutoHideControls(IsAutoHide);
 		updateTitleBarButtonVisibility(Container->topLevelDockArea() == this);
 	}
 }

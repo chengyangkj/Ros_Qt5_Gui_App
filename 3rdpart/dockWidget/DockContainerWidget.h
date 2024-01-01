@@ -53,6 +53,7 @@ struct FloatingDragPreviewPrivate;
 class CDockingStateReader;
 class CAutoHideSideBar;
 class CAutoHideTab;
+class CDockSplitter;
 struct AutoHideTabPrivate;
 struct AutoHideDockContainerPrivate;
 
@@ -94,7 +95,7 @@ protected:
 	/**
 	 * Access function for the internal root splitter
 	 */
-	QSplitter* rootSplitter() const;
+	CDockSplitter* rootSplitter() const;
 
 	/**
 	 * Creates and initializes a dockwidget auto hide container into the given area.

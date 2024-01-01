@@ -47,6 +47,7 @@ class CDockContainerWidget;
 class DockContainerWidgetPrivate;
 class CDockAreaTitleBar;
 class CDockingStateReader;
+class CDockSplitter;
 
 
 /**
@@ -215,6 +216,11 @@ public:
 	 * if there is no
 	 */
 	CAutoHideDockContainer* autoHideDockContainer() const; 
+
+	/**
+	 * Returns the parent splitter that contains this dock area
+	 */
+	CDockSplitter* parentSplitter() const;
 
 	/**
 	 * Returns true if the dock area is in an auto hide container

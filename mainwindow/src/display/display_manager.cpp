@@ -78,6 +78,9 @@ void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
     robot_pose_.x = x;
     robot_pose_.y = y;
     robot_pose_.theta = pose.theta;
+    QPointF view_pos =
+        graphics_view_ptr_->mapFromScene(QPointF(pose.x, pose.y));
+    set_reloc_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
   }
@@ -90,6 +93,8 @@ void DisplayManager::slotNavGoalScenePoseChanged(const RobotPose &pose) {
   robot_pose_goal_.x = x;
   robot_pose_goal_.y = y;
   robot_pose_goal_.theta = pose.theta;
+  QPointF view_pos = graphics_view_ptr_->mapFromScene(QPointF(pose.x, pose.y));
+  set_nav_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
   set_nav_pose_widget_->SetPose(RobotPose(
       robot_pose_goal_.x, robot_pose_goal_.y, robot_pose_goal_.theta));
 }
@@ -234,6 +239,9 @@ void DisplayManager::SetRelocMode(bool is_start) {
   if (is_start) {
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
+    auto current_scene = GetDisplay(DISPLAY_ROBOT)->scenePos();
+    QPointF view_pos = graphics_view_ptr_->mapFromScene(current_scene);
+    set_reloc_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
     set_reloc_pose_widget_->show();
   } else {
     set_reloc_pose_widget_->hide();
@@ -242,10 +250,13 @@ void DisplayManager::SetRelocMode(bool is_start) {
 }
 void DisplayManager::SetNavGoalMode(bool is_start) {
   if (is_start) {
-    slotSetNavPose(absoluteSum(robot_pose_,RobotPose(1,0,0)));
+    slotSetNavPose(absoluteSum(robot_pose_, RobotPose(1, 0, 0)));
     GetDisplay(DISPLAY_GOAL)->setVisible(true);
     GetDisplay(DISPLAY_GOAL)->SetMoveEnable(true);
     set_nav_pose_widget_->show();
+    auto current_scene = GetDisplay(DISPLAY_GOAL)->scenePos();
+    QPointF view_pos = graphics_view_ptr_->mapFromScene(current_scene);
+    set_nav_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
     FocusDisplay(DISPLAY_GOAL);
     QTimer::singleShot(100, this, [=]() { FocusDisplay(""); });
   } else {

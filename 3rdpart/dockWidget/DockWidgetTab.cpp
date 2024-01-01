@@ -245,7 +245,14 @@ DockWidgetTabPrivate::DockWidgetTabPrivate(CDockWidgetTab* _public) :
 void DockWidgetTabPrivate::createLayout()
 {
 	TitleLabel = new tTabLabel();
-	TitleLabel->setElideMode(Qt::ElideRight);
+	if (CDockManager::testConfigFlag(CDockManager::DisableTabTextEliding))
+	{
+		TitleLabel->setElideMode(Qt::ElideNone);
+	}
+	else
+	{
+		TitleLabel->setElideMode(Qt::ElideRight);
+	}
 	TitleLabel->setText(DockWidget->windowTitle());
 	TitleLabel->setObjectName("dockWidgetTabLabel");
 	TitleLabel->setAlignment(Qt::AlignCenter);
@@ -414,11 +421,12 @@ void CDockWidgetTab::mouseReleaseEvent(QMouseEvent* ev)
 			 break;
 
 		default:
-			if (CDockManager::testConfigFlag(CDockManager::FocusHighlighting))
-			{
-				d->focusController()->setDockWidgetTabPressed(false);
-			}
-			break; // do nothing
+			break;
+		}
+
+		if (CDockManager::testConfigFlag(CDockManager::FocusHighlighting))
+		{
+			d->focusController()->setDockWidgetTabPressed(false);
 		}
 	} 
 	else if (ev->button() == Qt::MiddleButton)
@@ -572,6 +580,14 @@ bool CDockWidgetTab::isActiveTab() const
 void CDockWidgetTab::setActiveTab(bool active)
 {
     d->updateCloseButtonVisibility(active);
+
+	if(CDockManager::testConfigFlag(CDockManager::ShowTabTextOnlyForActiveTab) && !d->Icon.isNull())
+	{
+		if(active)
+			d->TitleLabel->setVisible(true);
+		else
+			d->TitleLabel->setVisible(false);
+	}
 
 	// Focus related stuff
 	if (CDockManager::testConfigFlag(CDockManager::FocusHighlighting) && !d->DockWidget->dockManager()->isRestoringState())

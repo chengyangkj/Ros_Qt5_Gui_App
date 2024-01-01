@@ -213,6 +213,8 @@ public:
 														 //!< If neither this nor FloatingContainerForceNativeTitleBar is set (the default) native titlebars are used except on known bad systems.
 														 //! Users can overwrite this by setting the environment variable ADS_UseNativeTitle to "1" or "0".
 		MiddleMouseButtonClosesTab = 0x2000000, //! If the flag is set, the user can use the mouse middle button to close the tab under the mouse
+		DisableTabTextEliding =      0x4000000, //! Set this flag to disable eliding of tab texts in dock area tabs
+		ShowTabTextOnlyForActiveTab =0x8000000, //! Set this flag to show label texts in dock area tabs only for active tabs
 
         DefaultDockAreaButtons = DockAreaHasCloseButton
 							   | DockAreaHasUndockButton
@@ -250,10 +252,12 @@ public:
 		AutoHideSideBarsIconOnly = 0x10,///< show only icons in auto hide side tab - if a tab has no icon, then the text will be shown
 		AutoHideShowOnMouseOver = 0x20, ///< show the auto hide window on mouse over tab and hide it if mouse leaves auto hide container
 		AutoHideCloseButtonCollapsesDock = 0x40, ///< Close button of an auto hide container collapses the dock instead of hiding it completely
+		AutoHideHasCloseButton = 0x80, //< If the flag is set an auto hide title bar has a close button
+		AutoHideHasMinimizeButton = 0x100, ///< if this flag is set, the auto hide title bar has a minimize button to collapse the dock widget
 
 		DefaultAutoHideConfig = AutoHideFeatureEnabled
 			                  | DockAreaHasAutoHideButton
-			                  | AutoHideCloseButtonCollapsesDock
+			                  | AutoHideHasMinimizeButton
 
 	};
     Q_DECLARE_FLAGS(AutoHideFlags, eAutoHideFlag)
@@ -625,6 +629,36 @@ public:
 	 * QGuiApplication::applicationDisplayName().
 	 */
 	static QString floatingContainersTitle();
+
+    /**
+     * This function sets the tool button style for the given dock widget state.
+     * It is possible to switch the tool button style depending on the state.
+     * If a dock widget is floating, then here are more space and it is
+     * possible to select a style that requires more space like
+     * Qt::ToolButtonTextUnderIcon. For the docked state Qt::ToolButtonIconOnly
+     * might be better.
+     */
+    void setDockWidgetToolBarStyle(Qt::ToolButtonStyle Style, CDockWidget::eState State);
+
+    /**
+     * Returns the tool button style for the given docking state.
+     * \see setToolBarStyle()
+     */
+    Qt::ToolButtonStyle dockWidgetToolBarStyle(CDockWidget::eState State) const;
+
+    /**
+     * This function sets the tool button icon size for the given state.
+     * If a dock widget is floating, there is more space and increasing the
+     * icon size is possible. For docked widgets, small icon sizes, eg. 16 x 16
+     * might be better.
+     */
+    void setDockWidgetToolBarIconSize(const QSize& IconSize, CDockWidget::eState State);
+
+    /**
+     * Returns the icon size for a given docking state.
+     * \see setToolBarIconSize()
+     */
+    QSize dockWidgetToolBarIconSize(CDockWidget::eState State) const;
 
 public Q_SLOTS:
 	/**

@@ -4,31 +4,39 @@
 #include <QLabel>
 #include <QPushButton>
 SetPoseWidget::SetPoseWidget(QWidget *parent) : QWidget(parent) {
-
   QVBoxLayout *layout = new QVBoxLayout(this);
+  layout->setSpacing(0);
   QHBoxLayout *layout_x = new QHBoxLayout();
+  layout_x->setSpacing(0);
   QLabel *label_x = new QLabel("X:");
+  label_x->setMaximumSize(15, 30);
   spinBox_x_ = new QDoubleSpinBox();
   spinBox_x_->setRange(-10000, 10000);
   spinBox_x_->setSingleStep(0.1);
   layout_x->addWidget(label_x);
   layout_x->addWidget(spinBox_x_);
   QHBoxLayout *layout_y = new QHBoxLayout();
+  layout_y->setSpacing(0);
+
   QLabel *label_y = new QLabel("Y:");
+  label_y->setMaximumSize(15, 30);
   spinBox_y_ = new QDoubleSpinBox();
   spinBox_y_->setRange(-10000, 10000);
   spinBox_y_->setSingleStep(0.1);
   layout_y->addWidget(label_y);
   layout_y->addWidget(spinBox_y_);
   QHBoxLayout *layout_z = new QHBoxLayout();
+  layout_z->setSpacing(0);
+
   QLabel *label_z = new QLabel("theta:");
   spinBox_theta_ = new QDoubleSpinBox();
   spinBox_theta_->setRange(-180, 180);
   spinBox_theta_->setSingleStep(1);
   layout_z->addWidget(label_z);
   layout_z->addWidget(spinBox_theta_);
-
+  label_z->setMaximumSize(40, 30);
   QHBoxLayout *layout_button = new QHBoxLayout();
+  layout_button->setSpacing(0);
   QPushButton *button_ok = new QPushButton("OK");
   QPushButton *button_cancel = new QPushButton("Cancel");
   layout_button->addWidget(button_ok);
