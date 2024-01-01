@@ -68,7 +68,14 @@ sudo apt-get install qtbase5-private-dev
 ```
 mkdir -p ~/qt_ws
 cd ~/qt_ws
-git clone https://github.com/chengyangkj/ROS2_Qt5_Gui_App
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App
+```
+
+note:如果github下载过慢,可以使用以下指令从gitee拉取
+
+```
+git clone https://gitee.com/chengyangkj/Ros_Qt5_Gui_App
+
 ```
 
 ## 3,编译项目

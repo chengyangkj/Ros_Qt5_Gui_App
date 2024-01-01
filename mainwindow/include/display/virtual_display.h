@@ -22,9 +22,9 @@
 #include <any>
 #include <iostream>
 
+#include "display_defines.h"
 #include "occupancy_map.h"
 #include "point_type.h"
-#include "display_defines.h"
 using namespace basic;
 #define GetAnyData(type, data, res_data)                                       \
   {                                                                            \
@@ -62,11 +62,13 @@ public:
   bool enable_rotate_{false};
   std::string parent_name_;
   RobotPose pose_in_parent_{0, 0, 0};
+  VirtualDisplay *parent_ptr_;
   std::vector<VirtualDisplay *> children_;
+  bool is_moving_{false};
 signals:
   void signalCursorPose(QPointF pose);
-  void signalPoseUpdate(const RobotPose& pose);
-
+  void signalPoseUpdate(const RobotPose &pose);
+  void signalItemChange(GraphicsItemChange change, const QVariant &value);
 public:
   VirtualDisplay(const std::string &display_name, const int &z_value,
                  const std::string &parent_name);
@@ -76,6 +78,7 @@ public:
     enable_rotate_ = enable;
     return this;
   }
+  double GetScaleValue() { return scale_value_; }
   VirtualDisplay *SetScaleEnable(const bool &enable) {
     enable_scale_ = enable;
     return this;
@@ -110,7 +113,9 @@ public:
   QPointF PoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
   }
-  void SetPoseInParent(const RobotPose &pose) { pose_in_parent_ = pose; }
+  bool IsMoving() { return is_moving_; }
+  void UpdatePose(const RobotPose &pose) { SetPoseInParent(pose); }
+  void SetPoseInParent(const RobotPose &pose);
   RobotPose GetPoseInParent() { return pose_in_parent_; }
   std::string GetPraentName() { return parent_name_; }
   //设置原点在全局的坐标
@@ -129,6 +134,9 @@ private:
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
- 
+  virtual QVariant itemChange(GraphicsItemChange change,
+                              const QVariant &value) override;
+private slots:
+  void parentItemChange(GraphicsItemChange change, const QVariant &value);
 };
 } // namespace Display

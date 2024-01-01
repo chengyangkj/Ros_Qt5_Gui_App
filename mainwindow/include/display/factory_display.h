@@ -34,7 +34,7 @@ public:
                               const RobotPose &pose);
 
 private slots:
-  void updateCoordinateSystem();
+  void Process();
 
 private:
   QTimer timer_coordinate_system_;
@@ -44,6 +44,6 @@ private:
   bool initlizated_ = false;
   QGraphicsView *viewer_ptr_;
   std::atomic_bool run_flag_ = false;
-  std::string focus_display_name_="";
+  std::string focus_display_name_ = "";
 };
 } // namespace Display
