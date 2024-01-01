@@ -5,8 +5,6 @@
  * @LastEditTime: 2023-10-06 14:03:03
  * @FilePath: /ROS2_Qt5_Gui_App/README.md
 -->
-# ROS Qt5 Gui App
-## 轻量级ROS人机交互软件
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub stars](https://img.shields.io/github/stars/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
@@ -15,22 +13,50 @@
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 [![Gitter](https://badges.gitter.im/ros_qt5_gui_app/community.svg)](https://gitter.im/ros_qt5_gui_app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
+# 项目介绍
+
+## 轻量级移动机器人ROS人机交互软件
 
 本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时兼容ROS1/ROS2
 
-在编译时自动识别环境变量中的ROS1/ROS2环境并进行构建，在运行时自动加载对应的插件
+软件在编译时会自动识别环境变量中的ROS1/ROS2环境并进行构建，实现ROS通信与界面隔离
+
+软件所有功能均为自行绘制实现,因此可以轻松运行在一些性能比较低的边缘设备,后续功能不断完善中......
 
 ![image.png](./doc/images/main.png)
 
+![image.png](./doc/images/main.gif)
+
+<!-- TOC -->
+
+- [项目介绍](#项目介绍)
+  - [轻量级移动机器人ROS人机交互软件](#轻量级移动机器人ros人机交互软件)
+- [一,环境安装](#一环境安装)
+- [二,编译](#二编译)
+  - [1,克隆/下载本项目:](#1克隆下载本项目)
+  - [3,编译项目](#3编译项目)
+  - [4,运行项目](#4运行项目)
+- [三,使用说明](#三使用说明)
+    - [3.1,多机通信配置](#31多机通信配置)
+    - [3.2,配置文件](#32配置文件)
+    - [3.3,重定位位姿态发布](#33重定位位姿态发布)
+    - [3.4,导航目标点设置](#34导航目标点设置)
+    - [3.5,手动控制机器人](#35手动控制机器人)
+    - [3.6,速度仪表盘](#36速度仪表盘)
+- [四,相关链接](#四相关链接)
+- [五,相关教程及交流群](#五相关教程及交流群)
+
+<!-- /TOC -->
 
 
-# 一，环境安装 
+# 一,环境安装 
 
 ```
 sudo apt-get install qtbase5-private-dev
 ```
 
-# 二，编译
+# 二,编译
+
 
 注意，为了保证此项目同时兼容ROS1与ROS2，此项目不使用ROS1/ROS2的catkin_make/colcon构建系统进行够建，而是使用标准CMake进行构建，这也就意味着，本项目不会被ROS自动识别为功能包
 可以参考以下教程从0开始构建/运行此项目:
@@ -81,26 +107,42 @@ cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 
 ```
 
+软件配置文件路径(运行一次软件后会自动生成在可执行程序相对路径下):
+
+```
+
+~/qt_ws/ROS2_Qt5_Gui_App/build/config.ini
+
+```
+
 # 三,使用说明
 
-### 5.1,多机通信配置
+### 3.1,多机通信配置
+
+针对于ROS新手的温馨提示:此项配置,如果是单机使用即本软件运行在机器人身上,没有跨机器使用就不用配置，直接跳过即可.如果需要将本软件运行在自己的笔记本上,去连接远程的机器人的情况下需要进行配置
 
 ROS1/ROS2的多机通信完全依赖ROS原生(环境变量添加ROS_MASTER_URI与ROS_IP/ROS_DOMAINID),不再由用户手动指定,减轻新手使用负担
+
 ROS1:
+
 配置参考：多机通讯教程[csdn 博客](https://blog.csdn.net/qq_38441692/article/details/98205852)
+
 ROS2:
+
 环境变量多机配置相同的ROS_DOMAINID
 
-### 5.2,Topic名称配置
+### 3.2,配置文件
 
 第一次运行后，会在可执行程序同级目录生成config.ini,修改此配置文件即可,修改后重启生效,具体配置说明详见[配置文件说明](./doc/config.md)
 
 
-### 5.3，重定位位姿态发布
+### 3.3,重定位位姿态发布
 
 程序可以拖动式的设置机器人初始位置（重定位）,相对于Rviz,拖动时可以实时查看激光匹配情况,重定位更加精准
 
 ![image.png](./doc/images/reloc.jpg)
+
+![image.png](./doc/images/reloc.gif)
 
 注意:如果设置无效,需要检查config.ini中设置：
 
@@ -111,7 +153,7 @@ Topic=/initialpose
 为自己机器人监听的重定位Topic名称
 
 
-### 5.4，导航目标点设置
+### 3.4,导航目标点设置
 
 程序可以拖动式的设置机器人导航目标点（导航）使用图文说明如下:
 
@@ -119,6 +161,7 @@ Topic=/initialpose
 
 ![image.png](./doc/images/nav_goal_send2.jpg)
 
+![image.png](./doc/images/set_nav_goal.gif)
 
 注意:如果设置无效,需要检查config.ini中设置：
 
@@ -129,7 +172,7 @@ Topic=/move_base_simple/goal
 为自己机器人监听的导航目标点Topic名称
 
 
-### 5.5,手动控制
+### 3.5,手动控制机器人
 
 软件支持发布实时速度到底盘:
 
@@ -146,7 +189,7 @@ Topic=/cmd_vel
 ```
 为实际机器人监听的速度控制话题
 
-### 5.6 速度仪表盘
+### 3.6,速度仪表盘
 
 软件支持实时显示机器人速度:
 
@@ -165,7 +208,7 @@ Topic=/odom
 ....其他功能逐步完善
 
 
-# 四，相关链接
+# 四,相关链接
 
 
 | 友链名                                                                             | 支持平台                  | 功能                                                                                                   |
@@ -176,7 +219,7 @@ Topic=/odom
 | [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)         | Win10 Ubuntu              | ROS + QWidget + Librviz原生图层Api实现图层管理，不需手动创建图层                                       |
 | [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)     | Win10 Ubuntu              | cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行                       |
 | [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo)                        | ROS2                      | 在ROS2平台上运行的qt demo包，cmakelist.txt已配置好改为qt5，可以直接colcon build 编译使用               |
-| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)                | ROS2                      | 在ROS2平台上实现自绘制话题消息显示的功能包，近期上线....                                               |
+| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)                | ROS2                      | 与本仓库代码完全相同/保持同步                                                                          |
 | [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app) | 基于flutter实现多平台运行 | 逐步推进.....                                                                                          |
 
 
