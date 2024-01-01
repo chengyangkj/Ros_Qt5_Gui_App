@@ -1,5 +1,6 @@
 
 #include "display/factory_display.h"
+#include "display/display_manager.h";
 #include "logger/logger.h"
 namespace Display {
 
@@ -12,7 +13,7 @@ bool FactoryDisplay::Init(QGraphicsView *viewer) {
     viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     run_flag_ = true;
     connect(&timer_coordinate_system_, SIGNAL(timeout()), this,
-            SLOT(updateCoordinateSystem()));
+            SLOT(Process()));
     timer_coordinate_system_.setInterval(10);
     timer_coordinate_system_.start();
     return true;
@@ -109,18 +110,7 @@ bool FactoryDisplay::GetMoveEnable(const std::string &display_name) {
  * @description: 更新图层间的坐标系关系
  * @return {*}
  */
-void FactoryDisplay::updateCoordinateSystem() {
-  for (auto &[name, display] : total_display_map_) {
-    if (!display->GetPraentName().empty() && !display->GetMoveEnable()) {
-      RobotPose pose_in_parent = display->GetPoseInParent();
-      auto parent_ptr = GetDisplay(display->GetPraentName());
-      if (parent_ptr == nullptr)
-        continue;
-      QPointF scene_pose =
-          parent_ptr->mapToScene(QPointF(pose_in_parent.x, pose_in_parent.y));
-      display->setPos(scene_pose);
-    }
-  }
+void FactoryDisplay::Process() {
   // focus on
   auto display = GetDisplay(focus_display_name_);
   if (display != nullptr) {

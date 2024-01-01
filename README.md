@@ -8,11 +8,21 @@
 # ROS Qt5 Gui App
 ## 轻量级ROS人机交互软件
 
-本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时兼容ROS1/ROS2，在编译时自动识别环境变量中的ROS1/ROS2环境并进行构建，在运行时自动加载对应的插件
+![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub stars](https://img.shields.io/github/stars/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub forks](https://img.shields.io/github/forks/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub issues](https://img.shields.io/github/issues/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
+[![Gitter](https://badges.gitter.im/ros_qt5_gui_app/community.svg)](https://gitter.im/ros_qt5_gui_app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
+
+本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时兼容ROS1/ROS2
+
+在编译时自动识别环境变量中的ROS1/ROS2环境并进行构建，在运行时自动加载对应的插件
 
 ![image.png](./doc/images/main.png)
 
-[TOC]
+
 
 # 一，环境安装 
 

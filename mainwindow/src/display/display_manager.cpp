@@ -78,7 +78,6 @@ void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
     robot_pose_.x = x;
     robot_pose_.y = y;
     robot_pose_.theta = pose.theta;
-
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
   }
@@ -243,7 +242,7 @@ void DisplayManager::SetRelocMode(bool is_start) {
 }
 void DisplayManager::SetNavGoalMode(bool is_start) {
   if (is_start) {
-    slotSetNavPose(RobotPose(0, 0, 0));
+    slotSetNavPose(absoluteSum(robot_pose_,RobotPose(1,0,0)));
     GetDisplay(DISPLAY_GOAL)->setVisible(true);
     GetDisplay(DISPLAY_GOAL)->SetMoveEnable(true);
     set_nav_pose_widget_->show();

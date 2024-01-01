@@ -7,11 +7,30 @@ VirtualDisplay::VirtualDisplay(const std::string &display_name,
                                const std::string &parent_name)
     : display_name_(display_name), parent_name_(parent_name) {
   FactoryDisplay::Instance()->AddDisplay(this, parent_name);
+  parent_ptr_ = FactoryDisplay::Instance()->GetDisplay(parent_name_);
+  if (parent_ptr_ != nullptr) {
+    connect(parent_ptr_,
+            SIGNAL(signalItemChange(GraphicsItemChange, const QVariant &)),
+            this, SLOT(parentItemChange(GraphicsItemChange, const QVariant &)));
+  }
   this->setZValue(z_value);
   pose_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   goal_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
   move_cursor_ = new QCursor(QPixmap("://images/cursor_move.png"), 0, 0);
   transform_ = this->transform();
+}
+QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
+                                    const QVariant &value) {
+  emit signalItemChange(change, value);
+  return QGraphicsItem::itemChange(change, value);
+}
+void VirtualDisplay::parentItemChange(GraphicsItemChange change,
+                                      const QVariant &value) {
+  switch (change) {
+  case QGraphicsItem::ItemScaleHasChanged:
+    SetPoseInParent(pose_in_parent_);
+    break;
+  }
 }
 VirtualDisplay::~VirtualDisplay() {
   if (pose_cursor_ != nullptr) {
@@ -30,6 +49,17 @@ VirtualDisplay::~VirtualDisplay() {
     delete curr_cursor_;
     curr_cursor_ = nullptr;
   }
+}
+void VirtualDisplay::SetPoseInParent(const RobotPose &pose) {
+  pose_in_parent_ = pose;
+  if (parent_ptr_ == nullptr)
+    return;
+  QPointF scene_pose =
+      parent_ptr_->mapToScene(QPointF(pose_in_parent_.x, pose_in_parent_.y));
+  std::cout << "get scene pose:" << scene_pose.x() << " " << scene_pose.y()
+            << " map:" << pose_in_parent_.x << " " << pose_in_parent_.y
+            << std::endl;
+  setPos(scene_pose);
 }
 bool VirtualDisplay::SetDisplayConfig(const std::string &config_name,
                                       const std::any &config_data) {
@@ -70,6 +100,11 @@ void VirtualDisplay::MovedBy(const qreal &x, const qreal &y) {
   moveBy(x, y);
   for (auto child : children_) {
     child->MovedBy(x, y);
+  }
+  if (parent_ptr_ != nullptr) {
+    auto pose = parent_ptr_->mapFromScene(scenePos());
+    pose_in_parent_.x = pose.x();
+    pose_in_parent_.y = pose.y();
   }
   update();
 }
