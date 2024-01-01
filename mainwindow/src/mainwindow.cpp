@@ -81,7 +81,8 @@ void MainWindow::setupUi() {
   CDockManager::setConfigFlag(CDockManager::DockAreaHasUndockButton, false);
   CDockManager::setConfigFlag(CDockManager::DockAreaHasTabsMenuButton, false);
   CDockManager::setConfigFlag(CDockManager::MiddleMouseButtonClosesTab, true);
-  CDockManager::setConfigFlag(CDockManager::MiddleMouseButtonClosesTab, true);
+  CDockManager::setConfigFlag(CDockManager::EqualSplitOnInsertion, true);
+  CDockManager::setConfigFlag(CDockManager::ShowTabTextOnlyForActiveTab, true);
   dock_manager_ = new CDockManager(this);
 
   QVBoxLayout *central_layout = new QVBoxLayout();
@@ -155,6 +156,14 @@ void MainWindow::setupUi() {
                                    DashBoardDockWidget, CentralDockArea);
   ui->menuView->addAction(DashBoardDockWidget->toggleViewAction());
 
+  /////////////////////////////////////////////////////////pose widget
+  // auto set_pose_widget_ = new SetPoseWidget();
+  // set_pose_dock_widget_ = new ads::CDockWidget("PoseSet");
+  // set_pose_dock_widget_->setWidget(set_pose_widget_);
+  // dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
+  //                              set_pose_dock_widget_, CentralDockArea);
+  // set_pose_dock_widget_->toggleView(false);
+  // set_pose_dock_widget_->close();
   ////////////////////////////////////////////////////////速度控制
   speed_ctrl_widget_ = new SpeedCtrlWidget();
   connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,

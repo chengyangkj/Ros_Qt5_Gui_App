@@ -176,6 +176,12 @@ public:
         StateFloating
     };
 
+    enum eToolBarStyleSource
+    {
+    	ToolBarStyleFromDockManager,
+    	ToolBarStyleFromDockWidget
+    };
+
     /**
      * Sets the widget for the dock widget to widget.
      * The InsertMode defines how the widget is inserted into the dock widget.
@@ -410,6 +416,12 @@ public:
     QAction* toggleViewAction() const;
 
     /**
+     * Use provided action to be the default toggle view action for this dock widget.
+     * This dock widget now owns the action.
+     */
+    void setToggleViewAction(QAction* action);
+
+    /**
      * Configures the behavior of the toggle view action.
      * \see eToggleViewActionMode for a detailed description
      */
@@ -466,6 +478,17 @@ public:
      * on destruction
      */
     void setToolBar(QToolBar* ToolBar);
+
+    /**
+     * Configures, if the dock widget uses the global tool bar styles from
+     * dock manager or if it uses its own tool bar style
+     */
+    void setToolBarStyleSource(eToolBarStyleSource Source);
+
+    /**
+     * Returns the configured tool bar style source
+     */
+    eToolBarStyleSource toolBarStyleSource() const;
 
     /**
      * This function sets the tool button style for the given dock widget state.

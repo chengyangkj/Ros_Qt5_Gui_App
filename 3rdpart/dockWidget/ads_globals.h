@@ -107,7 +107,8 @@ enum TitleBarButton
 	TitleBarButtonTabsMenu,
 	TitleBarButtonUndock,
 	TitleBarButtonClose,
-	TitleBarButtonAutoHide
+	TitleBarButtonAutoHide,
+	TitleBarButtonMinimize
 };
 
 /**
@@ -131,6 +132,7 @@ enum eIcon
 	DockAreaMenuIcon,  //!< DockAreaMenuIcon
 	DockAreaUndockIcon,//!< DockAreaUndockIcon
 	DockAreaCloseIcon, //!< DockAreaCloseIcon
+	DockAreaMinimizeIcon,
 
 	IconCount,         //!< just a delimiter for range checks
 };
@@ -266,7 +268,7 @@ T findParent(const QWidget* w)
 		}
 		parentWidget = parentWidget->parentWidget();
 	}
-	return 0;
+	return nullptr;
 }
 
 /**

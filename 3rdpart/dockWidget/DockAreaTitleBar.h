@@ -97,6 +97,8 @@ private:
 private Q_SLOTS:
 	void onTabsMenuAboutToShow();
 	void onCloseButtonClicked();
+	void onAutoHideCloseActionTriggered();
+	void minimizeAutoHideContainer();
 	void onUndockButtonClicked();
 	void onTabsMenuActionTriggered(QAction* Action);
 	void onCurrentTabChanged(int Index);
@@ -207,6 +209,11 @@ public:
 	 * DockWidgetFloatable flag is true
 	 */
 	void setAreaFloating();
+
+	/**
+	 * Call this function, to create all the required auto hide controls
+	 */
+	void showAutoHideControls(bool Show);
 
 Q_SIGNALS:
 	/**
