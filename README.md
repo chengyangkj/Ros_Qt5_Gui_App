@@ -176,7 +176,7 @@ Topic=/move_base_simple/goal
 
 软件支持发布实时速度到底盘:
 
-[!image.png(./doc/images/manual_control.jpg)]
+![image.png](./doc/images/manual_control.jpg)
 
 对应按钮上的文字，可以由键盘对应按钮同步调用
 
@@ -193,7 +193,7 @@ Topic=/cmd_vel
 
 软件支持实时显示机器人速度:
 
-[!image.png(./doc/images/speed_dashboard.jpg)]
+![image.png](./doc/images/speed_dashboard.jpg)
 
 注意:如果设置无效,需要检查config.ini中设置：
 
