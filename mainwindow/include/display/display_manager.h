@@ -11,6 +11,7 @@
 #ifndef DISPLAY_MANAGER_H
 #define DISPLAY_MANAGER_H
 #include "algorithm.h"
+#include "display/scene_manager.h"
 #include "display_cost_map.h"
 #include "display_occ_map.h"
 #include "display_path.h"
@@ -59,6 +60,7 @@ private:
   QGraphicsView *graphics_view_ptr_;
   SetPoseWidget *set_reloc_pose_widget_;
   SetPoseWidget *set_nav_pose_widget_;
+
 signals:
   void cursorPosMap(QPointF);
   void signalPub2DPose(const RobotPose &pose);

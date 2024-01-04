@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<MsgId>("MsgId");
   qRegisterMetaType<std::any>("std::any");
   setupUi();
+  RestoreState();
   openChannel();
 }
 bool MainWindow::openChannel() {
@@ -229,8 +230,25 @@ void MainWindow::savePerspective() {
 void MainWindow::closeEvent(QCloseEvent *event) {
   // Delete dock manager here to delete all floating widgets. This ensures
   // that all top level windows of the dock manager are properly closed
+  // write state
+  SaveState();
   dock_manager_->deleteLater();
   QMainWindow::closeEvent(event);
+}
+void MainWindow::SaveState() {
+  QSettings Settings("state.ini", QSettings::IniFormat);
+  Settings.setValue("mainWindow/Geometry", this->saveGeometry());
+  Settings.setValue("mainWindow/State", this->saveState());
+  Settings.setValue("mainWindow/DockingState", dock_manager_->saveState());
+}
+
+//============================================================================
+void MainWindow::RestoreState() {
+  QSettings Settings("state.ini", QSettings::IniFormat);
+  this->restoreGeometry(Settings.value("mainWindow/Geometry").toByteArray());
+  this->restoreState(Settings.value("mainWindow/State").toByteArray());
+  // dock_manager_->restoreState(
+  //     Settings.value("mainWindow/DockingState").toByteArray());
 }
 void MainWindow::updateOdomInfo(RobotState state) {
   // 转向灯

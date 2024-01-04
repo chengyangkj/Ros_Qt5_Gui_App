@@ -7,9 +7,9 @@ namespace Display {
 bool FactoryDisplay::Init(QGraphicsView *viewer) {
   if (!initlizated_) {
     initlizated_ = true;
-    scene_ptr_ = new QGraphicsScene();
+    scene_manager_ptr_ = new SceneManager();
     viewer_ptr_ = viewer;
-    viewer_ptr_->setScene(scene_ptr_);
+    viewer_ptr_->setScene(scene_manager_ptr_);
     viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     run_flag_ = true;
     connect(&timer_coordinate_system_, SIGNAL(timeout()), this,
@@ -68,7 +68,7 @@ void FactoryDisplay::AddDisplay(VirtualDisplay *display,
   }
   total_display_map_[display->GetDisplayName()] = display;
 
-  scene_ptr_->addItem(display);
+  scene_manager_ptr_->addItem(display);
 }
 void FactoryDisplay::FocusDisplay(const std::string &display_name) {
 

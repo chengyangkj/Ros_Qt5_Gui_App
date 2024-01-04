@@ -79,6 +79,8 @@ private:
   bool openChannel(const std::string &channel_name);
   void closeChannel();
   void registerChannel();
+  void RestoreState();
+  void SaveState();
 private slots:
   void savePerspective();
 };

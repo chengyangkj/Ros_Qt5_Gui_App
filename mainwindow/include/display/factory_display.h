@@ -1,4 +1,5 @@
 #pragma once
+#include "display/scene_manager.h"
 #include "virtual_display.h"
 #include <QGraphicsItem>
 #include <QGraphicsView>
@@ -40,7 +41,7 @@ private:
   QTimer timer_coordinate_system_;
   std::string main_display_;
   std::map<std::string, VirtualDisplay *> total_display_map_;
-  QGraphicsScene *scene_ptr_;
+  SceneManager *scene_manager_ptr_;
   bool initlizated_ = false;
   QGraphicsView *viewer_ptr_;
   std::atomic_bool run_flag_ = false;
