@@ -1,5 +1,5 @@
 #pragma once
-#include "display/scene_manager.h"
+#include "display/scene_display.h"
 #include "virtual_display.h"
 #include <QGraphicsItem>
 #include <QGraphicsView>
@@ -15,7 +15,7 @@ public:
   }
   FactoryDisplay();
   ~FactoryDisplay();
-  bool Init(QGraphicsView *viewer);
+  bool Init(QGraphicsView *viewer, SceneDisplay *scene_ptr);
   // 获取图层
   VirtualDisplay *GetDisplay(const std::string &display_name);
   // 设置图层的scene坐标
@@ -41,7 +41,7 @@ private:
   QTimer timer_coordinate_system_;
   std::string main_display_;
   std::map<std::string, VirtualDisplay *> total_display_map_;
-  SceneManager *scene_manager_ptr_;
+  SceneDisplay *scene_display_ptr_;
   bool initlizated_ = false;
   QGraphicsView *viewer_ptr_;
   std::atomic_bool run_flag_ = false;

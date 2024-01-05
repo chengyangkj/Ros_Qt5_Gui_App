@@ -11,13 +11,13 @@
 #ifndef DISPLAY_MANAGER_H
 #define DISPLAY_MANAGER_H
 #include "algorithm.h"
-#include "display/scene_manager.h"
+#include "display/scene_display.h"
 #include "display_cost_map.h"
 #include "display_occ_map.h"
 #include "display_path.h"
 #include "factory_display.h"
 #include "laser_points.h"
-#include "msg/msg_info.h"
+
 #include "point_shape.h"
 #include "widgets/set_pose_widget.h"
 #include <Eigen/Dense>
@@ -29,17 +29,6 @@
 #include <any>
 #include <functional>
 #include <map>
-#define DISPLAY_ROBOT ToString(MsgId::kRobotPose)
-#define DISPLAY_MAP ToString(MsgId::kOccupancyMap)
-#define DISPLAY_LOCAL_COST_MAP ToString(MsgId::kLocalCostMap)
-#define DISPLAY_GLOBAL_COST_MAP ToString(MsgId::kGlobalCostMap)
-#define DISPLAY_GLOBAL_PATH ToString(MsgId::kGlobalPath)
-#define DISPLAY_LOCAL_PATH ToString(MsgId::kLocalPath)
-#define DISPLAY_LASER ToString(MsgId::kLaserScan)
-#define DISPLAY_PARTICLE "Particle"
-#define DISPLAY_REGION "Region"
-#define DISPLAY_TAG "Tag"
-#define DISPLAY_GOAL "GoalPose"
 
 // group
 #define GROUP_MAP "Group_Map"
@@ -60,7 +49,7 @@ private:
   QGraphicsView *graphics_view_ptr_;
   SetPoseWidget *set_reloc_pose_widget_;
   SetPoseWidget *set_nav_pose_widget_;
-
+  SceneDisplay *scene_display_ptr_;
 signals:
   void cursorPosMap(QPointF);
   void signalPub2DPose(const RobotPose &pose);
@@ -68,7 +57,7 @@ signals:
 public slots:
   void updateScaled(double value);
   void SetRelocPose();
-  void SetNavPose();
+  void AddOneNavGoal();
   void slotRobotScenePoseChanged(const RobotPose &pose);
   void slotNavGoalScenePoseChanged(const RobotPose &pose);
   void slotSetRobotPose(const RobotPose &pose);
@@ -91,6 +80,7 @@ public:
   QPointF wordPose2Map(const QPointF &pose);
   RobotPose wordPose2Map(const RobotPose &pose);
   RobotPose mapPose2Word(const RobotPose &pose);
+  RobotPose scenePoseToWord(const RobotPose &pose);
   bool UpdateDisplay(const std::string &display_name, const std::any &data);
   void UpdateRobotPose(const RobotPose &pose);
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);

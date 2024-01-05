@@ -4,12 +4,12 @@
 #include "logger/logger.h"
 namespace Display {
 
-bool FactoryDisplay::Init(QGraphicsView *viewer) {
+bool FactoryDisplay::Init(QGraphicsView *viewer, SceneDisplay *scene_ptr) {
   if (!initlizated_) {
     initlizated_ = true;
-    scene_manager_ptr_ = new SceneManager();
     viewer_ptr_ = viewer;
-    viewer_ptr_->setScene(scene_manager_ptr_);
+    scene_display_ptr_ = scene_ptr;
+    viewer_ptr_->setScene(scene_display_ptr_);
     viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     run_flag_ = true;
     connect(&timer_coordinate_system_, SIGNAL(timeout()), this,
@@ -58,8 +58,8 @@ bool FactoryDisplay::SetDisplayScaled(const std::string &display_name,
 }
 void FactoryDisplay::AddDisplay(VirtualDisplay *display,
                                 const std::string &parent_name) {
-  if (total_display_map_.count(display->GetDisplayName()) != 0)
-    return;
+  // if (total_display_map_.count(display->GetDisplayName()) != 0)
+  //   return;
   // add group
   if (!parent_name.empty()) {
     auto parent_ptr = GetDisplay(parent_name);
@@ -67,8 +67,7 @@ void FactoryDisplay::AddDisplay(VirtualDisplay *display,
     // display->setParent(parent_ptr);
   }
   total_display_map_[display->GetDisplayName()] = display;
-
-  scene_manager_ptr_->addItem(display);
+  scene_display_ptr_->addItem(display);
 }
 void FactoryDisplay::FocusDisplay(const std::string &display_name) {
 

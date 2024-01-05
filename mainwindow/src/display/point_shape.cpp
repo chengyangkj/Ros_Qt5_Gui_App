@@ -49,9 +49,10 @@ QVariant PointShape::itemChange(GraphicsItemChange change,
                                 const QVariant &value) {
   switch (change) {
   case ItemPositionHasChanged:
-    emit signalPoseUpdate(
-        RobotPose(scenePos().x(), scenePos().y(),
-                  normalize(robot_pose_.theta + rotate_value_)));
+    curr_scene_pose_ = RobotPose(scenePos().x(), scenePos().y(),
+                                 normalize(robot_pose_.theta + rotate_value_));
+    std::cout << "current pose:" << curr_scene_pose_ << std::endl;
+    emit signalPoseUpdate(curr_scene_pose_);
     break;
   // case ItemTransformHasChanged:
   //   emit signalPoseUpdate(

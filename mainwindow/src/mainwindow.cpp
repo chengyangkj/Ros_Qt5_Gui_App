@@ -194,7 +194,7 @@ void MainWindow::setupUi() {
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetRelocPose,
           [=]() { display_manager_->SetRelocPose(); });
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetNavPose,
-          [=]() { display_manager_->SetNavPose(); });
+          [=]() { display_manager_->AddOneNavGoal(); });
   connect(tools_bar_widget_, &ToolsBarWidget::SignalFocusRobot,
           [=](bool is_focus) {
             display_manager_->FocusDisplay(is_focus ? DISPLAY_ROBOT : "");
