@@ -13,7 +13,9 @@ namespace Display {
 
 DisplayManager::DisplayManager() {
   graphics_view_ptr_ = new QGraphicsView();
-  FactoryDisplay::Instance()->Init(graphics_view_ptr_);
+  scene_display_ptr_ = new SceneDisplay();
+  scene_display_ptr_->Init(graphics_view_ptr_, this);
+  FactoryDisplay::Instance()->Init(graphics_view_ptr_, scene_display_ptr_);
 
   //------------------------------------start display instace (register
   // display)-----------------------------
@@ -325,6 +327,13 @@ RobotPose DisplayManager::mapPose2Word(const RobotPose &pose) {
   ret.y = y;
   return ret;
 }
+RobotPose DisplayManager::scenePoseToWord(const RobotPose &pose) {
+  QPointF pose_map = FactoryDisplay::Instance()
+                         ->GetDisplay(DISPLAY_MAP)
+                         ->mapFromScene(QPointF(pose.x, pose.y));
+  std::cout << "pose map:" << RobotPose(pose_map.x(), pose_map.y(), pose.theta);
+  return mapPose2Word(RobotPose(pose_map.x(), pose_map.y(), pose.theta));
+}
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return FactoryDisplay::Instance()->GetDisplay(name);
 }
@@ -333,10 +342,11 @@ void DisplayManager::SetRelocPose() {
     SetRelocMode(true);
   }
 }
-void DisplayManager::SetNavPose() {
-  if (!set_nav_pose_widget_->isVisible()) {
-    SetNavGoalMode(true);
-  }
+void DisplayManager::AddOneNavGoal() {
+  // if (!set_nav_pose_widget_->isVisible()) {
+  //   SetNavGoalMode(true);
+  // }
+  scene_display_ptr_->AddOneNavGoal();
 }
 
 } // namespace Display

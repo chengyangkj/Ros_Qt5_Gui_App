@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<MsgId>("MsgId");
   qRegisterMetaType<std::any>("std::any");
   setupUi();
+  RestoreState();
   openChannel();
 }
 bool MainWindow::openChannel() {
@@ -193,7 +194,7 @@ void MainWindow::setupUi() {
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetRelocPose,
           [=]() { display_manager_->SetRelocPose(); });
   connect(tools_bar_widget_, &ToolsBarWidget::SignalSetNavPose,
-          [=]() { display_manager_->SetNavPose(); });
+          [=]() { display_manager_->AddOneNavGoal(); });
   connect(tools_bar_widget_, &ToolsBarWidget::SignalFocusRobot,
           [=](bool is_focus) {
             display_manager_->FocusDisplay(is_focus ? DISPLAY_ROBOT : "");
@@ -229,8 +230,25 @@ void MainWindow::savePerspective() {
 void MainWindow::closeEvent(QCloseEvent *event) {
   // Delete dock manager here to delete all floating widgets. This ensures
   // that all top level windows of the dock manager are properly closed
+  // write state
+  SaveState();
   dock_manager_->deleteLater();
   QMainWindow::closeEvent(event);
+}
+void MainWindow::SaveState() {
+  QSettings Settings("state.ini", QSettings::IniFormat);
+  Settings.setValue("mainWindow/Geometry", this->saveGeometry());
+  Settings.setValue("mainWindow/State", this->saveState());
+  Settings.setValue("mainWindow/DockingState", dock_manager_->saveState());
+}
+
+//============================================================================
+void MainWindow::RestoreState() {
+  QSettings Settings("state.ini", QSettings::IniFormat);
+  this->restoreGeometry(Settings.value("mainWindow/Geometry").toByteArray());
+  this->restoreState(Settings.value("mainWindow/State").toByteArray());
+  // dock_manager_->restoreState(
+  //     Settings.value("mainWindow/DockingState").toByteArray());
 }
 void MainWindow::updateOdomInfo(RobotState state) {
   // 转向灯
