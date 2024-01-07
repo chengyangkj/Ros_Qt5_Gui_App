@@ -28,7 +28,7 @@ private:
   void computeBoundRect(const RobotPath &path);
 
 public:
-  DisplayPath(const std::string &display_name, const int &z_value,
+  DisplayPath(const std::string &display_type, const int &z_value,
               std::string parent_name = "");
   ~DisplayPath();
   bool SetDisplayConfig(const std::string &config_name,

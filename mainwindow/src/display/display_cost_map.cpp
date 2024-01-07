@@ -11,9 +11,9 @@
 
 #include "display/display_cost_map.h"
 namespace Display {
-DisplayCostMap::DisplayCostMap(const std::string &display_name,
+DisplayCostMap::DisplayCostMap(const std::string &display_type,
                                const int &z_value, std::string parent_name)
-    : VirtualDisplay(display_name, z_value, parent_name) {
+    : VirtualDisplay(display_type, z_value, parent_name) {
   this->setCursor(*curr_cursor_);
 }
 bool DisplayCostMap::UpdateData(const std::any &data) {
@@ -25,7 +25,6 @@ bool DisplayCostMap::UpdateData(const std::any &data) {
     return false;
   }
   ParseCostMap();
-
   //绘制原点在地图中心
   SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
   update();

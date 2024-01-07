@@ -48,7 +48,6 @@ private:
   bool is_reloc_mode_{false};
   QGraphicsView *graphics_view_ptr_;
   SetPoseWidget *set_reloc_pose_widget_;
-  SetPoseWidget *set_nav_pose_widget_;
   SceneDisplay *scene_display_ptr_;
 signals:
   void cursorPosMap(QPointF);
@@ -59,11 +58,9 @@ public slots:
   void SetRelocPose();
   void AddOneNavGoal();
   void slotRobotScenePoseChanged(const RobotPose &pose);
-  void slotNavGoalScenePoseChanged(const RobotPose &pose);
   void slotSetRobotPose(const RobotPose &pose);
-  void slotSetNavPose(const RobotPose &pose);
   void UpdateTopicData(const MsgId &id, const std::any &data);
-  void FocusDisplay(const std::string &display_name);
+  void FocusDisplay(const std::string &display_type);
 
 private:
   void InitUi();
@@ -81,14 +78,14 @@ public:
   RobotPose wordPose2Map(const RobotPose &pose);
   RobotPose mapPose2Word(const RobotPose &pose);
   RobotPose scenePoseToWord(const RobotPose &pose);
-  bool UpdateDisplay(const std::string &display_name, const std::any &data);
+  bool UpdateDisplay(const std::string &display_type, const std::any &data);
   void UpdateRobotPose(const RobotPose &pose);
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
   void SetRelocMode(bool is_move);
   void SetNavGoalMode(bool is_start);
-
-  void SetFocusOn(const std::string &display_name) {
-    focus_display_ = display_name;
+  RobotPose GetRobotPose() { return robot_pose_; }
+  void SetFocusOn(const std::string &display_type) {
+    focus_display_ = display_type;
   }
 };
 

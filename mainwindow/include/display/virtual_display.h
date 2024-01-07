@@ -51,16 +51,16 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   Q_OBJECT
 
 public:
-  std::string display_name_{"null"};
+  std::string display_type_{"null"};
   QPointF pressed_pose_;
   QPointF start_pose_;
   QPointF end_pose_;
   bool is_mouse_press_;
   Qt::MouseButton pressed_button_{Qt::MouseButton::NoButton};
-  QCursor *curr_cursor_ = nullptr;
-  QCursor *move_cursor_ = nullptr;
-  QCursor *pose_cursor_ = nullptr;
-  QCursor *goal_cursor_ = nullptr;
+  std::shared_ptr<QCursor> curr_cursor_ = nullptr;
+  std::shared_ptr<QCursor> move_cursor_ = nullptr;
+  std::shared_ptr<QCursor> pose_cursor_ = nullptr;
+  std::shared_ptr<QCursor> goal_cursor_ = nullptr;
   double scale_value_ = 1;
   bool move_enable_{false};
   bool is_rotate_event_{false};
@@ -83,7 +83,7 @@ signals:
   void signalItemChange(GraphicsItemChange change, const QVariant &value);
 
 public:
-  VirtualDisplay(const std::string &display_name, const int &z_value,
+  VirtualDisplay(const std::string &display_type, const int &z_value,
                  const std::string &parent_name);
   virtual ~VirtualDisplay();
   bool UpdateDisplay(const std::any &data) { return UpdateData(data); }
@@ -111,6 +111,10 @@ public:
   }
   bool GetMoveEnable() { return move_enable_; }
   void AddChild(VirtualDisplay *child) { children_.push_back(child); }
+  void RemoveChild(VirtualDisplay *child) {
+    children_.erase(std::remove(children_.begin(), children_.end(), child),
+                    children_.end());
+  }
   std::vector<VirtualDisplay *> GetChildren() { return children_; }
   void UpdateMap(OccupancyMap map) { map_data_ = map; }
 
@@ -131,15 +135,15 @@ public:
   void SetPoseInParent(const RobotPose &pose);
   RobotPose GetCurrentScenePose() { return curr_scene_pose_; }
   RobotPose GetPoseInParent() { return pose_in_parent_; }
-  std::string GetPraentName() { return parent_name_; }
+  std::string GetParentName() { return parent_name_; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {
     setPos(pose - GetOriginPose());
   }
   void MovedBy(const qreal &x, const qreal &y);
   QRectF boundingRect() const override { return bounding_rect_; }
-  std::string GetDisplayName();
-  void SetDisplayName(const std::string &display_name);
+  std::string GetDisplayType();
+  void SetDisplayType(const std::string &display_type);
   void Update();
 
 private:

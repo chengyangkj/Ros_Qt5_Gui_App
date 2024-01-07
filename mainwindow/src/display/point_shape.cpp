@@ -14,9 +14,9 @@
 using namespace basic;
 
 namespace Display {
-PointShape::PointShape(const ePointType &type, const std::string &display_name,
+PointShape::PointShape(const ePointType &type, const std::string &display_type,
                        const int &z_value, std::string parent_name)
-    : VirtualDisplay(display_name, z_value, parent_name), type_(type) {
+    : VirtualDisplay(display_type, z_value, parent_name), type_(type) {
   SetRotateEnable(true);
   SetScaleEnable(false);
   moveBy(0, 0);
@@ -51,7 +51,6 @@ QVariant PointShape::itemChange(GraphicsItemChange change,
   case ItemPositionHasChanged:
     curr_scene_pose_ = RobotPose(scenePos().x(), scenePos().y(),
                                  normalize(robot_pose_.theta + rotate_value_));
-    std::cout << "current pose:" << curr_scene_pose_ << std::endl;
     emit signalPoseUpdate(curr_scene_pose_);
     break;
   // case ItemTransformHasChanged:
@@ -102,6 +101,8 @@ void PointShape::paint(QPainter *painter,
   static double last_rotate_value = rotate_value_;
 
   if (fabs(rotate_value_ - last_rotate_value) > deg2rad(0.1)) {
+    curr_scene_pose_ = RobotPose(scenePos().x(), scenePos().y(),
+                                 normalize(robot_pose_.theta + rotate_value_));
     emit signalPoseUpdate(
         RobotPose(scenePos().x(), scenePos().y(),
                   normalize(robot_pose_.theta + rotate_value_)));

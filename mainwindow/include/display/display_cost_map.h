@@ -14,7 +14,7 @@ class DisplayCostMap : public VirtualDisplay {
 private:
   /* data */
 public:
-  DisplayCostMap(const std::string &display_name, const int &z_value,
+  DisplayCostMap(const std::string &display_type, const int &z_value,
                  std::string parent_name = "");
   ~DisplayCostMap() = default;
   bool UpdateData(const std::any &data) override;

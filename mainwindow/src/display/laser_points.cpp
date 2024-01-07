@@ -8,9 +8,9 @@
  */
 #include "display/laser_points.h"
 namespace Display {
-LaserPoints::LaserPoints(const std::string &display_name, const int &z_value,
+LaserPoints::LaserPoints(const std::string &display_type, const int &z_value,
                          std::string parent_name)
-    : VirtualDisplay(display_name, z_value, parent_name) {}
+    : VirtualDisplay(display_type, z_value, parent_name) {}
 void LaserPoints::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
@@ -48,7 +48,7 @@ void LaserPoints::computeBoundRect(
   }
   // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
   //           << "ymin:" << ymin << std::endl;
-  SetBoundingRect(QRectF(xmin, ymin, xmax, ymax));
+  SetBoundingRect(QRectF(0, 0, xmax, ymax));
 }
 bool LaserPoints::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {

@@ -1,5 +1,6 @@
 #pragma once
 #include "display/point_shape.h"
+#include "widgets/nav_goal_widget.h"
 #include "widgets/set_pose_widget.h"
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
@@ -13,7 +14,7 @@ private:
   QGraphicsView *view_ptr_;
   Display::VirtualDisplay *curr_handle_display_{nullptr};
   DisplayManager *display_manager_;
-
+  NavGoalWidget *nav_goal_widget_;
 public:
   SceneDisplay(QObject *parent = nullptr);
   virtual ~SceneDisplay() = default;
