@@ -7,7 +7,7 @@
  * @Description: ros2通讯类
  */
 #include "rclcomm.h"
-#include "config/configManager.h"
+#include "config/config_manager.h"
 #include "logger/logger.h"
 #include <fstream>
 rclcomm::rclcomm() {

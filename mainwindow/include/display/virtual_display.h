@@ -77,6 +77,7 @@ public:
   VirtualDisplay *parent_ptr_;
   std::vector<VirtualDisplay *> children_;
   bool is_moving_{false};
+  std::string display_name_;
 signals:
   void signalCursorPose(QPointF pose);
   void signalPoseUpdate(const RobotPose &pose);
@@ -136,6 +137,8 @@ public:
   RobotPose GetCurrentScenePose() { return curr_scene_pose_; }
   RobotPose GetPoseInParent() { return pose_in_parent_; }
   std::string GetParentName() { return parent_name_; }
+  std::string GetDisplayName() { return display_name_; }
+  void SetDisplayName(const std::string &name) { display_name_ = name; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {
     setPos(pose - GetOriginPose());

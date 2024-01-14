@@ -74,7 +74,7 @@
 # 一,环境安装 
 
 ```
-sudo apt-get install qtbase5-private-dev
+sudo apt-get install qtbase5-private-dev libgtest-dev -y
 ```
 
 # 二,编译

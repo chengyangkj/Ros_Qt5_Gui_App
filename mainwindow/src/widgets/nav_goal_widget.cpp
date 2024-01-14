@@ -6,6 +6,15 @@
 NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   QVBoxLayout *layout = new QVBoxLayout(this);
   layout->setSpacing(0);
+  QHBoxLayout *layout_name = new QHBoxLayout();
+  layout_name->setSpacing(0);
+  QLabel *label_name = new QLabel("Name:");
+  label_name->setMinimumSize(15, 30);
+  lineEdit_name_ = new QLineEdit();
+  layout_name->addWidget(label_name);
+  layout_name->addWidget(lineEdit_name_);
+  layout->addLayout(layout_name);
+
   QHBoxLayout *layout_x = new QHBoxLayout();
   layout_x->setSpacing(0);
   QLabel *label_x = new QLabel("X:");
@@ -34,12 +43,13 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   spinBox_theta_->setSingleStep(1);
   layout_z->addWidget(label_z);
   layout_z->addWidget(spinBox_theta_);
+  label_z->setMinimumSize(15, 30);
   label_z->setMaximumSize(40, 30);
   QVBoxLayout *layout_button = new QVBoxLayout();
   layout_button->setSpacing(0);
   QPushButton *button_send = new QPushButton("Move");
-  QPushButton *button_remove = new QPushButton("Remove");
-  QPushButton *button_cancel = new QPushButton("Cancel");
+  QPushButton *button_remove = new QPushButton("Delete");
+  QPushButton *button_cancel = new QPushButton("Close");
   layout_button->addWidget(button_send);
   layout_button->addWidget(button_remove);
   layout_button->addWidget(button_cancel);
@@ -75,14 +85,14 @@ void NavGoalWidget::SlotUpdateValue(double value) {
   emit SignalPoseChanged(RobotPose(spinBox_x_->value(), spinBox_y_->value(),
                                    deg2rad(spinBox_theta_->value())));
 }
-void NavGoalWidget::SetPose(const RobotPose &pose) {
+void NavGoalWidget::SetPose(const PointInfo &info) {
   spinBox_x_->blockSignals(true);
   spinBox_y_->blockSignals(true);
   spinBox_theta_->blockSignals(true);
-  spinBox_x_->setValue(pose.x);
-  spinBox_y_->setValue(pose.y);
-  spinBox_theta_->setValue(rad2deg(pose.theta));
-
+  spinBox_x_->setValue(info.pose.x);
+  spinBox_y_->setValue(info.pose.y);
+  spinBox_theta_->setValue(rad2deg(info.pose.theta));
+  lineEdit_name_->setText(info.name);
   spinBox_x_->blockSignals(false);
   spinBox_y_->blockSignals(false);
   spinBox_theta_->blockSignals(false);

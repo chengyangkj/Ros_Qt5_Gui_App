@@ -23,9 +23,9 @@ bool FactoryDisplay::Init(QGraphicsView *viewer, SceneDisplay *scene_ptr) {
 FactoryDisplay::FactoryDisplay() {}
 FactoryDisplay::~FactoryDisplay() { run_flag_ = false; }
 // 获取图层
-VirtualDisplay *FactoryDisplay::GetDisplay(const std::string &display_type) {
-  if (total_display_map_.count(display_type) != 0) {
-    return total_display_map_[display_type];
+VirtualDisplay *FactoryDisplay::GetDisplay(const std::string &display_name) {
+  if (total_display_map_.count(display_name) != 0) {
+    return total_display_map_[display_name];
   }
   return nullptr;
 }
@@ -45,27 +45,27 @@ void FactoryDisplay::RemoveDisplay(VirtualDisplay *display) {
   }
 } // namespace Display
 // 设置图层的scene坐标
-bool FactoryDisplay::SetDisplayScenePose(const std::string &display_type,
+bool FactoryDisplay::SetDisplayScenePose(const std::string &display_name,
                                          const QPointF &pose) {
-  VirtualDisplay *display = GetDisplay(display_type);
+  VirtualDisplay *display = GetDisplay(display_name);
   if (display == nullptr)
     return false;
   display->setPos(pose);
   return true;
 }
 // 设置图层的scene坐标
-bool FactoryDisplay::SetDisplayPoseInParent(const std::string &display_type,
+bool FactoryDisplay::SetDisplayPoseInParent(const std::string &display_name,
                                             const RobotPose &pose) {
-  VirtualDisplay *display = GetDisplay(display_type);
+  VirtualDisplay *display = GetDisplay(display_name);
   if (display == nullptr)
     return false;
   display->SetPoseInParent(pose);
   return true;
 }
 // 设置图层放大缩小
-bool FactoryDisplay::SetDisplayScaled(const std::string &display_type,
+bool FactoryDisplay::SetDisplayScaled(const std::string &display_name,
                                       const double &value) {
-  VirtualDisplay *display = GetDisplay(display_type);
+  VirtualDisplay *display = GetDisplay(display_name);
   if (display == nullptr)
     return false;
   display->SetScaled(value);
@@ -73,26 +73,24 @@ bool FactoryDisplay::SetDisplayScaled(const std::string &display_type,
 }
 void FactoryDisplay::AddDisplay(VirtualDisplay *display,
                                 const std::string &parent_name) {
-  if (total_display_map_.count(display->GetDisplayType()) != 0) {
-    total_display_map_
-        [display->GetDisplayType() + ":" +
-         std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::system_clock::now().time_since_epoch())
-                            .count())] = display;
-  } else {
-    total_display_map_[display->GetDisplayType()] = display;
+  if (total_display_map_.count(display->GetDisplayName()) != 0) {
+    std::cout << "display name:" << display->GetDisplayName()
+              << " already exist" << std::endl;
+    return;
   }
+
+  total_display_map_[display->GetDisplayType()] = display;
+
   if (!parent_name.empty()) {
     auto parent_ptr = GetDisplay(parent_name);
     parent_ptr->AddChild(display);
-    // display->setParent(parent_ptr);
   }
 
   scene_display_ptr_->addItem(display);
 }
-void FactoryDisplay::FocusDisplay(const std::string &display_type) {
+void FactoryDisplay::FocusDisplay(const std::string &display_name) {
 
-  focus_display_type_ = display_type;
+  focus_display_name_ = display_name;
 }
 void FactoryDisplay::RemoveDisplay(const std::string &name) {
   auto iter = total_display_map_.find(name);
@@ -111,17 +109,17 @@ std::map<std::string, VirtualDisplay *> FactoryDisplay::GetTotalDisplayMap() {
   return total_display_map_;
 }
 // 设置响应鼠标事件的图层
-bool FactoryDisplay::SetMoveEnable(const std::string &display_type,
+bool FactoryDisplay::SetMoveEnable(const std::string &display_name,
                                    bool enable) {
-  if (total_display_map_.count(display_type) != 0) {
-    total_display_map_[display_type]->SetMoveEnable(enable);
+  if (total_display_map_.count(display_name) != 0) {
+    total_display_map_[display_name]->SetMoveEnable(enable);
     return true;
   }
   return false;
 }
-bool FactoryDisplay::GetMoveEnable(const std::string &display_type) {
-  if (total_display_map_.count(display_type) != 0) {
-    return total_display_map_[display_type]->GetMoveEnable();
+bool FactoryDisplay::GetMoveEnable(const std::string &display_name) {
+  if (total_display_map_.count(display_name) != 0) {
+    return total_display_map_[display_name]->GetMoveEnable();
   }
   return false;
 }
@@ -132,7 +130,7 @@ bool FactoryDisplay::GetMoveEnable(const std::string &display_type) {
  */
 void FactoryDisplay::Process() {
   // focus on
-  auto display = GetDisplay(focus_display_type_);
+  auto display = GetDisplay(focus_display_name_);
   if (display != nullptr) {
     viewer_ptr_->centerOn(display);
   }

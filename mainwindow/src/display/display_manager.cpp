@@ -25,8 +25,8 @@ DisplayManager::DisplayManager() {
   (new DisplayCostMap(DISPLAY_GLOBAL_COST_MAP, 2, DISPLAY_MAP));
 
   (new DisplayCostMap(DISPLAY_LOCAL_COST_MAP, 3, DISPLAY_MAP));
-  (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7,
-                  DISPLAY_MAP))
+  (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, DISPLAY_ROBOT,
+                  7, DISPLAY_MAP))
       ->SetRotateEnable(true);
   new LaserPoints(DISPLAY_LASER, 2, DISPLAY_MAP);
   new DisplayPath(DISPLAY_GLOBAL_PATH, 6, DISPLAY_MAP);

@@ -15,8 +15,8 @@ void SceneDisplay::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   nav_goal_widget_->hide();
 }
 void SceneDisplay::AddOneNavGoal() {
-  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8,
-                  DISPLAY_MAP))
+  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, DISPLAY_GOAL,
+                  8, DISPLAY_MAP))
       ->SetRotateEnable(true)
       ->SetMoveEnable(true)
       ->setVisible(true);
@@ -32,23 +32,15 @@ void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     std::string display_type = display->GetDisplayType();
     if (display_type == DISPLAY_GOAL) {
       curr_handle_display_ = display;
-
-      //设置初始目标点位置（车头前方1m）
-      // display->SetMoveEnable(false);
-      // display->UpdateDisplay(display_manager_->wordPose2Map(
-      //     absoluteSum(display_manager_->GetRobotPose(), RobotPose(1, 0,
-      //     0))));
-      // enable move after 300ms
-      // QTimer::singleShot(300,
-      //                    [this, display]() { display->SetMoveEnable(true);
-      //                    });
       //窗体初始化
       QPointF view_pos =
           view_ptr_->mapFromScene(curr_handle_display_->scenePos());
       nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
       nav_goal_widget_->show();
-      nav_goal_widget_->SetPose(
-          display_manager_->scenePoseToWord(display->GetCurrentScenePose()));
+      nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
+          .pose =
+              display_manager_->scenePoseToWord(display->GetCurrentScenePose()),
+          .name = "test"});
       nav_goal_widget_->disconnect();
 
       connect(nav_goal_widget_, &NavGoalWidget::SignalHandleOver,
@@ -98,8 +90,10 @@ void SceneDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
           view_ptr_->mapFromScene(curr_handle_display_->scenePos());
       nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
       nav_goal_widget_->show();
-      nav_goal_widget_->SetPose(display_manager_->scenePoseToWord(
-          curr_handle_display_->GetCurrentScenePose()));
+      nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
+          .pose = display_manager_->scenePoseToWord(
+              curr_handle_display_->GetCurrentScenePose()),
+          .name = "test"});
     }
   }
 

@@ -5,7 +5,8 @@ namespace Display {
 VirtualDisplay::VirtualDisplay(const std::string &display_type,
                                const int &z_value,
                                const std::string &parent_name)
-    : display_type_(display_type), parent_name_(parent_name) {
+    : display_type_(display_type), display_name_(display_type),
+      parent_name_(parent_name) {
   FactoryDisplay::Instance()->AddDisplay(this, parent_name);
   parent_ptr_ = FactoryDisplay::Instance()->GetDisplay(parent_name_);
   if (parent_ptr_ != nullptr) {

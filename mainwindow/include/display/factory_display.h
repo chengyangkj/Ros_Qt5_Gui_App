@@ -17,22 +17,22 @@ public:
   ~FactoryDisplay();
   bool Init(QGraphicsView *viewer, SceneDisplay *scene_ptr);
   // 获取图层
-  VirtualDisplay *GetDisplay(const std::string &display_type);
+  VirtualDisplay *GetDisplay(const std::string &display_name);
   // 设置图层的scene坐标
-  bool SetDisplayScenePose(const std::string &display_type,
+  bool SetDisplayScenePose(const std::string &display_name,
                            const QPointF &pose);
   // 设置图层放大缩小
-  bool SetDisplayScaled(const std::string &display_type, const double &value);
+  bool SetDisplayScaled(const std::string &display_name, const double &value);
   void AddDisplay(VirtualDisplay *display, const std::string &parent_name);
-  void FocusDisplay(const std::string &display_type);
+  void FocusDisplay(const std::string &display_name);
   void RemoveDisplay(const std::string &name);
   void RemoveDisplay(VirtualDisplay *display);
   int GetDisplaySize();
   std::map<std::string, VirtualDisplay *> GetTotalDisplayMap();
   // 设置响应鼠标事件的图层
-  bool SetMoveEnable(const std::string &display_type, bool enable = true);
-  bool GetMoveEnable(const std::string &display_type);
-  bool SetDisplayPoseInParent(const std::string &display_type,
+  bool SetMoveEnable(const std::string &display_name, bool enable = true);
+  bool GetMoveEnable(const std::string &display_name);
+  bool SetDisplayPoseInParent(const std::string &display_name,
                               const RobotPose &pose);
 
 private slots:
@@ -46,6 +46,6 @@ private:
   bool initlizated_ = false;
   QGraphicsView *viewer_ptr_;
   std::atomic_bool run_flag_ = false;
-  std::string focus_display_type_ = "";
+  std::string focus_display_name_ = "";
 };
 } // namespace Display
