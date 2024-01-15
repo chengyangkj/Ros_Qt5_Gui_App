@@ -15,7 +15,7 @@ class DisplayOccMap : public VirtualDisplay {
 private:
   /* data */
 public:
-  DisplayOccMap(const std::string &display_name, const int &z_value,
+  DisplayOccMap(const std::string &display_type, const int &z_value,
                 std::string parent_name = "");
   ~DisplayOccMap() = default;
   bool UpdateData(const std::any &data) override;

@@ -1,6 +1,6 @@
 
-#include "display/factory_display.h"
-#include "display/display_manager.h";
+#include "display//manager/display_factory.h"
+#include "display/manager/display_manager.h";
 #include "logger/logger.h"
 namespace Display {
 
@@ -29,6 +29,21 @@ VirtualDisplay *FactoryDisplay::GetDisplay(const std::string &display_name) {
   }
   return nullptr;
 }
+void FactoryDisplay::RemoveDisplay(VirtualDisplay *display) {
+  auto find_iter = std::find_if(
+      total_display_map_.begin(), total_display_map_.end(),
+      [display](std::pair<std::string, VirtualDisplay *> pair) -> bool {
+        return pair.second == display;
+      });
+  if (find_iter != total_display_map_.end()) {
+    total_display_map_.erase(find_iter);
+  }
+  auto parent_ptr_ =
+      FactoryDisplay::Instance()->GetDisplay(display->GetParentName());
+  if (parent_ptr_ != nullptr) {
+    parent_ptr_->RemoveChild(display);
+  }
+} // namespace Display
 // 设置图层的scene坐标
 bool FactoryDisplay::SetDisplayScenePose(const std::string &display_name,
                                          const QPointF &pose) {
@@ -58,15 +73,19 @@ bool FactoryDisplay::SetDisplayScaled(const std::string &display_name,
 }
 void FactoryDisplay::AddDisplay(VirtualDisplay *display,
                                 const std::string &parent_name) {
-  // if (total_display_map_.count(display->GetDisplayName()) != 0)
-  //   return;
-  // add group
+  if (total_display_map_.count(display->GetDisplayName()) != 0) {
+    std::cout << "display name:" << display->GetDisplayName()
+              << " already exist" << std::endl;
+    return;
+  }
+
+  total_display_map_[display->GetDisplayType()] = display;
+
   if (!parent_name.empty()) {
     auto parent_ptr = GetDisplay(parent_name);
     parent_ptr->AddChild(display);
-    // display->setParent(parent_ptr);
   }
-  total_display_map_[display->GetDisplayName()] = display;
+
   scene_display_ptr_->addItem(display);
 }
 void FactoryDisplay::FocusDisplay(const std::string &display_name) {

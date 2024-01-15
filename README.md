@@ -21,7 +21,29 @@
 
 软件在编译时会自动识别环境变量中的ROS1/ROS2环境并进行构建，实现ROS通信与界面隔离
 
-软件所有功能均为自行绘制实现,因此可以轻松运行在一些性能比较低的边缘设备,后续功能不断完善中......
+软件所有功能均为自行绘制实现,因此可以轻松运行在一些性能比较低的边缘设备,
+
+目前软件可以实现:
+
+  - 1,ROS1/ROS2通信
+  - 2,全局地图显示
+  - 3,全局/局部代价地图显示
+  - 4,机器人实时位置显示
+  - 5,机器人实时速度显示 
+  - 6,机器人手动控制
+  - 7,机器人重定位
+  - 8,机器人导航单点目标发布
+  - 9,机器人全局/局部规划轨迹显示
+  
+已规划未实现(TODO List):
+
+  - 1,机器地图编辑器功能
+  - 2,机器人多点导航
+  - 3,机器人导航任务链
+  - 4,基于protobuf的通信channel实现(制定自定义通信协议,彻底摆脱ROS通信机制,实现软件跨平台运行)
+  - 5,鹰眼视图
+
+后续功能不断完善中......
 
 ![image.png](./doc/images/main.png)
 
@@ -52,7 +74,7 @@
 # 一,环境安装 
 
 ```
-sudo apt-get install qtbase5-private-dev
+sudo apt-get install qtbase5-private-dev libgtest-dev -y
 ```
 
 # 二,编译
@@ -183,7 +205,7 @@ Topic=/move_base_simple/goal
 
 软件支持发布实时速度到底盘:
 
-[!image.png(./doc/images/manual_control.jpg)]
+![image.png](./doc/images/manual_control.jpg)
 
 对应按钮上的文字，可以由键盘对应按钮同步调用
 
@@ -200,7 +222,7 @@ Topic=/cmd_vel
 
 软件支持实时显示机器人速度:
 
-[!image.png(./doc/images/speed_dashboard.jpg)]
+![image.png](./doc/images/speed_dashboard.jpg)
 
 注意:如果设置无效,需要检查config.ini中设置：
 

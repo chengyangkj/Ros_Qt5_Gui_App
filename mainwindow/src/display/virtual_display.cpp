@@ -1,11 +1,12 @@
 #include "algorithm.h"
-#include "display/factory_display.h"
+#include "display/manager/display_factory.h"
 namespace Display {
 
-VirtualDisplay::VirtualDisplay(const std::string &display_name,
+VirtualDisplay::VirtualDisplay(const std::string &display_type,
                                const int &z_value,
                                const std::string &parent_name)
-    : display_name_(display_name), parent_name_(parent_name) {
+    : display_type_(display_type), display_name_(display_type),
+      parent_name_(parent_name) {
   FactoryDisplay::Instance()->AddDisplay(this, parent_name);
   parent_ptr_ = FactoryDisplay::Instance()->GetDisplay(parent_name_);
   if (parent_ptr_ != nullptr) {
@@ -14,9 +15,6 @@ VirtualDisplay::VirtualDisplay(const std::string &display_name,
             this, SLOT(parentItemChange(GraphicsItemChange, const QVariant &)));
   }
   this->setZValue(z_value);
-  pose_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
-  goal_cursor_ = new QCursor(QPixmap("://images/cursor_pos.png"), 0, 0);
-  move_cursor_ = new QCursor(QPixmap("://images/cursor_move.png"), 0, 0);
   transform_ = this->transform();
 }
 QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
@@ -32,24 +30,7 @@ void VirtualDisplay::parentItemChange(GraphicsItemChange change,
     break;
   }
 }
-VirtualDisplay::~VirtualDisplay() {
-  if (pose_cursor_ != nullptr) {
-    delete pose_cursor_;
-    pose_cursor_ = nullptr;
-  }
-  if (goal_cursor_ != nullptr) {
-    delete goal_cursor_;
-    goal_cursor_ = nullptr;
-  }
-  if (move_cursor_ != nullptr) {
-    delete move_cursor_;
-    move_cursor_ = nullptr;
-  }
-  if (curr_cursor_ != nullptr) {
-    delete curr_cursor_;
-    curr_cursor_ = nullptr;
-  }
-}
+VirtualDisplay::~VirtualDisplay() {}
 void VirtualDisplay::SetPoseInParent(const RobotPose &pose) {
   pose_in_parent_ = pose;
   if (parent_ptr_ == nullptr)
@@ -90,9 +71,9 @@ bool VirtualDisplay::SetRotate(const double &value) {
 }
 
 void VirtualDisplay::Update() { update(); }
-std::string VirtualDisplay::GetDisplayName() { return display_name_; }
-void VirtualDisplay::SetDisplayName(const std::string &display_name) {
-  display_name_ = display_name;
+std::string VirtualDisplay::GetDisplayType() { return display_type_; }
+void VirtualDisplay::SetDisplayType(const std::string &display_type) {
+  display_type_ = display_type;
 }
 void VirtualDisplay::MovedBy(const qreal &x, const qreal &y) {
   moveBy(x, y);
@@ -114,8 +95,6 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
   }
   if (!enable_scale_)
     return;
-
-  this->setCursor(Qt::CrossCursor);
   double beforeScaleValue = scale_value_;
   if (event->delta() > 0) {
     //  qDebug()<<"放大";
@@ -144,10 +123,8 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     return;
   }
   if (pressed_button_ == Qt::LeftButton) {
-    if (curr_cursor_ == move_cursor_) {
-      QPointF point = (event->pos() - pressed_pose_) * scale_value_;
-      MovedBy(point.x(), point.y());
-    }
+    QPointF point = (event->pos() - pressed_pose_) * scale_value_;
+    MovedBy(point.x(), point.y());
     end_pose_ = event->pos();
   }
   ////////////////////////// 右健旋转
@@ -200,8 +177,6 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
     is_mouse_press_ = true;
     start_pose_ = event->pos();
-    curr_cursor_ = move_cursor_;
-    this->setCursor(*curr_cursor_);
   } else if (event->button() == Qt::RightButton) {
     is_rotate_event_ = true;
   }
@@ -218,16 +193,6 @@ void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     pressed_pose_ = QPointF();
     is_mouse_press_ = false;
-    if (curr_cursor_ == pose_cursor_) {
-      curr_cursor_ = move_cursor_;
-      this->setCursor(*curr_cursor_);
-    } else if (curr_cursor_ == goal_cursor_) {
-      curr_cursor_ = move_cursor_;
-      this->setCursor(*curr_cursor_);
-    } else if (curr_cursor_ == move_cursor_) {
-      curr_cursor_ = move_cursor_;
-      this->setCursor(*curr_cursor_);
-    }
     start_pose_ = QPointF();
     end_pose_ = QPointF();
   }

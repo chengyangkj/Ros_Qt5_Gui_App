@@ -12,7 +12,7 @@ class LaserPoints : public VirtualDisplay {
 public:
   QColor laser_color_;
   std::map<int, std::vector<Point>> laser_data_scene_;
-  LaserPoints(const std::string &display_name, const int &z_value,
+  LaserPoints(const std::string &display_type, const int &z_value,
               std::string parent_name = "");
   ~LaserPoints();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

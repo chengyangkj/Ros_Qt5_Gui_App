@@ -36,7 +36,7 @@ ToolsBarWidget::ToolsBarWidget(QWidget *parent) : QWidget(parent) {
   horizontalLayout_tools->addWidget(set_pos_btn);
 
   QPushButton *set_goal_btn = new QPushButton();
-  set_goal_btn->setText("Set Nav Goal(导航到目标点)");
+  set_goal_btn->setText("Add Nav Goal(添加导航点)");
   set_goal_btn->setObjectName(QString::fromUtf8(" set_goal_btn"));
   set_goal_btn->setMinimumSize(QSize(0, 25));
   set_goal_btn->setStyleSheet(

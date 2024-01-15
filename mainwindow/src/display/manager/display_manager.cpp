@@ -2,7 +2,7 @@
 // 2, 图层坐标系 每个图层的单独坐标系
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
-#include "display/display_manager.h"
+#include "display/manager/display_manager.h"
 #include "algorithm.h"
 #include "logger/logger.h"
 #include <Eigen/Eigen>
@@ -12,9 +12,11 @@
 namespace Display {
 
 DisplayManager::DisplayManager() {
-  graphics_view_ptr_ = new QGraphicsView();
+  graphics_view_ptr_ = new ViewManager();
   scene_display_ptr_ = new SceneDisplay();
   scene_display_ptr_->Init(graphics_view_ptr_, this);
+  // 设置绘制区域
+  graphics_view_ptr_->setSceneRect(QRectF(0, 0, 800, 800));
   FactoryDisplay::Instance()->Init(graphics_view_ptr_, scene_display_ptr_);
 
   //------------------------------------start display instace (register
@@ -23,14 +25,9 @@ DisplayManager::DisplayManager() {
   (new DisplayCostMap(DISPLAY_GLOBAL_COST_MAP, 2, DISPLAY_MAP));
 
   (new DisplayCostMap(DISPLAY_LOCAL_COST_MAP, 3, DISPLAY_MAP));
-  (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, 7,
-                  DISPLAY_MAP))
+  (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, DISPLAY_ROBOT,
+                  7, DISPLAY_MAP))
       ->SetRotateEnable(true);
-  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, 8,
-                  DISPLAY_MAP))
-      ->SetRotateEnable(true)
-      ->SetMoveEnable(true)
-      ->setVisible(false);
   new LaserPoints(DISPLAY_LASER, 2, DISPLAY_MAP);
   new DisplayPath(DISPLAY_GLOBAL_PATH, 6, DISPLAY_MAP);
   new DisplayPath(DISPLAY_LOCAL_PATH, 6, DISPLAY_MAP);
@@ -45,8 +42,6 @@ DisplayManager::DisplayManager() {
   connect(GetDisplay(DISPLAY_ROBOT),
           SIGNAL(signalPoseUpdate(const RobotPose &)), this,
           SLOT(slotRobotScenePoseChanged(const RobotPose &)));
-  connect(GetDisplay(DISPLAY_GOAL), SIGNAL(signalPoseUpdate(const RobotPose &)),
-          this, SLOT(slotNavGoalScenePoseChanged(const RobotPose &)));
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
@@ -62,14 +57,7 @@ void DisplayManager::slotSetRobotPose(const RobotPose &pose) {
     FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, true);
   });
 }
-void DisplayManager::slotSetNavPose(const RobotPose &pose) {
-  FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, false);
-  GetDisplay(DISPLAY_GOAL)->UpdateDisplay(wordPose2Map(pose));
-  // enable move after 300ms
-  QTimer::singleShot(300, [this]() {
-    FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_GOAL, true);
-  });
-}
+
 void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
   if (is_reloc_mode_) {
     QPointF occ_pose =
@@ -87,19 +75,6 @@ void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
   }
 }
-void DisplayManager::slotNavGoalScenePoseChanged(const RobotPose &pose) {
-  QPointF occ_pose =
-      GetDisplay(DISPLAY_MAP)->mapFromScene(QPointF(pose.x, pose.y));
-  double x, y;
-  map_data_.ScenePose2xy(occ_pose.x(), occ_pose.y(), x, y);
-  robot_pose_goal_.x = x;
-  robot_pose_goal_.y = y;
-  robot_pose_goal_.theta = pose.theta;
-  QPointF view_pos = graphics_view_ptr_->mapFromScene(QPointF(pose.x, pose.y));
-  set_nav_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
-  set_nav_pose_widget_->SetPose(RobotPose(
-      robot_pose_goal_.x, robot_pose_goal_.y, robot_pose_goal_.theta));
-}
 void DisplayManager::InitUi() {
   set_reloc_pose_widget_ = new SetPoseWidget(graphics_view_ptr_);
   set_reloc_pose_widget_->hide();
@@ -112,18 +87,6 @@ void DisplayManager::InitUi() {
           });
   connect(set_reloc_pose_widget_, SIGNAL(SignalPoseChanged(const RobotPose &)),
           this, SLOT(slotSetRobotPose(const RobotPose &)));
-
-  set_nav_pose_widget_ = new SetPoseWidget(graphics_view_ptr_);
-  set_nav_pose_widget_->hide();
-  connect(set_nav_pose_widget_, &SetPoseWidget::SignalHandleOver,
-          [this](const bool &is_submit, const RobotPose &pose) {
-            SetNavGoalMode(false);
-            if (is_submit) {
-              emit signalPub2DGoal(pose);
-            }
-          });
-  connect(set_nav_pose_widget_, SIGNAL(SignalPoseChanged(const RobotPose &)),
-          this, SLOT(slotSetNavPose(const RobotPose &)));
 }
 DisplayManager::~DisplayManager() {}
 
@@ -151,31 +114,32 @@ bool DisplayManager::SetDisplayConfig(const std::string &config_name,
   }
   return display->SetDisplayConfig(config_list[1].toStdString(), data);
 }
-bool DisplayManager::UpdateDisplay(const std::string &display_name,
+bool DisplayManager::UpdateDisplay(const std::string &display_type,
                                    const std::any &data) {
-  // std::cout << "update display:" << display_name << std::endl;/
-  VirtualDisplay *display = GetDisplay(display_name);
+  // std::cout << "update display:" << display_type << std::endl;/
+  VirtualDisplay *display = GetDisplay(display_type);
   if (!display) {
-    // std::cout << "error current display not find on update:" << display_name
+    // std::cout << "error current display not find on update:" << display_type
     //           << std::endl;
     return false;
   }
-  if (display_name == DISPLAY_MAP) {
+  if (display_type == DISPLAY_MAP) {
     display->UpdateDisplay(data);
     GetAnyData(OccupancyMap, data, map_data_);
-
+    graphics_view_ptr_->setSceneRect(
+        QRectF(0, 0, map_data_.width(), map_data_.height()));
     // 所有图层更新地图数据
     for (auto [name, display] :
          FactoryDisplay::Instance()->GetTotalDisplayMap()) {
       display->UpdateMap(map_data_);
     }
-  } else if (display_name == DISPLAY_ROBOT) {
+  } else if (display_type == DISPLAY_ROBOT) {
     //重定位时屏蔽位置更新
     if (!is_reloc_mode_) {
       GetAnyData(RobotPose, data, robot_pose_);
       UpdateRobotPose(robot_pose_);
     }
-  } else if (display_name == DISPLAY_LASER) {
+  } else if (display_type == DISPLAY_LASER) {
     LaserScan laser_scan;
     GetAnyData(LaserScan, data, laser_scan)
         // 点坐标转换为图元坐标系下
@@ -183,8 +147,8 @@ bool DisplayManager::UpdateDisplay(const std::string &display_name,
         laser_scan.data = transLaserPoint(laser_scan.data);
 
     display->UpdateDisplay(laser_scan);
-  } else if (display_name == DISPLAY_GLOBAL_PATH ||
-             display_name == DISPLAY_LOCAL_PATH) {
+  } else if (display_type == DISPLAY_GLOBAL_PATH ||
+             display_type == DISPLAY_LOCAL_PATH) {
     // 激光坐标转换为地图的图元坐标
     RobotPath path_data;
     RobotPath path_data_trans;
@@ -250,24 +214,8 @@ void DisplayManager::SetRelocMode(bool is_start) {
   }
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, is_start);
 }
-void DisplayManager::SetNavGoalMode(bool is_start) {
-  if (is_start) {
-    slotSetNavPose(absoluteSum(robot_pose_, RobotPose(1, 0, 0)));
-    GetDisplay(DISPLAY_GOAL)->setVisible(true);
-    GetDisplay(DISPLAY_GOAL)->SetMoveEnable(true);
-    set_nav_pose_widget_->show();
-    auto current_scene = GetDisplay(DISPLAY_GOAL)->scenePos();
-    QPointF view_pos = graphics_view_ptr_->mapFromScene(current_scene);
-    set_nav_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
-    FocusDisplay(DISPLAY_GOAL);
-    QTimer::singleShot(100, this, [=]() { FocusDisplay(""); });
-  } else {
-    GetDisplay(DISPLAY_GOAL)->setVisible(false);
-    set_nav_pose_widget_->hide();
-  }
-}
-void DisplayManager::FocusDisplay(const std::string &display_name) {
-  FactoryDisplay::Instance()->FocusDisplay(display_name);
+void DisplayManager::FocusDisplay(const std::string &display_type) {
+  FactoryDisplay::Instance()->FocusDisplay(display_type);
 }
 
 /**
@@ -331,7 +279,6 @@ RobotPose DisplayManager::scenePoseToWord(const RobotPose &pose) {
   QPointF pose_map = FactoryDisplay::Instance()
                          ->GetDisplay(DISPLAY_MAP)
                          ->mapFromScene(QPointF(pose.x, pose.y));
-  std::cout << "pose map:" << RobotPose(pose_map.x(), pose_map.y(), pose.theta);
   return mapPose2Word(RobotPose(pose_map.x(), pose_map.y(), pose.theta));
 }
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
@@ -342,11 +289,6 @@ void DisplayManager::SetRelocPose() {
     SetRelocMode(true);
   }
 }
-void DisplayManager::AddOneNavGoal() {
-  // if (!set_nav_pose_widget_->isVisible()) {
-  //   SetNavGoalMode(true);
-  // }
-  scene_display_ptr_->AddOneNavGoal();
-}
+void DisplayManager::AddOneNavPoint() { scene_display_ptr_->AddOneNavPoint(); }
 
 } // namespace Display

@@ -11,10 +11,9 @@
 
 #include "display/display_occ_map.h"
 namespace Display {
-DisplayOccMap::DisplayOccMap(const std::string &display_name,
+DisplayOccMap::DisplayOccMap(const std::string &display_type,
                              const int &z_value, std::string parent_name)
-    : VirtualDisplay(display_name, z_value, parent_name) {
-  this->setCursor(*curr_cursor_);
+    : VirtualDisplay(display_type, z_value, parent_name) {
   SetMoveEnable(true);
 }
 bool DisplayOccMap::UpdateData(const std::any &data) {
@@ -29,9 +28,10 @@ bool DisplayOccMap::UpdateData(const std::any &data) {
   }
 
   ParseOccupyMap();
-  //绘制原点在地图中心
   SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
   update();
+  // std::cout << "map update calling:" << map_image_.width() << " "
+  //           << map_image_.height() << std::endl;
   return true;
 }
 bool DisplayOccMap::SetDisplayConfig(const std::string &config_name,
@@ -73,9 +73,7 @@ void DisplayOccMap::paint(QPainter *painter,
   //   draw_x = top_left_x;
   //   draw_y = top_left_y;
   // }
-  //以图片中心做原点进行绘制(方便旋转)
   painter->drawImage(0, 0, map_image_);
-  // std::cout << "map painter event" << std::endl;
 }
 void DisplayOccMap::ParseOccupyMap() {
   // Eigen::matrix 坐标系与QImage坐标系不同,这里行列反着遍历

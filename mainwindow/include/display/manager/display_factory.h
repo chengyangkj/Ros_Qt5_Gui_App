@@ -1,5 +1,5 @@
 #pragma once
-#include "display/scene_display.h"
+#include "display/manager/scene_manager.h"
 #include "virtual_display.h"
 #include <QGraphicsItem>
 #include <QGraphicsView>
@@ -26,6 +26,7 @@ public:
   void AddDisplay(VirtualDisplay *display, const std::string &parent_name);
   void FocusDisplay(const std::string &display_name);
   void RemoveDisplay(const std::string &name);
+  void RemoveDisplay(VirtualDisplay *display);
   int GetDisplaySize();
   std::map<std::string, VirtualDisplay *> GetTotalDisplayMap();
   // 设置响应鼠标事件的图层

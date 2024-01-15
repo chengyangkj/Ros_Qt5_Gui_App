@@ -7,7 +7,7 @@
  * @Description: ros1通讯类
  */
 #include "rosnode.h"
-#include "config/configManager.h"
+#include "config/config_manager.h"
 RosNode::RosNode(/* args */) { std::cout << "ros node start" << std::endl; }
 basic::RobotPose Convert(const geometry_msgs::Pose &pose) {
   RobotPose robot_pose;

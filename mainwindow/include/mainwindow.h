@@ -5,7 +5,7 @@
 #include "DockManager.h"
 #include "DockWidget.h"
 #include "channel_manager.h"
-#include "display/display_manager.h"
+#include "display/manager/display_manager.h"
 #include "point_type.h"
 #include "widgets/dashboard.h"
 #include "widgets/nav_goal_table_view.h"
