@@ -4,5 +4,6 @@ build/*
 compile_commands.json
 .cache
 .vscode
+.vscode/*
 build
 CMakeLists.txt.user
