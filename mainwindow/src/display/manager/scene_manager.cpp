@@ -1,6 +1,6 @@
-#include "display/scene_display.h"
-#include "display/display_manager.h"
-#include "display/factory_display.h"
+#include "display/manager/scene_manager.h"
+#include "display/manager/display_factory.h"
+#include "display/manager/display_manager.h"
 #include "display/point_shape.h"
 #include <QDebug>
 #include <iostream>
@@ -13,8 +13,15 @@ void SceneDisplay::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   set_nav_pose_widget_->hide();
   nav_goal_widget_ = new NavGoalWidget(view_ptr_);
   nav_goal_widget_->hide();
+  QPixmap goal_image;
+  goal_image.load("://images/goal_green.png");
+  QMatrix matrix;
+  matrix.rotate(90);
+  goal_image = goal_image.transformed(matrix, Qt::SmoothTransformation);
+  nav_goal_cursor_ = std::make_shared<QCursor>(goal_image, 0, 0);
 }
-void SceneDisplay::AddOneNavGoal() {
+void SceneDisplay::AddOneNavPoint() {
+  // this->setCursor(nav_goal_cursor_);
   (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, DISPLAY_GOAL,
                   8, DISPLAY_MAP))
       ->SetRotateEnable(true)
@@ -40,7 +47,7 @@ void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
           .pose =
               display_manager_->scenePoseToWord(display->GetCurrentScenePose()),
-          .name = "test"});
+          .name = QString::fromStdString(display->GetDisplayName())});
       nav_goal_widget_->disconnect();
 
       connect(nav_goal_widget_, &NavGoalWidget::SignalHandleOver,
@@ -93,7 +100,8 @@ void SceneDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
           .pose = display_manager_->scenePoseToWord(
               curr_handle_display_->GetCurrentScenePose()),
-          .name = "test"});
+          .name =
+              QString::fromStdString(curr_handle_display_->GetDisplayName())});
     }
   }
 

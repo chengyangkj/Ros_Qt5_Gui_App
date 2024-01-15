@@ -1,5 +1,5 @@
 #pragma once
-#include "display/scene_display.h"
+#include "display/manager/scene_manager.h"
 #include "virtual_display.h"
 #include <QGraphicsItem>
 #include <QGraphicsView>

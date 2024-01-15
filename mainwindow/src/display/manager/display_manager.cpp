@@ -2,7 +2,7 @@
 // 2, 图层坐标系 每个图层的单独坐标系
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
-#include "display/display_manager.h"
+#include "display/manager/display_manager.h"
 #include "algorithm.h"
 #include "logger/logger.h"
 #include <Eigen/Eigen>
@@ -12,7 +12,7 @@
 namespace Display {
 
 DisplayManager::DisplayManager() {
-  graphics_view_ptr_ = new QGraphicsView();
+  graphics_view_ptr_ = new ViewManager();
   scene_display_ptr_ = new SceneDisplay();
   scene_display_ptr_->Init(graphics_view_ptr_, this);
   // 设置绘制区域
@@ -289,6 +289,6 @@ void DisplayManager::SetRelocPose() {
     SetRelocMode(true);
   }
 }
-void DisplayManager::AddOneNavGoal() { scene_display_ptr_->AddOneNavGoal(); }
+void DisplayManager::AddOneNavPoint() { scene_display_ptr_->AddOneNavPoint(); }
 
 } // namespace Display

@@ -33,7 +33,19 @@ void ConfigManager::SetDefaultTopicName(const std::string &frame_name,
                                         const std::string &topic_name) {
   SetDefaultConfig(frame_name + "/Topic", topic_name);
 }
-bool ConfigManager::ReadTopologyMap(const std::string &map_path, TopologyMap& map) {
+bool ConfigManager::GetConfig(const std::string &key, std::string &value) {
+  QSettings setting(config_path_, QSettings::IniFormat);
+  value = setting.value(QString::fromStdString(key)).toString().toStdString();
+  return true;
+}
+bool ConfigManager::SetConfig(const std::string &key,
+                              const std::string &value) {
+  QSettings setting(config_path_, QSettings::IniFormat);
+  setting.setValue(QString::fromStdString(key), QString::fromStdString(value));
+  return true;
+}
+bool ConfigManager::ReadTopologyMap(const std::string &map_path,
+                                    TopologyMap &map) {
   std::ifstream file(map_path);
   std::string json((std::istreambuf_iterator<char>(file)),
                    std::istreambuf_iterator<char>());
@@ -48,7 +60,7 @@ bool ConfigManager::ReadTopologyMap(const std::string &map_path, TopologyMap& ma
   return true;
 }
 bool ConfigManager::WriteTopologyMap(const std::string &map_path,
-                                       const TopologyMap &topology_map) {
+                                     const TopologyMap &topology_map) {
   std::ofstream file(map_path);
   if (!file.is_open()) {
     fprintf(stderr, "Error opening file %s\n", map_path.c_str());

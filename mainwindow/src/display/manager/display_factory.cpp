@@ -1,6 +1,6 @@
 
-#include "display/factory_display.h"
-#include "display/display_manager.h";
+#include "display//manager/display_factory.h"
+#include "display/manager/display_manager.h";
 #include "logger/logger.h"
 namespace Display {
 

@@ -11,13 +11,15 @@
 #ifndef DISPLAY_MANAGER_H
 #define DISPLAY_MANAGER_H
 #include "algorithm.h"
-#include "display/scene_display.h"
+#include "display/manager/scene_manager.h"
+#include "display/manager/view_manager.h"
 #include "display_cost_map.h"
+#include "display_factory.h"
 #include "display_occ_map.h"
 #include "display_path.h"
-#include "factory_display.h"
 #include "laser_points.h"
 
+#include "config/config_manager.h"
 #include "point_shape.h"
 #include "widgets/set_pose_widget.h"
 #include <Eigen/Dense>
@@ -29,7 +31,6 @@
 #include <any>
 #include <functional>
 #include <map>
-
 // group
 #define GROUP_MAP "Group_Map"
 namespace Display {
@@ -46,7 +47,7 @@ private:
   OccupancyMap local_cost_map_;
   double global_scal_value_ = 1;
   bool is_reloc_mode_{false};
-  QGraphicsView *graphics_view_ptr_;
+  ViewManager *graphics_view_ptr_;
   SetPoseWidget *set_reloc_pose_widget_;
   SceneDisplay *scene_display_ptr_;
 signals:
@@ -56,7 +57,7 @@ signals:
 public slots:
   void updateScaled(double value);
   void SetRelocPose();
-  void AddOneNavGoal();
+  void AddOneNavPoint();
   void slotRobotScenePoseChanged(const RobotPose &pose);
   void slotSetRobotPose(const RobotPose &pose);
   void UpdateTopicData(const MsgId &id, const std::any &data);

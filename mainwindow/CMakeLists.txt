@@ -26,6 +26,7 @@ target_include_directories(
   ${TARGET_NAME}
   PUBLIC
 	include/
+  include/display/
  ${CMAKE_CURRENT_BINARY_DIR}
 )
 target_link_libraries(${TARGET_NAME} Qt5::Widgets Qt5::Core qt${QT_VERSION_MAJOR}advanceddocking json_struct common basic channel)

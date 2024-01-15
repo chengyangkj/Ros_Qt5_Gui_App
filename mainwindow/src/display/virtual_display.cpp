@@ -1,5 +1,5 @@
 #include "algorithm.h"
-#include "display/factory_display.h"
+#include "display/manager/display_factory.h"
 namespace Display {
 
 VirtualDisplay::VirtualDisplay(const std::string &display_type,
@@ -15,12 +15,6 @@ VirtualDisplay::VirtualDisplay(const std::string &display_type,
             this, SLOT(parentItemChange(GraphicsItemChange, const QVariant &)));
   }
   this->setZValue(z_value);
-  pose_cursor_ =
-      std::make_shared<QCursor>(QPixmap("://images/cursor_pos.png"), 0, 0);
-  goal_cursor_ =
-      std::make_shared<QCursor>(QPixmap("://images/cursor_pos.png"), 0, 0);
-  move_cursor_ =
-      std::make_shared<QCursor>(QPixmap("://images/cursor_move.png"), 0, 0);
   transform_ = this->transform();
 }
 QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
@@ -101,8 +95,6 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
   }
   if (!enable_scale_)
     return;
-
-  this->setCursor(Qt::CrossCursor);
   double beforeScaleValue = scale_value_;
   if (event->delta() > 0) {
     //  qDebug()<<"放大";
@@ -131,10 +123,8 @@ void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     return;
   }
   if (pressed_button_ == Qt::LeftButton) {
-    if (curr_cursor_ == move_cursor_) {
-      QPointF point = (event->pos() - pressed_pose_) * scale_value_;
-      MovedBy(point.x(), point.y());
-    }
+    QPointF point = (event->pos() - pressed_pose_) * scale_value_;
+    MovedBy(point.x(), point.y());
     end_pose_ = event->pos();
   }
   ////////////////////////// 右健旋转
@@ -187,8 +177,6 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
     is_mouse_press_ = true;
     start_pose_ = event->pos();
-    curr_cursor_ = move_cursor_;
-    this->setCursor(*curr_cursor_);
   } else if (event->button() == Qt::RightButton) {
     is_rotate_event_ = true;
   }
@@ -205,16 +193,6 @@ void VirtualDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   if (event->button() == Qt::LeftButton) {
     pressed_pose_ = QPointF();
     is_mouse_press_ = false;
-    if (curr_cursor_ == pose_cursor_) {
-      curr_cursor_ = move_cursor_;
-      this->setCursor(*curr_cursor_);
-    } else if (curr_cursor_ == goal_cursor_) {
-      curr_cursor_ = move_cursor_;
-      this->setCursor(*curr_cursor_);
-    } else if (curr_cursor_ == move_cursor_) {
-      curr_cursor_ = move_cursor_;
-      this->setCursor(*curr_cursor_);
-    }
     start_pose_ = QPointF();
     end_pose_ = QPointF();
   }

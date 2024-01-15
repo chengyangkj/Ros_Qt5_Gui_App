@@ -35,8 +35,9 @@ public:
   void SetDefaultConfig(const std::string &name, const std::string &value);
   void SetDefaultTopicName(const std::string &frame_name,
                            const std::string &topic_name);
-  bool ReadTopologyMap(const std::string &map_path,
-                                      TopologyMap &map);
+  bool GetConfig(const std::string &key, std::string &value);
+  bool SetConfig(const std::string &key, const std::string &value);
+  bool ReadTopologyMap(const std::string &map_path, TopologyMap &map);
   bool WriteTopologyMap(const std::string &map_path,
                         const TopologyMap &topology_map);
 };

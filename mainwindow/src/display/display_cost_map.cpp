@@ -14,7 +14,6 @@ namespace Display {
 DisplayCostMap::DisplayCostMap(const std::string &display_type,
                                const int &z_value, std::string parent_name)
     : VirtualDisplay(display_type, z_value, parent_name) {
-  this->setCursor(*curr_cursor_);
 }
 bool DisplayCostMap::UpdateData(const std::any &data) {
   try {

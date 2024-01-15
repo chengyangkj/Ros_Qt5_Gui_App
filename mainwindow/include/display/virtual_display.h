@@ -57,10 +57,6 @@ public:
   QPointF end_pose_;
   bool is_mouse_press_;
   Qt::MouseButton pressed_button_{Qt::MouseButton::NoButton};
-  std::shared_ptr<QCursor> curr_cursor_ = nullptr;
-  std::shared_ptr<QCursor> move_cursor_ = nullptr;
-  std::shared_ptr<QCursor> pose_cursor_ = nullptr;
-  std::shared_ptr<QCursor> goal_cursor_ = nullptr;
   double scale_value_ = 1;
   bool move_enable_{false};
   bool is_rotate_event_{false};
