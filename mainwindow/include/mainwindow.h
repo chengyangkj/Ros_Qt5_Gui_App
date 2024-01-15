@@ -8,6 +8,7 @@
 #include "display/display_manager.h"
 #include "point_type.h"
 #include "widgets/dashboard.h"
+#include "widgets/nav_goal_table_view.h"
 #include "widgets/set_pose_widget.h"
 #include "widgets/speed_ctrl.h"
 #include "widgets/status_bar.h"
@@ -70,6 +71,7 @@ private:
   SpeedCtrlWidget *speed_ctrl_widget_;
   StatusBarWidget *status_bar_widget_;
   ToolsBarWidget *tools_bar_widget_;
+  NavGoalTableView *nav_goal_table_view_;
 signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);
 

@@ -157,14 +157,25 @@ void MainWindow::setupUi() {
                                    DashBoardDockWidget, CentralDockArea);
   ui->menuView->addAction(DashBoardDockWidget->toggleViewAction());
 
-  /////////////////////////////////////////////////////////pose widget
-  // auto set_pose_widget_ = new SetPoseWidget();
-  // set_pose_dock_widget_ = new ads::CDockWidget("PoseSet");
-  // set_pose_dock_widget_->setWidget(set_pose_widget_);
-  // dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
-  //                              set_pose_dock_widget_, CentralDockArea);
-  // set_pose_dock_widget_->toggleView(false);
-  // set_pose_dock_widget_->close();
+  /////////////////////////////////////////////////////////导航任务列表
+
+  QWidget *task_list_widget = new QWidget();
+  nav_goal_table_view_ = new NavGoalTableView();
+  QVBoxLayout *horizontalLayout_13 = new QVBoxLayout();
+  horizontalLayout_13->addWidget(nav_goal_table_view_);
+  task_list_widget->setLayout(horizontalLayout_13);
+  task_list_widget->setMinimumSize(QSize(300, 300));
+  ads::CDockWidget *nav_goal_list_dock_widget =
+      new ads::CDockWidget("NavGoalList");
+  QPushButton *btn_start_goal_list = new QPushButton("Start");
+  QPushButton *btn_stop_goal_list = new QPushButton("Stop");
+  QHBoxLayout *horizontalLayout_14 = new QHBoxLayout();
+  horizontalLayout_14->addWidget(btn_start_goal_list);
+  horizontalLayout_14->addWidget(btn_stop_goal_list);
+  horizontalLayout_13->addLayout(horizontalLayout_14);
+  nav_goal_list_dock_widget->setWidget(task_list_widget);
+  dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
+                               nav_goal_list_dock_widget, CentralDockArea);
   ////////////////////////////////////////////////////////速度控制
   speed_ctrl_widget_ = new SpeedCtrlWidget();
   connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,
