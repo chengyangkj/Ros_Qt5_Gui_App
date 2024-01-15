@@ -55,7 +55,7 @@ bool MainWindow::openChannel(const std::string &channel_name) {
 }
 void MainWindow::registerChannel() {
   channel_manager_.RegisterOnDataCallback(
-      std::move([=, this](const MsgId &id, const std::any &data) {
+      std::move([this](const MsgId &id, const std::any &data) {
         emit OnRecvChannelData(id, data);
       }));
 }
@@ -164,7 +164,7 @@ void MainWindow::setupUi() {
   QVBoxLayout *horizontalLayout_13 = new QVBoxLayout();
   horizontalLayout_13->addWidget(nav_goal_table_view_);
   task_list_widget->setLayout(horizontalLayout_13);
-  task_list_widget->setMinimumSize(QSize(300, 300));
+  task_list_widget->setMinimumSize(QSize(500, 300));
   ads::CDockWidget *nav_goal_list_dock_widget =
       new ads::CDockWidget("NavGoalList");
   QPushButton *btn_start_goal_list = new QPushButton("Start");
