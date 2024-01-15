@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body >
+        <div id="container" style="height: 360px"></div>
+
+        <script type="text/javascript" src="build/dist/echarts.min.js"></script>
+
+        <script type="text/javascript">
+var dom = document.getElementById("container");
+var myChart = echarts.init(dom);
+var app = {};
+var option = {
+series: [{
+    type: 'gauge',
+    axisLine: {
+        lineStyle: {
+            width: 20,
+            color: [
+                [0.3, '#67e0e3'],
+                [0.7, '#37a2da'],
+                [1, '#fd666d']
+            ]
+        }
+    },
+    pointer: {
+        itemStyle: {
+            color: 'auto'
+        }
+    },
+    axisTick: {
+        distance: -20,
+        length: 8,
+        lineStyle: {
+            color: '#fff',
+            width: 2
+        }
+    },
+    splitLine: {
+        distance: -30,
+        length: 40,
+        lineStyle: {
+            color: '#fff',
+            width: 4
+        }
+    },
+    axisLabel: {
+        color: 'auto',
+        distance: 20,
+        fontSize: 15
+    },
+    detail: {
+        valueAnimation: true,
+        formatter: '{value} cm/s',
+        color: 'auto',
+        fontSize: 15
+    },
+    data: [{
+        value: 0
+    }]
+}]
+};
+//窗体自适应
+window.onresize = myChart.resize ;
+// 为echarts对象加载数据
+myChart.setOption(option);
+if (option && typeof option === 'object') {
+    myChart.setOption(option);
+}
+function setDatas(str){
+
+
+    option.series[0].data[0].value =str  ;
+    myChart.setOption(option);
+};
+function setSize(size){
+                    // 首先是取到元素
+                    var main = document.getElementById('main');
+                    main.style.width = size["width"] + "px";
+                    main.style.height = size["height"] + "px";
+                    myChart.resize();
+            }
+        </script>
+    </body>
+</html>
+    

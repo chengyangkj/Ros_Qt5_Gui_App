@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:270px;"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="build/dist/echarts.js"></script>
+    <script type="text/javascript">
+
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'build/dist'
+            }
+        });
+
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/line'
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var myChart = ec.init(document.getElementById('main'),'macarons');
+
+                var option = {
+
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['发送线速度','反馈线速度','发送角速度','反馈角速度']
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            boundaryGap : false,
+            data : [0,0,0,0,]
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'send Linear',
+            type:'line',
+            smooth:true,
+            itemStyle: {normal: {areaStyle: {type: 'default'}}},
+            data:[0,0,0,0,0]
+        },
+        {
+            name:'Recv Linear',
+            type:'line',
+            smooth:true,
+            itemStyle: {normal: {areaStyle: {type: 'default'}}},
+            data:[0,0,0,0,0]
+        },
+        {
+            name:'Send Angular',
+            type:'line',
+            smooth:true,
+            itemStyle: {normal: {areaStyle: {type: 'default'}}},
+            data:[0,0,0,0,0]
+        },
+        {
+            name:'Recv Angular',
+            type:'line',
+            smooth:true,
+            itemStyle: {normal: {areaStyle: {type: 'default'}}},
+            data:[0,0,0,0,0]
+        }
+    ]
+};
+
+                //窗体自适应
+                                window.onresize = myChart.resize ;
+                // 为echarts对象加载数据
+                myChart.setOption(option);
+            }
+        );
+    </script>
+</body>

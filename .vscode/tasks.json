@@ -1,0 +1,30 @@
+{
+    // https://code.visualstudio.com/docs/editor/tasks
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",  // 任务的名字叫Build，注意是大小写区分的，等会在launch中调用这个名字
+            "type": "shell",  // 任务执行的是shell命令，也可以是
+            "command": "g++", // 命令是g++
+            "args": [
+                "'-Wall'",
+                "'-std=c++17'",  //使用c++17标准编译
+                "'${file}'", //当前文件名
+                "-o", //对象名，不进行编译优化
+                "'${fileBasenameNoExtension}.exe'",  //当前文件名（去掉扩展名）
+            ],
+          // 所以以上部分，就是在shell中执行（假设文件名为filename.cpp）
+          // g++ filename.cpp -o filename.exe
+            "group": { 
+                "kind": "build",
+                "isDefault": true   
+                // 任务分组，因为是tasks而不是task，意味着可以连着执行很多任务
+                // 在build组的任务们，可以通过在Command Palette(F1) 输入run build task来运行
+                // 当然，如果任务分组是test，你就可以用run test task来运行 
+            },
+            "problemMatcher": [
+                "$gcc" // 使用gcc捕获错误
+            ],
+        }
+    ]
+}
