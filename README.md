@@ -12,7 +12,7 @@
 ![GitHub issues](https://img.shields.io/github/issues/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 <a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=nC80H57wmKPwRDLFeQrDDjVl81XuC21P&authKey=2wTUTfoQ5v%2BD4C5zfpuR%2BSPMDqdXgDXA%2FS2wHI1NxTfWIG%2B%2FqK08dgyjMMOzhXa9&noverify=0&group_code=797497206">
-<img alt="Static Badge" src="https://img.shields.io/badge/qq\u7fa4-797497206-purple">
+<img alt="Static Badge" src="https://img.shields.io/badge/QQ%e7%be%a4-797497206-purple">
 </a>
 
 <!-- 
