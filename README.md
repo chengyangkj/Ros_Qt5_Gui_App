@@ -43,10 +43,11 @@
   - 3,机器人导航任务链
   - 4,基于protobuf的通信channel实现(制定自定义通信协议,彻底摆脱ROS通信机制,实现软件跨平台运行)
   - 5,鹰眼视图
+  - 6,基于OpenGl的3D视图显示
 
-后续功能不断完善中......
+此仓库长期维护后续功能不断完善中......
 
-此仓库国内加速镜像仓库链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
+此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
 ![image.png](./doc/images/main.png)
 
