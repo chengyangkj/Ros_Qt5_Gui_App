@@ -11,7 +11,18 @@
 ![GitHub forks](https://img.shields.io/github/forks/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub issues](https://img.shields.io/github/issues/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
-[![Gitter](https://badges.gitter.im/ros_qt5_gui_app/community.svg)](https://gitter.im/ros_qt5_gui_app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+<a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=mvzoO6tJQtu0ZQYa_itHW7JrT0i4OCdK&authKey=exOT53pUpRG85mwuSMstWKbLlnrme%2FEuJE0Rt%2Fw6ONNvfHqftoWMay03mk1Qi7yv&noverify=0&group_code=797497206">
+<img alt="Static Badge" src="https://img.shields.io/badge/QQ%e7%be%a4-797497206-purple">
+</a>
+
+<!-- 
+<a href="https://www.bilibili.com/video/BV14h4y1w7TC">
+<img alt="Static Badge" src="https://img.shields.io/badge/%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B-208647">
+</a>
+<a href="https://www.bilibili.com/video/BV11h4y1y74H">
+<img alt="Static Badge" src="https://img.shields.io/badge/Linux%E9%83%A8%E7%BD%B2%E8%A7%86%E9%A2%91-208647">
+</a>
+-->
 
 # 项目介绍
 
@@ -43,8 +54,11 @@
   - 3,机器人导航任务链
   - 4,基于protobuf的通信channel实现(制定自定义通信协议,彻底摆脱ROS通信机制,实现软件跨平台运行)
   - 5,鹰眼视图
+  - 6,基于OpenGl的3D视图显示
 
-后续功能不断完善中......
+此仓库长期维护后续功能不断完善中......
+
+此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
 ![image.png](./doc/images/main.png)
 
