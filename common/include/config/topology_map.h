@@ -1,5 +1,7 @@
+#pragma once
 #include "json_struct/json_struct.h"
 #include "point/point_type.h"
+
 JS_ENUM(PointType, NavGoal);
 JS_ENUM_DECLARE_STRING_PARSER(PointType)
 struct TopologyMap {
@@ -26,4 +28,35 @@ struct TopologyMap {
   std::string map_name;
   std::vector<PointInfo> points;
   JS_OBJ(map_name, points);
+  void AddPoint(const PointInfo &point) { points.push_back(point); }
+  void RemovePoint(const std::string &name) {
+    auto it =
+        std::find_if(points.begin(), points.end(), [&](const PointInfo &point) {
+          return point.name == name;
+        });
+    if (it != points.end()) {
+      points.erase(it);
+    }
+  }
+  void UpdatePoint(const std::string &name, const PointInfo &point) {
+    auto it =
+        std::find_if(points.begin(), points.end(), [&](const PointInfo &point) {
+          return point.name == name;
+        });
+    if (it != points.end()) {
+      *it = point;
+    }
+  }
+  PointInfo GetPoint(const std::string &name) {
+    auto it =
+        std::find_if(points.begin(), points.end(), [&](const PointInfo &point) {
+          return point.name == name;
+        });
+    if (it != points.end()) {
+      return *it;
+    }
+    // 如果找不到点，返回一个空的PointInfo对象
+    return PointInfo();
+  }
+  std::vector<PointInfo> GetPoints() { return points; }
 };

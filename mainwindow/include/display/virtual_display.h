@@ -81,7 +81,7 @@ signals:
 
 public:
   VirtualDisplay(const std::string &display_type, const int &z_value,
-                 const std::string &parent_name);
+                 const std::string &parent_name,std::string display_name="");
   virtual ~VirtualDisplay();
   bool UpdateDisplay(const std::any &data) { return UpdateData(data); }
   VirtualDisplay *SetRotateEnable(const bool &enable) {

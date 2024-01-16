@@ -164,7 +164,6 @@ void MainWindow::setupUi() {
   QVBoxLayout *horizontalLayout_13 = new QVBoxLayout();
   horizontalLayout_13->addWidget(nav_goal_table_view_);
   task_list_widget->setLayout(horizontalLayout_13);
-  task_list_widget->setMinimumSize(QSize(500, 300));
   ads::CDockWidget *nav_goal_list_dock_widget =
       new ads::CDockWidget("NavGoalList");
   QPushButton *btn_start_goal_list = new QPushButton("Start");
@@ -176,6 +175,7 @@ void MainWindow::setupUi() {
   nav_goal_list_dock_widget->setWidget(task_list_widget);
   dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
                                nav_goal_list_dock_widget, CentralDockArea);
+  nav_goal_list_dock_widget->toggleView(false);
   ////////////////////////////////////////////////////////速度控制
   speed_ctrl_widget_ = new SpeedCtrlWidget();
   connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,

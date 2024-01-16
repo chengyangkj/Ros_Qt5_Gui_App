@@ -83,6 +83,10 @@ void FactoryDisplay::AddDisplay(VirtualDisplay *display,
 
   if (!parent_name.empty()) {
     auto parent_ptr = GetDisplay(parent_name);
+    if (parent_ptr == nullptr) {
+      std::cout << "not find parent display:" << parent_name << std::endl;
+      return;
+    }
     parent_ptr->AddChild(display);
   }
 

@@ -45,6 +45,7 @@ DisplayManager::DisplayManager() {
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
+  scene_display_ptr_->LoadTopologyMap();
 }
 void DisplayManager::UpdateTopicData(const MsgId &id, const std::any &data) {
   UpdateDisplay(ToString(id), data);

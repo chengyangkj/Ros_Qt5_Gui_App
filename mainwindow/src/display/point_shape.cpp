@@ -17,8 +17,8 @@ namespace Display {
 PointShape::PointShape(const ePointType &type, const std::string &display_type,
                        const std::string &display_name, const int &z_value,
                        std::string parent_name)
-    : VirtualDisplay(display_type, z_value, parent_name), type_(type) {
-  SetDisplayName(display_name);
+    : VirtualDisplay(display_type, z_value, parent_name, display_name),
+      type_(type) {
   SetRotateEnable(true);
   SetScaleEnable(false);
   moveBy(0, 0);

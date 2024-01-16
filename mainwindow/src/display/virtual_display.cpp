@@ -4,9 +4,14 @@ namespace Display {
 
 VirtualDisplay::VirtualDisplay(const std::string &display_type,
                                const int &z_value,
-                               const std::string &parent_name)
-    : display_type_(display_type), display_name_(display_type),
+                               const std::string &parent_name,
+                               std::string display_name)
+    : display_type_(display_type), display_name_(display_name),
       parent_name_(parent_name) {
+  //如果没有设置图层名 则以type作为名称
+  if (display_name.empty()) {
+    display_name_ = display_type;
+  }
   FactoryDisplay::Instance()->AddDisplay(this, parent_name);
   parent_ptr_ = FactoryDisplay::Instance()->GetDisplay(parent_name_);
   if (parent_ptr_ != nullptr) {

@@ -33,10 +33,12 @@ void ConfigManager::SetDefaultTopicName(const std::string &frame_name,
                                         const std::string &topic_name) {
   SetDefaultConfig(frame_name + "/Topic", topic_name);
 }
-bool ConfigManager::GetConfig(const std::string &key, std::string &value) {
+std::string ConfigManager::GetConfig(const std::string &key) {
+  std::string value;
   QSettings setting(config_path_, QSettings::IniFormat);
-  value = setting.value(QString::fromStdString(key)).toString().toStdString();
-  return true;
+  value =
+      setting.value(QString::fromStdString(key), "").toString().toStdString();
+  return value;
 }
 bool ConfigManager::SetConfig(const std::string &key,
                               const std::string &value) {
