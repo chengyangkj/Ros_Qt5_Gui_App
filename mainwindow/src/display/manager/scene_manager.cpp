@@ -12,7 +12,6 @@ void SceneDisplay::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
       "TopologyMap/Path", "./default_topology_map.json");
 
   // 1s自动保存1次 拓扑地图
-  QTimer::singleShot(1000, this, [=] { saveTopologyMap(); });
 
   display_manager_ = manager;
   view_ptr_ = view_ptr;
@@ -26,9 +25,9 @@ void SceneDisplay::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   matrix.rotate(90);
   goal_image = goal_image.transformed(matrix, Qt::SmoothTransformation);
   nav_goal_cursor_ = std::make_shared<QCursor>(goal_image, 0, 0);
+  saveTopologyMap();
 }
 void SceneDisplay::LoadTopologyMap() {
-  std::cout << "start load topology map" << std::endl;
   Config::ConfigManager::Instacnce()->ReadTopologyMap(
       Config::ConfigManager::Instacnce()->GetConfig("TopologyMap/Path"),
       topology_map_);
@@ -40,16 +39,14 @@ void SceneDisplay::LoadTopologyMap() {
     goal_point->SetRotateEnable(true)->SetMoveEnable(true)->setVisible(true);
     goal_point->UpdateDisplay(
         display_manager_->wordPose2Map(point.ToRobotPose()));
-    std::cout << "update topoMpa:" << point.name
-              << "pose:" << point.ToRobotPose() << std::endl;
   }
 }
 void SceneDisplay::saveTopologyMap() {
-  if (topology_map_.points.size() == 0)
-    return;
-  Config::ConfigManager::Instacnce()->WriteTopologyMap(
-      Config::ConfigManager::Instacnce()->GetConfig("TopologyMap/Path"),
-      topology_map_);
+  if (topology_map_.points.size() != 0) {
+    Config::ConfigManager::Instacnce()->WriteTopologyMap(
+        Config::ConfigManager::Instacnce()->GetConfig("TopologyMap/Path"),
+        topology_map_);
+  }
   // 递归
   QTimer::singleShot(1000, this, [=] { saveTopologyMap(); });
 }
@@ -116,18 +113,17 @@ void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 }
 void SceneDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos(); // 获取点击位置
-  QGraphicsItem *item =
-      itemAt(position, views()[0]->transform()); // 获取点击位置下的 item
-  if (item != nullptr) { // 判断是否获取到了 item
-    Display::VirtualDisplay *display =
-        dynamic_cast<Display::VirtualDisplay *>(item);
-    std::string display_type = display->GetDisplayType();
+  if (curr_handle_display_ != nullptr) {     // 判断是否获取到了 item
+    std::string display_type = curr_handle_display_->GetDisplayType();
     if (display_type == DISPLAY_GOAL) {
+      std::cout << "release goal:"
+                << curr_handle_display_->GetCurrentScenePose() << std::endl;
       topology_map_.UpdatePoint(
-          display->GetDisplayName(),
+          curr_handle_display_->GetDisplayName(),
           TopologyMap::PointInfo(
-              display_manager_->scenePoseToWord(display->GetCurrentScenePose()),
-              display->GetDisplayName()));
+              display_manager_->scenePoseToWord(
+                  curr_handle_display_->GetCurrentScenePose()),
+              curr_handle_display_->GetDisplayName()));
     }
   }
   QGraphicsScene::mouseReleaseEvent(mouseEvent);

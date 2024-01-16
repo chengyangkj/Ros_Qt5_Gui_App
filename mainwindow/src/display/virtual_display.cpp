@@ -42,7 +42,6 @@ void VirtualDisplay::SetPoseInParent(const RobotPose &pose) {
     return;
   QPointF scene_pose =
       parent_ptr_->mapToScene(QPointF(pose_in_parent_.x, pose_in_parent_.y));
-
   setPos(scene_pose);
 }
 bool VirtualDisplay::SetDisplayConfig(const std::string &config_name,

@@ -1,5 +1,6 @@
 #include "config/config_manager.h"
 #include <QFile>
+#include <filesystem>
 #include <fstream>
 namespace Config {
 // #define CHECK_DEFALUT
@@ -61,17 +62,26 @@ bool ConfigManager::ReadTopologyMap(const std::string &map_path,
   }
   return true;
 }
-bool ConfigManager::WriteTopologyMap(const std::string &map_path,
-                                     const TopologyMap &topology_map) {
-  std::ofstream file(map_path);
-  if (!file.is_open()) {
-    fprintf(stderr, "Error opening file %s\n", map_path.c_str());
+bool writeStringToFile(const std::string &filePath,
+                       const std::string &content) {
+  std::filesystem::path path(filePath);
+  std::filesystem::create_directories(path.parent_path()); // 创建路径
+
+  std::ofstream outputFile(filePath);
+  if (outputFile) {
+    outputFile << content; // 写入内容
+    outputFile.close();    // 关闭文件
+    return true;
+  } else {
+    std::cerr << "无法创建文件 " << filePath << std::endl;
     return false;
   }
+}
+bool ConfigManager::WriteTopologyMap(const std::string &map_path,
+                                     const TopologyMap &topology_map) {
+
   std::string pretty_json = JS::serializeStruct(topology_map);
-  file << pretty_json;
-  file.close();
-  return true;
+  return writeStringToFile(map_path, pretty_json);
 }
 
 } // namespace Config

@@ -45,7 +45,6 @@ DisplayManager::DisplayManager() {
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
-  scene_display_ptr_->LoadTopologyMap();
 }
 void DisplayManager::UpdateTopicData(const MsgId &id, const std::any &data) {
   UpdateDisplay(ToString(id), data);
@@ -134,6 +133,11 @@ bool DisplayManager::UpdateDisplay(const std::string &display_type,
          FactoryDisplay::Instance()->GetTotalDisplayMap()) {
       display->UpdateMap(map_data_);
     }
+    if (!init_flag_) {
+      scene_display_ptr_->LoadTopologyMap();
+      init_flag_ = true;
+    }
+
   } else if (display_type == DISPLAY_ROBOT) {
     //重定位时屏蔽位置更新
     if (!is_reloc_mode_) {

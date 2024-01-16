@@ -50,6 +50,7 @@ private:
   ViewManager *graphics_view_ptr_;
   SetPoseWidget *set_reloc_pose_widget_;
   SceneDisplay *scene_display_ptr_;
+  bool init_flag_{false};
 signals:
   void cursorPosMap(QPointF);
   void signalPub2DPose(const RobotPose &pose);
