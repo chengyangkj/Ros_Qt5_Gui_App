@@ -13,6 +13,7 @@
 ![GitHub issues closed](https://img.shields.io/github/issues-closed/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 [![Gitter](https://badges.gitter.im/ros_qt5_gui_app/community.svg)](https://gitter.im/ros_qt5_gui_app/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
+
 # 项目介绍
 
 ## 轻量级移动机器人ROS人机交互软件
@@ -44,6 +45,8 @@
   - 5,鹰眼视图
 
 后续功能不断完善中......
+
+此仓库国内加速镜像仓库链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
 ![image.png](./doc/images/main.png)
 
