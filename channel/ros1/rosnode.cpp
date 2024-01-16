@@ -36,9 +36,9 @@ void RosNode::Process() {
 bool RosNode::Start() {
   int argc = 0;
   ros::init(argc, nullptr, "ros_qt5_gui_app", ros::init_options::AnonymousName);
-  if (!ros::master::check()) {
-    std::cout << "ros master not running" << std::endl;
-    return false;
+  while (!ros::master::check()) {
+    std::cout << "wait ros master........" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
   }
   ros::start();
   init();

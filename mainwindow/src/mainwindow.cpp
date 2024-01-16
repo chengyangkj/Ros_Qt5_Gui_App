@@ -19,7 +19,7 @@
 #include "FloatingDockContainer.h"
 #include "algorithm.h"
 #include "logger/logger.h"
-
+#include <QDebug>
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -176,6 +176,8 @@ void MainWindow::setupUi() {
   nav_goal_list_dock_widget->setWidget(task_list_widget);
   dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
                                nav_goal_list_dock_widget, CentralDockArea);
+  ui->menuView->addAction(nav_goal_list_dock_widget->toggleViewAction());
+
   ////////////////////////////////////////////////////////速度控制
   speed_ctrl_widget_ = new SpeedCtrlWidget();
   connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,
@@ -251,15 +253,32 @@ void MainWindow::SaveState() {
   Settings.setValue("mainWindow/Geometry", this->saveGeometry());
   Settings.setValue("mainWindow/State", this->saveState());
   Settings.setValue("mainWindow/DockingState", dock_manager_->saveState());
+  QMap<QString, ads::CDockWidget *> dock_map = dock_manager_->dockWidgetsMap();
+  for (auto iter = dock_map.begin(); iter != dock_map.end(); ++iter) {
+    Settings.setValue("menuView/" + iter.key(), iter.value()->isClosed());
+  }
 }
 
 //============================================================================
 void MainWindow::RestoreState() {
-  QSettings Settings("state.ini", QSettings::IniFormat);
-  this->restoreGeometry(Settings.value("mainWindow/Geometry").toByteArray());
-  this->restoreState(Settings.value("mainWindow/State").toByteArray());
-  // dock_manager_->restoreState(
-  //     Settings.value("mainWindow/DockingState").toByteArray());
+  QSettings settings("state.ini", QSettings::IniFormat);
+  this->restoreGeometry(settings.value("mainWindow/Geometry").toByteArray());
+  this->restoreState(settings.value("mainWindow/State").toByteArray());
+  settings.beginGroup("menuView");
+  // 获取该组下的所有键
+  QStringList keys = settings.childKeys();
+  QList<QAction *> actions = ui->menuView->actions();
+
+  // 遍历所有键
+  foreach (const QString &key, keys) {
+    // 获取键对应的值
+    QVariant value = settings.value(key);
+    auto widget = dock_manager_->findDockWidget(key);
+    if (widget) {
+      widget->toggleView(!value.toBool());
+    }
+  }
+  settings.endGroup();
 }
 void MainWindow::updateOdomInfo(RobotState state) {
   // 转向灯
