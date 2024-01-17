@@ -4,10 +4,8 @@
 TEST(TopologyMapTest, ReadAndWriteMap) {
   TopologyMap map;
   map.map_name = "test";
-  map.points.push_back(TopologyMap::PointInfo{
-      .x = 1.11, .y = 2.22, .theta = 3.33, .name = "test1"});
-  map.points.push_back(TopologyMap::PointInfo{
-      .x = 2.11, .y = 3.22, .theta = 4.33, .name = "test2"});
+  map.points.push_back(TopologyMap::PointInfo(1.11, 2.22, 3.33, "test1"));
+  map.points.push_back(TopologyMap::PointInfo(2.11, .22, 4.33, "test2"));
   EXPECT_TRUE(Config::ConfigManager::Instacnce()->WriteTopologyMap(
       "./test_map.json", map));
 
