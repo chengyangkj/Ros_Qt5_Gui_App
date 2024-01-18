@@ -20,20 +20,36 @@ jobs:
     - name: Pull ROS Docker image
       run: docker pull ros:melodic
 
-
-    - name: Build On ROS Melodic
+    - name: Build On ROS foxy
       run: |
         docker run --rm \
           -v $(pwd):/workspace \
           -w /workspace \
           -u root \
-          ros:melodic \
+          ros:foxy \
           /bin/bash -c \
-          "source /opt/ros/melodic/setup.bash \
+          "source /opt/ros/foxy/setup.bash \
           && sudo apt-get update \
           && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
-          && source /opt/ros/melodic/setup.bash \
+          && rm -rf build \
           && mkdir build/ \
           && cd build/ \
           && cmake .. \
           && make"
+
+    # - name: Build On ROS Melodic
+    #   run: |
+    #     docker run --rm \
+    #       -v $(pwd):/workspace \
+    #       -w /workspace \
+    #       -u root \
+    #       ros:melodic \
+    #       /bin/bash -c \
+    #       "source /opt/ros/melodic/setup.bash \
+    #       && sudo apt-get update \
+    #       && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
+    #       && rm -rf build \
+    #       && mkdir build/ \
+    #       && cd build/ \
+    #       && cmake .. \
+    #       && make"
