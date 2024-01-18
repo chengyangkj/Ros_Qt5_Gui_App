@@ -21,6 +21,7 @@ jobs:
     - name: Pull ROS Docker image
       run: docker pull ros:melodic
 
+
     - name: Build ROS code
       run: |
         docker run \
@@ -28,7 +29,9 @@ jobs:
           -w /workspace \
           -u root \
           ros:melodic \
-          mkdir -p build/ \
+          pwd \
+          && ls \
+          && mkdir build/ \
           && cd build/ \
           && cmake .. \
           && make
