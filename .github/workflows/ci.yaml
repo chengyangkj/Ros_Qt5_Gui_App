@@ -26,8 +26,12 @@ jobs:
         docker run \
           -v $(pwd):/workspace \
           -w /workspace \
+          -u root \
           ros:melodic \
-          ls
+          mkdir -p build/ \
+          && cd build/ \
+          && cmake .. \
+          && make
 
     - name: Run ROS code
       run: |
