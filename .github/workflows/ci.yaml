@@ -30,7 +30,7 @@ jobs:
           /bin/bash -c \
           "source /opt/ros/foxy/setup.bash \
           && sudo apt-get update \
-          && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
+          && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev libeigen3-dev libgtest-dev -y  \
           && rm -rf build \
           && mkdir build/ \
           && cd build/ \
