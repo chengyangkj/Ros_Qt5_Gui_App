@@ -11,14 +11,20 @@
 namespace Display {
 class DisplayManager;
 class SceneDisplay : public QGraphicsScene {
+  enum eMode {
+    kNone,
+    kAddNavGoal,
+  };
+
 private:
   SetPoseWidget *set_nav_pose_widget_;
   QGraphicsView *view_ptr_;
   Display::VirtualDisplay *curr_handle_display_{nullptr};
   DisplayManager *display_manager_;
   NavGoalWidget *nav_goal_widget_;
-  std::shared_ptr<QCursor> nav_goal_cursor_ = nullptr;
+  QCursor nav_goal_cursor_;
   TopologyMap topology_map_;
+  eMode current_mode_{kNone};
 
 public:
   SceneDisplay(QObject *parent = nullptr);
@@ -32,6 +38,5 @@ private:
   void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void saveTopologyMap();
-
 };
 } // namespace Display

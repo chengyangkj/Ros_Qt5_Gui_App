@@ -286,6 +286,12 @@ RobotPose DisplayManager::scenePoseToWord(const RobotPose &pose) {
                          ->mapFromScene(QPointF(pose.x, pose.y));
   return mapPose2Word(RobotPose(pose_map.x(), pose_map.y(), pose.theta));
 }
+RobotPose DisplayManager::scenePoseToMap(const RobotPose &pose) {
+  QPointF pose_map = FactoryDisplay::Instance()
+                         ->GetDisplay(DISPLAY_MAP)
+                         ->mapFromScene(QPointF(pose.x, pose.y));
+  return RobotPose(pose_map.x(), pose_map.y(), pose.theta);
+}
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return FactoryDisplay::Instance()->GetDisplay(name);
 }

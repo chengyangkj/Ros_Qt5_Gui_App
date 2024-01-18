@@ -24,7 +24,8 @@ void SceneDisplay::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   QMatrix matrix;
   matrix.rotate(90);
   goal_image = goal_image.transformed(matrix, Qt::SmoothTransformation);
-  nav_goal_cursor_ = std::make_shared<QCursor>(goal_image, 0, 0);
+  nav_goal_cursor_ =
+      QCursor(goal_image, goal_image.width() / 2, goal_image.height() / 2);
   saveTopologyMap();
 }
 void SceneDisplay::LoadTopologyMap() {
@@ -51,64 +52,82 @@ void SceneDisplay::saveTopologyMap() {
   QTimer::singleShot(1000, this, [=] { saveTopologyMap(); });
 }
 void SceneDisplay::AddOneNavPoint() {
-  std::string name = "NAV_POINT_" + std::to_string(topology_map_.points.size());
-  // this->setCursor(nav_goal_cursor_);
-  (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL, name, 8,
-                  DISPLAY_MAP))
-      ->SetRotateEnable(true)
-      ->SetMoveEnable(true)
-      ->setVisible(true);
-  topology_map_.AddPoint(TopologyMap::PointInfo(0, 0, 0, name));
-  std::cout << "add one nav point size:" << topology_map_.points.size()
-            << " name:" << name << std::endl;
+
+  view_ptr_->setCursor(nav_goal_cursor_);
+
+  current_mode_ = eMode::kAddNavGoal;
 }
 void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-
   QPointF position = mouseEvent->scenePos(); // 获取点击位置
-  QGraphicsItem *item =
-      itemAt(position, views()[0]->transform()); // 获取点击位置下的 item
-  if (item != nullptr) { // 判断是否获取到了 item
-    Display::VirtualDisplay *display =
-        dynamic_cast<Display::VirtualDisplay *>(item);
-    std::string display_type = display->GetDisplayType();
-    if (display_type == DISPLAY_GOAL) {
-      curr_handle_display_ = display;
-      //窗体初始化
-      QPointF view_pos =
-          view_ptr_->mapFromScene(curr_handle_display_->scenePos());
-      nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
-      nav_goal_widget_->show();
-      nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
-          .pose =
-              display_manager_->scenePoseToWord(display->GetCurrentScenePose()),
-          .name = QString::fromStdString(display->GetDisplayName())});
-      nav_goal_widget_->disconnect();
+  switch (current_mode_) {
+  case eMode::kNone: {
+    QGraphicsItem *item =
+        itemAt(position, views()[0]->transform()); // 获取点击位置下的 item
+    if (item != nullptr) { // 判断是否获取到了 item
+      Display::VirtualDisplay *display =
+          dynamic_cast<Display::VirtualDisplay *>(item);
+      std::string display_type = display->GetDisplayType();
+      if (display_type == DISPLAY_GOAL) {
+        curr_handle_display_ = display;
+        //窗体初始化
+        QPointF view_pos =
+            view_ptr_->mapFromScene(curr_handle_display_->scenePos());
+        nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+        nav_goal_widget_->show();
+        nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
+            .pose = display_manager_->scenePoseToWord(
+                display->GetCurrentScenePose()),
+            .name = QString::fromStdString(display->GetDisplayName())});
+        nav_goal_widget_->disconnect();
 
-      connect(nav_goal_widget_, &NavGoalWidget::SignalHandleOver,
-              [this, display](const NavGoalWidget::HandleResult &flag,
-                              const RobotPose &pose) {
-                if (flag == NavGoalWidget::HandleResult::kSend) {
-                  emit display_manager_->signalPub2DGoal(pose);
-                  nav_goal_widget_->hide();
-                } else if (flag == NavGoalWidget::HandleResult::kRemove) {
-                  topology_map_.RemovePoint(display->GetDisplayName());
-                  curr_handle_display_ = nullptr;
-                  FactoryDisplay::Instance()->RemoveDisplay(display);
-                  nav_goal_widget_->disconnect();
-                  delete display;
-                  nav_goal_widget_->hide();
+        connect(nav_goal_widget_, &NavGoalWidget::SignalHandleOver,
+                [this, display](const NavGoalWidget::HandleResult &flag,
+                                const RobotPose &pose) {
+                  if (flag == NavGoalWidget::HandleResult::kSend) {
+                    emit display_manager_->signalPub2DGoal(pose);
+                    nav_goal_widget_->hide();
+                  } else if (flag == NavGoalWidget::HandleResult::kRemove) {
+                    topology_map_.RemovePoint(display->GetDisplayName());
+                    curr_handle_display_ = nullptr;
+                    FactoryDisplay::Instance()->RemoveDisplay(display);
+                    nav_goal_widget_->disconnect();
+                    delete display;
+                    nav_goal_widget_->hide();
 
-                } else {
-                  curr_handle_display_ = nullptr;
-                  nav_goal_widget_->hide();
-                }
-              });
-      connect(nav_goal_widget_, &NavGoalWidget::SignalPoseChanged,
-              [this, display](const RobotPose &pose) {
-                display->UpdateDisplay(display_manager_->wordPose2Map(pose));
-              });
+                  } else {
+                    curr_handle_display_ = nullptr;
+                    nav_goal_widget_->hide();
+                  }
+                });
+        connect(nav_goal_widget_, &NavGoalWidget::SignalPoseChanged,
+                [this, display](const RobotPose &pose) {
+                  display->UpdateDisplay(display_manager_->wordPose2Map(pose));
+                });
+      }
     }
+  } break;
+  case eMode::kAddNavGoal: {
+    std::string name =
+        "NAV_POINT_" + std::to_string(topology_map_.points.size());
+    auto goal_point = (new PointShape(PointShape::ePointType::kNavGoal,
+                                      DISPLAY_GOAL, name, 8, DISPLAY_MAP));
+
+    goal_point->SetRotateEnable(true)->SetMoveEnable(true)->setVisible(true);
+    goal_point->UpdateDisplay(display_manager_->scenePoseToMap(
+        basic::RobotPose(position.x(), position.y(), 0)));
+    topology_map_.AddPoint(TopologyMap::PointInfo(
+        display_manager_->scenePoseToWord(
+            basic::RobotPose(position.x(), position.y(), 0)),
+        name));
+    std::cout << "add one nav point size:" << topology_map_.points.size()
+              << " name:" << name << std::endl;
+    current_mode_ = kNone;
+    view_ptr_->unsetCursor();
+  } break;
+  default:
+    break;
   }
+
   QGraphicsScene::mousePressEvent(mouseEvent);
 }
 void SceneDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
@@ -129,20 +148,29 @@ void SceneDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 void SceneDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
-  QPointF position = mouseEvent->scenePos(); // 获取点击位置
-  if (curr_handle_display_ != nullptr) {
-    std::string display_type = curr_handle_display_->GetDisplayType();
-    if (display_type == DISPLAY_GOAL) {
-      QPointF view_pos =
-          view_ptr_->mapFromScene(curr_handle_display_->scenePos());
-      nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
-      nav_goal_widget_->show();
-      nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
-          .pose = display_manager_->scenePoseToWord(
-              curr_handle_display_->GetCurrentScenePose()),
-          .name =
-              QString::fromStdString(curr_handle_display_->GetDisplayName())});
+  switch (current_mode_) {
+  case eMode::kNone: {
+    QPointF position = mouseEvent->scenePos(); // 获取点击位置
+    if (curr_handle_display_ != nullptr) {
+      std::string display_type = curr_handle_display_->GetDisplayType();
+      if (display_type == DISPLAY_GOAL) {
+        QPointF view_pos =
+            view_ptr_->mapFromScene(curr_handle_display_->scenePos());
+        nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+        nav_goal_widget_->show();
+        nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
+            .pose = display_manager_->scenePoseToWord(
+                curr_handle_display_->GetCurrentScenePose()),
+            .name = QString::fromStdString(
+                curr_handle_display_->GetDisplayName())});
+      }
     }
+  } break;
+  case eMode::kAddNavGoal: {
+
+  } break;
+  default:
+    break;
   }
 
   QGraphicsScene::mouseMoveEvent(mouseEvent);
