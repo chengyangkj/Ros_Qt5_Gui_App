@@ -29,7 +29,8 @@ jobs:
           -w /workspace \
           -u root \
           ros:melodic \
-          sudo apt-get install libqt5* qtbase5-private-dev libgtest-dev -y  \
+          sudo apt-get update \
+          && sudo apt-get install libqt5* qtbase5-private-dev libgtest-dev -y  \
           && mkdir build/ \
           && cd build/ \
           && cmake .. \
