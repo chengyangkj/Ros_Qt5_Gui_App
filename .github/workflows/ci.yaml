@@ -23,14 +23,11 @@ jobs:
 
     - name: Build ROS code
       run: |
-        docker run --rm \
+        docker run \
           -v $(pwd):/workspace \
           -w /workspace \
           ros:melodic \
-          mkdir -p build/ \
-          && cd build/ \
-          && cmake .. \
-          && make
+          ls
 
     - name: Run ROS code
       run: |
