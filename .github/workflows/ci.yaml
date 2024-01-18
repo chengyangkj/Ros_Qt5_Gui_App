@@ -37,7 +37,7 @@ jobs:
           && echo '-------------start cmake-------------' \
           && cmake .. \
           && echo '-------------start build-------------' \
-          && make -j$(nproc)"
+          && make -j5"
 
     # - name: Build On ROS Melodic
     #   run: |
