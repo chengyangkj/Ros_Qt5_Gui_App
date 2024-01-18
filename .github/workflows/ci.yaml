@@ -35,7 +35,7 @@ jobs:
           && mkdir build/ \
           && cd build/ \
           && cmake .. \
-          && make -j$(nproc)"
+          && make -j3"
 
     # - name: Build On ROS Melodic
     #   run: |
