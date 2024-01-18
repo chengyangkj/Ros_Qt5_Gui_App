@@ -23,7 +23,7 @@ jobs:
 
     - name: Build ROS code
       run: |
-        docker run --rm -it \
+        docker run --rm \
           -v $(pwd):/workspace \
           -w /workspace \
           ros:melodic \
