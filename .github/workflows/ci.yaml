@@ -16,8 +16,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-    - name: Set up Docker
-      uses: docker/setup-docker@v1
+
 
     - name: Pull ROS Docker image
       run: docker pull ros:melodic
