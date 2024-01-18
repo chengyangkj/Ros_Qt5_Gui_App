@@ -132,8 +132,12 @@ void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 }
 void SceneDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos(); // 获取点击位置
-  if (curr_handle_display_ != nullptr) {     // 判断是否获取到了 item
-    std::string display_type = curr_handle_display_->GetDisplayType();
+  QGraphicsItem *item =
+      itemAt(position, views()[0]->transform()); // 获取点击位置下的 item
+  if (item != nullptr) {
+    Display::VirtualDisplay *display =
+        dynamic_cast<Display::VirtualDisplay *>(item);
+    std::string display_type = display->GetDisplayType();
     if (display_type == DISPLAY_GOAL) {
       std::cout << "release goal:"
                 << curr_handle_display_->GetCurrentScenePose() << std::endl;
@@ -143,6 +147,9 @@ void SceneDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
               display_manager_->scenePoseToWord(
                   curr_handle_display_->GetCurrentScenePose()),
               curr_handle_display_->GetDisplayName()));
+    } else {
+      curr_handle_display_ = nullptr;
+      nav_goal_widget_->hide();
     }
   }
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
