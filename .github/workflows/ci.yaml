@@ -34,7 +34,9 @@ jobs:
           && rm -rf build \
           && mkdir build/ \
           && cd build/ \
+          && echo '-------------start cmake-------------' \
           && cmake .. \
+          && echo '-------------start build-------------' \
           && make -j$(nproc)"
 
     # - name: Build On ROS Melodic
