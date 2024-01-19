@@ -9,36 +9,19 @@ on:
     #   - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  humble_source:
+    runs_on: ubuntu-22.04
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-
-
-    - name: Pull ROS Docker image
-      run: docker pull ros:melodic
-
-    - name: Build On ROS foxy
-      run: |
-        docker run --rm \
-          -v $(pwd):/workspace \
-          -w /workspace \
-          -u root \
-          ros:foxy \
-          /bin/bash -c \
-          "source /opt/ros/foxy/setup.bash \
-          && sudo apt-get update \
-          && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev libeigen3-dev libgtest-dev libboost-all-dev -y  \
-          && rm -rf build \
-          && cmake . -B build \
-          && echo '-------------start build!-------------' \
-          && cd build\
-          && ls \
-          && make\
-          && echo '-------------end build-------------' "
-
+      - uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: humble
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: ls
+        run: ls
+      - name: check env
+        run: |
+          ls /opt/ros/
     # - name: Build On ROS Melodic
     #   run: |
     #     docker run --rm \
