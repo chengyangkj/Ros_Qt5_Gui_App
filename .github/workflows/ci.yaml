@@ -12,9 +12,9 @@ jobs:
   humble_build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: ros-tooling/action-ros-ci@0.3.5
+      - uses: ros-tooling/setup-ros@v0.7
         with:
-          target-ros2-distro: humble
+          required-ros-distributions: humble
       - name: Checkout code
         uses: actions/checkout@v2
       - name: ls
