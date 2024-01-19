@@ -46,6 +46,6 @@ jobs:
       - name: Test
         run: |
           /bin/bash -c \
-          "source /opt/ros/foxy/setup.bash \
+          "source /opt/ros/melodic/setup.bash \
           && cd build \
           && make test"
