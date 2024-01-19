@@ -1,5 +1,5 @@
 ### Project
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.5)
 project(json_struct VERSION "1.0.0" HOMEPAGE_URL "https://github.com/jorgen/json_struct" DESCRIPTION "A library for parsing JSON directly to C++ structs and vice versa." LANGUAGES CXX)
 set(CPACK_PACKAGE_VENDOR "Jørgen Lind")
 
