@@ -34,7 +34,9 @@ jobs:
           && rm -rf build \
           && cmake . -B build \
           && echo '-------------start build!-------------' \
-          && cmake --build build \
+          && cd build\
+          && ls \
+          && make\
           && echo '-------------end build-------------' "
 
     # - name: Build On ROS Melodic
