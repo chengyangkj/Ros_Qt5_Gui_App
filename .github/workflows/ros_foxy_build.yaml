@@ -1,4 +1,4 @@
-name: ROS2:Foxy
+name: ROS2:Foxy(20.04)
 
 on:
   push:
