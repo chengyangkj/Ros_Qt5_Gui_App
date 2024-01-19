@@ -114,11 +114,7 @@ elseif(QT_VERSION_MAJOR STREQUAL "6")
 endif()
 
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${library_name}ConfigVersion.cmake"
-    VERSION ${VERSION_SHORT}
-    COMPATIBILITY SameMajorVersion
-)
+
 install(FILES ${ads_HEADERS}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${library_name}
     COMPONENT headers
