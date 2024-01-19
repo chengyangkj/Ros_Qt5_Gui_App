@@ -64,7 +64,7 @@
 
 此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
-本项目已接入CI,保证多ROS版本/系统版本可用性,持续集成,持续更新,持续维护,持续优化,持续迭代......
+本项目已接入CI,保证多ROS版本/系统版本可用性,持续集成,持续优化迭代......
 
 ![image.png](./doc/images/main.png)
 

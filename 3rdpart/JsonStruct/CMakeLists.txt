@@ -1,5 +1,9 @@
 # Project
 cmake_minimum_required(VERSION 3.5)
+project(
+  json_struct
+  VERSION "1.0.0"
+  LANGUAGES CXX)
 set(CPACK_PACKAGE_VENDOR "Jørgen Lind")
 
 set(ADDITIONAL_MODULES_DIR "${CMAKE_CURRENT_LIST_DIR}/cmake")
