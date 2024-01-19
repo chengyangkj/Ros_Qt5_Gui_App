@@ -2,11 +2,11 @@ name: Build and Test ROS Code
 
 on:
   push:
-    # branches:
-    #   - main
+    branches:
+      - master
   pull_request:
-    # branches:
-    #   - main
+    branches:
+      - master
 
 jobs:
   humble_build:
@@ -40,9 +40,8 @@ jobs:
       - name: Compress files
         run: 
           /bin/bash -c \
-          "release=$(lsb_release -rs) \
-          && release=${release//$'\n'/} \
-          && tar -czvf ros_qt5_gui_app-Ubuntu-${release}-ros-humble.tar.gz ./path/to/installation \
+          "cd build/install/ \
+          && tar -czvf ros_qt5_gui_app-Ubuntu-$(lsb_release -rs | tr -d '\n')-ros-humble.tar.gz ./path/to/installation \
           && ls"
       - name: Create release
         id: create_release
@@ -60,6 +59,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ros_qt5_gui_app-Ubuntu-${release}-ros-humble.tar.gz  # 设置要上传的文件路径
-          asset_name: ros_qt5_gui_app-Ubuntu-${release}-ros-humble.tar.gz  # 设置要上传的文件名称
+          asset_path: ./ros_qt5_gui_app-Ubuntu-$(lsb_release -rs | tr -d '\n')-ros-humble.tar.gz  # 设置要上传的文件路径
+          asset_name: ros_qt5_gui_app-Ubuntu-$(lsb_release -rs | tr -d '\n')-ros-humble.tar.gz  # 设置要上传的文件名称
           asset_content_type: application/gzip  # 设置文件的 MIME 类型
