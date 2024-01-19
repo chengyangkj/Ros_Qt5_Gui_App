@@ -10,11 +10,11 @@ on:
 
 jobs:
   foxy_build:
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu:focal
+    runs-on: ubuntu-20.04
+    # container:
+    #   image: ubuntu:focal
     steps:
-      - uses: ros-tooling/setup-ros@v0.7
+      - uses: ros-tooling/setup-ros@v0.6
         with:
           required-ros-distributions: foxy
       - name: Checkout code
