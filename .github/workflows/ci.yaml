@@ -21,7 +21,7 @@ jobs:
         run: sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
       - name: Build
         run: |
-        source /opt/ros/melodic/setup.bash \
+        source /opt/ros/humble/setup.bash \
         && rm -rf build \
         && mkdir build/ \
         && cd build/ \
