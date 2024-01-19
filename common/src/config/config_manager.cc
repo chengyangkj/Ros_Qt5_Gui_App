@@ -1,6 +1,6 @@
 #include "config/config_manager.h"
+#include "boost/filesystem.hpp"
 #include <QFile>
-#include <filesystem>
 #include <fstream>
 namespace Config {
 // #define CHECK_DEFALUT
@@ -64,8 +64,10 @@ bool ConfigManager::ReadTopologyMap(const std::string &map_path,
 }
 bool writeStringToFile(const std::string &filePath,
                        const std::string &content) {
-  std::filesystem::path path(filePath);
-  std::filesystem::create_directories(path.parent_path()); // 创建路径
+  boost::filesystem::path path(filePath);
+  if (!boost::filesystem::exists(path.parent_path())) {
+    boost::filesystem::create_directories(path.parent_path()); // 创建路径
+  }
 
   std::ofstream outputFile(filePath);
   if (outputFile) {

@@ -170,7 +170,7 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     origin_pose.y = pose_map_frame.point.y + cost_map.heightMap();
     origin_pose.theta = 0;
   } catch (tf2::TransformException &ex) {
-    // LOGGER_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
+    // LOG_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
   }
 
   double map_o_x, map_o_y;
@@ -342,7 +342,7 @@ basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
 
   } catch (tf2::TransformException &ex) {
 
-    // LOGGER_ERROR("getTrasnsform error from:" << from << " to:" << to
+    // LOG_ERROR("getTrasnsform error from:" << from << " to:" << to
     //                                          << " error:" << ex.what());
   }
   return ret;

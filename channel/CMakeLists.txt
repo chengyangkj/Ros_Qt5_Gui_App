@@ -1,4 +1,5 @@
 include(TargetNameHelper)
+include(GTestHelper)
 GetTargetName()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -33,7 +34,7 @@ add_library(${TARGET_NAME} STATIC
 ${QT_MOC_HPP}
 ${SRC_FILE}
 )
-target_link_libraries(${TARGET_NAME} PUBLIC   Boost::filesystem)
+target_link_libraries(${TARGET_NAME} PUBLIC  Boost::filesystem)
 target_include_directories(${TARGET_NAME} PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}
 manager
@@ -42,6 +43,7 @@ set_target_properties(${TARGET_NAME} PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
-if(BUILD_WITH_TEST)
-add_subdirectory(test)
-endif()
+#######test
+find_library(DL_LIBRARY dl)
+set(TEST_LINK_LIBRARIES ${TARGET_NAME} ${DL_LIBRARY})
+AddTest()

@@ -97,13 +97,14 @@
 理论上只需要安装如下基础包就可以编译此项目:
 
 ```
-sudo apt-get install qtbase5-private-dev libgtest-dev -y
+sudo apt-get update
+sudo apt-get install qtbase5-private-dev -y
 ```
 
-如果系统环境比较纯净(没有自带Qt等环境)，可以执行如下指令安装全部依赖:
+如果以上安装后还不行，可以执行如下指令安装全部依赖:
 
 ```
-sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
+sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev libeigen3-dev libgtest-dev -y
 
 ```
 

@@ -19,6 +19,6 @@ int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
 
   ApplicationManager manager_;
-  LOGGER_INFO("ros_qt5_gui_app init!")
+  LOG_INFO("ros_qt5_gui_app init!")
   return a.exec();
 }

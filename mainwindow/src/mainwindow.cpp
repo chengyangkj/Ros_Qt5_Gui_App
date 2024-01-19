@@ -24,7 +24,7 @@ using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
 
-  LOG(INFO) << " MainWindow init thread id" << QThread::currentThreadId();
+  LOG_INFO(" MainWindow init thread id" << QThread::currentThreadId());
   qRegisterMetaType<std::string>("std::string");
   qRegisterMetaType<RobotPose>("RobotPose");
   qRegisterMetaType<RobotSpeed>("RobotSpeed");

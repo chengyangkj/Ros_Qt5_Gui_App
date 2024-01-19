@@ -1,4 +1,6 @@
 macro(AddTest)
+if(BUILD_WITH_TEST)
+
 include(TargetNameHelper)
 GetTargetName()
 # 查找 GTest 库
@@ -13,5 +15,5 @@ target_link_libraries(${TARGET_NAME}_test ${GTEST_LIBRARIES} gtest_main pthread 
 
 # 添加测试
 add_test(NAME ${TARGET_NAME}_test COMMAND  ${TARGET_NAME}_test)
-
+endif()
 endmacro()

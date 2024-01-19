@@ -1,8 +1,13 @@
 #pragma once
-#include "easylogging++.h"
+enum LogLevel {
+  DEBUG,
+  INFO,
+  WARNING,
+  ERROR,
+  FATAL
 
+};
 static void InitLogger() {
-
   // el::Configurations defaultConf;
   // defaultConf.setToDefault();
   // //设置最大文件大小
@@ -26,14 +31,15 @@ static void InitLogger() {
   // /// 设置级别门阀值，修改参数可以控制日志输出
   // el::Loggers::setLoggingLevel(el::Level::Global);
 }
-#ifndef LOGGER_INFO
-#define LOGGER_INFO(str)                                                       \
+#ifndef LOG_INFO
+#define LOG_INFO(str)                                                          \
   { std::cout << str << std::endl; }
 #endif
-#ifndef LOGGER_ERROR
-#define LOGGER_ERROR(str)                                                      \
+#ifndef LOG_ERROR
+#define LOG_ERROR(str)                                                         \
   { std::cout << str << std::endl; }
 #endif
-#ifndef LOGGER_WARN
-#define LOGGER_WARN(str) LOG(WARN) << str;
+#ifndef LOG_WARN
+#define LOG_WARN(str)                                                          \
+  { std::cout << str << std::endl; }
 #endif

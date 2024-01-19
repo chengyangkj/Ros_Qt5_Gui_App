@@ -27,7 +27,7 @@ jobs:
           && rm -rf build \
           && mkdir build/ \
           && cd build/ \
-          && cmake .. \
+          && cmake .. -DBUILD_WITH_TEST=ON\
           && make -j$(nproc) \
           && make install
           "
