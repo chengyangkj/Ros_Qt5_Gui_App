@@ -1,0 +1,41 @@
+name: ROS2:Foxy(20.04)
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  foxy_build:
+    runs-on: ubuntu-20.04
+    # container:
+    #   image: ubuntu:focal
+    steps:
+      - uses: ros-tooling/setup-ros@v0.6
+        with:
+          required-ros-distributions: foxy
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
+      - name: Build
+        run: |
+          /bin/bash -c \
+          "source /opt/ros/foxy/setup.bash \
+          && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
+          && rm -rf build \
+          && mkdir build/ \
+          && cd build/ \
+          && cmake .. \
+          && make -j$(nproc) \
+          && make install
+          "
+      - name: Test
+        run: |
+          /bin/bash -c \
+          "source /opt/ros/foxy/setup.bash \
+          && cd build \
+          && make test"
