@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: ros-tooling/action-ros-ci@0.3.5
         with:
-          required-ros-distributions: humble
+          target-ros2-distro: humble
       - name: Checkout code
         uses: actions/checkout@v2
       - name: ls
