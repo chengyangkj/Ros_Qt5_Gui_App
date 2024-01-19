@@ -1,4 +1,4 @@
-name: ROS2:Humble
+name: ROS2:Humble(22.04)
 
 on:
   push:

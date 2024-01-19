@@ -60,7 +60,7 @@
 
 此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
-各版本ROS CI构建测试状态:
+master分支各版本ROS的CI构建测试状态:
 
 ![humble](https://github.com/chengyangkj/Ros_Qt5_Gui_App/actions/workflows/ros_humble_build.yaml/badge.svg)
 
