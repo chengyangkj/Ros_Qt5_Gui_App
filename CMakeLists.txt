@@ -25,8 +25,6 @@ enable_testing()
 set(QT_VERSION_MAJOR 5)
 set(VERSION_SHORT "0.0.1")
 set(BUILD_STATIC TRUE)
-set(CMAKE_INSTALL_BINDIR ./)
-set(CMAKE_INSTALL_LIBDIR ./)
 add_subdirectory(3rdpart/dockWidget)
 add_subdirectory(3rdpart/JsonStruct)
 

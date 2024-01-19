@@ -129,33 +129,21 @@ write_basic_package_version_file(
   "${library_name}ConfigVersion.cmake"
   VERSION ${VERSION_SHORT}
   COMPATIBILITY SameMajorVersion)
-install(
-  FILES ${ads_HEADERS}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${library_name}
-  COMPONENT headers)
-# install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE"
+# install( FILES ${ads_HEADERS} DESTINATION
+# ${CMAKE_INSTALL_INCLUDEDIR}/${library_name} COMPONENT headers) install(FILES
+# "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE"
 # "${CMAKE_CURRENT_SOURCE_DIR}/../gnu-lgpl-v2.1.md" DESTINATION license/ads
-# COMPONENT license )
-install(
-  TARGETS ${library_name}
-  EXPORT adsTargets
-  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  INCLUDES
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${library_name})
+# COMPONENT license ) install( TARGETS ${library_name} EXPORT adsTargets RUNTIME
+# DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION
+# ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} INCLUDES
+# DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${library_name})
 
-install(
-  EXPORT adsTargets
-  FILE adsTargets.cmake
-  NAMESPACE ads::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name})
-install(
-  FILES qtadvanceddockingConfig.cmake
-  RENAME ${library_name}Config.cmake
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name})
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${library_name}ConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name})
+# install( EXPORT adsTargets FILE adsTargets.cmake NAMESPACE ads:: DESTINATION
+# ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name}) install( FILES
+# qtadvanceddockingConfig.cmake RENAME ${library_name}Config.cmake DESTINATION
+# ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name}) install(FILES
+# "${CMAKE_CURRENT_BINARY_DIR}/${library_name}ConfigVersion.cmake" DESTINATION
+# ${CMAKE_INSTALL_LIBDIR}/cmake/${library_name})
 
 target_include_directories(
   ${library_name} PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
