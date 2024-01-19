@@ -2,11 +2,11 @@ name: Build and Test ROS Code
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
   pull_request:
-    branches:
-      - main
+    # branches:
+    #   - main
 
 jobs:
   humble_build:
