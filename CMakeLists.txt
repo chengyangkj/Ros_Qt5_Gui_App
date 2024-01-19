@@ -25,6 +25,7 @@ enable_testing()
 # 依赖
 set(QT_VERSION_MAJOR 5)
 set(VERSION_SHORT "0.0.1")
+set(BUILD_STATIC TRUE)
 add_subdirectory(3rdpart/dockWidget)
 add_subdirectory(3rdpart/JsonStruct)
 
