@@ -28,4 +28,11 @@ jobs:
           && mkdir build/ \
           && cd build/ \
           && cmake .. \
-          && make -j$(nproc)"
+          && make -j$(nproc) \
+          && make install
+          "
+      - name: Test
+        run: |
+          /bin/bash -c \
+          "source /opt/ros/humble/setup.bash \
+          && make test"

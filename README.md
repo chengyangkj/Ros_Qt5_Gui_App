@@ -67,7 +67,7 @@
 <!-- TOC -->
 
 - [项目介绍](#项目介绍)
-  - [轻量级移动机器人ROS人机交互软件](#轻量级移动机器人ros人机交互软件)
+  - [轻量级ROS1/ROS2移动机器人人机交互软件](#轻量级ros1ros2移动机器人人机交互软件)
 - [一,环境安装](#一环境安装)
 - [二,编译](#二编译)
   - [1,克隆/下载本项目:](#1克隆下载本项目)
@@ -88,8 +88,17 @@
 
 # 一,环境安装 
 
+理论上只需要安装如下基础包就可以编译此项目:
+
 ```
 sudo apt-get install qtbase5-private-dev libgtest-dev -y
+```
+
+如果系统环境比较纯净(没有自带Qt等环境)，可以执行如下指令安装全部依赖:
+
+```
+sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
+
 ```
 
 # 二,编译
