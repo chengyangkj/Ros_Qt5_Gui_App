@@ -10,7 +10,7 @@ on:
 
 jobs:
   humble_source:
-    runs_on: ubuntu-22.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: ros-tooling/setup-ros@v0.7
         with:
