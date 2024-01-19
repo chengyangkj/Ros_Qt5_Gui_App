@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-  # pull_request:
-  #   branches:
-  #     - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   humble_build:
@@ -37,28 +37,3 @@ jobs:
           "source /opt/ros/humble/setup.bash \
           && cd build \
           && make test"
-      # - name: Compress files
-      #   run: 
-      #     /bin/bash -c \
-      #     "cd build/install/ \
-      #     && tar -czvf ros_qt5_gui_app-Ubuntu-$(lsb_release -rs | tr -d '\n')-ros-humble.tar.gz ./path/to/installation \
-      #     && ls"
-      # - name: Create release
-      #   id: create_release
-      #   uses: actions/create-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     tag_name: v0.0.1  # 设置发布的标签名称
-      #     release_name: Release v0.0.1  # 设置发布的名称
-      #     body: |
-      #       Release v0.0.1 Test
-      # - name: Upload release asset
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: ./ros_qt5_gui_app-Ubuntu-$(lsb_release -rs | tr -d '\n')-ros-humble.tar.gz  # 设置要上传的文件路径
-      #     asset_name: ros_qt5_gui_app-Ubuntu-$(lsb_release -rs | tr -d '\n')-ros-humble.tar.gz  # 设置要上传的文件名称
-      #     asset_content_type: application/gzip  # 设置文件的 MIME 类型

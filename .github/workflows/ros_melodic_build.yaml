@@ -1,16 +1,16 @@
-name: ROS1:Melodic(18.04)
+name: ROS1:Melodic(20.04)
 
 on:
   push:
     branches:
       - master
-  # pull_request:
-  #   branches:
-  #     - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   melodic_build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - uses: ros-tooling/setup-ros@v0.7
         with:
