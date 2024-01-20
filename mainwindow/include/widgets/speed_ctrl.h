@@ -386,6 +386,9 @@ public:
     QPushButton *btn_stop = new QPushButton();
     btn_stop->setObjectName(QString::fromUtf8("btn_stop"));
     btn_stop->setText("停止(s)");
+    btn_stop->setStyleSheet("QPushButton {background-color: red; color: white; "
+                            "font-size: 14px;}"
+                            "QPushButton:hover {background-color: darkred;}");
     btn_stop->setShortcut(QApplication::translate("Widget", "s", nullptr));
     connect(btn_stop, &QPushButton::clicked,
             [this]() { emit signalControlSpeed(RobotSpeed()); });
@@ -398,12 +401,14 @@ public:
     // horizontalLayout_23->setObjectName(
     //     QString::fromUtf8("horizontalLayout_23"));
     // QSpacerItem *horizontalSpacer_5 =
-    //     new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    //     new QSpacerItem(40, 20, QSizePolicy::Expanding,
+    //     QSizePolicy::Minimum);
 
     // horizontalLayout_23->addItem(horizontalSpacer_5);
 
     // QSpacerItem *horizontalSpacer_6 =
-    //     new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    //     new QSpacerItem(40, 20, QSizePolicy::Expanding,
+    //     QSizePolicy::Minimum);
 
     // horizontalLayout_23->addItem(horizontalSpacer_6);
 
