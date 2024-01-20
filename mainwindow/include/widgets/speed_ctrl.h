@@ -394,25 +394,26 @@ public:
     horizontalLayout_stop_button->addStretch();
     verticalLayout_speed_ctrl->addLayout(horizontalLayout_stop_button);
 
-    QHBoxLayout *horizontalLayout_23 = new QHBoxLayout();
-    horizontalLayout_23->setObjectName(
-        QString::fromUtf8("horizontalLayout_23"));
-    QSpacerItem *horizontalSpacer_5 =
-        new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    // QHBoxLayout *horizontalLayout_23 = new QHBoxLayout();
+    // horizontalLayout_23->setObjectName(
+    //     QString::fromUtf8("horizontalLayout_23"));
+    // QSpacerItem *horizontalSpacer_5 =
+    //     new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    horizontalLayout_23->addItem(horizontalSpacer_5);
+    // horizontalLayout_23->addItem(horizontalSpacer_5);
 
-    QSpacerItem *horizontalSpacer_6 =
-        new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    // QSpacerItem *horizontalSpacer_6 =
+    //     new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    horizontalLayout_23->addItem(horizontalSpacer_6);
+    // horizontalLayout_23->addItem(horizontalSpacer_6);
 
-    verticalLayout_speed_ctrl->addLayout(horizontalLayout_23);
+    // verticalLayout_speed_ctrl->addLayout(horizontalLayout_23);
 
-    QSpacerItem *verticalSpacer_4 =
-        new QSpacerItem(385, 21, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    // QSpacerItem *verticalSpacer_4 =
+    //     new QSpacerItem(385, 21, QSizePolicy::Minimum,
+    //     QSizePolicy::Expanding);
 
-    verticalLayout_speed_ctrl->addItem(verticalSpacer_4);
+    // verticalLayout_speed_ctrl->addItem(verticalSpacer_4);
 
     this->setLayout(verticalLayout_speed_ctrl);
   }

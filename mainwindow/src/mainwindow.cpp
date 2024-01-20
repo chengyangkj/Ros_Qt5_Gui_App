@@ -163,6 +163,19 @@ void MainWindow::setupUi() {
                                    DashBoardDockWidget, CentralDockArea);
   ui->menuView->addAction(DashBoardDockWidget->toggleViewAction());
 
+  ////////////////////////////////////////////////////////速度控制
+  speed_ctrl_widget_ = new SpeedCtrlWidget();
+  connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,
+          [this](const RobotSpeed &speed) {
+            SendChannelMsg(MsgId::kSetRobotSpeed, speed);
+          });
+  ads::CDockWidget *SpeedCtrlDockWidget = new ads::CDockWidget("SpeedCtrl");
+  SpeedCtrlDockWidget->setWidget(speed_ctrl_widget_);
+  auto speed_ctrl_area =
+      dock_manager_->addDockWidget(ads::DockWidgetArea::BottomDockWidgetArea,
+                                   SpeedCtrlDockWidget, dashboard_area);
+  ui->menuView->addAction(SpeedCtrlDockWidget->toggleViewAction());
+
   /////////////////////////////////////////////////////////导航任务列表
 
   QWidget *task_list_widget = new QWidget();
@@ -183,19 +196,6 @@ void MainWindow::setupUi() {
                                nav_goal_list_dock_widget, CentralDockArea);
   nav_goal_list_dock_widget->toggleView(false);
   ui->menuView->addAction(nav_goal_list_dock_widget->toggleViewAction());
-
-  ////////////////////////////////////////////////////////速度控制
-  speed_ctrl_widget_ = new SpeedCtrlWidget();
-  connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,
-          [this](const RobotSpeed &speed) {
-            SendChannelMsg(MsgId::kSetRobotSpeed, speed);
-          });
-  ads::CDockWidget *SpeedCtrlDockWidget = new ads::CDockWidget("SpeedCtrl");
-  SpeedCtrlDockWidget->setWidget(speed_ctrl_widget_);
-  auto speed_ctrl_area =
-      dock_manager_->addDockWidget(ads::DockWidgetArea::BottomDockWidgetArea,
-                                   SpeedCtrlDockWidget, dashboard_area);
-  ui->menuView->addAction(SpeedCtrlDockWidget->toggleViewAction());
 
   //////////////////////////////////////////////////////槽链接
 
