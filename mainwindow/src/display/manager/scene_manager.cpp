@@ -170,6 +170,8 @@ void SceneDisplay::blindNavGoalWidget(Display::VirtualDisplay *display) {
             if (flag == NavGoalWidget::HandleResult::kSend) {
               emit display_manager_->signalPub2DGoal(pose);
               nav_goal_widget_->hide();
+              curr_handle_display_ = nullptr;
+              nav_goal_widget_->hide();
             } else if (flag == NavGoalWidget::HandleResult::kRemove) {
               LOG_INFO("remove:" << display->GetDisplayName());
               topology_map_.RemovePoint(display->GetDisplayName());
