@@ -107,6 +107,10 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
     //  qDebug()<<"缩小";
     scale_value_ *= 0.9; // 每次缩小10%
   }
+  if (scale_value_ < 1) {
+    scale_value_ = 1;
+    return;
+  }
   // qDebug()<<"scale:"<<scale_value_;
   SetScaled(scale_value_);
 
