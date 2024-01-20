@@ -31,6 +31,8 @@
 </a>
 -->
 
+ 简体中文 | [English](./README_en.md)
+
 本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时在ROS1/ROS2系统中使用
 
 软件在编译时会自动识别环境变量中的ROS1/ROS2环境并进行构建，实现ROS通信与界面隔离
@@ -66,11 +68,20 @@
 
 本项目已接入CI,保证多ROS版本/系统版本可用性,持续集成,持续优化迭代......
 
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chengyangkj/Ros_Qt5_Gui_App&type=Timeline&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=chengyangkj/Ros_Qt5_Gui_App&type=Timeline" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=chengyangkj/Ros_Qt5_Gui_App&type=Timeline" width="75%" />
+  </picture>
+
+## 项目截图
+
 ![image.png](./doc/images/main.png)
 
 ![image.png](./doc/images/main.gif)
 
 <!-- TOC -->
+## 目录
 
 - [一,环境安装](#一环境安装)
 - [二,编译](#二编译)
@@ -272,7 +283,7 @@ Topic=/odom
 Topic=/battery
 ```
 
-![image.png](./doc/images/battery_state.jpg)
+![image.png](./doc/images/battery_state.png)
 
 
 # 四,相关链接
