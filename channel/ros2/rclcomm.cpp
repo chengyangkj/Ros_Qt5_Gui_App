@@ -69,6 +69,11 @@ bool rclcomm::Start() {
           GET_TOPIC_NAME("LaserScan"), 20,
           std::bind(&rclcomm::laser_callback, this, std::placeholders::_1),
           sub_laser_obt);
+  battery_state_subscriber_ =
+      node->create_subscription<sensor_msgs::msg::BatteryState>(
+          GET_TOPIC_NAME("Battery"), 1,
+          std::bind(&rclcomm::BatteryCallback, this, std::placeholders::_1),
+          sub1_obt);
   global_path_subscriber_ = node->create_subscription<nav_msgs::msg::Path>(
       GET_TOPIC_NAME("GlobalPlan"), 20,
       std::bind(&rclcomm::path_callback, this, std::placeholders::_1),
@@ -115,6 +120,13 @@ void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
   default:
     break;
   }
+}
+void rclcomm::BatteryCallback(
+    const sensor_msgs::msg::BatteryState::SharedPtr msg) {
+  std::map<std::string, std::string> map;
+  map["percent"] = std::to_string(msg->percentage);
+  map["voltage"] = std::to_string(msg->voltage);
+  OnDataCallback(MsgId::kBatteryState, map);
 }
 void rclcomm::getRobotPose() {
   OnDataCallback(MsgId::kRobotPose, getTrasnsform("base_link", "map"));

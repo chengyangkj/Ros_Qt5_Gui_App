@@ -18,6 +18,7 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "point_type.h"
+#include "sensor_msgs/msg/battery_state.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "tf2/LinearMath/Quaternion.h"
@@ -40,6 +41,7 @@ private:
   void globalCostMapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
   void laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
   void path_callback(const nav_msgs::msg::Path::SharedPtr msg);
+  void BatteryCallback(const sensor_msgs::msg::BatteryState::SharedPtr msg);
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
 
@@ -67,6 +69,8 @@ private:
       global_cost_map_subscriber_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr
       laser_scan_subscriber_;
+  rclcpp::Subscription<sensor_msgs::msg::BatteryState>::SharedPtr
+      battery_state_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr local_path_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr global_path_subscriber_;
