@@ -39,25 +39,26 @@
 
 目前软件可以实现:
 
-  - 1,ROS1/ROS2通信
-  - 2,全局地图显示
-  - 3,全局/局部代价地图显示
-  - 4,机器人实时位置显示
-  - 5,机器人实时速度显示 
-  - 6,机器人手动控制
-  - 7,机器人重定位
-  - 8,机器人导航单点目标发布
-  - 9,机器人全局/局部规划轨迹显示
-  - 10,机器人拓扑地图功能,多导航点单点导航
+  - ROS1/ROS2通信
+  - 全局地图显示
+  - 全局/局部代价地图显示
+  - 机器人实时位置显示
+  - 机器人实时速度显示 
+  - 机器人手动控制
+  - 机器人重定位
+  - 机器人导航单点目标发布
+  - 机器人全局/局部规划轨迹显示
+  - 机器人拓扑地图功能,多导航点单点导航
   
 已规划未实现(TODO List):
 
-  - 1,机器地图编辑器功能
-  - 2,机器人拓扑地图多点连续导航/拓扑地图路线绘制
-  - 3,机器人导航任务链
-  - 4,基于protobuf的通信channel实现(制定自定义通信协议,彻底摆脱ROS通信机制,实现软件跨平台运行)
-  - 5,鹰眼视图
-  - 6,基于OpenGl的3D视图显示
+  - 机器地图编辑器功能
+  - 机器人拓扑地图多点连续导航/拓扑地图路线绘制
+  - 机器人导航任务链
+  - 基于protobuf的通信channel实现(制定自定义通信协议,彻底摆脱ROS通信机制,实现软件跨平台运行)
+  - 鹰眼视图
+  - 基于OpenGl的3D视图显示
+  - 相机图像显示
 
 
 此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
@@ -82,6 +83,7 @@
     - [3.4,导航目标点设置](#34导航目标点设置)
     - [3.5,手动控制机器人](#35手动控制机器人)
     - [3.6,速度仪表盘](#36速度仪表盘)
+    - [3.7,电池电量显示](#37电池电量显示)
 - [四,相关链接](#四相关链接)
 - [五,相关教程及交流群](#五相关教程及交流群)
 
@@ -260,8 +262,16 @@ Topic=/odom
 
 为机器人时机发布的里程计话题
 
+### 3.7,电池电量显示
 
-....其他功能逐步完善
+软件支持实时显示机器人电量,在配置中配置话题名，电池电量的Topic类型为:sensor_msgs::BatteryState
+
+```
+[Battery]
+Topic=/battery
+```
+
+![image.png](./doc/images/battery_state.jpg)
 
 
 # 四,相关链接
@@ -275,7 +285,7 @@ Topic=/odom
 | [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)         | Win10 Ubuntu              | ROS + QWidget + Librviz原生图层Api实现图层管理，不需手动创建图层                                       |
 | [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)     | Win10 Ubuntu              | cakin_create_qt_pkg 创建的原始包，cmakelist.txt已配置好改为qt5，可以直接编译运行                       |
 | [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo)                        | ROS2                      | 在ROS2平台上运行的qt demo包，cmakelist.txt已配置好改为qt5，可以直接colcon build 编译使用               |
-| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)                | ROS2                      | 与本仓库代码完全相同/保持同步                                                                          |
+| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)                | ROS2                      | 与本仓库代码完全相同/停止维护                                                                          |
 | [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app) | 基于flutter实现多平台运行 | 逐步推进.....                                                                                          |
 
 

@@ -83,7 +83,8 @@ void RosNode::init() {
                                         &RosNode::LocalPathCallback, this);
   odometry_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Odometry"), 200,
                                       &RosNode::OdometryCallback, this);
-
+  battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Battery"), 200,
+                                     &RosNode::BatteryCallback, this);
   tf_listener_ = new tf::TransformListener();
 }
 bool RosNode::Stop() {
@@ -114,6 +115,12 @@ void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
   default:
     break;
   }
+}
+void RosNode::BatteryCallback(sensor_msgs::BatteryState::ConstPtr battery) {
+  std::map<std::string, std::string> map;
+  map["percent"] = std::to_string(battery->percentage);
+  map["voltage"] = std::to_string(battery->voltage);
+  OnDataCallback(MsgId::kBatteryState, map);
 }
 void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
 

@@ -64,6 +64,12 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
   case MsgId::kOdomPose:
     updateOdomInfo(std::any_cast<RobotState>(data));
     break;
+  case MsgId::kBatteryState: {
+    std::map<std::string, std::string> map =
+        std::any_cast<std::map<std::string, std::string>>(data);
+    status_bar_widget_->SlotSetBatteryStatus(std::stod(map["percent"]),
+                                             std::stod(map["voltage"]));
+  } break;
   default:
     break;
   }
