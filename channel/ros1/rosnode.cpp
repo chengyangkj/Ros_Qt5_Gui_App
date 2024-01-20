@@ -75,15 +75,15 @@ void RosNode::init() {
   global_cost_map_subscriber_ =
       nh.subscribe(GET_TOPIC_NAME("GlobalCostMap"), 1,
                    &RosNode::GlobalCostMapCallback, this);
-  laser_scan_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LaserScan"), 20,
+  laser_scan_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LaserScan"), 1,
                                         &RosNode::LaserScanCallback, this);
-  global_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("GlobalPlan"), 20,
+  global_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("GlobalPlan"), 1,
                                          &RosNode::GlobalPathCallback, this);
-  local_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LocalPlan"), 20,
+  local_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LocalPlan"), 1,
                                         &RosNode::LocalPathCallback, this);
-  odometry_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Odometry"), 200,
+  odometry_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Odometry"), 1,
                                       &RosNode::OdometryCallback, this);
-  battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Battery"), 200,
+  battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Battery"), 1,
                                      &RosNode::BatteryCallback, this);
   tf_listener_ = new tf::TransformListener();
 }
@@ -108,7 +108,7 @@ void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
   } break;
   case MsgId::kSetRobotSpeed: {
     auto speed = std::any_cast<basic::RobotSpeed>(msg);
-    std::cout << "recv reloc pose:" << speed << std::endl;
+    std::cout << "recv speed pose:" << speed << std::endl;
     PubRobotSpeed(speed);
 
   } break;
