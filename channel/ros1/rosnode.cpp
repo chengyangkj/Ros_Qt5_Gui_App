@@ -251,18 +251,27 @@ void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
   }
 }
 void RosNode::GlobalPathCallback(nav_msgs::Path::ConstPtr msg) {
-  basic::RobotPath path;
-  for (int i = 0; i < msg->poses.size(); i++) {
-    double x = msg->poses.at(i).pose.position.x;
-    double y = msg->poses.at(i).pose.position.y;
-    basic::Point point;
-    point.x = x;
-    point.y = y;
-    path.push_back(point);
-    //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<"
-    //        "<<point.y();
+  try {
+    //        geometry_msgs::msg::TransformStamped laser_transform =
+    //        tf_buffer_->lookupTransform("map","base_scan",tf2::TimePointZero);
+    geometry_msgs::PointStamped point_map_frame;
+    geometry_msgs::PointStamped point_odom_frame;
+    basic::RobotPath path;
+    for (int i = 0; i < msg->poses.size(); i++) {
+      double x = msg->poses.at(i).pose.position.x;
+      double y = msg->poses.at(i).pose.position.y;
+      point_odom_frame.point.x = x;
+      point_odom_frame.point.y = y;
+      point_odom_frame.header.frame_id = msg->header.frame_id;
+      tf_listener_->transformPoint("map", point_odom_frame, point_map_frame);
+      basic::Point point;
+      point.x = point_map_frame.point.x;
+      point.y = point_map_frame.point.y;
+      path.push_back(point);
+    }
+    OnDataCallback(MsgId::kGlobalPath, path);
+  } catch (tf2::TransformException &ex) {
   }
-  OnDataCallback(MsgId::kGlobalPath, path);
 }
 void RosNode::LocalPathCallback(nav_msgs::Path::ConstPtr msg) {
   try {

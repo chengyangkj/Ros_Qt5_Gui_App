@@ -218,18 +218,29 @@ void rclcomm::Process() {
 }
 
 void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
-  basic::RobotPath path;
-  for (int i = 0; i < msg->poses.size(); i++) {
-    double x = msg->poses.at(i).pose.position.x;
-    double y = msg->poses.at(i).pose.position.y;
-    basic::Point point;
-    point.x = x;
-    point.y = y;
-    path.push_back(point);
-    //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<"
-    //        "<<point.y();
+  try {
+    //        geometry_msgs::msg::TransformStamped laser_transform =
+    //        tf_buffer_->lookupTransform("map","base_scan",tf2::TimePointZero);
+    geometry_msgs::msg::PointStamped point_map_frame;
+    geometry_msgs::msg::PointStamped point_odom_frame;
+    basic::RobotPath path;
+    for (int i = 0; i < msg->poses.size(); i++) {
+      double x = msg->poses.at(i).pose.position.x;
+      double y = msg->poses.at(i).pose.position.y;
+      point_odom_frame.point.x = x;
+      point_odom_frame.point.y = y;
+      point_odom_frame.header.frame_id = msg->header.frame_id;
+      tf_buffer_->transform(point_odom_frame, point_map_frame, "map");
+      basic::Point point;
+      point.x = point_map_frame.point.x;
+      point.y = point_map_frame.point.y;
+      path.push_back(point);
+      //        qDebug()<<"x:"<<x<<" y:"<<y<<" trans:"<<point.x()<<"
+      //        "<<point.y();
+    }
+    OnDataCallback(MsgId::kGlobalPath, path);
+  } catch (tf2::TransformException &ex) {
   }
-  OnDataCallback(MsgId::kGlobalPath, path);
 }
 void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
   // qDebug()<<"订阅到激光话题";

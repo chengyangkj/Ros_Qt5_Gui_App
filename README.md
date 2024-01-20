@@ -6,7 +6,6 @@
  * @FilePath: /ROS2_Qt5_Gui_App/README.md
 -->
 简体中文 | [English](./README_en.md)
-
 ## 轻量级ROS1/ROS2移动机器人人机交互软件
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
