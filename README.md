@@ -5,6 +5,7 @@
  * @LastEditTime: 2023-10-06 14:03:03
  * @FilePath: /ROS2_Qt5_Gui_App/README.md
 -->
+简体中文 | [English](./README_en.md)
 
 ## 轻量级ROS1/ROS2移动机器人人机交互软件
 
@@ -31,7 +32,6 @@
 </a>
 -->
 
- 简体中文 | [English](./README_en.md)
 
 本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时在ROS1/ROS2系统中使用
 
