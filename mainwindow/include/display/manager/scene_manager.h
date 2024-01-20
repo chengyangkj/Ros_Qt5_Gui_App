@@ -38,5 +38,8 @@ private:
   void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void saveTopologyMap();
+  void blindNavGoalWidget(Display::VirtualDisplay *);
+  void updateNavGoalWidgetPose(const Display::VirtualDisplay *);
+  std::string generatePointName(const std::string& prefix);
 };
 } // namespace Display

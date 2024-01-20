@@ -6,6 +6,8 @@
  * @FilePath: /ROS2_Qt5_Gui_App/README.md
 -->
 
+## 轻量级ROS1/ROS2移动机器人人机交互软件
+
 ![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub stars](https://img.shields.io/github/stars/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub forks](https://img.shields.io/github/forks/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
@@ -28,10 +30,6 @@
 <img alt="Static Badge" src="https://img.shields.io/badge/Linux%E9%83%A8%E7%BD%B2%E8%A7%86%E9%A2%91-208647">
 </a>
 -->
-
-# 项目介绍
-
-## 轻量级ROS1/ROS2移动机器人人机交互软件
 
 本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时在ROS1/ROS2系统中使用
 
@@ -72,8 +70,6 @@
 
 <!-- TOC -->
 
-- [项目介绍](#项目介绍)
-  - [轻量级ROS1/ROS2移动机器人人机交互软件](#轻量级ros1ros2移动机器人人机交互软件)
 - [一,环境安装](#一环境安装)
 - [二,编译](#二编译)
   - [1,克隆/下载本项目:](#1克隆下载本项目)

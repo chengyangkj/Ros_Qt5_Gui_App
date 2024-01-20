@@ -8,7 +8,20 @@
  */
 #include "rosnode.h"
 #include "config/config_manager.h"
-RosNode::RosNode(/* args */) { std::cout << "ros node start" << std::endl; }
+RosNode::RosNode(/* args */) {
+  SET_DEFAULT_TOPIC_NAME("NavGoal", "/move_base_simple/goal")
+  SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
+  SET_DEFAULT_TOPIC_NAME("Map", "/map")
+  SET_DEFAULT_TOPIC_NAME("LocalCostMap", "/move_base/local_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME("GlobalCostMap", "/move_base/global_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME("LaserScan", "/scan")
+  SET_DEFAULT_TOPIC_NAME("GlobalPlan", "/move_base/DWAPlannerROS/global_plan")
+  SET_DEFAULT_TOPIC_NAME("LocalPlan", "/move_base/DWAPlannerROS/local_plan")
+  SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
+  SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
+  SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
+  std::cout << "ros node start" << std::endl;
+}
 basic::RobotPose Convert(const geometry_msgs::Pose &pose) {
   RobotPose robot_pose;
 
@@ -46,16 +59,6 @@ bool RosNode::Start() {
 }
 void RosNode::init() {
   // 设置默认的topic名称
-  SET_DEFAULT_TOPIC_NAME("NavGoal", "/move_base_simple/goal")
-  SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
-  SET_DEFAULT_TOPIC_NAME("Map", "/map")
-  SET_DEFAULT_TOPIC_NAME("LocalCostMap", "/move_base/local_costmap/costmap")
-  SET_DEFAULT_TOPIC_NAME("GlobalCostMap", "/move_base/global_costmap/costmap")
-  SET_DEFAULT_TOPIC_NAME("LaserScan", "/scan")
-  SET_DEFAULT_TOPIC_NAME("GlobalPlan", "/move_base/DWAPlannerROS/global_plan")
-  SET_DEFAULT_TOPIC_NAME("LocalPlan", "/move_base/DWAPlannerROS/local_plan")
-  SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
-  SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   ros::NodeHandle nh;
   nav_goal_publisher_ =
       nh.advertise<geometry_msgs::PoseStamped>(GET_TOPIC_NAME("NavGoal"), 10);

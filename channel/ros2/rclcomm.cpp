@@ -21,6 +21,7 @@ rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME("LocalPlan", "/local_plan")
   SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
   SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
+  SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
 }
 bool rclcomm::Start() {
   rclcpp::init(0, nullptr);
