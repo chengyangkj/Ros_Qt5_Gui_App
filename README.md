@@ -32,7 +32,7 @@
 -->
 
 
-本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时在ROS1/ROS2系统中使用
+本项目基于Qt5开发，基于Module Cmake进行构建，可以实现一套代码同时在ROS1/ROS2系统中使用(本项目已接入CI,保证多ROS版本/系统版本可用性)
 
 软件在编译时会自动识别环境变量中的ROS1/ROS2环境并进行构建，实现ROS通信与界面隔离
 
@@ -64,8 +64,6 @@
 
 
 此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
-
-本项目已接入CI,保证多ROS版本/系统版本可用性,持续集成,持续优化迭代......
 
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chengyangkj/Ros_Qt5_Gui_App&type=Timeline&theme=dark" />
