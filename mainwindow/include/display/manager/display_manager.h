@@ -20,6 +20,7 @@
 #include "laser_points.h"
 
 #include "config/config_manager.h"
+#include "config/topology_map.h"
 #include "point_shape.h"
 #include "widgets/set_pose_widget.h"
 #include <Eigen/Dense>
@@ -49,12 +50,14 @@ private:
   bool is_reloc_mode_{false};
   ViewManager *graphics_view_ptr_;
   SetPoseWidget *set_reloc_pose_widget_;
-  SceneDisplay *scene_display_ptr_;
+  SceneManager *scene_display_ptr_;
   bool init_flag_{false};
 signals:
   void cursorPosMap(QPointF);
   void signalPub2DPose(const RobotPose &pose);
   void signalPub2DGoal(const RobotPose &pose);
+  void signalTopologyMapUpdate(const TopologyMap &map);
+  void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
 public slots:
   void updateScaled(double value);
   void SetRelocPose();

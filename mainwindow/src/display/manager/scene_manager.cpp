@@ -7,8 +7,8 @@
 #include <QDebug>
 #include <iostream>
 namespace Display {
-SceneDisplay::SceneDisplay(QObject *parent) : QGraphicsScene(parent) {}
-void SceneDisplay::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
+SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent) {}
+void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   Config::ConfigManager::Instacnce()->SetDefaultConfig(
       "TopologyMap/Path", "./default_topology_map.json");
 
@@ -30,7 +30,7 @@ void SceneDisplay::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   LoadTopologyMap();
   saveTopologyMap();
 }
-void SceneDisplay::LoadTopologyMap() {
+void SceneManager::LoadTopologyMap() {
   Config::ConfigManager::Instacnce()->ReadTopologyMap(
       Config::ConfigManager::Instacnce()->GetConfig("TopologyMap/Path"),
       topology_map_);
@@ -44,20 +44,21 @@ void SceneDisplay::LoadTopologyMap() {
         display_manager_->wordPose2Map(point.ToRobotPose()));
   }
 }
-void SceneDisplay::saveTopologyMap() {
+void SceneManager::saveTopologyMap() {
   Config::ConfigManager::Instacnce()->WriteTopologyMap(
       Config::ConfigManager::Instacnce()->GetConfig("TopologyMap/Path"),
       topology_map_);
+  emit signalTopologyMapUpdate(topology_map_);
   // 递归
   QTimer::singleShot(1000, this, [=] { saveTopologyMap(); });
 }
-void SceneDisplay::AddOneNavPoint() {
+void SceneManager::AddOneNavPoint() {
 
   view_ptr_->setCursor(nav_goal_cursor_);
 
   current_mode_ = eMode::kAddNavGoal;
 }
-void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos(); // 获取点击位置
   switch (current_mode_) {
   case eMode::kNone: {
@@ -71,6 +72,11 @@ void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
         curr_handle_display_ = display;
         //窗体初始化
         blindNavGoalWidget(display);
+        emit signalCurrentSelectPointChanged(
+            TopologyMap::PointInfo(TopologyMap::PointInfo(
+                display_manager_->scenePoseToWord(
+                    basic::RobotPose(position.x(), position.y(), 0)),
+                display->GetDisplayName())));
       }
     }
   } break;
@@ -98,7 +104,7 @@ void SceneDisplay::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 
   QGraphicsScene::mousePressEvent(mouseEvent);
 }
-std::string SceneDisplay::generatePointName(const std::string &prefix) {
+std::string SceneManager::generatePointName(const std::string &prefix) {
   int index = topology_map_.points.size();
   std::string name = prefix + "_" + std::to_string(topology_map_.points.size());
   //生成不重复的ID
@@ -116,7 +122,7 @@ std::string SceneDisplay::generatePointName(const std::string &prefix) {
   }
   return name;
 }
-void SceneDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos(); // 获取点击位置
   if (curr_handle_display_ != nullptr) {
     std::string display_type = curr_handle_display_->GetDisplayType();
@@ -135,7 +141,7 @@ void SceneDisplay::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   }
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
-void SceneDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
+void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   switch (current_mode_) {
   case eMode::kNone: {
     QPointF position = mouseEvent->scenePos(); // 获取点击位置
@@ -155,7 +161,7 @@ void SceneDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 
   QGraphicsScene::mouseMoveEvent(mouseEvent);
 }
-void SceneDisplay::blindNavGoalWidget(Display::VirtualDisplay *display) {
+void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
   nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
   nav_goal_widget_->show();
@@ -191,7 +197,7 @@ void SceneDisplay::blindNavGoalWidget(Display::VirtualDisplay *display) {
             display->UpdateDisplay(display_manager_->wordPose2Map(pose));
           });
 }
-void SceneDisplay::updateNavGoalWidgetPose(
+void SceneManager::updateNavGoalWidgetPose(
     const Display::VirtualDisplay *display) {
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
   nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
@@ -201,5 +207,5 @@ void SceneDisplay::updateNavGoalWidgetPose(
           curr_handle_display_->GetCurrentScenePose()),
       .name = QString::fromStdString(curr_handle_display_->GetDisplayName())});
 }
-SceneDisplay::~SceneDisplay() {}
+SceneManager::~SceneManager() {}
 } // namespace Display

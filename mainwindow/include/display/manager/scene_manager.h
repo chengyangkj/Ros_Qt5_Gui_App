@@ -10,7 +10,8 @@
 #include <display/virtual_display.h>
 namespace Display {
 class DisplayManager;
-class SceneDisplay : public QGraphicsScene {
+class SceneManager : public QGraphicsScene {
+  Q_OBJECT
   enum eMode {
     kNone,
     kAddNavGoal,
@@ -25,10 +26,13 @@ private:
   QCursor nav_goal_cursor_;
   TopologyMap topology_map_;
   eMode current_mode_{kNone};
+signals:
+  void signalTopologyMapUpdate(const TopologyMap &map);
+  void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
 
 public:
-  SceneDisplay(QObject *parent = nullptr);
-  virtual ~SceneDisplay();
+  SceneManager(QObject *parent = nullptr);
+  virtual ~SceneManager();
   void Init(QGraphicsView *view_ptr, DisplayManager *manager);
   void AddOneNavPoint();
   void LoadTopologyMap();
@@ -40,6 +44,6 @@ private:
   void saveTopologyMap();
   void blindNavGoalWidget(Display::VirtualDisplay *);
   void updateNavGoalWidgetPose(const Display::VirtualDisplay *);
-  std::string generatePointName(const std::string& prefix);
+  std::string generatePointName(const std::string &prefix);
 };
 } // namespace Display
