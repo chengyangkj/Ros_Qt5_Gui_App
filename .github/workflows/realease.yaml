@@ -85,6 +85,7 @@ jobs:
       #     asset_content_type: application/gzip
       - name: create_file
         run: |
+          mkdir -p ${{ github.workspace }}
           echo "hello world" > ${{ github.workspace }}/${{matrix.os-ros.ros}}.txt
   release:
     runs-on: ubuntu-latest
