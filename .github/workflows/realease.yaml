@@ -1,9 +1,10 @@
 name: AutoRelease
 
 on:
-  release:
-      types:
-        - created
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*'
 jobs:
   release:
     runs-on: ubuntu-latest
