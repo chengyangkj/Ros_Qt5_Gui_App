@@ -32,7 +32,7 @@ jobs:
       steps:
         - name: ls
           run: |
-            echo ${{ needs.build.outputs.upload_url }} >> ./test.txt
+            echo ${{ needs.create_release.outputs.upload_url }} >> ./test.txt
             cat ./test.txt
 
   # build:
