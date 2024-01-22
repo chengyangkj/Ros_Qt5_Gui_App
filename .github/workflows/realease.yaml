@@ -53,7 +53,7 @@ jobs:
           && make test"
       - name: Package Release
         run: |
-          cd build/install
+          cd build/install/bin
           tar -czvf release_package.tar.gz ./*
       - name: Create Release
         id: create_release
