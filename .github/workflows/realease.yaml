@@ -79,6 +79,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/install/release_package.tar.gz
+          asset_path: ./release_package.tar.gz
           asset_name: ros_qt5_gui_app_${{matrix.os-ros.ros}}_${{matrix.os-ros.image}}.tar.gz
           asset_content_type: application/gzip
