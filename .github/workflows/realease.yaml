@@ -80,10 +80,9 @@ jobs:
       - name: Upload Release Asset
         env:
           upload_url: ${{needs.create_release.outputs.upload_url}}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         with:
           upload_url: $upload_url
           asset_path: ${{ github.workspace }}/release_package.tar.gz
