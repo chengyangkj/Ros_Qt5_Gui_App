@@ -55,7 +55,6 @@ jobs:
         run: |
           cd build/install
           tar -czvf release_package.tar.gz ./*
-          mv release_package.tar.gz $GITHUB_WORKSPACE/release_package.tar.gz
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
