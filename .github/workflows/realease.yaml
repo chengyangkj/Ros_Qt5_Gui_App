@@ -1,0 +1,72 @@
+name: Auto Release
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:bionic
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up ROS
+        uses: ros-tooling/setup-ros@v0.6
+        with:
+          required-ros-distributions: melodic
+
+      - name: Install Dependencies
+        run: sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
+
+      - name: Update gtest
+        run: |
+          wget https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz \
+          && tar -zxvf release-1.12.1.tar.gz \
+          && cd googletest-release-1.12.1 \
+          && mkdir build \
+          && cd build \
+          && cmake .. \
+          && make -j$(nproc) \
+          && sudo make install
+
+      - name: Build
+        run: |
+          /bin/bash -c \
+          "source /opt/ros/melodic/setup.bash \
+          && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
+          && rm -rf build \
+          && mkdir build/ \
+          && cd build/ \
+          && cmake .. -DBUILD_WITH_TEST=ON\
+          && make -j$(nproc) \
+          && make install"
+
+      - name: Package and Upload to Release
+        run: |
+          cd build/install
+          tar -czvf release_package_melodic.tar.gz .
+          mv release_package.tar.gz $GITHUB_WORKSPACE/release_package.tar.gz
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          release_name: Release ${{ github.event.release.tag_name }}
+          body: ${{ github.event.release.body }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/release_package.tar.gz
+          asset_name: release_package.tar.gz
+          asset_content_type: application/tar+gzip
