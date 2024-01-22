@@ -23,7 +23,7 @@ jobs:
           prerelease: false
       - name: Write URL
         run: |
-          echo ${{create_release.outputs.upload_url}} >> $UPLOAD_URL
+          echo ${{steps.create_release.outputs.upload_url}} >> $UPLOAD_URL
   build_melodic:
       runs-on: ubuntu-latest
       needs: create_release
