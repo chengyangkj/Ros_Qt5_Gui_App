@@ -5,12 +5,22 @@ on:
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*'
-
+  release:
+      types:
+        - created
 jobs:
   release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os-ros: 
+          - { image: 'ubuntu:bionic', ros: 'melodic' }
+          - { image: 'ubuntu:focal', ros: 'noetic' }
+          - { image: 'ubuntu:focal', ros: 'foxy' }
+          - { image: 'ubuntu:jammy', ros: 'humble' }
+
     container:
-      image: ubuntu:bionic
+      image: ${{matrix.os-ros.image}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -18,7 +28,7 @@ jobs:
       - name: Set up ROS
         uses: ros-tooling/setup-ros@v0.6
         with:
-          required-ros-distributions: melodic
+          required-ros-distributions: ${{matrix.os-ros.ros}}
 
       - name: Install Dependencies
         run: sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
@@ -37,7 +47,7 @@ jobs:
       - name: Build
         run: |
           /bin/bash -c \
-          "source /opt/ros/melodic/setup.bash \
+          "source /opt/ros/${{matrix.os-ros.ros}}/setup.bash \
           && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
           && rm -rf build \
           && mkdir build/ \
@@ -48,7 +58,7 @@ jobs:
       - name: Test
         run: |
           /bin/bash -c \
-          "source /opt/ros/melodic/setup.bash \
+          "source /opt/ros/${{matrix.os-ros.ros}}/setup.bash \
           && cd build \
           && make test"
       - name: Package Release
@@ -73,5 +83,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./build/install/release_package.tar.gz
-          asset_name: release_package.tar.gz
+          asset_name: ros_qt5_gui_app_${{matrix.os-ros.ros}}_${{matrix.os-ros.image}}.tar.gz
           asset_content_type: application/gzip
