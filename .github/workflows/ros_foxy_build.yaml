@@ -1,4 +1,4 @@
-name: ROS2:Foxy(20.04/22.04)
+name: ROS2:Foxy(20.04)
 
 on:
   push:
@@ -15,7 +15,6 @@ jobs:
       matrix:
         os-ros: 
           - { image: 'ubuntu:focal', ros: 'foxy' }
-          - { image: 'ubuntu:jammy', ros: 'foxy' }
 
     container:
       image: ${{matrix.os-ros.image}}
