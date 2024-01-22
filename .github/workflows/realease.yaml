@@ -88,7 +88,6 @@ jobs:
           echo "hello world" > ${{ github.workspace }}/${{matrix.os-ros.ros}}.txt
   release:
     needs: build
-    run-on: ubuntu-latest
     steps:
       - name: ls
         run: |
