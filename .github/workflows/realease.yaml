@@ -1,10 +1,6 @@
 name: AutoRelease
 
 on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - 'v*'
   release:
       types:
         - created
