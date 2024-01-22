@@ -45,11 +45,16 @@ jobs:
           && cmake .. -DBUILD_WITH_TEST=ON\
           && make -j$(nproc) \
           && make install"
-
+      - name: Test
+        run: |
+          /bin/bash -c \
+          "source /opt/ros/melodic/setup.bash \
+          && cd build \
+          && make test"
       - name: Package and Upload to Release
         run: |
           cd build/install
-          tar -czvf release_package_melodic.tar.gz .
+          tar -czvf release_package.tar.gz ./*
           mv release_package.tar.gz $GITHUB_WORKSPACE/release_package.tar.gz
 
       - name: Create Release
