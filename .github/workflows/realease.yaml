@@ -35,9 +35,9 @@ jobs:
       # container:
       #   image: ${{matrix.os-ros.image}}
       steps:
-        - env:
-            upload_url: ${{needs.create_release.outputs.upload_url}}
         - name: ls
+          env:
+            upload_url: ${{needs.create_release.outputs.upload_url}}
           run: |
             echo $upload_url
 
