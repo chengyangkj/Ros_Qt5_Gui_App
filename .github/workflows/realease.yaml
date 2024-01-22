@@ -32,8 +32,8 @@ jobs:
       steps:
         - name: ls
           run: |
-          echo ${{ needs.build.outputs.upload_url }} >> ./test.txt
-          cat ./test.txt
+            echo ${{ needs.build.outputs.upload_url }} >> ./test.txt
+            cat ./test.txt
 
   # build:
   #   runs-on: ubuntu-latest
