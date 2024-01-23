@@ -13,12 +13,19 @@ namespace Display {
 
 DisplayManager::DisplayManager() {
   graphics_view_ptr_ = new ViewManager();
-  scene_display_ptr_ = new SceneDisplay();
+  scene_display_ptr_ = new SceneManager();
   scene_display_ptr_->Init(graphics_view_ptr_, this);
   // 设置绘制区域
   graphics_view_ptr_->setSceneRect(QRectF(0, 0, 800, 800));
   FactoryDisplay::Instance()->Init(graphics_view_ptr_, scene_display_ptr_);
-
+  connect(scene_display_ptr_,
+          SIGNAL(signalTopologyMapUpdate(const TopologyMap &)), this,
+          SIGNAL(signalTopologyMapUpdate(const TopologyMap &)));
+  connect(
+      scene_display_ptr_,
+      SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)),
+      this,
+      SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)));
   //------------------------------------start display instace (register
   // display)-----------------------------
   (new DisplayOccMap(DISPLAY_MAP, 1));

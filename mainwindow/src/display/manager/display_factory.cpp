@@ -4,7 +4,7 @@
 #include "logger/logger.h"
 namespace Display {
 
-bool FactoryDisplay::Init(QGraphicsView *viewer, SceneDisplay *scene_ptr) {
+bool FactoryDisplay::Init(QGraphicsView *viewer, SceneManager *scene_ptr) {
   if (!initlizated_) {
     initlizated_ = true;
     viewer_ptr_ = viewer;

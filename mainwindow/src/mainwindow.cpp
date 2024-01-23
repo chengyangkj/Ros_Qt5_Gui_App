@@ -8,9 +8,7 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "widgets/speed_ctrl.h"
-
+#include "AutoHideDockContainer.h"
 #include "DockAreaTabBar.h"
 #include "DockAreaTitleBar.h"
 #include "DockAreaWidget.h"
@@ -19,6 +17,8 @@
 #include "FloatingDockContainer.h"
 #include "algorithm.h"
 #include "logger/logger.h"
+#include "ui_mainwindow.h"
+#include "widgets/speed_ctrl.h"
 #include <QDebug>
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<RobotPath>("RobotPath");
   qRegisterMetaType<MsgId>("MsgId");
   qRegisterMetaType<std::any>("std::any");
+  qRegisterMetaType<TopologyMap>("TopologyMap");
+  qRegisterMetaType<TopologyMap::PointInfo>("TopologyMap::PointInfo");
   setupUi();
   RestoreState();
   openChannel();
@@ -90,8 +92,8 @@ void MainWindow::setupUi() {
   CDockManager::setConfigFlag(CDockManager::MiddleMouseButtonClosesTab, true);
   CDockManager::setConfigFlag(CDockManager::EqualSplitOnInsertion, true);
   CDockManager::setConfigFlag(CDockManager::ShowTabTextOnlyForActiveTab, true);
+  CDockManager::setAutoHideConfigFlags(CDockManager::DefaultAutoHideConfig);
   dock_manager_ = new CDockManager(this);
-
   QVBoxLayout *central_layout = new QVBoxLayout();
   /////////////////////////////////////////////////////////////////状态栏
   status_bar_widget_ = new StatusBarWidget();
@@ -183,20 +185,40 @@ void MainWindow::setupUi() {
   QVBoxLayout *horizontalLayout_13 = new QVBoxLayout();
   horizontalLayout_13->addWidget(nav_goal_table_view_);
   task_list_widget->setLayout(horizontalLayout_13);
-  ads::CDockWidget *nav_goal_list_dock_widget =
-      new ads::CDockWidget("NavGoalList");
+  ads::CDockWidget *nav_goal_list_dock_widget = new ads::CDockWidget("Task");
+  QPushButton *btn_add_one_goal = new QPushButton("Add");
+  QPushButton *btn_remove_select_goal = new QPushButton("Remove Select");
+  QHBoxLayout *horizontalLayout_15 = new QHBoxLayout();
   QPushButton *btn_start_goal_list = new QPushButton("Start");
   QPushButton *btn_stop_goal_list = new QPushButton("Stop");
   QHBoxLayout *horizontalLayout_14 = new QHBoxLayout();
+  horizontalLayout_15->addWidget(btn_add_one_goal);
+  horizontalLayout_15->addWidget(btn_remove_select_goal);
   horizontalLayout_14->addWidget(btn_start_goal_list);
   horizontalLayout_14->addWidget(btn_stop_goal_list);
+  horizontalLayout_13->addLayout(horizontalLayout_15);
   horizontalLayout_13->addLayout(horizontalLayout_14);
   nav_goal_list_dock_widget->setWidget(task_list_widget);
-  dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
-                               nav_goal_list_dock_widget, CentralDockArea);
-  nav_goal_list_dock_widget->toggleView(false);
+  nav_goal_list_dock_widget->setMinimumSizeHintMode(
+      CDockWidget::MinimumSizeHintFromDockWidget);
+  nav_goal_list_dock_widget->setMinimumSize(200, 150);
+  nav_goal_list_dock_widget->setMaximumSize(480, 9999);
+  const auto autoHideContainer = dock_manager_->addAutoHideDockWidget(
+      SideBarLocation::SideBarRight, nav_goal_list_dock_widget);
+  autoHideContainer->setSize(480);
+  // nav_goal_list_dock_widget->toggleView(false);
   ui->menuView->addAction(nav_goal_list_dock_widget->toggleViewAction());
-
+  connect(btn_add_one_goal, &QPushButton::clicked,
+          [this]() { nav_goal_table_view_->AddItem(); });
+  connect(btn_remove_select_goal, &QPushButton::clicked, [this]() {});
+  connect(display_manager_,
+          SIGNAL(signalTopologyMapUpdate(const TopologyMap &)),
+          nav_goal_table_view_, SLOT(UpdateTopologyMap(const TopologyMap &)));
+  connect(
+      display_manager_,
+      SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)),
+      nav_goal_table_view_,
+      SLOT(UpdateSelectPoint(const TopologyMap::PointInfo &)));
   //////////////////////////////////////////////////////槽链接
 
   connect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
@@ -259,10 +281,12 @@ void MainWindow::SaveState() {
   Settings.setValue("mainWindow/Geometry", this->saveGeometry());
   Settings.setValue("mainWindow/State", this->saveState());
   Settings.setValue("mainWindow/DockingState", dock_manager_->saveState());
-  QMap<QString, ads::CDockWidget *> dock_map = dock_manager_->dockWidgetsMap();
-  for (auto iter = dock_map.begin(); iter != dock_map.end(); ++iter) {
-    Settings.setValue("menuView/" + iter.key(), iter.value()->isClosed());
-  }
+  // QMap<QString, ads::CDockWidget *> dock_map =
+  // dock_manager_->dockWidgetsMap(); for (auto iter = dock_map.begin(); iter !=
+  // dock_map.end(); ++iter) {
+  //   Settings.setValue("menuView/" + iter.key(), iter.value()->isClosed());
+  // }
+  // perspectivesManager_->addPerspective("main", *this);
 }
 
 //============================================================================
@@ -270,21 +294,23 @@ void MainWindow::RestoreState() {
   QSettings settings("state.ini", QSettings::IniFormat);
   this->restoreGeometry(settings.value("mainWindow/Geometry").toByteArray());
   this->restoreState(settings.value("mainWindow/State").toByteArray());
-  settings.beginGroup("menuView");
-  // 获取该组下的所有键
-  QStringList keys = settings.childKeys();
-  QList<QAction *> actions = ui->menuView->actions();
+  // dock_manager_->loadPerspectives();
+  // dock_manager_make
+  // settings.beginGroup("menuView");
+  // // 获取该组下的所有键
+  // QStringList keys = settings.childKeys();
+  // QList<QAction *> actions = ui->menuView->actions();
 
-  // 遍历所有键
-  foreach (const QString &key, keys) {
-    // 获取键对应的值
-    QVariant value = settings.value(key);
-    auto widget = dock_manager_->findDockWidget(key);
-    if (widget) {
-      widget->toggleView(!value.toBool());
-    }
-  }
-  settings.endGroup();
+  // // 遍历所有键
+  // foreach (const QString &key, keys) {
+  //   // 获取键对应的值
+  //   QVariant value = settings.value(key);
+  //   auto widget = dock_manager_->findDockWidget(key);
+  //   if (widget) {
+  //     // widget->toggleView(!value.toBool());
+  //   }
+  // }
+  // settings.endGroup();
 }
 void MainWindow::updateOdomInfo(RobotState state) {
   // 转向灯
