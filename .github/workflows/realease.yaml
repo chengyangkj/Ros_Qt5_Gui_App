@@ -89,5 +89,5 @@ jobs:
         with:
           upload_url: ${{needs.create_release.outputs.upload_url}}
           asset_path: ${{ github.workspace }}/release_package.tar.gz
-          asset_name: ros_qt5_gui_app_${{matrix.os-ros.ros}}_${{matrix.os-ros.image}}.tar.gz
+          asset_name: ros_qt5_gui_app_${{matrix.os-ros.ros}}_${{matrix.os-ros.image}}_x86_64.tar.gz
           asset_content_type: application/gzip
