@@ -24,7 +24,9 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   goal_image.load("://images/goal_green.png");
   QMatrix matrix;
   matrix.rotate(90);
-  goal_image = goal_image.transformed(matrix, Qt::SmoothTransformation);
+  goal_image =
+      goal_image.transformed(QTransform(matrix), Qt::SmoothTransformation);
+
   nav_goal_cursor_ =
       QCursor(goal_image, goal_image.width() / 2, goal_image.height() / 2);
   LoadTopologyMap();
@@ -70,7 +72,7 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       std::string display_type = display->GetDisplayType();
       if (display_type == DISPLAY_GOAL) {
         curr_handle_display_ = display;
-        //窗体初始化
+        // 窗体初始化
         blindNavGoalWidget(display);
         emit signalCurrentSelectPointChanged(
             TopologyMap::PointInfo(TopologyMap::PointInfo(
@@ -107,7 +109,7 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
 std::string SceneManager::generatePointName(const std::string &prefix) {
   int index = topology_map_.points.size();
   std::string name = prefix + "_" + std::to_string(topology_map_.points.size());
-  //生成不重复的ID
+  // 生成不重复的ID
   while (true) {
     auto iter =
         std::find_if(topology_map_.points.begin(), topology_map_.points.end(),
