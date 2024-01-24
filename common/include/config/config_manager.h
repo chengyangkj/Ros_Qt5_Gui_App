@@ -1,6 +1,6 @@
 #pragma once
+#include "config_define.h"
 #include "topology_map.h"
-#include <QSettings>
 #ifndef GET_TOPIC_NAME
 #define GET_TOPIC_NAME(frame_name)                                             \
   Config::ConfigManager::Instacnce()->GetTopicName(frame_name)
@@ -21,12 +21,13 @@ namespace Config {
 
 class ConfigManager {
 private:
-  QString config_path_ = "./config.ini";
+  std::string config_path_ = "./config.json";
+  ConfigRoot config_root_; // 配置文件根节点
+  ConfigManager(/* args */);
 
 public:
-  ConfigManager(/* args */);
   ~ConfigManager();
-  void Init(const QString &config_path);
+  void Init(const std::string &config_path);
   static ConfigManager *Instacnce() {
     static ConfigManager config;
     return &config;
@@ -35,8 +36,7 @@ public:
   void SetDefaultConfig(const std::string &name, const std::string &value);
   void SetDefaultTopicName(const std::string &frame_name,
                            const std::string &topic_name);
-  std::string GetConfig(const std::string &key);
-  bool SetConfig(const std::string &key, const std::string &value);
+  ConfigRoot &GetRootConfig() { return config_root_; }
   bool ReadTopologyMap(const std::string &map_path, TopologyMap &map);
   bool WriteTopologyMap(const std::string &map_path,
                         const TopologyMap &topology_map);

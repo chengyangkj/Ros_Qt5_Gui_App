@@ -27,7 +27,9 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
     robot_image_.load("://images/dir.png");
     QMatrix matrix;
     matrix.rotate(45);
-    robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);
+    robot_image_ =
+        robot_image_.transformed(QTransform(matrix), Qt::SmoothTransformation);
+
     SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
                            0 - robot_image_.height() / 2, robot_image_.width(),
                            robot_image_.height()));
@@ -39,7 +41,9 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
     robot_image_.load("://images/goal_green.png");
     QMatrix matrix;
     matrix.rotate(90);
-    robot_image_ = robot_image_.transformed(matrix, Qt::SmoothTransformation);
+    robot_image_ =
+        robot_image_.transformed(QTransform(matrix), Qt::SmoothTransformation);
+
     SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
                            0 - robot_image_.height() / 2, robot_image_.width(),
                            robot_image_.height()));
