@@ -34,7 +34,7 @@ add_library(${TARGET_NAME} STATIC
 ${QT_MOC_HPP}
 ${SRC_FILE}
 )
-target_link_libraries(${TARGET_NAME} PUBLIC  Boost::filesystem)
+target_link_libraries(${TARGET_NAME} PUBLIC Boost::filesystem pthread dl)
 target_include_directories(${TARGET_NAME} PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}
 manager

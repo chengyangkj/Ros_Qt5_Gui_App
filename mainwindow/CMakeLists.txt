@@ -13,7 +13,7 @@ qt5_wrap_ui(QT_UI_HPP ${UI_FILE})
 qt5_wrap_cpp(QT_MOC_HPP ${INCLUDE_FILE})
 qt5_add_resources(QT_RESOUCE_HPP ${QRC_FILE})
 #向可执行程序添加源文件
-add_library(${TARGET_NAME} SHARED
+add_library(${TARGET_NAME} STATIC
     ${SOURCE_FILE}
     ${INCLUDE_FILE}
     ${UI_FILE}

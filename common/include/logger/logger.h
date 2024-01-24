@@ -1,45 +1,42 @@
 #pragma once
-enum LogLevel {
-  DEBUG,
-  INFO,
-  WARNING,
-  ERROR,
-  FATAL
+#include <iostream>
+#include <sstream>
+enum class LogLevel { INFO, ERROR, WARN };
 
+class Logger {
+public:
+  static void log(LogLevel level, const std::stringstream &message) {
+    switch (level) {
+    case LogLevel::INFO:
+      std::cout << "[INFO] " << message.str() << std::endl;
+      break;
+    case LogLevel::ERROR:
+      std::cerr << "[ERROR] " << message.str() << std::endl;
+      break;
+    case LogLevel::WARN:
+      std::cerr << "[WARN] " << message.str() << std::endl;
+      break;
+    }
+  }
 };
-static void InitLogger() {
-  // el::Configurations defaultConf;
-  // defaultConf.setToDefault();
-  // //设置最大文件大小
-  // defaultConf.setGlobally(el::ConfigurationType::MaxLogFileSize, "1000000");
-  // //是否写入文件
-  // defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
-  // //是否输出控制台
-  // defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
-  // // filename
-  // defaultConf.setGlobally(el::ConfigurationType::Filename,
-  //                         "ros_qt_gui_app.log");
-  // //设置配置文件
-  // el::Loggers::reconfigureLogger("default", defaultConf);
 
-  // /// 防止Fatal级别日志中断程序
-  // el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortOnFatalLog);
+#define LOG_INFO(message)                                                      \
+  do {                                                                         \
+    std::stringstream ss;                                                      \
+    ss << message;                                                             \
+    Logger::log(LogLevel::INFO, ss);                                           \
+  } while (0);
 
-  // /// 选择划分级别的日志
-  // el::Loggers::addFlag(el::LoggingFlag::HierarchicalLogging);
+#define LOG_ERROR(message)                                                     \
+  do {                                                                         \
+    std::stringstream ss;                                                      \
+    ss << message;                                                             \
+    Logger::log(LogLevel::ERROR, ss);                                          \
+  } while (0);
 
-  // /// 设置级别门阀值，修改参数可以控制日志输出
-  // el::Loggers::setLoggingLevel(el::Level::Global);
-}
-#ifndef LOG_INFO
-#define LOG_INFO(str)                                                          \
-  { std::cout << str << std::endl; }
-#endif
-#ifndef LOG_ERROR
-#define LOG_ERROR(str)                                                         \
-  { std::cout << str << std::endl; }
-#endif
-#ifndef LOG_WARN
-#define LOG_WARN(str)                                                          \
-  { std::cout << str << std::endl; }
-#endif
+#define LOG_WARN(message)                                                      \
+  do {                                                                         \
+    std::stringstream ss;                                                      \
+    ss << message;                                                             \
+    Logger::log(LogLevel::WARN, ss);                                           \
+  } while (0);

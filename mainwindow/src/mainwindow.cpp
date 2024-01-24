@@ -20,10 +20,12 @@
 #include "ui_mainwindow.h"
 #include "widgets/speed_ctrl.h"
 #include <QDebug>
+#include <iostream>
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
-
+  Q_INIT_RESOURCE(images);
+  Q_INIT_RESOURCE(media);
   LOG_INFO(" MainWindow init thread id" << QThread::currentThreadId());
   qRegisterMetaType<std::string>("std::string");
   qRegisterMetaType<RobotPose>("RobotPose");
