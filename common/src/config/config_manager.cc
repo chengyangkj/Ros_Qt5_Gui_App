@@ -23,12 +23,18 @@ bool writeStringToFile(const std::string &filePath,
 // #define CHECK_DEFALUT
 ConfigManager::ConfigManager(/* args */) { Init(config_path_); }
 void ConfigManager::Init(const std::string &config_path) {
+
   config_path_ = config_path;
   // 配置不存在 写入默认配置
   if (!boost::filesystem::exists(config_path_)) {
     std::string pretty_json = JS::serializeStruct(config_root_);
+
     writeStringToFile(config_path_, pretty_json);
   }
+  ReadRootConfig();
+}
+ConfigManager::~ConfigManager() {}
+bool ConfigManager::ReadRootConfig() {
   std::ifstream file(config_path_);
   std::string json((std::istreambuf_iterator<char>(file)),
                    std::istreambuf_iterator<char>());
@@ -40,12 +46,15 @@ void ConfigManager::Init(const std::string &config_path) {
     fprintf(stderr, "Error parsing config.json error: %s\n", errorStr.c_str());
     std::exit(1);
   }
+  return true;
 }
-ConfigManager::~ConfigManager() {
+bool ConfigManager::WriteRootConfig() {
   std::string pretty_json = JS::serializeStruct(config_root_);
   writeStringToFile(config_path_, pretty_json);
+  return true;
 }
 std::string ConfigManager::GetTopicName(const std::string &frame_name) {
+  ReadRootConfig();
   auto iter = std::find_if(config_root_.display_config.begin(),
                            config_root_.display_config.end(),
                            [&frame_name](const auto &item) {
@@ -70,6 +79,7 @@ void ConfigManager::SetDefaultTopicName(const std::string &frame_name,
   } else if (iter->topic == "") {
     iter->topic = topic_name;
   }
+  WriteRootConfig();
 }
 
 bool ConfigManager::ReadTopologyMap(const std::string &map_path,

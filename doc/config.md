@@ -1,81 +1,117 @@
 ## 配置说明
 
-第一次运行后，会在可执行程序同级目录生成config.ini
+第一次运行后，会在可执行程序同级目录生成config.json
+
+图层相关的配置存在于:
+display_config
+拓扑地图配置存在于:
+topology_map_config
 
 ### 1，局部代价地图配置
 
 ```
-[LocalCostMap]
-Topic=/local_costmap/costmap
+{
+      "display_name": "LocalCostMap",
+      "topic": "/local_costmap/costmap",
+      "enable": true
+}
 ```
 
 ### 2，全局代价地图配置
 
 ```
-[GlobalCostMap]
-Topic=/global_costmap/costmap  ###话题名
+{
+      "display_name": "GlobalCostMap",
+      "topic": "/global_costmap/costmap",
+      "enable": true
+}
 ```
 ### 3，全局路径规划配置
 
 ```
-[GlobalPlan]
-Topic=/move_base/DWAPlannerROS/global_plan  ##话题名
+{
+      "display_name": "GlobalPlan",
+      "topic": "/move_base/DWAPlannerROS/global_plan",
+      "enable": true
+}
 ```
 ### 4，激光雷达配置
 
 ```
-[LaserScan]
-Topic=/scan #话题名
+{
+      "display_name": "LaserScan",
+      "topic": "/scan",
+      "enable": true
+}
 ```
 
 ### 5，机器人局部导航路径配置
 
 ```
-[LocalPlan]
-Topic=/move_base/DWAPlannerROS/local_plan  #话题名
+{
+      "display_name": "LocalPlan",
+      "topic": "/move_base/DWAPlannerROS/local_plan",
+      "enable": true
+}
 ```
 
 ### 机器人全局地图
 
 ```
-[Map]
-Topic=/map   #话题名
+{
+      "display_name": "Map,
+      "topic": "/map",
+      "enable": true
+}
 ```
 
 ### 6，机器人导航目标点发布配置
 
 ```
-[NavGoal]
-Topic=/move_base_simple/goal #话题名，机器人需要接收此话题
+{
+      "display_name": "NavGoal",
+      "topic": "/move_base_simple/goal",
+      "enable": true
+}
 ```
 ### 7，机器人里程计话题
 
 ```
-[Odometry]
-Topic=/odom  #话题名，软件订阅此话题用于获取速度等信息
+{
+      "display_name": "Odometry",
+      "topic": "/odom ",
+      "enable": true
+}
 ```
 ### 8，机器人初始位置话题
 
 ```
-[Reloc]
-Topic=/initialpose  #机器人重定位话题，软件发布此话题，机器人需要订阅此话题用于重定位
+{
+      "display_name": "Reloc",
+      "topic": "/initialpose",
+      "enable": true
+}
 ```
 ### 9，机器人速度话题
 
 ```
-[Speed]
-Topic=/cmd_vel  #机器人接收此话题，用于软件下发手动控制速度
+{
+      "display_name": "Speed",
+      "topic": "/cmd_vel",
+      "enable": true
+}
 ```
 
-### 10，拓扑地图名
+### 拓扑地图名
 
 软件初始化时会读取此配置，用于加载/保存拓扑地图
 
 其中拓扑地图的保存路径配置项为：
 
 ```
-[TopologyMap]
-Path=./default_topology_map.json  //地图路径
+ "topology_map_config": {
+    "map_name": "./default_topology_map.json"
+  }
 
 ```
 拓扑地图包含以下信息：

@@ -12,10 +12,6 @@
                                                           topic_name);
 #endif
 
-#ifndef SET_DEFAULT_CONFIG
-#define SET_DEFAULT_CONFIG(key, value)                                         \
-  Config::ConfigManager::Instacnce()->SetDefaultConfig(key, value);
-#endif
 
 namespace Config {
 
@@ -24,10 +20,15 @@ private:
   std::string config_path_ = "./config.json";
   ConfigRoot config_root_; // 配置文件根节点
   ConfigManager(/* args */);
-
+  // 禁用拷贝构造函数和赋值运算符
+  ConfigManager(const ConfigManager &) = delete;
+  ConfigManager &operator=(const ConfigManager &) = delete;
+  bool ReadRootConfig();
+  bool WriteRootConfig();
 public:
   ~ConfigManager();
   void Init(const std::string &config_path);
+  //静态库的单例 同时在动态库与可执行程序中使用有多副本的问题
   static ConfigManager *Instacnce() {
     static ConfigManager config;
     return &config;

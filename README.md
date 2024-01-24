@@ -192,7 +192,7 @@ cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 
 ```
 
-~/qt_ws/ROS2_Qt5_Gui_App/build/config.ini
+~/qt_ws/ROS2_Qt5_Gui_App/build/config.json
 
 ```
 
@@ -214,7 +214,7 @@ ROS2:
 
 ### 3.2,配置文件
 
-第一次运行后，会在可执行程序同级目录生成config.ini,修改此配置文件即可,修改后重启生效,具体配置说明详见[配置文件说明](./doc/config.md)
+第一次运行后，会在可执行程序同级目录生成config.json,修改此配置文件即可(需要注意Json格式),修改后重启生效,具体配置说明详见[配置文件说明](./doc/config.md)
 
 
 ### 3.3,重定位位姿态发布
@@ -225,11 +225,14 @@ ROS2:
 
 ![image.png](./doc/images/reloc.gif)
 
-注意:如果设置无效,需要检查config.ini中设置：
+注意:如果设置无效,需要检查config.json中设置：
 
 ```
-[Reloc]
-Topic=/initialpose  
+{
+      "display_name": "Reloc",
+      "topic": "/initialpose",
+      "enable": true
+}
 ```
 为自己机器人监听的重定位Topic名称
 
@@ -244,11 +247,14 @@ Topic=/initialpose
 
 ![image.png](./doc/images/set_nav_goal.gif)
 
-注意:如果设置无效,需要检查config.ini中设置：
+注意:如果设置无效,需要检查config.json中设置：
 
 ```
-[NavGoal]
-Topic=/move_base_simple/goal
+{
+      "display_name": "NavGoal",
+      "topic": "/move_base_simple/goal",
+      "enable": true
+}
 ```
 为自己机器人监听的导航目标点Topic名称
 
@@ -261,11 +267,14 @@ Topic=/move_base_simple/goal
 
 对应按钮上的文字，可以由键盘对应按钮同步调用
 
-注意:如果设置无效,需要检查config.ini中设置：
+注意:如果设置无效,需要检查config.json中设置：
 
 ```
-[Speed]
-Topic=/cmd_vel
+{
+      "display_name": "Speed",
+      "topic": "/cmd_vel",
+      "enable": true
+}
 
 ```
 为实际机器人监听的速度控制话题
@@ -276,11 +285,14 @@ Topic=/cmd_vel
 
 ![image.png](./doc/images/speed_dashboard.jpg)
 
-注意:如果设置无效,需要检查config.ini中设置：
+注意:如果设置无效,需要检查config.json中设置：
 
 ```
-[Odometry]
-Topic=/odom
+{
+      "display_name": "Odometry",
+      "topic": "/odom",
+      "enable": true
+}
 ```
 
 为机器人时机发布的里程计话题
@@ -290,8 +302,11 @@ Topic=/odom
 软件支持实时显示机器人电量,在配置中配置话题名，电池电量的Topic类型为:sensor_msgs::BatteryState
 
 ```
-[Battery]
-Topic=/battery
+{
+      "display_name": "Battery",
+      "topic": "/battery",
+      "enable": true
+}
 ```
 
 ![image.png](./doc/images/battery_state.png)
