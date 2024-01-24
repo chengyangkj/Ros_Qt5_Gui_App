@@ -4,6 +4,7 @@ include(GTestHelper)
 GetTargetName()
 
 file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} src/*.cpp src/*.cc)
+list(FILTER SOURCE_FILE EXCLUDE REGEX "(.*_test\\.cpp$)|(.*_test\\.cc$)")
 file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  *.h *.hpp)
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem)
