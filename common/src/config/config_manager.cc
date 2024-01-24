@@ -3,14 +3,31 @@
 #include <QFile>
 #include <fstream>
 namespace Config {
+bool writeStringToFile(const std::string &filePath,
+                       const std::string &content) {
+  boost::filesystem::path path(filePath);
+  if (!boost::filesystem::exists(path.parent_path())) {
+    boost::filesystem::create_directories(path.parent_path()); // 创建路径
+  }
+
+  std::ofstream outputFile(filePath);
+  if (outputFile) {
+    outputFile << content; // 写入内容
+    outputFile.close();    // 关闭文件
+    return true;
+  } else {
+    std::cerr << "无法创建文件 " << filePath << std::endl;
+    return false;
+  }
+}
 // #define CHECK_DEFALUT
 ConfigManager::ConfigManager(/* args */) { Init(config_path_); }
 void ConfigManager::Init(const std::string &config_path) {
   config_path_ = config_path;
   // 配置不存在 写入默认配置
   if (!boost::filesystem::exists(config_path_)) {
-    std::string pretty_json = JS::serializeStruct(topology_map);
-    writeStringToFile(map_path, pretty_json);
+    std::string pretty_json = JS::serializeStruct(config_root_);
+    writeStringToFile(config_path_, pretty_json);
   }
   std::ifstream file(config_path_);
   std::string json((std::istreambuf_iterator<char>(file)),
@@ -25,8 +42,8 @@ void ConfigManager::Init(const std::string &config_path) {
   }
 }
 ConfigManager::~ConfigManager() {
-  std::string pretty_json = JS::serializeStruct(topology_map);
-  writeStringToFile(map_path, pretty_json);
+  std::string pretty_json = JS::serializeStruct(config_root_);
+  writeStringToFile(config_path_, pretty_json);
 }
 std::string ConfigManager::GetTopicName(const std::string &frame_name) {
   auto iter = std::find_if(config_root_.display_config.begin(),
@@ -70,23 +87,7 @@ bool ConfigManager::ReadTopologyMap(const std::string &map_path,
   }
   return true;
 }
-bool writeStringToFile(const std::string &filePath,
-                       const std::string &content) {
-  boost::filesystem::path path(filePath);
-  if (!boost::filesystem::exists(path.parent_path())) {
-    boost::filesystem::create_directories(path.parent_path()); // 创建路径
-  }
 
-  std::ofstream outputFile(filePath);
-  if (outputFile) {
-    outputFile << content; // 写入内容
-    outputFile.close();    // 关闭文件
-    return true;
-  } else {
-    std::cerr << "无法创建文件 " << filePath << std::endl;
-    return false;
-  }
-}
 bool ConfigManager::WriteTopologyMap(const std::string &map_path,
                                      const TopologyMap &topology_map) {
 
