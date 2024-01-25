@@ -20,10 +20,14 @@ bool writeStringToFile(const std::string &filePath,
     return false;
   }
 }
+ConfigManager *ConfigManager::Instacnce() {
+  static ConfigManager config;
+  return &config;
+}
 // #define CHECK_DEFALUT
 ConfigManager::ConfigManager(/* args */) { Init(config_path_); }
 void ConfigManager::Init(const std::string &config_path) {
-
+  std::cout << "init!!!!!!!!!!!! this:" << this << std::endl;
   config_path_ = config_path;
   // 配置不存在 写入默认配置
   if (!boost::filesystem::exists(config_path_)) {

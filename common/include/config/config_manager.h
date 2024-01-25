@@ -28,11 +28,7 @@ private:
 public:
   ~ConfigManager();
   void Init(const std::string &config_path);
-  //静态库的单例 同时在动态库与可执行程序中使用有多副本的问题
-  static ConfigManager *Instacnce() {
-    static ConfigManager config;
-    return &config;
-  }
+  static ConfigManager *Instacnce();
   std::string GetTopicName(const std::string &frame_name);
   void SetDefaultConfig(const std::string &name, const std::string &value);
   void SetDefaultTopicName(const std::string &frame_name,
