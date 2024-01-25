@@ -1,6 +1,7 @@
 #pragma once
 #include "config_define.h"
 #include "topology_map.h"
+#include <mutex>
 #ifndef GET_TOPIC_NAME
 #define GET_TOPIC_NAME(frame_name)                                             \
   Config::ConfigManager::Instacnce()->GetTopicName(frame_name)
@@ -12,19 +13,20 @@
                                                           topic_name);
 #endif
 
-
 namespace Config {
 
 class ConfigManager {
 private:
   std::string config_path_ = "./config.json";
   ConfigRoot config_root_; // 配置文件根节点
+  std::mutex mutex_;
   ConfigManager(/* args */);
   // 禁用拷贝构造函数和赋值运算符
   ConfigManager(const ConfigManager &) = delete;
   ConfigManager &operator=(const ConfigManager &) = delete;
   bool ReadRootConfig();
   bool WriteRootConfig();
+
 public:
   ~ConfigManager();
   void Init(const std::string &config_path);
