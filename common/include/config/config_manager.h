@@ -12,7 +12,6 @@
                                                           topic_name);
 #endif
 
-
 namespace Config {
 
 class ConfigManager {
@@ -25,6 +24,7 @@ private:
   ConfigManager &operator=(const ConfigManager &) = delete;
   bool ReadRootConfig();
   bool WriteRootConfig();
+
 public:
   ~ConfigManager();
   void Init(const std::string &config_path);
@@ -33,6 +33,8 @@ public:
     static ConfigManager config;
     return &config;
   }
+  static bool writeStringToFile(const std::string &filePath,
+                                const std::string &content);
   std::string GetTopicName(const std::string &frame_name);
   void SetDefaultConfig(const std::string &name, const std::string &value);
   void SetDefaultTopicName(const std::string &frame_name,

@@ -1,10 +1,10 @@
+#include "config/task_chain.h"
 #include "config/topology_map.h"
 #include <QDebug>
 #include <QHeaderView>
 #include <QPainter>
 #include <QStandardItemModel>
 #include <QTableView>
-
 #include <mutex>
 using namespace basic;
 class NavGoalTableView : public QTableView {
@@ -18,6 +18,7 @@ private:
   TopologyMap topologyMap_;
   RobotPose robot_pose_;
   std::atomic<bool> is_task_chain_running_;
+  TaskChain task_chain_;
 public slots:
   void UpdateTopologyMap(const TopologyMap &_topology_map);
   void AddItem();
@@ -25,10 +26,12 @@ public slots:
   void StartTaskChain();
   void StopTaskChain();
   void UpdateRobotPose(const RobotPose &pose);
+  bool LoadTaskChain(const std::string &name);
+  bool SaveTaskChain(const std::string &name);
 signals:
   void signalSendNavGoal(const RobotPose &pose);
   void signalTaskFinish();
 
- private:
+private:
   void onItemChanged(QStandardItem *item);
 };

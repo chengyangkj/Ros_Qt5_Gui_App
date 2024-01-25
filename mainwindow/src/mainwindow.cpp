@@ -219,6 +219,30 @@ void MainWindow::setupUi() {
           [this](const RobotPose &pose) {
             SendChannelMsg(MsgId::kSetNavGoalPose, pose);
           });
+  connect(btn_load_task_chain, &QPushButton::clicked, [this]() {
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "Open JSON file",
+                                                    "", "JSON files (*.json)");
+
+    // 如果用户选择了文件，则输出文件名
+    if (!fileName.isEmpty()) {
+      qDebug() << "Selected file:" << fileName;
+      nav_goal_table_view_->LoadTaskChain(fileName.toStdString());
+    }
+  });
+  connect(btn_save_task_chain, &QPushButton::clicked, [this]() {
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save JSON file",
+                                                    "", "JSON files (*.json)");
+
+    // 如果用户选择了文件，则输出文件名
+    if (!fileName.isEmpty()) {
+      qDebug() << "Selected file:" << fileName;
+      if (!fileName.endsWith(".json")) {
+        fileName += ".json";
+        nav_goal_table_view_->SaveTaskChain(fileName.toStdString());
+      }
+    }
+  });
+
   // nav_goal_list_dock_widget->toggleView(false);
   ui->menuView->addAction(nav_goal_list_dock_widget->toggleViewAction());
   connect(
