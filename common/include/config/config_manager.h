@@ -1,6 +1,7 @@
 #pragma once
 #include "config_define.h"
 #include "topology_map.h"
+#include <mutex>
 #ifndef GET_TOPIC_NAME
 #define GET_TOPIC_NAME(frame_name)                                             \
   Config::ConfigManager::Instacnce()->GetTopicName(frame_name)
@@ -18,6 +19,7 @@ class ConfigManager {
 private:
   std::string config_path_ = "./config.json";
   ConfigRoot config_root_; // 配置文件根节点
+  std::mutex mutex_;
   ConfigManager(/* args */);
   // 禁用拷贝构造函数和赋值运算符
   ConfigManager(const ConfigManager &) = delete;
@@ -28,13 +30,9 @@ private:
 public:
   ~ConfigManager();
   void Init(const std::string &config_path);
-  //静态库的单例 同时在动态库与可执行程序中使用有多副本的问题
-  static ConfigManager *Instacnce() {
-    static ConfigManager config;
-    return &config;
-  }
   static bool writeStringToFile(const std::string &filePath,
                                 const std::string &content);
+  static ConfigManager *Instacnce();
   std::string GetTopicName(const std::string &frame_name);
   void SetDefaultConfig(const std::string &name, const std::string &value);
   void SetDefaultTopicName(const std::string &frame_name,

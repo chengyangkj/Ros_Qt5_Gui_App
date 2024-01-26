@@ -20,10 +20,13 @@ bool ConfigManager::writeStringToFile(const std::string &filePath,
     return false;
   }
 }
+ConfigManager *ConfigManager::Instacnce() {
+  static ConfigManager config;
+  return &config;
+}
 // #define CHECK_DEFALUT
 ConfigManager::ConfigManager(/* args */) { Init(config_path_); }
 void ConfigManager::Init(const std::string &config_path) {
-
   config_path_ = config_path;
   // 配置不存在 写入默认配置
   if (!boost::filesystem::exists(config_path_)) {
@@ -33,8 +36,9 @@ void ConfigManager::Init(const std::string &config_path) {
   }
   ReadRootConfig();
 }
-ConfigManager::~ConfigManager() {}
+ConfigManager::~ConfigManager() { WriteRootConfig(); }
 bool ConfigManager::ReadRootConfig() {
+  std::lock_guard<std::mutex> lock(mutex_);
   std::ifstream file(config_path_);
   std::string json((std::istreambuf_iterator<char>(file)),
                    std::istreambuf_iterator<char>());
@@ -49,12 +53,12 @@ bool ConfigManager::ReadRootConfig() {
   return true;
 }
 bool ConfigManager::WriteRootConfig() {
+  std::lock_guard<std::mutex> lock(mutex_);
   std::string pretty_json = JS::serializeStruct(config_root_);
   writeStringToFile(config_path_, pretty_json);
   return true;
 }
 std::string ConfigManager::GetTopicName(const std::string &frame_name) {
-  ReadRootConfig();
   auto iter = std::find_if(config_root_.display_config.begin(),
                            config_root_.display_config.end(),
                            [&frame_name](const auto &item) {
@@ -84,6 +88,8 @@ void ConfigManager::SetDefaultTopicName(const std::string &frame_name,
 
 bool ConfigManager::ReadTopologyMap(const std::string &map_path,
                                     TopologyMap &map) {
+  std::lock_guard<std::mutex> lock(mutex_);
+
   std::ifstream file(map_path);
   std::string json((std::istreambuf_iterator<char>(file)),
                    std::istreambuf_iterator<char>());
@@ -100,7 +106,7 @@ bool ConfigManager::ReadTopologyMap(const std::string &map_path,
 
 bool ConfigManager::WriteTopologyMap(const std::string &map_path,
                                      const TopologyMap &topology_map) {
-
+  std::lock_guard<std::mutex> lock(mutex_);
   std::string pretty_json = JS::serializeStruct(topology_map);
   return writeStringToFile(map_path, pretty_json);
 }
