@@ -49,6 +49,7 @@ public slots:
   void SendChannelMsg(const MsgId &id, const std::any &data);
   void RecvChannelMsg(const MsgId &id, const std::any &data);
   void updateOdomInfo(RobotState state);
+  void RestoreState();
 
 protected:
   virtual void closeEvent(QCloseEvent *event) override;
@@ -56,7 +57,6 @@ protected:
 private:
   QAction *SavePerspectiveAction = nullptr;
   QWidgetAction *PerspectiveListAction = nullptr;
-  QComboBox *PerspectiveComboBox = nullptr;
   ChannelManager channel_manager_;
   Ui::MainWindow *ui;
   DashBoard *speed_dash_board_;
@@ -81,9 +81,6 @@ private:
   bool openChannel(const std::string &channel_name);
   void closeChannel();
   void registerChannel();
-  void RestoreState();
   void SaveState();
-private slots:
-  void savePerspective();
 };
 #endif // MAINWINDOW_H

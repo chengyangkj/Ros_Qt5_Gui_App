@@ -40,8 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<TopologyMap>("TopologyMap");
   qRegisterMetaType<TopologyMap::PointInfo>("TopologyMap::PointInfo");
   setupUi();
-  RestoreState();
   openChannel();
+  QTimer::singleShot(50, [=]() { RestoreState(); });
 }
 bool MainWindow::openChannel() {
   if (channel_manager_.OpenChannelAuto()) {
@@ -281,19 +281,6 @@ void MainWindow::signalCursorPose(QPointF pos) {
   label_pos_scene_->setText("x: " + QString::number(pos.x()).mid(0, 4) +
                             "  y: " + QString::number(pos.y()).mid(0, 4));
 }
-void MainWindow::savePerspective() {
-  QString PerspectiveName =
-      QInputDialog::getText(this, "Save Perspective", "Enter unique name:");
-  if (PerspectiveName.isEmpty()) {
-    return;
-  }
-
-  dock_manager_->addPerspective(PerspectiveName);
-  QSignalBlocker Blocker(PerspectiveComboBox);
-  PerspectiveComboBox->clear();
-  PerspectiveComboBox->addItems(dock_manager_->perspectiveNames());
-  PerspectiveComboBox->setCurrentText(PerspectiveName);
-}
 
 //============================================================================
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -305,16 +292,11 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   QMainWindow::closeEvent(event);
 }
 void MainWindow::SaveState() {
-  QSettings Settings("state.ini", QSettings::IniFormat);
-  Settings.setValue("mainWindow/Geometry", this->saveGeometry());
-  Settings.setValue("mainWindow/State", this->saveState());
-  Settings.setValue("mainWindow/DockingState", dock_manager_->saveState());
-  // QMap<QString, ads::CDockWidget *> dock_map =
-  // dock_manager_->dockWidgetsMap(); for (auto iter = dock_map.begin(); iter !=
-  // dock_map.end(); ++iter) {
-  //   Settings.setValue("menuView/" + iter.key(), iter.value()->isClosed());
-  // }
-  // perspectivesManager_->addPerspective("main", *this);
+  QSettings settings("state.ini", QSettings::IniFormat);
+  settings.setValue("mainWindow/Geometry", this->saveGeometry());
+  settings.setValue("mainWindow/State", this->saveState());
+  dock_manager_->addPerspective("history");
+  dock_manager_->savePerspectives(settings);
 }
 
 //============================================================================
@@ -322,23 +304,8 @@ void MainWindow::RestoreState() {
   QSettings settings("state.ini", QSettings::IniFormat);
   this->restoreGeometry(settings.value("mainWindow/Geometry").toByteArray());
   this->restoreState(settings.value("mainWindow/State").toByteArray());
-  // dock_manager_->loadPerspectives();
-  // dock_manager_make
-  // settings.beginGroup("menuView");
-  // // 获取该组下的所有键
-  // QStringList keys = settings.childKeys();
-  // QList<QAction *> actions = ui->menuView->actions();
-
-  // // 遍历所有键
-  // foreach (const QString &key, keys) {
-  //   // 获取键对应的值
-  //   QVariant value = settings.value(key);
-  //   auto widget = dock_manager_->findDockWidget(key);
-  //   if (widget) {
-  //     // widget->toggleView(!value.toBool());
-  //   }
-  // }
-  // settings.endGroup();
+  dock_manager_->loadPerspectives(settings);
+  dock_manager_->openPerspective("history");
 }
 void MainWindow::updateOdomInfo(RobotState state) {
   // 转向灯
