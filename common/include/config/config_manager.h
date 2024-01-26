@@ -30,6 +30,8 @@ class ConfigManager {
  public:
   ~ConfigManager();
   void Init(const std::string &config_path);
+  static bool writeStringToFile(const std::string &filePath,
+                                const std::string &content);
   static ConfigManager *Instacnce();
   std::string GetTopicName(const std::string &frame_name);
   void SetDefaultConfig(const std::string &name, const std::string &value);

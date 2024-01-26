@@ -3,8 +3,8 @@
 #include <fstream>
 #include "boost/filesystem.hpp"
 namespace Config {
-bool writeStringToFile(const std::string &filePath,
-                       const std::string &content) {
+bool ConfigManager::writeStringToFile(const std::string &filePath,
+                                      const std::string &content) {
   boost::filesystem::path path(filePath);
   if (!boost::filesystem::exists(path.parent_path())) {
     boost::filesystem::create_directories(path.parent_path());  // 创建路径
