@@ -167,5 +167,6 @@
         <file>images/save.png</file>
         <file>images/load.png</file>
         <file>images/add.png</file>
+        <file>images/add.svg</file>
     </qresource>
 </RCC>
