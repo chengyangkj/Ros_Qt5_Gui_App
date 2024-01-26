@@ -1,5 +1,4 @@
 #pragma once
-#include "virtual_channel_node.h"
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Twist.h>
@@ -9,12 +8,13 @@
 #include <ros/ros.h>
 #include <sensor_msgs/BatteryState.h>
 #include <sensor_msgs/LaserScan.h>
-#include <sensor_msgs/image_encodings.h> //图像编码格式
+#include <sensor_msgs/image_encodings.h>  //图像编码格式
 #include <tf/transform_listener.h>
+#include "virtual_channel_node.h"
 class RosNode : public VirtualChannelNode {
-private:
+ private:
   /* data */
-public:
+ public:
   RosNode(/* args */);
   ~RosNode() override;
 
@@ -24,7 +24,7 @@ public:
   std::string Name() { return "ROS1"; };
   void SendMessage(const MsgId &msg_id, const std::any &msg) override;
 
-private:
+ private:
   void init();
   void OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg);
   void MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg);
@@ -40,7 +40,7 @@ private:
   void GetRobotPose();
   basic::RobotPose GetTrasnsform(std::string from, std::string to);
 
-private:
+ private:
   ros::Publisher nav_goal_publisher_;
   ros::Publisher speed_publisher_;
   ros::Publisher reloc_pose_publisher_;

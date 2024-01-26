@@ -18,7 +18,6 @@
 ** License along with this library; If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-
 //============================================================================
 /// \file   DockAreaTabBar.h
 /// \author Uwe Kindler
@@ -32,8 +31,7 @@
 #include <QScrollArea>
 #include "ads_globals.h"
 
-namespace ads
-{
+namespace ads {
 class CDockAreaWidget;
 class CDockWidgetTab;
 struct DockAreaTabBarPrivate;
@@ -50,179 +48,176 @@ class IFloatingWidget;
  * has not finished. And we need to remove a tab, if the user drags a
  * a dock widget out of a group of tabbed widgets
  */
-class ADS_EXPORT CDockAreaTabBar : public QScrollArea
-{
-	Q_OBJECT
-private:
-	DockAreaTabBarPrivate* d; ///< private data (pimpl)
-	friend struct DockAreaTabBarPrivate;
-	friend class CDockAreaTitleBar;
+class ADS_EXPORT CDockAreaTabBar : public QScrollArea {
+  Q_OBJECT
+ private:
+  DockAreaTabBarPrivate* d;  ///< private data (pimpl)
+  friend struct DockAreaTabBarPrivate;
+  friend class CDockAreaTitleBar;
 
-private Q_SLOTS:
-	void onTabClicked();
-	void onTabCloseRequested();
-	void onCloseOtherTabsRequested();
-	void onTabWidgetMoved(const QPoint& GlobalPos);
+ private Q_SLOTS:
+  void onTabClicked();
+  void onTabCloseRequested();
+  void onCloseOtherTabsRequested();
+  void onTabWidgetMoved(const QPoint& GlobalPos);
 
-protected:
-	virtual void wheelEvent(QWheelEvent* Event) override;
+ protected:
+  virtual void wheelEvent(QWheelEvent* Event) override;
 
+ public:
+  using Super = QScrollArea;
 
-public:
-	using Super = QScrollArea;
-
-	/**
+  /**
 	 * Default Constructor
 	 */
-	CDockAreaTabBar(CDockAreaWidget* parent);
+  CDockAreaTabBar(CDockAreaWidget* parent);
 
-	/**
+  /**
 	 * Virtual Destructor
 	 */
-	virtual ~CDockAreaTabBar();
+  virtual ~CDockAreaTabBar();
 
-	/**
+  /**
 	 * Inserts the given dock widget tab at the given position.
 	 * Inserting a new tab at an index less than or equal to the current index
 	 * will increment the current index, but keep the current tab.
 	 */
-	void insertTab(int Index, CDockWidgetTab* Tab);
+  void insertTab(int Index, CDockWidgetTab* Tab);
 
-	/**
+  /**
 	 * Removes the given DockWidgetTab from the tabbar
 	 */
-	void removeTab(CDockWidgetTab* Tab);
+  void removeTab(CDockWidgetTab* Tab);
 
-	/**
+  /**
 	 * Returns the number of tabs in this tabbar
 	 */
-	int count() const;
+  int count() const;
 
-	/**
+  /**
 	 * Returns the current index or -1 if no tab is selected
 	 */
-	int currentIndex() const;
+  int currentIndex() const;
 
-	/**
+  /**
 	 * Returns the current tab or a nullptr if no tab is selected.
 	 */
-	CDockWidgetTab* currentTab() const;
+  CDockWidgetTab* currentTab() const;
 
-	/**
+  /**
 	 * Returns the tab with the given index
 	 */
-	CDockWidgetTab* tab(int Index) const;
+  CDockWidgetTab* tab(int Index) const;
 
-	/**
+  /**
 	 * Returns the tab at the given position.
 	 * Returns -1 if the position is left of the first tab and count() if the
 	 * position is right of the last tab. Returns -2 to indicate an invalid
 	 * value.
 	 */
-	int tabAt(const QPoint& Pos) const;
+  int tabAt(const QPoint& Pos) const;
 
-	/**
+  /**
 	 * Returns the tab insertion index for the given mouse cursor position
 	 */
-	int tabInsertIndexAt(const QPoint& Pos) const;
+  int tabInsertIndexAt(const QPoint& Pos) const;
 
-	/**
+  /**
 	 * Filters the tab widget events
 	 */
-	virtual bool eventFilter(QObject *watched, QEvent *event) override;
+  virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
-	/**
+  /**
 	 * This function returns true if the tab is open, that means if it is
 	 * visible to the user. If the function returns false, the tab is
 	 * closed
 	 */
-	bool isTabOpen(int Index) const;
+  bool isTabOpen(int Index) const;
 
-	/**
+  /**
 	 * Overrides the minimumSizeHint() function of QScrollArea
 	 * The minimumSizeHint() is bigger than the sizeHint () for the scroll
 	 * area because even if the scrollbars are invisible, the required space
 	 * is reserved in the minimumSizeHint(). This override simply returns
 	 * sizeHint();
 	 */
-	virtual QSize minimumSizeHint() const override;
+  virtual QSize minimumSizeHint() const override;
 
-	/**
+  /**
 	 * The function provides a sizeHint that matches the height of the
 	 * internal viewport.
 	 */
-	virtual QSize sizeHint() const override;
+  virtual QSize sizeHint() const override;
 
-public Q_SLOTS:
-	/**
+ public Q_SLOTS:
+  /**
 	 * This property sets the index of the tab bar's visible tab
 	 */
-	void setCurrentIndex(int Index);
+  void setCurrentIndex(int Index);
 
-	/**
+  /**
 	 * This function will close the tab given in Index param.
 	 * Closing a tab means, the tab will be hidden, it will not be removed
 	 */
-	void closeTab(int Index);
+  void closeTab(int Index);
 
-Q_SIGNALS:
-    /**
+ Q_SIGNALS:
+  /**
      * This signal is emitted when the tab bar's current tab is about to be changed. The new
      * current has the given index, or -1 if there isn't a new one.
      */
-	void currentChanging(int Index);
+  void currentChanging(int Index);
 
-	/**
+  /**
 	 * This signal is emitted when the tab bar's current tab changes. The new
 	 * current has the given index, or -1 if there isn't a new one
 	 */
-	void currentChanged(int Index);
+  void currentChanged(int Index);
 
-	/**
+  /**
 	 * This signal is emitted when user clicks on a tab
 	 */
-	void tabBarClicked(int index);
+  void tabBarClicked(int index);
 
-	/**
+  /**
 	 * This signal is emitted when the close button on a tab is clicked.
 	 * The index is the index that should be closed.
 	 */
-	void tabCloseRequested(int index);
+  void tabCloseRequested(int index);
 
-	/**
+  /**
 	 * This signal is emitted if a tab has been closed
 	 */
-	void tabClosed(int index);
+  void tabClosed(int index);
 
-	/**
+  /**
 	 * This signal is emitted if a tab has been opened.
 	 * A tab is opened if it has been made visible
 	 */
-	void tabOpened(int index);
+  void tabOpened(int index);
 
-	/**
+  /**
 	 * This signal is emitted when the tab has moved the tab at index position
 	 * from to index position to.
 	 */
-	void tabMoved(int from, int to);
+  void tabMoved(int from, int to);
 
-	/**
+  /**
 	 * This signal is emitted, just before the tab with the given index is
 	 * removed
 	 */
-	void removingTab(int index);
+  void removingTab(int index);
 
-	/**
+  /**
 	 * This signal is emitted if a tab has been inserted
 	 */
-	void tabInserted(int index);
+  void tabInserted(int index);
 
-	/**
+  /**
 	 * This signal is emitted when a tab title elide state has been changed
 	 */
-	void elidedChanged(bool elided);
-}; // class CDockAreaTabBar
-} // namespace ads
+  void elidedChanged(bool elided);
+};  // class CDockAreaTabBar
+}  // namespace ads
 //-----------------------------------------------------------------------------
-#endif // DockAreaTabBarH
-
+#endif  // DockAreaTabBarH

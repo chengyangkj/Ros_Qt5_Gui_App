@@ -18,7 +18,6 @@
 ** License along with this library; If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-
 //============================================================================
 /// \file   ads_globals.h
 /// \author Uwe Kindler
@@ -26,41 +25,40 @@
 /// \brief  Declaration of
 //============================================================================
 
-
 //============================================================================
 //                                   INCLUDES
 //============================================================================
-#include <QPair>
-#include <QtCore/QtGlobal>
-#include <QPixmap>
-#include <QWidget>
 #include <QDebug>
-#include <QStyle>
 #include <QMouseEvent>
+#include <QPair>
+#include <QPixmap>
+#include <QStyle>
+#include <QWidget>
+#include <QtCore/QtGlobal>
 
 #include <iostream>
 
 #if defined(Q_OS_UNIX) && !defined(Q_OS_MACOS)
-#include <xcb/xcb.h>
+  #include <xcb/xcb.h>
 #endif
 
 QT_FORWARD_DECLARE_CLASS(QAbstractButton)
 
 #ifndef ADS_STATIC
-#ifdef ADS_SHARED_EXPORT
-#define ADS_EXPORT Q_DECL_EXPORT
+  #ifdef ADS_SHARED_EXPORT
+    #define ADS_EXPORT Q_DECL_EXPORT
+  #else
+    #define ADS_EXPORT Q_DECL_IMPORT
+  #endif
 #else
-#define ADS_EXPORT Q_DECL_IMPORT
-#endif
-#else
-#define ADS_EXPORT
+  #define ADS_EXPORT
 #endif
 
 // Define ADS_DEBUG_PRINT to enable a lot of debug output
 #ifdef ADS_DEBUG_PRINT
-#define ADS_PRINT(s) qDebug() << s
+  #define ADS_PRINT(s) qDebug() << s
 #else
-#define ADS_PRINT(s)
+  #define ADS_PRINT(s)
 #endif
 
 // Set ADS_DEBUG_LEVEL to enable additional debug output and to enable layout
@@ -69,100 +67,87 @@ QT_FORWARD_DECLARE_CLASS(QAbstractButton)
 
 QT_FORWARD_DECLARE_CLASS(QSplitter)
 
-namespace ads
-{
+namespace ads {
 Q_NAMESPACE
 class CDockSplitter;
 
-enum DockWidgetArea
-{
-	NoDockWidgetArea = 0x00,
-	LeftDockWidgetArea = 0x01,
-	RightDockWidgetArea = 0x02,
-	TopDockWidgetArea = 0x04,
-	BottomDockWidgetArea = 0x08,
-	CenterDockWidgetArea = 0x10,
-	LeftAutoHideArea = 0x20,
-	RightAutoHideArea = 0x40,
-	TopAutoHideArea = 0x80,
-	BottomAutoHideArea = 0x100,
+enum DockWidgetArea {
+  NoDockWidgetArea = 0x00,
+  LeftDockWidgetArea = 0x01,
+  RightDockWidgetArea = 0x02,
+  TopDockWidgetArea = 0x04,
+  BottomDockWidgetArea = 0x08,
+  CenterDockWidgetArea = 0x10,
+  LeftAutoHideArea = 0x20,
+  RightAutoHideArea = 0x40,
+  TopAutoHideArea = 0x80,
+  BottomAutoHideArea = 0x100,
 
-	InvalidDockWidgetArea = NoDockWidgetArea,
-	OuterDockAreas = TopDockWidgetArea | LeftDockWidgetArea | RightDockWidgetArea | BottomDockWidgetArea,
-	AutoHideDockAreas = LeftAutoHideArea | RightAutoHideArea | TopAutoHideArea | BottomAutoHideArea,
-	AllDockAreas = OuterDockAreas | CenterDockWidgetArea
+  InvalidDockWidgetArea = NoDockWidgetArea,
+  OuterDockAreas = TopDockWidgetArea | LeftDockWidgetArea | RightDockWidgetArea | BottomDockWidgetArea,
+  AutoHideDockAreas = LeftAutoHideArea | RightAutoHideArea | TopAutoHideArea | BottomAutoHideArea,
+  AllDockAreas = OuterDockAreas | CenterDockWidgetArea
 };
 Q_DECLARE_FLAGS(DockWidgetAreas, DockWidgetArea)
 
-
-enum eTabIndex
-{
-	TabDefaultInsertIndex = -1,
-	TabInvalidIndex = -2
+enum eTabIndex {
+  TabDefaultInsertIndex = -1,
+  TabInvalidIndex = -2
 };
 
-
-enum TitleBarButton
-{
-	TitleBarButtonTabsMenu,
-	TitleBarButtonUndock,
-	TitleBarButtonClose,
-	TitleBarButtonAutoHide,
-	TitleBarButtonMinimize
+enum TitleBarButton {
+  TitleBarButtonTabsMenu,
+  TitleBarButtonUndock,
+  TitleBarButtonClose,
+  TitleBarButtonAutoHide,
+  TitleBarButtonMinimize
 };
 
 /**
  * The different dragging states
  */
-enum eDragState
-{
-	DraggingInactive,     //!< DraggingInactive
-	DraggingMousePressed, //!< DraggingMousePressed
-	DraggingTab,          //!< DraggingTab
-	DraggingFloatingWidget//!< DraggingFloatingWidget
+enum eDragState {
+  DraggingInactive,       //!< DraggingInactive
+  DraggingMousePressed,   //!< DraggingMousePressed
+  DraggingTab,            //!< DraggingTab
+  DraggingFloatingWidget  //!< DraggingFloatingWidget
 };
 
 /**
  * The different icons used in the UI
  */
-enum eIcon
-{
-	TabCloseIcon,      //!< TabCloseIcon
-	AutoHideIcon,      //!< AutoHideIcon
-	DockAreaMenuIcon,  //!< DockAreaMenuIcon
-	DockAreaUndockIcon,//!< DockAreaUndockIcon
-	DockAreaCloseIcon, //!< DockAreaCloseIcon
-	DockAreaMinimizeIcon,
+enum eIcon {
+  TabCloseIcon,        //!< TabCloseIcon
+  AutoHideIcon,        //!< AutoHideIcon
+  DockAreaMenuIcon,    //!< DockAreaMenuIcon
+  DockAreaUndockIcon,  //!< DockAreaUndockIcon
+  DockAreaCloseIcon,   //!< DockAreaCloseIcon
+  DockAreaMinimizeIcon,
 
-	IconCount,         //!< just a delimiter for range checks
+  IconCount,  //!< just a delimiter for range checks
 };
 
 /**
  * For bitwise combination of dock wdget features
  */
-enum eBitwiseOperator
-{
-	BitwiseAnd,
-	BitwiseOr
+enum eBitwiseOperator {
+  BitwiseAnd,
+  BitwiseOr
 };
-
 
 /**
  * Each dock container supports 4 sidebars
  */
-enum SideBarLocation
-{
-	SideBarTop,
-	SideBarLeft,
-	SideBarRight,
-	SideBarBottom,
-	SideBarNone
+enum SideBarLocation {
+  SideBarTop,
+  SideBarLeft,
+  SideBarRight,
+  SideBarBottom,
+  SideBarNone
 };
 Q_ENUMS(SideBarLocation);
 
-
-namespace internal
-{
+namespace internal {
 static const bool RestoreTesting = true;
 static const bool Restore = false;
 static const char* const ClosedProperty = "close";
@@ -175,20 +160,20 @@ extern const int DockedWidgetDragStartEvent;
 /**
  * Get atom from cache or request it from the XServer.
  */
-xcb_atom_t xcb_get_atom(const char *name);
+xcb_atom_t xcb_get_atom(const char* name);
 
 /**
  * Add a property to a window. Only works on "hidden" windows.
  */
-void xcb_add_prop(bool state, WId window, const char *type, const char *prop);
+void xcb_add_prop(bool state, WId window, const char* type, const char* prop);
 /**
  * Updates up to two window properties. Can be set on a visible window.
  */
-void xcb_update_prop(bool set, WId window, const char *type, const char *prop, const char *prop2 = nullptr);
+void xcb_update_prop(bool set, WId window, const char* type, const char* prop, const char* prop2 = nullptr);
 /**
  * Only for debugging purposes.
  */
-bool xcb_dump_props(WId window, const char *type);
+bool xcb_dump_props(WId window, const char* type);
 /**
  * Gets the active window manager from the X11 Server.
  * Requires a EWMH conform window manager (Almost all common used ones are).
@@ -208,18 +193,16 @@ void replaceSplitterWidget(QSplitter* Splitter, QWidget* From, QWidget* To);
  */
 void hideEmptyParentSplitters(CDockSplitter* FirstParentSplitter);
 
-
 /**
  * Convenience class for QPair to provide better naming than first and
  * second
  */
-class CDockInsertParam : public QPair<Qt::Orientation, bool>
-{
-public:
-    using QPair<Qt::Orientation, bool>::QPair;
-	Qt::Orientation orientation() const {return this->first;}
-	bool append() const {return this->second;}
-	int insertOffset() const {return append() ? 1 : 0;}
+class CDockInsertParam : public QPair<Qt::Orientation, bool> {
+ public:
+  using QPair<Qt::Orientation, bool>::QPair;
+  Qt::Orientation orientation() const { return this->first; }
+  bool append() const { return this->second; }
+  int insertOffset() const { return append() ? 1 : 0; }
 };
 
 /**
@@ -227,19 +210,16 @@ public:
  */
 CDockInsertParam dockAreaInsertParameters(DockWidgetArea Area);
 
-
 /**
  * Returns the SieBarLocation for the AutoHide dock widget areas
  */
 SideBarLocation toSideBarLocation(DockWidgetArea Area);
-
 
 /**
  * Returns true for the top or bottom side bar ansd false for the
  * left and right side bar
  */
 bool isHorizontalSideBarLocation(SideBarLocation Location);
-
 
 /**
  * Returns true, if the given dock area is a SideBar area
@@ -256,19 +236,16 @@ bool isSideBarArea(DockWidgetArea Area);
  * current dock widget in a dock area have no parent.
  */
 template <class T>
-T findParent(const QWidget* w)
-{
-	QWidget* parentWidget = w->parentWidget();
-	while (parentWidget)
-	{
-		T ParentImpl = qobject_cast<T>(parentWidget);
-		if (ParentImpl)
-		{
-			return ParentImpl;
-		}
-		parentWidget = parentWidget->parentWidget();
-	}
-	return nullptr;
+T findParent(const QWidget* w) {
+  QWidget* parentWidget = w->parentWidget();
+  while (parentWidget) {
+    T ParentImpl = qobject_cast<T>(parentWidget);
+    if (ParentImpl) {
+      return ParentImpl;
+    }
+    parentWidget = parentWidget->parentWidget();
+  }
+  return nullptr;
 }
 
 /**
@@ -278,56 +255,46 @@ T findParent(const QWidget* w)
  */
 QPixmap createTransparentPixmap(const QPixmap& Source, qreal Opacity);
 
-
 /**
  * Helper function for settings flags in a QFlags instance.
  */
 template <class T>
-void setFlag(T& Flags, typename T::enum_type flag, bool on = true)
-{
+void setFlag(T& Flags, typename T::enum_type flag, bool on = true) {
 #if QT_VERSION >= 0x050700
-	Flags.setFlag(flag, on);
+  Flags.setFlag(flag, on);
 #else
-    if(on)
-    {
-        Flags |= flag;
-    }
-    else
-    {
-        Flags &= ~flag;
-    }
+  if (on) {
+    Flags |= flag;
+  } else {
+    Flags &= ~flag;
+  }
 #endif
 }
-
 
 /**
  * Helper function for settings tooltips without cluttering the code with
  * tests for preprocessor macros
  */
 template <class QObjectPtr>
-void setToolTip(QObjectPtr obj, const QString &tip)
-{
+void setToolTip(QObjectPtr obj, const QString& tip) {
 #ifndef QT_NO_TOOLTIP
-	obj->setToolTip(tip);
+  obj->setToolTip(tip);
 #else
-	Q_UNUSED(obj);
-	Q_UNUSED(tip);
+  Q_UNUSED(obj);
+  Q_UNUSED(tip);
 #endif
 }
-
 
 /**
  * Helper function for access to mouse event global position in Qt5 and
  */
-inline QPoint globalPositionOf(QMouseEvent* ev)
-{
+inline QPoint globalPositionOf(QMouseEvent* ev) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    return ev->globalPosition().toPoint();
+  return ev->globalPosition().toPoint();
 #else
-    return ev->globalPos();
+  return ev->globalPos();
 #endif
 }
-
 
 /**
  * Helper function to set the icon of a certain button.
@@ -343,14 +310,12 @@ inline QPoint globalPositionOf(QMouseEvent* ev)
  * param[in] CustomIconId The identifier for the custom icon.
  */
 void setButtonIcon(QAbstractButton* Button, QStyle::StandardPixmap StandarPixmap,
-	ads::eIcon CustomIconId);
+                   ads::eIcon CustomIconId);
 
-
-enum eRepolishChildOptions
-{
-	RepolishIgnoreChildren,
-	RepolishDirectChildren,
-	RepolishChildrenRecursively
+enum eRepolishChildOptions {
+  RepolishIgnoreChildren,
+  RepolishDirectChildren,
+  RepolishChildrenRecursively
 };
 
 /**
@@ -359,15 +324,14 @@ enum eRepolishChildOptions
  */
 void repolishStyle(QWidget* w, eRepolishChildOptions Options = RepolishIgnoreChildren);
 
-
 /**
  * Returns the geometry of the given widget in global space
  */
 QRect globalGeometry(QWidget* w);
 
-} // namespace internal
-} // namespace ads
+}  // namespace internal
+}  // namespace ads
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ads::DockWidgetAreas)
 //---------------------------------------------------------------------------
-#endif // ads_globalsH
+#endif  // ads_globalsH

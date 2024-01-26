@@ -14,8 +14,7 @@
 
 #include "ads_globals.h"
 
-namespace ads
-{
+namespace ads {
 
 struct IconProviderPrivate;
 
@@ -25,37 +24,35 @@ struct IconProviderPrivate;
  * The IconProvider enables the user to register custom icons in case using
  * stylesheets is not an option.
  */
-class ADS_EXPORT CIconProvider
-{
-private:
-	IconProviderPrivate* d; ///< private data (pimpl)
-	friend struct IconProviderPrivate;
+class ADS_EXPORT CIconProvider {
+ private:
+  IconProviderPrivate* d;  ///< private data (pimpl)
+  friend struct IconProviderPrivate;
 
-public:
-	/**
+ public:
+  /**
 	 * Default Constructor
 	 */
-	CIconProvider();
+  CIconProvider();
 
-	/**
+  /**
 	 * Virtual Destructor
 	 */
-	virtual ~CIconProvider();
+  virtual ~CIconProvider();
 
-	/**
+  /**
 	 * The function returns a custom icon if one is registered and a null Icon
 	 * if no custom icon is registered
 	 */
-	QIcon customIcon(eIcon IconId) const;
+  QIcon customIcon(eIcon IconId) const;
 
-	/**
+  /**
 	 * Registers a custom icon for the given IconId
 	 */
-	void registerCustomIcon(eIcon IconId, const QIcon &icon);
-}; // class IconProvider
+  void registerCustomIcon(eIcon IconId, const QIcon& icon);
+};  // class IconProvider
 
-} // namespace ads
-
+}  // namespace ads
 
 //---------------------------------------------------------------------------
-#endif // IconProviderH
+#endif  // IconProviderH

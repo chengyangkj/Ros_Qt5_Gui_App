@@ -1,14 +1,14 @@
 #pragma once
-#include "display/manager/scene_manager.h"
-#include "virtual_display.h"
 #include <QGraphicsItem>
 #include <QGraphicsView>
 #include <QThread>
 #include <QTimer>
+#include "display/manager/scene_manager.h"
+#include "virtual_display.h"
 namespace Display {
 class FactoryDisplay : public QObject {
   Q_OBJECT
-public:
+ public:
   static FactoryDisplay *Instance() {
     static FactoryDisplay *factory = new FactoryDisplay();
     return factory;
@@ -35,10 +35,10 @@ public:
   bool SetDisplayPoseInParent(const std::string &display_name,
                               const RobotPose &pose);
 
-private slots:
+ private slots:
   void Process();
 
-private:
+ private:
   QTimer timer_coordinate_system_;
   std::string main_display_;
   std::map<std::string, VirtualDisplay *> total_display_map_;
@@ -48,4 +48,4 @@ private:
   std::atomic_bool run_flag_ = false;
   std::string focus_display_name_ = "";
 };
-} // namespace Display
+}  // namespace Display

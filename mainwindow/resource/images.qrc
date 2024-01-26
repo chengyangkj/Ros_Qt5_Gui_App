@@ -164,5 +164,8 @@
         <file>images/goal_blue.png</file>
         <file>images/goal_green.png</file>
         <file>images/goal_red.png</file>
+        <file>images/save.png</file>
+        <file>images/load.png</file>
+        <file>images/add.png</file>
     </qresource>
 </RCC>

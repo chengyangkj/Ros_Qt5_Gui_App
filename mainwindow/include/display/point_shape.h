@@ -10,18 +10,20 @@
 #ifndef PointShape_H
 #define PointShape_H
 // NOLINTBEGIN
-#include "virtual_display.h"
 #include <QCursor>
 #include <QGraphicsItem>
 #include <QGraphicsSceneWheelEvent>
 #include <QMenu>
 #include <QObject>
 #include <QPainter>
+#include "virtual_display.h"
 namespace Display {
 class PointShape : public VirtualDisplay {
   Q_OBJECT
-public:
-  enum ePointType { kRobot, kParticle, kNavGoal };
+ public:
+  enum ePointType { kRobot,
+                    kParticle,
+                    kNavGoal };
   PointShape(const ePointType &type, const std::string &display_type,
              const std::string &display_name, const int &z_value,
              std::string parent_name = "");
@@ -32,13 +34,13 @@ public:
                         const std::any &config_data) override;
   // void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
-private:
+ private:
   QPixmap robot_image_;
   ePointType type_;
   RobotPose robot_pose_;
   bool enable_{true};
 
-private:
+ private:
   void drawRobot(QPainter *painter);
   void drawNavGoal(QPainter *painter);
   void drawParticle(QPainter *painter);
@@ -51,5 +53,5 @@ private:
                       const QVariant &value) override;
 };
 // NOLINTEND
-} // namespace Display
-#endif // PointShape_H
+}  // namespace Display
+#endif  // PointShape_H

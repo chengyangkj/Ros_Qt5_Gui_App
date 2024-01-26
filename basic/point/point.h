@@ -16,12 +16,13 @@
 
 #include <iostream>
 
-#define DEBUG_STREAM cerr << __PRETTY_FUNCTION__ << ":" // FIXME
+#define DEBUG_STREAM cerr << __PRETTY_FUNCTION__ << ":"  // FIXME
 
 namespace basic {
 
 /*结构体点*/
-template <class T> struct point {
+template <class T>
+struct point {
   inline point() : x(0), y(0) {}
   inline point(T _x, T _y) : x(_x), y(_y) {}
   T x, y;
@@ -40,22 +41,26 @@ inline point<T> operator-(const point<T> &p1, const point<T> &p2) {
 }
 
 /*点的 * 运算符的重载  乘以一个数*/
-template <class T> inline point<T> operator*(const point<T> &p, const T &v) {
+template <class T>
+inline point<T> operator*(const point<T> &p, const T &v) {
   return point<T>(p.x * v, p.y * v);
 }
 
 /*点的 * 运算符的重载  乘以一个数*/
-template <class T> inline point<T> operator*(const T &v, const point<T> &p) {
+template <class T>
+inline point<T> operator*(const T &v, const point<T> &p) {
   return point<T>(p.x * v, p.y * v);
 }
 
 /*点的 * 运算符的重载  point的内积*/
-template <class T> inline T operator*(const point<T> &p1, const point<T> &p2) {
+template <class T>
+inline T operator*(const point<T> &p1, const point<T> &p2) {
   return p1.x * p2.x + p1.y * p2.y;
 }
 
 /*带方向的点  即除了位置之外，还有角度，可以理解为机器人的位姿*/
-template <class T, class A> struct orientedpoint : public point<T> {
+template <class T, class A>
+struct orientedpoint : public point<T> {
   inline orientedpoint() : point<T>(0, 0), theta(0){};
   inline orientedpoint(const point<T> &p);
   inline orientedpoint(T x, T y, A _theta) : point<T>(x, y), theta(_theta) {}
@@ -73,7 +78,8 @@ template <class T, class A> struct orientedpoint : public point<T> {
 };
 
 /*角度归一化 即把角度化成-PI~PI*/
-template <class T, class A> void orientedpoint<T, A>::normalize() {
+template <class T, class A>
+void orientedpoint<T, A>::normalize() {
   if (theta >= -M_PI && theta < M_PI)
     return;
 
@@ -156,14 +162,16 @@ point<T> absoluteSum(const orientedpoint<T, A> &p1, const point<T> &p2) {
 }
 
 /*点的比较函数 一般用于排序*/
-template <class T> struct pointcomparator {
+template <class T>
+struct pointcomparator {
   bool operator()(const point<T> &a, const point<T> &b) const {
     return a.x < b.x || (a.x == b.x && a.y < b.y);
   }
 };
 
 /*点构成的角度的比较函数  一般用于排序*/
-template <class T> struct pointradialcomparator {
+template <class T>
+struct pointradialcomparator {
   point<T> origin;
   bool operator()(const point<T> &a, const point<T> &b) const {
     point<T> delta1 = a - origin;
@@ -173,7 +181,8 @@ template <class T> struct pointradialcomparator {
 };
 
 /*把两个点的最大的X和最大的Y返回*/
-template <class T> inline point<T> max(const point<T> &p1, const point<T> &p2) {
+template <class T>
+inline point<T> max(const point<T> &p1, const point<T> &p2) {
   point<T> p = p1;
   p.x = p.x > p2.x ? p.x : p2.x;
   p.y = p.y > p2.y ? p.y : p2.y;
@@ -181,7 +190,8 @@ template <class T> inline point<T> max(const point<T> &p1, const point<T> &p2) {
 }
 
 /*把两个点的最小的X和最小的Y返回*/
-template <class T> inline point<T> min(const point<T> &p1, const point<T> &p2) {
+template <class T>
+inline point<T> min(const point<T> &p1, const point<T> &p2) {
   point<T> p = p1;
   p.x = p.x < p2.x ? p.x : p2.x;
   p.y = p.y < p2.y ? p.y : p2.y;
@@ -255,6 +265,6 @@ typedef point<int> IntPoint;
 typedef point<double> Point;
 typedef orientedpoint<double, double> OrientedPoint;
 
-}; // namespace basic
+};  // namespace basic
 
 #endif

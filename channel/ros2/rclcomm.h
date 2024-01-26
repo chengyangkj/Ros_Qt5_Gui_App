@@ -10,6 +10,7 @@
 #ifndef RCLCOMM_H
 #define RCLCOMM_H
 
+#include <rclcpp/rclcpp.hpp>
 #include "algorithm.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
@@ -26,14 +27,12 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 #include "virtual_channel_node.h"
-#include <rclcpp/rclcpp.hpp>
 class rclcomm : public VirtualChannelNode {
-
-public:
+ public:
   rclcomm();
   ~rclcomm() override = default;
 
-private:
+ private:
   void recv_callback(const std_msgs::msg::Int32::SharedPtr msg);
   void map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
   void odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg);
@@ -45,7 +44,7 @@ private:
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
 
-public:
+ public:
   bool Start() override;
   bool Stop() override;
   void Process() override;
@@ -56,7 +55,7 @@ public:
   basic::RobotPose getTrasnsform(std::string from, std::string to);
   void SendMessage(const MsgId &msg_id, const std::any &msg) override;
 
-private:
+ private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr speed_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
       reloc_pose_publisher_;
@@ -84,7 +83,7 @@ private:
   rclcpp::CallbackGroup::SharedPtr callback_group_other;
   std::atomic_bool init_flag_{false};
 
-private:
+ private:
 };
 
-#endif // RCLCOMM_H
+#endif  // RCLCOMM_H

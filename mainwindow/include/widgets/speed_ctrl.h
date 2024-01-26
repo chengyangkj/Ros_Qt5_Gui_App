@@ -1,7 +1,4 @@
 #pragma once
-#include "algorithm.h"
-#include "point_type.h"
-#include "widgets/joystick.h"
 #include <QCalendarWidget>
 #include <QCheckBox>
 #include <QComboBox>
@@ -42,17 +39,20 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "algorithm.h"
+#include "point_type.h"
+#include "widgets/joystick.h"
 using namespace basic;
 class SpeedCtrlWidget : public QWidget {
   Q_OBJECT
-private:
+ private:
   QCheckBox *checkBox_use_all_;
   JoyStick *joyStick_widget_;
   QSlider *horizontalSlider_raw_;
   QSlider *horizontalSlider_linear_;
-signals:
+ signals:
   void signalControlSpeed(const RobotSpeed &speed);
-private slots:
+ private slots:
   void slotSpeedControl() {
     QPushButton *btn = qobject_cast<QPushButton *>(sender());
     char button_key = btn->text().toStdString()[0];
@@ -63,42 +63,36 @@ private slots:
     char key;
 
     switch (button_key) {
-    case 'u':
-      key = is_all ? 'U' : 'u';
-      break;
-    case 'i':
-      key = is_all ? 'I' : 'i';
-      break;
-    case 'o':
-      key = is_all ? 'O' : 'o';
-      break;
-    case 'j':
-      key = is_all ? 'J' : 'j';
-      break;
-    case 'l':
-      key = is_all ? 'L' : 'l';
-      break;
-    case 'm':
-      key = is_all ? 'M' : 'm';
-      break;
-    case ',':
-      key = is_all ? '<' : ',';
-      break;
-    case '.':
-      key = is_all ? '>' : '.';
-      break;
-    default:
-      return;
+      case 'u':
+        key = is_all ? 'U' : 'u';
+        break;
+      case 'i':
+        key = is_all ? 'I' : 'i';
+        break;
+      case 'o':
+        key = is_all ? 'O' : 'o';
+        break;
+      case 'j':
+        key = is_all ? 'J' : 'j';
+        break;
+      case 'l':
+        key = is_all ? 'L' : 'l';
+        break;
+      case 'm':
+        key = is_all ? 'M' : 'm';
+        break;
+      case ',':
+        key = is_all ? '<' : ',';
+        break;
+      case '.':
+        key = is_all ? '>' : '.';
+        break;
+      default:
+        return;
     }
 
     std::map<char, std::vector<float>> moveBindings{
-        {'i', {1, 0, 0, 0}},  {'o', {1, 0, 0, -1}},  {'j', {0, 0, 0, 1}},
-        {'l', {0, 0, 0, -1}}, {'u', {1, 0, 0, 1}},   {',', {-1, 0, 0, 0}},
-        {'.', {-1, 0, 0, 1}}, {'m', {-1, 0, 0, -1}}, {'O', {1, -1, 0, 0}},
-        {'I', {1, 0, 0, 0}},  {'J', {0, 1, 0, 0}},   {'L', {0, -1, 0, 0}},
-        {'U', {1, 1, 0, 0}},  {'<', {-1, 0, 0, 0}},  {'>', {-1, -1, 0, 0}},
-        {'M', {-1, 1, 0, 0}}, {'t', {0, 0, 1, 0}},   {'b', {0, 0, -1, 0}},
-        {'k', {0, 0, 0, 0}},  {'K', {0, 0, 0, 0}}};
+        {'i', {1, 0, 0, 0}}, {'o', {1, 0, 0, -1}}, {'j', {0, 0, 0, 1}}, {'l', {0, 0, 0, -1}}, {'u', {1, 0, 0, 1}}, {',', {-1, 0, 0, 0}}, {'.', {-1, 0, 0, 1}}, {'m', {-1, 0, 0, -1}}, {'O', {1, -1, 0, 0}}, {'I', {1, 0, 0, 0}}, {'J', {0, 1, 0, 0}}, {'L', {0, -1, 0, 0}}, {'U', {1, 1, 0, 0}}, {'<', {-1, 0, 0, 0}}, {'>', {-1, -1, 0, 0}}, {'M', {-1, 1, 0, 0}}, {'t', {0, 0, 1, 0}}, {'b', {0, 0, -1, 0}}, {'k', {0, 0, 0, 0}}, {'K', {0, 0, 0, 0}}};
     //计算是往哪个方向
 
     float x = moveBindings[key][0];
@@ -115,41 +109,35 @@ private slots:
     char key;
     std::cout << "joy stic value:" << value << std::endl;
     switch (value) {
-    case JoyStick::Direction::upleft:
-      key = is_all ? 'U' : 'u';
-      break;
-    case JoyStick::Direction::up:
-      key = is_all ? 'I' : 'i';
-      break;
-    case JoyStick::Direction::upright:
-      key = is_all ? 'O' : 'o';
-      break;
-    case JoyStick::Direction::left:
-      key = is_all ? 'J' : 'j';
-      break;
-    case JoyStick::Direction::right:
-      key = is_all ? 'L' : 'l';
-      break;
-    case JoyStick::Direction::down:
-      key = is_all ? 'M' : 'm';
-      break;
-    case JoyStick::Direction::downleft:
-      key = is_all ? '<' : ',';
-      break;
-    case JoyStick::Direction::downright:
-      key = is_all ? '>' : '.';
-      break;
-    default:
-      return;
+      case JoyStick::Direction::upleft:
+        key = is_all ? 'U' : 'u';
+        break;
+      case JoyStick::Direction::up:
+        key = is_all ? 'I' : 'i';
+        break;
+      case JoyStick::Direction::upright:
+        key = is_all ? 'O' : 'o';
+        break;
+      case JoyStick::Direction::left:
+        key = is_all ? 'J' : 'j';
+        break;
+      case JoyStick::Direction::right:
+        key = is_all ? 'L' : 'l';
+        break;
+      case JoyStick::Direction::down:
+        key = is_all ? 'M' : 'm';
+        break;
+      case JoyStick::Direction::downleft:
+        key = is_all ? '<' : ',';
+        break;
+      case JoyStick::Direction::downright:
+        key = is_all ? '>' : '.';
+        break;
+      default:
+        return;
     }
     std::map<char, std::vector<float>> moveBindings{
-        {'i', {1, 0, 0, 0}},  {'o', {1, 0, 0, -1}},  {'j', {0, 0, 0, 1}},
-        {'l', {0, 0, 0, -1}}, {'u', {1, 0, 0, 1}},   {',', {-1, 0, 0, 0}},
-        {'.', {-1, 0, 0, 1}}, {'m', {-1, 0, 0, -1}}, {'O', {1, -1, 0, 0}},
-        {'I', {1, 0, 0, 0}},  {'J', {0, 1, 0, 0}},   {'L', {0, -1, 0, 0}},
-        {'U', {1, 1, 0, 0}},  {'<', {-1, 0, 0, 0}},  {'>', {-1, -1, 0, 0}},
-        {'M', {-1, 1, 0, 0}}, {'t', {0, 0, 1, 0}},   {'b', {0, 0, -1, 0}},
-        {'k', {0, 0, 0, 0}},  {'K', {0, 0, 0, 0}}};
+        {'i', {1, 0, 0, 0}}, {'o', {1, 0, 0, -1}}, {'j', {0, 0, 0, 1}}, {'l', {0, 0, 0, -1}}, {'u', {1, 0, 0, 1}}, {',', {-1, 0, 0, 0}}, {'.', {-1, 0, 0, 1}}, {'m', {-1, 0, 0, -1}}, {'O', {1, -1, 0, 0}}, {'I', {1, 0, 0, 0}}, {'J', {0, 1, 0, 0}}, {'L', {0, -1, 0, 0}}, {'U', {1, 1, 0, 0}}, {'<', {-1, 0, 0, 0}}, {'>', {-1, -1, 0, 0}}, {'M', {-1, 1, 0, 0}}, {'t', {0, 0, 1, 0}}, {'b', {0, 0, -1, 0}}, {'k', {0, 0, 0, 0}}, {'K', {0, 0, 0, 0}}};
     //计算是往哪个方向
     float x = moveBindings[key][0];
     float y = moveBindings[key][1];
@@ -158,7 +146,7 @@ private slots:
     emit signalControlSpeed(RobotSpeed(x * liner, y * liner, th * turn));
   }
 
-public:
+ public:
   SpeedCtrlWidget(QWidget *parent = 0) : QWidget(parent) {
     QVBoxLayout *verticalLayout_speed_ctrl = new QVBoxLayout();
     verticalLayout_speed_ctrl->setObjectName(
@@ -386,9 +374,10 @@ public:
     QPushButton *btn_stop = new QPushButton();
     btn_stop->setObjectName(QString::fromUtf8("btn_stop"));
     btn_stop->setText("停止(s)");
-    btn_stop->setStyleSheet("QPushButton {background-color: red; color: white; "
-                            "font-size: 14px;}"
-                            "QPushButton:hover {background-color: darkred;}");
+    btn_stop->setStyleSheet(
+        "QPushButton {background-color: red; color: white; "
+        "font-size: 14px;}"
+        "QPushButton:hover {background-color: darkred;}");
     btn_stop->setShortcut(QApplication::translate("Widget", "s", nullptr));
     connect(btn_stop, &QPushButton::clicked,
             [this]() { emit signalControlSpeed(RobotSpeed()); });
