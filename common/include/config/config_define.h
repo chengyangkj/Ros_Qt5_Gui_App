@@ -1,6 +1,6 @@
 #pragma once
-#include "json_struct/json_struct.h"
 #include <map>
+#include "json_struct/json_struct.h"
 namespace Config {
 struct DisplayConfig {
   std::string display_name;
@@ -21,4 +21,4 @@ struct ConfigRoot {
   JS_OBJ(display_config, topology_map_config);
 };
 
-} // namespace Config
+}  // namespace Config

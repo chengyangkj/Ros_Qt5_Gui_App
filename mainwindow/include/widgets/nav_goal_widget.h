@@ -1,7 +1,4 @@
 #pragma once
-#include "algorithm.h"
-#include "point_type.h"
-#include "widgets/joystick.h"
 #include <QCalendarWidget>
 #include <QCheckBox>
 #include <QComboBox>
@@ -12,31 +9,35 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QtWidgets/QListWidget>
+#include "algorithm.h"
+#include "point_type.h"
+#include "widgets/joystick.h"
 using namespace basic;
 class NavGoalWidget : public QWidget {
   Q_OBJECT
-public:
-  enum HandleResult { kSend = 0, kRemove = 1, kCancel = 2 };
-  struct PointInfo
-  {
-    RobotPose pose; 
+ public:
+  enum HandleResult { kSend = 0,
+                      kRemove = 1,
+                      kCancel = 2 };
+  struct PointInfo {
+    RobotPose pose;
     QString name;
   };
-  
-private:
+
+ private:
   QDoubleSpinBox *spinBox_x_;
   QDoubleSpinBox *spinBox_y_;
   QDoubleSpinBox *spinBox_theta_;
   QLineEdit *lineEdit_name_;
-signals:
+ signals:
   void SignalPoseChanged(const RobotPose &pose);
   void SignalHandleOver(const HandleResult &flag, const RobotPose &pose);
-public slots:
+ public slots:
   void SetPose(const PointInfo &pose);
-private slots:
+ private slots:
   void SlotUpdateValue(double);
 
-public:
+ public:
   NavGoalWidget(QWidget *parent = 0);
   ~NavGoalWidget() {}
 };

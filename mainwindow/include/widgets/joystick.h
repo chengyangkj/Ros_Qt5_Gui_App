@@ -11,7 +11,7 @@
 class JoyStick : public QWidget {
   Q_OBJECT
 
-public:
+ public:
   JoyStick(QWidget *parent = 0);
   ~JoyStick();
   enum Direction {
@@ -25,31 +25,31 @@ public:
     down,
     downright
   };
-signals:
+ signals:
   void keyNumchanged(int num);
 
-protected:
+ protected:
   void paintEvent(QPaintEvent *event) override;
   void mouseMoveEvent(QMouseEvent *event) override;
   void mouseReleaseEvent(QMouseEvent *event) override;
   void mousePressEvent(QMouseEvent *event) override;
   //  void resizeEvent(QResizeEvent *event)override;
-private:
+ private:
   int mouseX;
   int mouseY;
-  int JoyStickX; //摇杆
+  int JoyStickX;  //摇杆
   int JoyStickY;
   int JoyStickR;
-  int padX; //底盘
+  int padX;  //底盘
   int padY;
   int padR;
-  double handPadDis; //两圆圆心距离
+  double handPadDis;  //两圆圆心距离
   bool mousePressed;
   QTimer *tim;
 
-private:
-  double Pointdis(int a, int b, int x, int y); //两点距离
+ private:
+  double Pointdis(int a, int b, int x, int y);  //两点距离
   int getKeyNum();
 };
 
-#endif // JoyStick_H
+#endif  // JoyStick_H

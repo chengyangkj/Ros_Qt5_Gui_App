@@ -2,39 +2,36 @@
 #include <json_struct/json_struct.h>
 #include "include/nlohmann/json.hpp"
 
-struct Friends
-{
-    int id;
-    std::string name;
+struct Friends {
+  int id;
+  std::string name;
 };
 JS_OBJ_EXT(Friends, id, name);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Friends, id, name);
 
-struct JPerson
-{
-    std::string _id;
-    int index;
-    std::string guid;
-    bool isActive;
-    std::string balance;
-    std::string picture;
-    int age;
-    std::string eyeColor;
-    std::string name;
-    std::string gender;
-    std::string company;
-    std::string email;
-    std::string phone;
-    std::string address;
-    std::string about;
-    std::string registered;
-    float latitude;
-    float longitude;
-    std::vector<std::string> tags;
-    std::vector<Friends> friends;
-    std::string greeting;
-    std::string favoriteFruit;
-
+struct JPerson {
+  std::string _id;
+  int index;
+  std::string guid;
+  bool isActive;
+  std::string balance;
+  std::string picture;
+  int age;
+  std::string eyeColor;
+  std::string name;
+  std::string gender;
+  std::string company;
+  std::string email;
+  std::string phone;
+  std::string address;
+  std::string about;
+  std::string registered;
+  float latitude;
+  float longitude;
+  std::vector<std::string> tags;
+  std::vector<Friends> friends;
+  std::string greeting;
+  std::string favoriteFruit;
 };
 JS_OBJ_EXT(JPerson, _id, index, guid, isActive, balance, picture, age, eyeColor, name, gender, company, email, phone,
            address, about, registered, latitude, longitude, tags, friends, greeting, favoriteFruit);
@@ -42,8 +39,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(JPerson, _id, index, guid, isActive, balance,
                                    company, email, phone, address, about, registered, latitude, longitude, tags,
                                    friends, greeting, favoriteFruit);
 
-struct SmallPerson
-{
+struct SmallPerson {
   std::string name;
 };
 JS_OBJ_EXT(SmallPerson, name);

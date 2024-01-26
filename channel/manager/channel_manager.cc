@@ -54,7 +54,7 @@ bool ChannelManager::OpenChannel(const std::string &path) {
     typedef VirtualChannelNode *(*GetChannelInstanceFunc)();
     GetChannelInstanceFunc func_get =
         (GetChannelInstanceFunc)library_channel_->get<VirtualChannelNode *()>(
-            "GetChannelInstance"); // 取出该符号
+            "GetChannelInstance");  // 取出该符号
     channel_ptr_ = func_get();
     if (channel_ptr_ == nullptr) {
       std::cout << "get channel instance failed!" << std::endl;
@@ -84,4 +84,11 @@ void ChannelManager::SendMessage(const MsgId &msg_id, const std::any &msg) {
   if (channel_ptr_ != nullptr) {
     channel_ptr_->SendMessage(msg_id, msg);
   }
+}
+VirtualChannelNode *ChannelManager::GetChannel() {
+  [[unlikely]] if (channel_ptr_ == nullptr) {
+    std::cout << "error channel is nullptr exit!" << std::endl;
+    exit(1);
+  }
+  return channel_ptr_;
 }

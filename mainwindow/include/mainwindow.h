@@ -1,18 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "DockAreaWidget.h"
-#include "DockManager.h"
-#include "DockWidget.h"
-#include "channel_manager.h"
-#include "display/manager/display_manager.h"
-#include "point_type.h"
-#include "widgets/dashboard.h"
-#include "widgets/nav_goal_table_view.h"
-#include "widgets/set_pose_widget.h"
-#include "widgets/speed_ctrl.h"
-#include "widgets/status_bar.h"
-#include "widgets/tools_bar.h"
 #include <QCalendarWidget>
 #include <QComboBox>
 #include <QFileDialog>
@@ -32,6 +20,18 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QWidgetAction>
+#include "DockAreaWidget.h"
+#include "DockManager.h"
+#include "DockWidget.h"
+#include "channel_manager.h"
+#include "display/manager/display_manager.h"
+#include "point_type.h"
+#include "widgets/dashboard.h"
+#include "widgets/nav_goal_table_view.h"
+#include "widgets/set_pose_widget.h"
+#include "widgets/speed_ctrl.h"
+#include "widgets/status_bar.h"
+#include "widgets/tools_bar.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -41,22 +41,22 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
-public:
+ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
-public slots:
+ public slots:
   void signalCursorPose(QPointF pos);
   void SendChannelMsg(const MsgId &id, const std::any &data);
   void RecvChannelMsg(const MsgId &id, const std::any &data);
   void updateOdomInfo(RobotState state);
+  void RestoreState();
 
-protected:
+ protected:
   virtual void closeEvent(QCloseEvent *event) override;
 
-private:
+ private:
   QAction *SavePerspectiveAction = nullptr;
   QWidgetAction *PerspectiveListAction = nullptr;
-  QComboBox *PerspectiveComboBox = nullptr;
   ChannelManager channel_manager_;
   Ui::MainWindow *ui;
   DashBoard *speed_dash_board_;
@@ -72,18 +72,15 @@ private:
   StatusBarWidget *status_bar_widget_;
   ToolsBarWidget *tools_bar_widget_;
   NavGoalTableView *nav_goal_table_view_;
-signals:
+ signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);
 
-private:
+ private:
   void setupUi();
   bool openChannel();
   bool openChannel(const std::string &channel_name);
   void closeChannel();
   void registerChannel();
-  void RestoreState();
   void SaveState();
-private slots:
-  void savePerspective();
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

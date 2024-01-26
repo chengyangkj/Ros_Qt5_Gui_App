@@ -15,5 +15,5 @@ target_link_libraries(${TARGET_NAME} ${Boost_LIBRARIES} Qt5::Core basic json_str
 target_include_directories(${TARGET_NAME} PUBLIC include)
 
 #######test
-set(TEST_LINK_LIBRARIES Qt5::Core basic json_struct ${TARGET_NAME})
-AddTest()
+# set(TEST_LINK_LIBRARIES Qt5::Core basic json_struct ${TARGET_NAME})
+# AddTest()

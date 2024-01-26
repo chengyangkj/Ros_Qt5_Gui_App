@@ -8,17 +8,17 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 #pragma once
-#include "msg/msg_info.h"
-#include "virtual_channel_node.h"
 #include <any>
 #include <boost/dll/import.hpp>
 #include <boost/filesystem.hpp>
+#include "msg/msg_info.h"
+#include "virtual_channel_node.h"
 class ChannelManager {
-private:
+ private:
   VirtualChannelNode *channel_ptr_{nullptr};
   boost::dll::shared_library *library_channel_;
 
-public:
+ public:
   explicit ChannelManager();
   ~ChannelManager();
   /// @brief 传入channel so路径，打开对应的通信channel
@@ -31,6 +31,7 @@ public:
   /// @brief 查找lib路径下所有channel
   /// @return channel list
   std::vector<std::string> DiscoveryAllChannel();
+  VirtualChannelNode *GetChannel();
   void RegisterOnDataCallback(
       std::function<void(const MsgId &id, const std::any &data)> &&func) {
     if (channel_ptr_ != nullptr) {

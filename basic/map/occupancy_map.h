@@ -30,26 +30,22 @@
 namespace basic {
 
 class OccupancyMap {
-public:
-  double origin_x{0};     // 地图原点x(栅格地图左下角)
-  double origin_y{0};     // 地图原点y(栅格地图左下角)
-  double origin_theta{0}; // 地图原点theta(栅格地图左下角)
-  double resolution{0};   // 地图分辨率
-  Eigen::Vector3d origin_pose{0, 0, 0}; // 地图原点位置(栅格地图左下角)
-  int rows{0};                          // 行(高)
-  int cols{0};                          // 列(宽)
-  Eigen::MatrixXi map_data; // 地图数据,数据的地图已经被上下翻转
-public:
+ public:
+  double origin_x{0};                    // 地图原点x(栅格地图左下角)
+  double origin_y{0};                    // 地图原点y(栅格地图左下角)
+  double origin_theta{0};                // 地图原点theta(栅格地图左下角)
+  double resolution{0};                  // 地图分辨率
+  Eigen::Vector3d origin_pose{0, 0, 0};  // 地图原点位置(栅格地图左下角)
+  int rows{0};                           // 行(高)
+  int cols{0};                           // 列(宽)
+  Eigen::MatrixXi map_data;              // 地图数据,数据的地图已经被上下翻转
+ public:
   OccupancyMap() {}
   OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res)
-      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]),
-        origin_y(origin[1]), origin_theta(origin[2]), resolution(res),
-        map_data(rows_, cols) {}
+      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]), origin_y(origin[1]), origin_theta(origin[2]), resolution(res), map_data(rows_, cols) {}
   OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
                Eigen::MatrixXi data)
-      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]),
-        origin_y(origin[1]), origin_theta(origin[2]), resolution(res),
-        map_data(data) {}
+      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]), origin_y(origin[1]), origin_theta(origin[2]), resolution(res), map_data(data) {}
   ~OccupancyMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
   Eigen::MatrixXi flip() { return map_data.colwise().reverse(); }
@@ -132,7 +128,7 @@ public:
    * @return {*}
    */
   void OccPose2xy(const double &scene_x, const double &scene_y,
-                    double &word_x, double &word_y) {
+                  double &word_x, double &word_y) {
     word_y = scene_x * resolution + origin_x;
     word_x = (height() - scene_y) * resolution + origin_y;
   }
@@ -216,6 +212,6 @@ public:
   }
 };
 
-} // namespace basic
+}  // namespace basic
 
 #endif

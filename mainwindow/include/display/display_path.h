@@ -18,16 +18,16 @@
 using namespace basic;
 namespace Display {
 class DisplayPath : public VirtualDisplay {
-private:
+ private:
   QColor color_;
   QPolygonF path_points_;
 
-private:
+ private:
   void drawPath(QPainter *painter);
 
   void computeBoundRect(const RobotPath &path);
 
-public:
+ public:
   DisplayPath(const std::string &display_type, const int &z_value,
               std::string parent_name = "");
   ~DisplayPath();
@@ -37,4 +37,4 @@ public:
              QWidget *widget = nullptr) override;
   bool UpdateData(const std::any &data) override;
 };
-} // namespace Display
+}  // namespace Display

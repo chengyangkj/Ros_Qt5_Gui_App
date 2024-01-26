@@ -12,32 +12,30 @@
 //============================================================================
 #include <QXmlStreamReader>
 
-namespace ads
-{
+namespace ads {
 
 /**
  * Extends QXmlStreamReader with file version information
  */
-class CDockingStateReader : public QXmlStreamReader
-{
-private:
-	int m_FileVersion;
+class CDockingStateReader : public QXmlStreamReader {
+ private:
+  int m_FileVersion;
 
-public:
-	using QXmlStreamReader::QXmlStreamReader;
+ public:
+  using QXmlStreamReader::QXmlStreamReader;
 
-	/**
+  /**
 	 * Set the file version for this state reader
 	 */
-	void setFileVersion(int FileVersion);
+  void setFileVersion(int FileVersion);
 
-	/**
+  /**
 	 * Returns the file version set via setFileVersion
 	 */
-	int fileVersion() const;
+  int fileVersion() const;
 };
 
-} // namespace ads
+}  // namespace ads
 
 //---------------------------------------------------------------------------
-#endif // DockingStateReaderH
+#endif  // DockingStateReaderH

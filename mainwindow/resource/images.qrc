@@ -159,10 +159,12 @@
         <file>background/loding3.gif</file>
         <file>background/loding4.gif</file>
         <file>background/loding5.gif</file>
-        <file>images/dir.png</file>
-        <file>images/dir_16.png</file>
-        <file>images/goal_blue.png</file>
-        <file>images/goal_green.png</file>
-        <file>images/goal_red.png</file>
+        <file>images/save.png</file>
+        <file>images/load.png</file>
+        <file>images/robot.svg</file>
+        <file>images/goal.svg</file>
+        <file>images/target.svg</file>
+        <file>images/add_32.svg</file>
+        <file>images/add_16.svg</file>
     </qresource>
 </RCC>

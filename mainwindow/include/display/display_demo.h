@@ -18,10 +18,10 @@
 namespace Display {
 
 class DisplayDemo : public VirtualDisplay {
-private:
+ private:
   void drawFrame(QPainter *painter);
 
-public:
+ public:
   DisplayDemo(const std::string &display_type, const int &z_value,
               std::string parent_name = "");
   ~DisplayDemo();
@@ -30,4 +30,4 @@ public:
   bool UpdateData(const std::any &data) override;
 };
 
-} // namespace Display
+}  // namespace Display

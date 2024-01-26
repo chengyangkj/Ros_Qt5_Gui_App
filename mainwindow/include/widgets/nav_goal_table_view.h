@@ -9,11 +9,11 @@
 using namespace basic;
 class NavGoalTableView : public QTableView {
   Q_OBJECT
-public:
+ public:
   explicit NavGoalTableView(QWidget *_parent_widget = nullptr);
   ~NavGoalTableView() override;
 
-private:
+ private:
   QStandardItemModel *table_model_;
   TopologyMap topologyMap_;
   RobotPose robot_pose_;

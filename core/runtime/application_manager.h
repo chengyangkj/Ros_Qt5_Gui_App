@@ -1,10 +1,10 @@
 #pragma once
 #include "mainwindow.h"
 class ApplicationManager {
-private:
- MainWindow main_window;
+ private:
+  MainWindow main_window;
 
-public:
- ApplicationManager(/* args */);
- ~ApplicationManager();
+ public:
+  ApplicationManager(/* args */);
+  ~ApplicationManager();
 };
