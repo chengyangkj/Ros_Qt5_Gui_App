@@ -28,7 +28,7 @@ jobs:
           required-ros-distributions: ${{matrix.os-ros.ros}}
 
       - name: Install Dependencies
-        run: sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
+        run: sudo apt-get install qtbase5-dev qt5-qmake libqt5svg5-dev qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
 
       - name: Update gtest
         run: |
@@ -45,7 +45,7 @@ jobs:
         run: |
           /bin/bash -c \
           "source /opt/ros/${{matrix.os-ros.ros}}/setup.bash \
-          && sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
+          && sudo apt-get install qtbase5-dev qt5-qmake libqt5svg5-dev qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
           && rm -rf build \
           && mkdir build/ \
           && cd build/ \

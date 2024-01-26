@@ -9,8 +9,8 @@
  */
 #ifndef POINT_TYPE_H
 #define POINT_TYPE_H
-#include "point.h"
 #include <Eigen/Dense>
+#include "point.h"
 namespace basic {
 typedef OrientedPoint RobotPose;
 typedef std::vector<Point> RobotPath;
@@ -21,25 +21,24 @@ struct RobotSpeed {
   double w{0};
   RobotSpeed() {}
   RobotSpeed(double vx, double vy, double w) : vx(vx), vy(vy), w(w) {}
-
 };
 
- inline std::ostream &operator<<(std::ostream &os, const RobotSpeed &p) {
-    os << "x:" << p.vx << " y:" << p.vy << " theta:" << p.w;
-    return os;
-  }
+inline std::ostream &operator<<(std::ostream &os, const RobotSpeed &p) {
+  os << "x:" << p.vx << " y:" << p.vy << " theta:" << p.w;
+  return os;
+}
 struct RobotState : public RobotPose, RobotSpeed {
-   public:
-    RobotState() = default;
-    RobotState(const RobotPose &p, const RobotSpeed &s) : RobotPose(p), RobotSpeed(s) {}
-    RobotState(const OrientedPoint &p):RobotPose(p){}
+ public:
+  RobotState() = default;
+  RobotState(const RobotPose &p, const RobotSpeed &s) : RobotPose(p), RobotSpeed(s) {}
+  RobotState(const OrientedPoint &p) : RobotPose(p) {}
 };
 // 激光点云数据结构
 struct LaserScan {
   LaserScan() = default;
   LaserScan(int i, std::vector<Point> d) : id(i), data(d) {}
-  int id;                  // 激光ID
-  std::vector<Point> data; // 点坐标
+  int id;                   // 激光ID
+  std::vector<Point> data;  // 点坐标
   void push_back(Point p) { data.push_back(p); }
   void clear() { data.clear(); }
 };
@@ -58,6 +57,6 @@ inline Eigen::Vector3d absoluteSum(const Eigen::Vector3d &p,
   return pw;
 }
 
-} // namespace basic
+}  // namespace basic
 
 #endif

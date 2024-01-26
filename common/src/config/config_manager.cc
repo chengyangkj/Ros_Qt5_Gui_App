@@ -1,19 +1,19 @@
 #include "config/config_manager.h"
-#include "boost/filesystem.hpp"
 #include <QFile>
 #include <fstream>
+#include "boost/filesystem.hpp"
 namespace Config {
 bool writeStringToFile(const std::string &filePath,
                        const std::string &content) {
   boost::filesystem::path path(filePath);
   if (!boost::filesystem::exists(path.parent_path())) {
-    boost::filesystem::create_directories(path.parent_path()); // 创建路径
+    boost::filesystem::create_directories(path.parent_path());  // 创建路径
   }
 
   std::ofstream outputFile(filePath);
   if (outputFile) {
-    outputFile << content; // 写入内容
-    outputFile.close();    // 关闭文件
+    outputFile << content;  // 写入内容
+    outputFile.close();     // 关闭文件
     return true;
   } else {
     std::cerr << "无法创建文件 " << filePath << std::endl;
@@ -36,7 +36,7 @@ void ConfigManager::Init(const std::string &config_path) {
   }
   ReadRootConfig();
 }
-ConfigManager::~ConfigManager() { WriteRootConfig(); }
+ConfigManager::~ConfigManager() {}
 bool ConfigManager::ReadRootConfig() {
   std::lock_guard<std::mutex> lock(mutex_);
   std::ifstream file(config_path_);
@@ -111,4 +111,4 @@ bool ConfigManager::WriteTopologyMap(const std::string &map_path,
   return writeStringToFile(map_path, pretty_json);
 }
 
-} // namespace Config
+}  // namespace Config

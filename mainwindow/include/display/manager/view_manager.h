@@ -4,13 +4,13 @@
 #include <QMouseEvent>
 
 class ViewManager : public QGraphicsView {
-public:
- ViewManager(QWidget *parent = nullptr);
+ public:
+  ViewManager(QWidget *parent = nullptr);
 
-protected:
- void mouseMoveEvent(QMouseEvent *event) override;
+ protected:
+  void mouseMoveEvent(QMouseEvent *event) override;
 
- void enterEvent(QEvent *event) override;
+  void enterEvent(QEvent *event) override;
 
- void leaveEvent(QEvent *event) override;
+  void leaveEvent(QEvent *event) override;
 };

@@ -23,52 +23,43 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
   SetScaleEnable(false);
   moveBy(0, 0);
   switch (type_) {
-  case kRobot: {
-    robot_image_.load("://images/dir.png");
-    QMatrix matrix;
-    matrix.rotate(45);
-    robot_image_ =
-        robot_image_.transformed(QTransform(matrix), Qt::SmoothTransformation);
-
-    SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
-                           0 - robot_image_.height() / 2, robot_image_.width(),
-                           robot_image_.height()));
-  } break;
-  case kParticle: {
-
-  } break;
-  case kNavGoal: {
-    robot_image_.load("://images/goal_green.png");
-    QMatrix matrix;
-    matrix.rotate(90);
-    robot_image_ =
-        robot_image_.transformed(QTransform(matrix), Qt::SmoothTransformation);
-
-    SetBoundingRect(QRectF(0 - robot_image_.width() / 2,
-                           0 - robot_image_.height() / 2, robot_image_.width(),
-                           robot_image_.height()));
-  } break;
+    case kRobot: {
+      robot_svg_renderer_.load(QString("://images/robot.svg"));
+      deg_offset_ = 45;
+      SetBoundingRect(QRectF(0 - robot_svg_renderer_.defaultSize().width() / 2,
+                             0 - robot_svg_renderer_.defaultSize().height() / 2, robot_svg_renderer_.defaultSize().width(),
+                             robot_svg_renderer_.defaultSize().height()));
+    } break;
+    case kParticle: {
+    } break;
+    case kNavGoal: {
+      robot_svg_renderer_.load(QString("://images/target.svg"));
+      deg_offset_ = -135;
+      SetBoundingRect(QRectF(0 - robot_svg_renderer_.defaultSize().width() / 2,
+                             0 - robot_svg_renderer_.defaultSize().height() / 2, robot_svg_renderer_.defaultSize().width(),
+                             robot_svg_renderer_.defaultSize().height()));
+    } break;
   }
   // this->setCursor(Qt::);
 }
 QVariant PointShape::itemChange(GraphicsItemChange change,
                                 const QVariant &value) {
   switch (change) {
-  case ItemPositionHasChanged:
-    curr_scene_pose_ = RobotPose(scenePos().x(), scenePos().y(),
-                                 normalize(robot_pose_.theta + rotate_value_));
-    emit signalPoseUpdate(curr_scene_pose_);
-    break;
-  // case ItemTransformHasChanged:
-  //   emit signalPoseUpdate(
-  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
-  //   break;
-  // case ItemRotationHasChanged:
-  //   emit signalPoseUpdate(
-  //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
-  //   break;
-  default:
-    break;
+    case ItemPositionHasChanged:
+      curr_scene_pose_ = RobotPose(scenePos().x(), scenePos().y(),
+                                   normalize(robot_pose_.theta + rotate_value_));
+      emit signalPoseUpdate(curr_scene_pose_);
+      break;
+    // case ItemTransformHasChanged:
+    //   emit signalPoseUpdate(
+    //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+    //   break;
+    // case ItemRotationHasChanged:
+    //   emit signalPoseUpdate(
+    //       Eigen::Vector3f(scenePos().x(), scenePos().y(), rotate_value_));
+    //   break;
+    default:
+      break;
   };
   return QGraphicsItem::itemChange(change, value);
 }
@@ -94,15 +85,15 @@ void PointShape::paint(QPainter *painter,
   painter->setRenderHints(QPainter::Antialiasing |
                           QPainter::SmoothPixmapTransform);
   switch (type_) {
-  case kRobot:
-    drawRobot(painter);
-    break;
-  case kParticle:
-    drawParticle(painter);
-    break;
-  case kNavGoal:
-    drawNavGoal(painter);
-    break;
+    case kRobot:
+      drawRobot(painter);
+      break;
+    case kParticle:
+      drawParticle(painter);
+      break;
+    case kNavGoal:
+      drawNavGoal(painter);
+      break;
   }
   static double last_rotate_value = rotate_value_;
 
@@ -116,20 +107,21 @@ void PointShape::paint(QPainter *painter,
 }
 void PointShape::setEnable(const bool &enable) {}
 void PointShape::drawRobot(QPainter *painter) {
-  painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
+  painter->setRenderHint(QPainter::Antialiasing, true);  // 设置反锯齿 反走样
   painter->save();
-  painter->rotate(-rad2deg(robot_pose_.theta) - rad2deg(rotate_value_));
-  painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
-                      robot_image_);
-
+  painter->rotate(-rad2deg(robot_pose_.theta) - rad2deg(rotate_value_) + deg_offset_);
+  QRectF targetRect(-robot_svg_renderer_.defaultSize().width() / 2, -robot_svg_renderer_.defaultSize().height() / 2, robot_svg_renderer_.defaultSize().width(), robot_svg_renderer_.defaultSize().height());
+  // 将SVG图形渲染到QPainter
+  robot_svg_renderer_.render(painter, targetRect);
   painter->restore();
 }
 void PointShape::drawNavGoal(QPainter *painter) {
-  painter->setRenderHint(QPainter::Antialiasing, true); // 设置反锯齿 反走样
+  painter->setRenderHint(QPainter::Antialiasing, true);  // 设置反锯齿 反走样
   painter->save();
-  painter->rotate(-rad2deg(robot_pose_.theta) - rad2deg(rotate_value_));
-  painter->drawPixmap(-robot_image_.width() / 2, -robot_image_.height() / 2,
-                      robot_image_);
+  painter->rotate(-rad2deg(robot_pose_.theta) - rad2deg(rotate_value_) + deg_offset_);
+  QRectF targetRect(-robot_svg_renderer_.defaultSize().width() / 2, -robot_svg_renderer_.defaultSize().height() / 2, robot_svg_renderer_.defaultSize().width(), robot_svg_renderer_.defaultSize().height());
+  // 将SVG图形渲染到QPainter
+  robot_svg_renderer_.render(painter, targetRect);
   painter->restore();
 }
 // void PointShape::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
@@ -141,4 +133,4 @@ void PointShape::drawNavGoal(QPainter *painter) {
 // }
 void PointShape::drawParticle(QPainter *painter) {}
 // NOLINTEND
-} // namespace Display
+}  // namespace Display

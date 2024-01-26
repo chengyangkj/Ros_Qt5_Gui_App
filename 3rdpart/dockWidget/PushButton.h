@@ -14,45 +14,42 @@
 
 #include <QPushButton>
 
-namespace ads
-{
+namespace ads {
 
 /**
  * ADS specific push button class with orientation support
  */
-class ADS_EXPORT CPushButton : public QPushButton
-{
-    Q_OBJECT
-public:
-    enum Orientation {
-        Horizontal,
-        VerticalTopToBottom,
-        VerticalBottomToTop
-    };
+class ADS_EXPORT CPushButton : public QPushButton {
+  Q_OBJECT
+ public:
+  enum Orientation {
+    Horizontal,
+    VerticalTopToBottom,
+    VerticalBottomToTop
+  };
 
-    using QPushButton::QPushButton;
+  using QPushButton::QPushButton;
 
-    virtual QSize sizeHint() const override;
+  virtual QSize sizeHint() const override;
 
-    /**
+  /**
      * Returns the current orientation
      */
-    Orientation buttonOrientation() const;
+  Orientation buttonOrientation() const;
 
-    /**
+  /**
      * Set the orientation of this button
      */
-    void setButtonOrientation(Orientation orientation);
+  void setButtonOrientation(Orientation orientation);
 
-protected:
-    virtual void paintEvent(QPaintEvent *event) override;
+ protected:
+  virtual void paintEvent(QPaintEvent *event) override;
 
-private:
-    Orientation m_Orientation = Horizontal;
+ private:
+  Orientation m_Orientation = Horizontal;
 };
 
-} // namespace ads
+}  // namespace ads
 
 //---------------------------------------------------------------------------
-#endif // PushButtonH
-
+#endif  // PushButtonH

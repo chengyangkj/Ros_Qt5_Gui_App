@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 class PluginManager {
-private:
+ private:
   /* data */
-public:
+ public:
   PluginManager(/* args */);
   ~PluginManager();
   bool LoadPlugins(const std::string &plugin_path);

@@ -31,6 +31,6 @@ inline double normalize(double theta) {
   return theta;
 }
 
-} // namespace basic
+}  // namespace basic
 
-#endif // ROBOTALGORITHM_H
+#endif  // ROBOTALGORITHM_H

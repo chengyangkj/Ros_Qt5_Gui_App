@@ -7,14 +7,14 @@
  */
 #ifndef ROBO_MAP_H
 #define ROBO_MAP_H
+#include <Eigen/Dense>
 #include "occupancy_map.h"
 #include "virtual_display.h"
-#include <Eigen/Dense>
 namespace Display {
 class DisplayOccMap : public VirtualDisplay {
-private:
+ private:
   /* data */
-public:
+ public:
   DisplayOccMap(const std::string &display_type, const int &z_value,
                 std::string parent_name = "");
   ~DisplayOccMap() = default;
@@ -22,7 +22,7 @@ public:
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data);
 
-private:
+ private:
   OccupancyMap map_data_;
 
   QTransform transform_;
@@ -30,10 +30,10 @@ private:
   Eigen::Vector3f sub_map_center_pose_;
   double sub_map_value_ = 1;
 
-private:
+ private:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
   void ParseOccupyMap();
 };
-} // namespace Display
+}  // namespace Display
 #endif

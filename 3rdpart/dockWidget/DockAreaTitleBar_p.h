@@ -18,14 +18,12 @@
 ** License along with this library; If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-
 //============================================================================
 /// \file   DockAreaTitleBar_p.h
 /// \author Uwe Kindler
 /// \date   12.10.2018
 /// \brief  Declaration of classes CTitleBarButton and CSpacerWidget
 //============================================================================
-
 
 //============================================================================
 //                                   INCLUDES
@@ -34,10 +32,7 @@
 
 #include "ads_globals.h"
 
-namespace ads
-{
-
-
+namespace ads {
 
 /**
 * This spacer widget is here because of the following problem.
@@ -47,17 +42,16 @@ namespace ads
 * into a floating widget, then mouse events are not handled anymore and dragging
 * of the floating widget stops.
 */
-class CSpacerWidget : public QWidget
-{
-	Q_OBJECT
-public:
-	using Super = QWidget;
-	CSpacerWidget(QWidget* Parent = 0);
-	virtual QSize sizeHint() const override {return QSize(0, 0);}
-	virtual QSize minimumSizeHint() const override {return QSize(0, 0);}
+class CSpacerWidget : public QWidget {
+  Q_OBJECT
+ public:
+  using Super = QWidget;
+  CSpacerWidget(QWidget* Parent = 0);
+  virtual QSize sizeHint() const override { return QSize(0, 0); }
+  virtual QSize minimumSizeHint() const override { return QSize(0, 0); }
 };
 
-}
- // namespace ads
+}  // namespace ads
+   // namespace ads
 //-----------------------------------------------------------------------------
-#endif // DockAreaTitleBar_pH
+#endif  // DockAreaTitleBar_pH

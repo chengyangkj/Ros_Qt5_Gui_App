@@ -7,19 +7,18 @@
  * /ros_qt5_gui_app/include/channel/base/virtual_communcation_node.h
  */
 #pragma once
+#include <any>
+#include <atomic>
+#include <thread>
 #include "msg/msg_info.h"
 #include "occupancy_map.h"
 #include "point_type.h"
-#include <any>
-#include <thread>
-#include <atomic>
 using namespace basic;
 class VirtualChannelNode {
-
-private:
+ private:
   std::thread process_thread_;
 
-public:
+ public:
   VirtualChannelNode(/* args */) {}
   void RegisterOnDataCallback(
       std::function<void(const MsgId &id, const std::any &data)> &&func) {
@@ -52,7 +51,7 @@ public:
   virtual std::string Name() = 0;
   virtual void SendMessage(const MsgId &msg_id, const std::any &msg) = 0;
 
-public:
+ public:
   std::function<void(const MsgId &id, const std::any &data)> OnDataCallback;
   int loop_rate_{30};
   std::atomic<bool> run_flag_{false};

@@ -8,7 +8,7 @@
  * @Description: 图层的虚拟类
  */
 #pragma once
-#include "msg/msg_info.h"
+#include <math.h>
 #include <Eigen/Dense>
 #include <QCursor>
 #include <QGraphicsItem>
@@ -20,19 +20,19 @@
 #include <QtCore>
 #include <any>
 #include <iostream>
-#include <math.h>
+#include "msg/msg_info.h"
 
 #include "display_defines.h"
 #include "occupancy_map.h"
 #include "point_type.h"
 using namespace basic;
-#define GetAnyData(type, data, res_data)                                       \
-  {                                                                            \
-    try {                                                                      \
-      res_data = std::any_cast<type>(data);                                    \
-    } catch (const std::bad_any_cast &e) {                                     \
-      std::cout << e.what() << '\n';                                           \
-    }                                                                          \
+#define GetAnyData(type, data, res_data)    \
+  {                                         \
+    try {                                   \
+      res_data = std::any_cast<type>(data); \
+    } catch (const std::bad_any_cast &e) {  \
+      std::cout << e.what() << '\n';        \
+    }                                       \
   }
 
 namespace Display {
@@ -50,7 +50,7 @@ namespace Display {
 class VirtualDisplay : public QObject, public QGraphicsItem {
   Q_OBJECT
 
-public:
+ public:
   std::string display_type_{"null"};
   QPointF pressed_pose_;
   QPointF start_pose_;
@@ -74,14 +74,14 @@ public:
   std::vector<VirtualDisplay *> children_;
   bool is_moving_{false};
   std::string display_name_;
-signals:
+ signals:
   void signalCursorPose(QPointF pose);
   void signalPoseUpdate(const RobotPose &pose);
   void signalItemChange(GraphicsItemChange change, const QVariant &value);
 
-public:
+ public:
   VirtualDisplay(const std::string &display_type, const int &z_value,
-                 const std::string &parent_name,std::string display_name="");
+                 const std::string &parent_name, std::string display_name = "");
   virtual ~VirtualDisplay();
   bool UpdateDisplay(const std::any &data) { return UpdateData(data); }
   VirtualDisplay *SetRotateEnable(const bool &enable) {
@@ -124,7 +124,7 @@ public:
   void SetBoundingRect(QRectF rect) { bounding_rect_ = rect; }
   QPointF GetOriginPose() { return bounding_rect_.topLeft(); }
   QPointF GetOriginPoseScene() { return mapToScene(GetOriginPose()); }
-  QPointF PoseToScene(QPointF pose) { //将坐标转换为scene(以中心为原点)
+  QPointF PoseToScene(QPointF pose) {  //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
   }
   bool IsMoving() { return is_moving_; }
@@ -145,7 +145,7 @@ public:
   void SetDisplayType(const std::string &display_type);
   void Update();
 
-private:
+ private:
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -153,7 +153,7 @@ private:
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant &value) override;
-private slots:
+ private slots:
   void parentItemChange(GraphicsItemChange change, const QVariant &value);
 };
-} // namespace Display
+}  // namespace Display

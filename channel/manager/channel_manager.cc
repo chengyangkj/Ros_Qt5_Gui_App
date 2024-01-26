@@ -54,7 +54,7 @@ bool ChannelManager::OpenChannel(const std::string &path) {
     typedef VirtualChannelNode *(*GetChannelInstanceFunc)();
     GetChannelInstanceFunc func_get =
         (GetChannelInstanceFunc)library_channel_->get<VirtualChannelNode *()>(
-            "GetChannelInstance"); // 取出该符号
+            "GetChannelInstance");  // 取出该符号
     channel_ptr_ = func_get();
     if (channel_ptr_ == nullptr) {
       std::cout << "get channel instance failed!" << std::endl;

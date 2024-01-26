@@ -1,7 +1,4 @@
 #pragma once
-#include "algorithm.h"
-#include "point_type.h"
-#include "widgets/joystick.h"
 #include <QCalendarWidget>
 #include <QCheckBox>
 #include <QComboBox>
@@ -42,20 +39,23 @@
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
+#include "algorithm.h"
+#include "point_type.h"
+#include "widgets/joystick.h"
 using namespace basic;
 class ToolsBarWidget : public QWidget {
   Q_OBJECT
-private:
+ private:
   QPushButton *pushButton_status_;
   QProgressBar *battery_bar_;
   QLabel *label_power_;
-signals:
+ signals:
   void SignalSetRelocPose();
   void SignalSetNavPose();
   void SignalFocusRobot(bool);
-public slots:
+ public slots:
 
-public:
+ public:
   ToolsBarWidget(QWidget *parent = 0);
   ~ToolsBarWidget() {}
 };

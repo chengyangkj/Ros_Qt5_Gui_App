@@ -19,10 +19,6 @@
 #include "display_path.h"
 #include "laser_points.h"
 
-#include "config/config_manager.h"
-#include "config/topology_map.h"
-#include "point_shape.h"
-#include "widgets/set_pose_widget.h"
 #include <Eigen/Dense>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -32,12 +28,16 @@
 #include <any>
 #include <functional>
 #include <map>
+#include "config/config_manager.h"
+#include "config/topology_map.h"
+#include "point_shape.h"
+#include "widgets/set_pose_widget.h"
 // group
 #define GROUP_MAP "Group_Map"
 namespace Display {
 class DisplayManager : public QObject {
   Q_OBJECT
-private:
+ private:
   std::map<std::string, std::any> display_map_;
 
   RobotPose robot_pose_{0, 0, 0};
@@ -52,13 +52,13 @@ private:
   SetPoseWidget *set_reloc_pose_widget_;
   SceneManager *scene_display_ptr_;
   bool init_flag_{false};
-signals:
+ signals:
   void cursorPosMap(QPointF);
   void signalPub2DPose(const RobotPose &pose);
   void signalPub2DGoal(const RobotPose &pose);
   void signalTopologyMapUpdate(const TopologyMap &map);
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
-public slots:
+ public slots:
   void updateScaled(double value);
   void SetRelocPose();
   void AddOneNavPoint();
@@ -67,12 +67,12 @@ public slots:
   void UpdateTopicData(const MsgId &id, const std::any &data);
   void FocusDisplay(const std::string &display_type);
 
-private:
+ private:
   void InitUi();
   std::vector<Point> transLaserPoint(const std::vector<Point> &point);
   QPushButton *btn_move_focus_;
 
-public:
+ public:
   DisplayManager();
   ~DisplayManager();
   QGraphicsView *GetViewPtr() { return graphics_view_ptr_; }
@@ -95,6 +95,6 @@ public:
   }
 };
 
-} // namespace Display
+}  // namespace Display
 
 #endif

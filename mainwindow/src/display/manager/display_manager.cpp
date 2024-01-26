@@ -3,10 +3,10 @@
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
 #include "display/manager/display_manager.h"
-#include "algorithm.h"
-#include "logger/logger.h"
 #include <Eigen/Eigen>
 #include <QOpenGLWidget>
+#include "algorithm.h"
+#include "logger/logger.h"
 
 #include <fstream>
 namespace Display {
@@ -33,7 +33,7 @@ DisplayManager::DisplayManager() {
 
   (new DisplayCostMap(DISPLAY_LOCAL_COST_MAP, 3, DISPLAY_MAP));
   (new PointShape(PointShape::ePointType::kRobot, DISPLAY_ROBOT, DISPLAY_ROBOT,
-                  7, DISPLAY_MAP))
+                  9, DISPLAY_MAP))
       ->SetRotateEnable(true);
   new LaserPoints(DISPLAY_LASER, 2, DISPLAY_MAP);
   new DisplayPath(DISPLAY_GLOBAL_PATH, 6, DISPLAY_MAP);
@@ -309,4 +309,4 @@ void DisplayManager::SetRelocPose() {
 }
 void DisplayManager::AddOneNavPoint() { scene_display_ptr_->AddOneNavPoint(); }
 
-} // namespace Display
+}  // namespace Display
