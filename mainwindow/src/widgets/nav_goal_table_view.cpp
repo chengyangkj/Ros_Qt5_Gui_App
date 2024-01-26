@@ -1,7 +1,4 @@
 #include "widgets/nav_goal_table_view.h"
-#include "algorithm.h"
-#include "config/config_manager.h"
-#include "logger/logger.h"
 #include <QComboBox>
 #include <QFileDialog>
 #include <QHeaderView>
@@ -9,6 +6,9 @@
 #include <QPushButton>
 #include <QtConcurrent>
 #include <fstream>
+#include "algorithm.h"
+#include "config/config_manager.h"
+#include "logger/logger.h"
 NavGoalTableView::NavGoalTableView(QWidget *_parent_widget)
     : QTableView(_parent_widget) {
   table_model_ = new QStandardItemModel();
@@ -65,7 +65,6 @@ void NavGoalTableView::UpdateSelectPoint(const TopologyMap::PointInfo &point) {
   }
 }
 void NavGoalTableView::AddItem() {
-
   QComboBox *comboBox = new QComboBox();
   for (auto point : topologyMap_.points) {
     comboBox->addItem(point.name.c_str());
@@ -92,7 +91,6 @@ void NavGoalTableView::StartTaskChain() {
   is_task_chain_running_ = true;
   QtConcurrent::run([this]() {
     for (int row = 0; row < table_model_->rowCount(); ++row) {
-
       QComboBox *comboBoxName =
           static_cast<QComboBox *>(indexWidget(model()->index(row, 0)));
       QLabel *label_status =
@@ -110,15 +108,17 @@ void NavGoalTableView::StartTaskChain() {
       while (diff.mod() > 0.1 || diff.theta > deg2rad(5)) {
         LOG_INFO("Task chain is running diff:" << diff);
         diff = absoluteDifference(target_pose, robot_pose_);
+        if (!is_task_chain_running_) {
+          emit signalTaskFinish();
+          LOG_INFO("Task chain is stopped");
+          return;
+        }
         QThread::msleep(100);
       }
       label_status->setText("Finish");
-      if (!is_task_chain_running_) {
-        emit signalTaskFinish();
-        LOG_INFO("Task chain is stopped");
-        return;
-      }
     }
+    LOG_INFO("Task chain is finished");
+    emit signalTaskFinish();
   });
 }
 bool NavGoalTableView::LoadTaskChain(const std::string &name) {
@@ -137,8 +137,18 @@ bool NavGoalTableView::LoadTaskChain(const std::string &name) {
   }
   for (auto point : task_chain_.points) {
     QComboBox *comboBox = new QComboBox();
+    bool find_point = false;
     for (auto p : topologyMap_.points) {
       comboBox->addItem(p.name.c_str());
+      if (point.name == p.name) {
+        find_point = true;
+      }
+    }
+    if (!find_point) {
+      LOG_ERROR(
+          "Can't find point " << point.name << " in topology map skip this point!");
+      delete comboBox;
+      continue;
     }
     comboBox->setCurrentText(QString::fromStdString(point.name));
     QLabel *label_status = new QLabel("None");
@@ -163,7 +173,6 @@ bool NavGoalTableView::LoadTaskChain(const std::string &name) {
 }
 bool NavGoalTableView::SaveTaskChain(const std::string &name) {
   for (int row = 0; row < table_model_->rowCount(); ++row) {
-
     QComboBox *comboBoxName =
         static_cast<QComboBox *>(indexWidget(model()->index(row, 0)));
     QLabel *label_status =

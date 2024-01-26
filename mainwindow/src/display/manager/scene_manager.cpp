@@ -18,7 +18,7 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   nav_goal_widget_ = new NavGoalWidget(view_ptr_);
   nav_goal_widget_->hide();
   QPixmap goal_image;
-  goal_image.load("://images/add_16.svg");
+  goal_image.load("://images/add_32.svg");
   QMatrix matrix;
   matrix.rotate(90);
   goal_image =
