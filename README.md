@@ -50,7 +50,7 @@
 | 机器人重定位                | ✅    |      |
 | 机器人单点/多点导航         | ✅    |      |
 | 机器人全局/局部规划轨迹显示 | ✅    |      |
-| 机器人拓扑地图功能          | ✅    |      |
+| 机器人拓扑地图功能          | ✍    |      |
 | 电池电量显示                | ✅    |      |
 | 地图编辑功能                | ✍    |      |
 | 机器人导航任务链            | ✍    |      |
@@ -124,7 +124,7 @@ sudo chmod a+x ./ros_qt5_gui_app
 
 ```
 sudo apt-get update
-sudo apt-get install qtbase5-private-dev -y
+sudo apt-get install qtbase5-private-dev libqt5svg5-dev -y
 ```
 
 如果以上安装后还不行，可以执行如下指令安装全部依赖:

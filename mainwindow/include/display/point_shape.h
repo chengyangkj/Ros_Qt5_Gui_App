@@ -16,6 +16,7 @@
 #include <QMenu>
 #include <QObject>
 #include <QPainter>
+#include <QSvgRenderer>
 #include "virtual_display.h"
 namespace Display {
 class PointShape : public VirtualDisplay {
@@ -35,9 +36,10 @@ class PointShape : public VirtualDisplay {
   // void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
  private:
-  QPixmap robot_image_;
+  QSvgRenderer robot_svg_renderer_;
   ePointType type_;
   RobotPose robot_pose_;
+  double deg_offset_{0};
   bool enable_{true};
 
  private:

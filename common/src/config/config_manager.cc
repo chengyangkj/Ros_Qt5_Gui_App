@@ -36,7 +36,7 @@ void ConfigManager::Init(const std::string &config_path) {
   }
   ReadRootConfig();
 }
-ConfigManager::~ConfigManager() { WriteRootConfig(); }
+ConfigManager::~ConfigManager() {}
 bool ConfigManager::ReadRootConfig() {
   std::lock_guard<std::mutex> lock(mutex_);
   std::ifstream file(config_path_);
