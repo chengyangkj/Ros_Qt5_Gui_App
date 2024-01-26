@@ -9,8 +9,6 @@
 namespace Display {
 SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent) {}
 void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
-  Config::ConfigManager::Instacnce()->SetDefaultConfig(
-      "TopologyMap/Path", "./default_topology_map.json");
 
   // 1s自动保存1次 拓扑地图
 
@@ -34,7 +32,9 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
 }
 void SceneManager::LoadTopologyMap() {
   Config::ConfigManager::Instacnce()->ReadTopologyMap(
-      Config::ConfigManager::Instacnce()->GetConfig("TopologyMap/Path"),
+      Config::ConfigManager::Instacnce()
+          ->GetRootConfig()
+          .topology_map_config.map_name,
       topology_map_);
   for (auto &point : topology_map_.points) {
     auto goal_point =
@@ -48,7 +48,9 @@ void SceneManager::LoadTopologyMap() {
 }
 void SceneManager::saveTopologyMap() {
   Config::ConfigManager::Instacnce()->WriteTopologyMap(
-      Config::ConfigManager::Instacnce()->GetConfig("TopologyMap/Path"),
+      Config::ConfigManager::Instacnce()
+          ->GetRootConfig()
+          .topology_map_config.map_name,
       topology_map_);
   emit signalTopologyMapUpdate(topology_map_);
   // 递归

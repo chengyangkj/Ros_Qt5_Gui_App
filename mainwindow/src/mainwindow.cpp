@@ -68,6 +68,9 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
   case MsgId::kOdomPose:
     updateOdomInfo(std::any_cast<RobotState>(data));
     break;
+  case MsgId::kRobotPose: {
+    nav_goal_table_view_->UpdateRobotPose(std::any_cast<RobotPose>(data));
+  } break;
   case MsgId::kBatteryState: {
     std::map<std::string, std::string> map =
         std::any_cast<std::map<std::string, std::string>>(data);
@@ -188,31 +191,54 @@ void MainWindow::setupUi() {
   horizontalLayout_13->addWidget(nav_goal_table_view_);
   task_list_widget->setLayout(horizontalLayout_13);
   ads::CDockWidget *nav_goal_list_dock_widget = new ads::CDockWidget("Task");
-  QPushButton *btn_add_one_goal = new QPushButton("Add");
-  QPushButton *btn_remove_select_goal = new QPushButton("Remove Select");
+  QPushButton *btn_add_one_goal = new QPushButton("Add Point");
   QHBoxLayout *horizontalLayout_15 = new QHBoxLayout();
-  QPushButton *btn_start_goal_list = new QPushButton("Start");
-  QPushButton *btn_stop_goal_list = new QPushButton("Stop");
+  QPushButton *btn_start_task_chain = new QPushButton("Start Task Chain");
   QHBoxLayout *horizontalLayout_14 = new QHBoxLayout();
   horizontalLayout_15->addWidget(btn_add_one_goal);
-  horizontalLayout_15->addWidget(btn_remove_select_goal);
-  horizontalLayout_14->addWidget(btn_start_goal_list);
-  horizontalLayout_14->addWidget(btn_stop_goal_list);
+  horizontalLayout_14->addWidget(btn_start_task_chain);
+
+  QPushButton *btn_load_task_chain = new QPushButton("Load Task Chain");
+  QPushButton *btn_save_task_chain = new QPushButton("Save Task Chain");
+  QHBoxLayout *horizontalLayout_16 = new QHBoxLayout();
+  horizontalLayout_16->addWidget(btn_load_task_chain);
+  horizontalLayout_16->addWidget(btn_save_task_chain);
+
   horizontalLayout_13->addLayout(horizontalLayout_15);
   horizontalLayout_13->addLayout(horizontalLayout_14);
+  horizontalLayout_13->addLayout(horizontalLayout_16);
   nav_goal_list_dock_widget->setWidget(task_list_widget);
   nav_goal_list_dock_widget->setMinimumSizeHintMode(
       CDockWidget::MinimumSizeHintFromDockWidget);
   nav_goal_list_dock_widget->setMinimumSize(200, 150);
   nav_goal_list_dock_widget->setMaximumSize(480, 9999);
-  const auto autoHideContainer = dock_manager_->addAutoHideDockWidget(
-      SideBarLocation::SideBarRight, nav_goal_list_dock_widget);
-  autoHideContainer->setSize(480);
+  dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
+                               nav_goal_list_dock_widget, CentralDockArea);
+  nav_goal_list_dock_widget->toggleView(true);
+  connect(nav_goal_table_view_, &NavGoalTableView::signalSendNavGoal,
+          [this](const RobotPose &pose) {
+            SendChannelMsg(MsgId::kSetNavGoalPose, pose);
+          });
   // nav_goal_list_dock_widget->toggleView(false);
   ui->menuView->addAction(nav_goal_list_dock_widget->toggleViewAction());
-  connect(btn_add_one_goal, &QPushButton::clicked,
-          [this]() { nav_goal_table_view_->AddItem(); });
-  connect(btn_remove_select_goal, &QPushButton::clicked, [this]() {});
+  connect(
+      btn_add_one_goal, &QPushButton::clicked,
+      [this, nav_goal_list_dock_widget]() { nav_goal_table_view_->AddItem(); });
+  connect(btn_start_task_chain, &QPushButton::clicked,
+          [this, btn_start_task_chain]() {
+            if (btn_start_task_chain->text() == "Start Task Chain") {
+              btn_start_task_chain->setText("Stop Task Chain");
+              nav_goal_table_view_->StartTaskChain();
+            } else {
+              btn_start_task_chain->setText("Start Task Chain");
+              nav_goal_table_view_->StopTaskChain();
+            }
+          });
+  connect(nav_goal_table_view_, &NavGoalTableView::signalTaskFinish,
+          [this, btn_start_task_chain]() {
+            LOG_INFO("task finish!");
+            btn_start_task_chain->setText("Start Task Chain");
+          });
   connect(display_manager_,
           SIGNAL(signalTopologyMapUpdate(const TopologyMap &)),
           nav_goal_table_view_, SLOT(UpdateTopologyMap(const TopologyMap &)));

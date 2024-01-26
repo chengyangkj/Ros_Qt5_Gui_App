@@ -29,10 +29,12 @@ endif()
 #manager
 find_package(Boost REQUIRED COMPONENTS filesystem)
 file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*.h manager/*.hpp)
-file(GLOB_RECURSE SRC_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*.cpp manager/*.cc)
+file(GLOB_RECURSE SOURCE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*.cpp manager/*.cc)
+file(GLOB_RECURSE test_files ${CMAKE_SOURCE_DIR} *_test.cc *_test.cpp)
+list(REMOVE_ITEM SOURCE_FILE ${test_files})
 add_library(${TARGET_NAME} STATIC
 ${QT_MOC_HPP}
-${SRC_FILE}
+${SOURCE_FILE}
 )
 target_link_libraries(${TARGET_NAME} PUBLIC Boost::filesystem pthread dl)
 target_include_directories(${TARGET_NAME} PUBLIC 

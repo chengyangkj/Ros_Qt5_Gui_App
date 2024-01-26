@@ -31,6 +31,7 @@ public:
   /// @brief 查找lib路径下所有channel
   /// @return channel list
   std::vector<std::string> DiscoveryAllChannel();
+  VirtualChannelNode *GetChannel();
   void RegisterOnDataCallback(
       std::function<void(const MsgId &id, const std::any &data)> &&func) {
     if (channel_ptr_ != nullptr) {

@@ -1,6 +1,7 @@
 #pragma once
+#include "config_define.h"
 #include "topology_map.h"
-#include <QSettings>
+#include <mutex>
 #ifndef GET_TOPIC_NAME
 #define GET_TOPIC_NAME(frame_name)                                             \
   Config::ConfigManager::Instacnce()->GetTopicName(frame_name)
@@ -12,31 +13,29 @@
                                                           topic_name);
 #endif
 
-#ifndef SET_DEFAULT_CONFIG
-#define SET_DEFAULT_CONFIG(key, value)                                         \
-  Config::ConfigManager::Instacnce()->SetDefaultConfig(key, value);
-#endif
-
 namespace Config {
 
 class ConfigManager {
 private:
-  QString config_path_ = "./config.ini";
+  std::string config_path_ = "./config.json";
+  ConfigRoot config_root_; // 配置文件根节点
+  std::mutex mutex_;
+  ConfigManager(/* args */);
+  // 禁用拷贝构造函数和赋值运算符
+  ConfigManager(const ConfigManager &) = delete;
+  ConfigManager &operator=(const ConfigManager &) = delete;
+  bool ReadRootConfig();
+  bool WriteRootConfig();
 
 public:
-  ConfigManager(/* args */);
   ~ConfigManager();
-  void Init(const QString &config_path);
-  static ConfigManager *Instacnce() {
-    static ConfigManager config;
-    return &config;
-  }
+  void Init(const std::string &config_path);
+  static ConfigManager *Instacnce();
   std::string GetTopicName(const std::string &frame_name);
   void SetDefaultConfig(const std::string &name, const std::string &value);
   void SetDefaultTopicName(const std::string &frame_name,
                            const std::string &topic_name);
-  std::string GetConfig(const std::string &key);
-  bool SetConfig(const std::string &key, const std::string &value);
+  ConfigRoot &GetRootConfig() { return config_root_; }
   bool ReadTopologyMap(const std::string &map_path, TopologyMap &map);
   bool WriteTopologyMap(const std::string &map_path,
                         const TopologyMap &topology_map);
