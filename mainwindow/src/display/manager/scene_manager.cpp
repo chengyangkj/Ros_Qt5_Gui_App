@@ -66,7 +66,8 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     case eMode::kNone: {
       QGraphicsItem *item =
           itemAt(position, views()[0]->transform());  // 获取点击位置下的 item
-      if (item != nullptr) {                          // 判断是否获取到了 item
+
+      if (item != nullptr) {  // 判断是否获取到了 item
         Display::VirtualDisplay *display =
             dynamic_cast<Display::VirtualDisplay *>(item);
         std::string display_type = display->GetDisplayType();
@@ -79,6 +80,9 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
                   display_manager_->scenePoseToWord(
                       basic::RobotPose(position.x(), position.y(), 0)),
                   display->GetDisplayName())));
+        } else if (display_type != DISPLAY_GOAL && curr_handle_display_ != nullptr && curr_handle_display_->GetDisplayType() == DISPLAY_GOAL) {
+          curr_handle_display_ = nullptr;
+          nav_goal_widget_->hide();
         }
       }
     } break;
@@ -126,21 +130,6 @@ std::string SceneManager::generatePointName(const std::string &prefix) {
 }
 void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos();  // 获取点击位置
-  if (curr_handle_display_ != nullptr) {
-    std::string display_type = curr_handle_display_->GetDisplayType();
-    if (display_type == DISPLAY_GOAL) {
-      LOG_INFO("release goal:" << curr_handle_display_->GetCurrentScenePose());
-      topology_map_.UpdatePoint(
-          curr_handle_display_->GetDisplayName(),
-          TopologyMap::PointInfo(
-              display_manager_->scenePoseToWord(
-                  curr_handle_display_->GetCurrentScenePose()),
-              curr_handle_display_->GetDisplayName()));
-    } else {
-      curr_handle_display_ = nullptr;
-      nav_goal_widget_->hide();
-    }
-  }
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
 }
 void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
