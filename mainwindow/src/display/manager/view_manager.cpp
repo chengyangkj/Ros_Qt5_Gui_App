@@ -30,12 +30,12 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   background-color: lightblue;"
       "}");
   bottom_bar_layout->addWidget(set_big_btn_);
-  QToolButton *set_scale_btn_ = new QToolButton();
-  set_scale_btn_->setIcon(QIcon(":/images/scale.svg"));
-  set_scale_btn_->setIconSize(QSize(25, 25));
-  set_scale_btn_->setToolTip("缩小");
-  set_scale_btn_->setCursor(Qt::PointingHandCursor);
-  set_scale_btn_->setStyleSheet(
+  QToolButton *set_small_btn_ = new QToolButton();
+  set_small_btn_->setIcon(QIcon(":/images/scale.svg"));
+  set_small_btn_->setIconSize(QSize(25, 25));
+  set_small_btn_->setToolTip("缩小");
+  set_small_btn_->setCursor(Qt::PointingHandCursor);
+  set_small_btn_->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
@@ -43,7 +43,7 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "QToolButton:pressed {"
       "   background-color: lightblue;"
       "}");
-  bottom_bar_layout->addWidget(set_scale_btn_);
+  bottom_bar_layout->addWidget(set_small_btn_);
   focus_robot_btn_ = new QToolButton();
   focus_robot_btn_->setIcon(QIcon(":/images/unfocus.svg"));
   focus_robot_btn_->setToolTip("聚焦机器人");
@@ -76,10 +76,14 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       focus_robot_btn_->setToolTip("取消聚焦机器人");
       focus_robot_btn_->setIcon(QIcon(":/images/focus.svg"));
     } else {
-    
       focus_robot_btn_->setToolTip("聚焦机器人");
       focus_robot_btn_->setIcon(QIcon(":/images/unfocus.svg"));
     }
+  });
+  connect(set_big_btn_, &QToolButton::clicked,
+          [this]() { display_manager_ptr_->SetScaleBig(); });
+  connect(set_small_btn_, &QToolButton::clicked, [this]() {
+    display_manager_ptr_->SetScaleSmall();
   });
 }
 void ViewManager::SetDisplayManagerPtr(DisplayManager *display_manager) {

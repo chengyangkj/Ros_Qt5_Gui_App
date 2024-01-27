@@ -60,6 +60,7 @@ class DisplayManager : public QObject {
   void signalPub2DGoal(const RobotPose &pose);
   void signalTopologyMapUpdate(const TopologyMap &map);
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
+  void signalPubMap(const OccupancyMap &map);
  public slots:
   void updateScaled(double value);
   void StartReloc();
@@ -69,6 +70,9 @@ class DisplayManager : public QObject {
   void slotSetRobotPose(const RobotPose &pose);
   void UpdateTopicData(const MsgId &id, const std::any &data);
   void FocusDisplay(const std::string &display_type);
+  void SaveMap(const std::string &save_path);
+  void SetScaleBig();
+  void SetScaleSmall();
 
  private:
   void InitUi();
@@ -92,6 +96,8 @@ class DisplayManager : public QObject {
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
   void SetRelocMode(bool is_move);
   void SetNavGoalMode(bool is_start);
+  OccupancyMap &GetMap();
+  void UpdateMap(OccupancyMap &);
   RobotPose GetRobotPose() { return robot_pose_; }
   void SetFocusOn(const std::string &display_type) {
     focus_display_ = display_type;

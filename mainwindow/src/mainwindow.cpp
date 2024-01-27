@@ -252,6 +252,55 @@ void MainWindow::setupUi() {
   add_point_btn->setIcon(add_point_btn_icon);
   layout_tools_edit_map->addWidget(add_point_btn);
 
+  QToolButton *add_topology_path_btn = new QToolButton();
+  add_topology_path_btn->setStyleSheet(
+      "QToolButton {"
+      "   border: none;"
+      "   background-color: transparent;"
+      "}"
+      "QToolButton:pressed {"
+      "   background-color: lightblue;"
+      "}");
+  add_topology_path_btn->setToolTip("连接工位点");
+  add_topology_path_btn->setCursor(Qt::PointingHandCursor);
+  add_topology_path_btn->setIconSize(QSize(32, 32));
+
+  QIcon add_topology_path_btn_icon;
+  add_topology_path_btn_icon.addFile(QString::fromUtf8(":/images/topo_link_btn.svg"),
+                                     QSize(), QIcon::Normal, QIcon::Off);
+  add_topology_path_btn->setIcon(add_topology_path_btn_icon);
+  layout_tools_edit_map->addWidget(add_topology_path_btn);
+  //TODO 拓扑点连接
+  add_topology_path_btn->setEnabled(false);
+  //添加区域按钮
+  QToolButton *add_region_btn = new QToolButton();
+  add_region_btn->setStyleSheet(
+      "QToolButton {"
+      "   border: none;"
+      "   background-color: transparent;"
+      "}"
+      "QToolButton:pressed {"
+      "   background-color: lightblue;"
+      "}");
+  add_region_btn->setToolTip("添加区域");
+  add_region_btn->setCursor(Qt::PointingHandCursor);
+  add_region_btn->setIconSize(QSize(32, 32));
+
+  QIcon add_region_btn_icon;
+  add_region_btn_icon.addFile(QString::fromUtf8(":/images/region_btn.svg"),
+                              QSize(), QIcon::Normal, QIcon::Off);
+  add_region_btn->setIcon(add_region_btn_icon);
+  add_region_btn->setEnabled(false);
+  layout_tools_edit_map->addWidget(add_region_btn);
+
+  //分隔
+  QFrame *separator = new QFrame();
+  separator->setFrameShape(QFrame::HLine);
+  separator->setFrameShadow(QFrame::Sunken);
+
+  // 将分割符号添加到布局中
+  layout_tools_edit_map->addWidget(separator);
+
   //橡皮擦按钮
 
   QToolButton *erase_btn = new QToolButton();
@@ -272,10 +321,30 @@ void MainWindow::setupUi() {
                          QSize(), QIcon::Normal, QIcon::Off);
   erase_btn->setIcon(erase_btn_icon);
   layout_tools_edit_map->addWidget(erase_btn);
+  //画笔按钮
+  QToolButton *draw_pen_btn = new QToolButton();
+  draw_pen_btn->setStyleSheet(
+      "QToolButton {"
+      "   border: none;"
+      "   background-color: transparent;"
+      "}"
+      "QToolButton:pressed {"
+      "   background-color: lightblue;"
+      "}");
+  draw_pen_btn->setToolTip("线条");
+  draw_pen_btn->setCursor(Qt::PointingHandCursor);
+  draw_pen_btn->setIconSize(QSize(32, 32));
+
+  QIcon draw_pen_btn_icon;
+  draw_pen_btn_icon.addFile(QString::fromUtf8(":/images/pen.svg"),
+                            QSize(), QIcon::Normal, QIcon::Off);
+  draw_pen_btn->setIcon(draw_pen_btn_icon);
+
+  layout_tools_edit_map->addWidget(draw_pen_btn);
   //线段按钮
 
-  QToolButton *edit_line_btn = new QToolButton();
-  edit_line_btn->setStyleSheet(
+  QToolButton *draw_line_btn = new QToolButton();
+  draw_line_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
@@ -283,37 +352,16 @@ void MainWindow::setupUi() {
       "QToolButton:pressed {"
       "   background-color: lightblue;"
       "}");
-  edit_line_btn->setToolTip("线条");
-  edit_line_btn->setCursor(Qt::PointingHandCursor);
-  edit_line_btn->setIconSize(QSize(32, 32));
+  draw_line_btn->setToolTip("线条");
+  draw_line_btn->setCursor(Qt::PointingHandCursor);
+  draw_line_btn->setIconSize(QSize(32, 32));
 
-  QIcon edit_line_btn_icon;
-  edit_line_btn_icon.addFile(QString::fromUtf8(":/images/line_btn.svg"),
+  QIcon draw_line_btn_icon;
+  draw_line_btn_icon.addFile(QString::fromUtf8(":/images/line_btn.svg"),
                              QSize(), QIcon::Normal, QIcon::Off);
-  edit_line_btn->setIcon(edit_line_btn_icon);
+  draw_line_btn->setIcon(draw_line_btn_icon);
 
-  layout_tools_edit_map->addWidget(edit_line_btn);
-  //区域按钮
-
-  QToolButton *add_region_btn = new QToolButton();
-  add_region_btn->setStyleSheet(
-      "QToolButton {"
-      "   border: none;"
-      "   background-color: transparent;"
-      "}"
-      "QToolButton:pressed {"
-      "   background-color: lightblue;"
-      "}");
-  add_region_btn->setToolTip("添加区域");
-  add_region_btn->setCursor(Qt::PointingHandCursor);
-  add_region_btn->setIconSize(QSize(32, 32));
-
-  QIcon add_region_btn_icon;
-  add_region_btn_icon.addFile(QString::fromUtf8(":/images/region_btn.svg"),
-                              QSize(), QIcon::Normal, QIcon::Off);
-  add_region_btn->setIcon(add_region_btn_icon);
-
-  layout_tools_edit_map->addWidget(add_region_btn);
+  layout_tools_edit_map->addWidget(draw_line_btn);
 
   layout_tools_edit_map->addItem(
       new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -494,8 +542,30 @@ void MainWindow::setupUi() {
   // ui相关
   connect(reloc_btn, &QToolButton::clicked,
           [this]() { display_manager_->StartReloc(); });
-  connect(save_map_btn, &QToolButton::clicked, [this]() {});
-  connect(open_map_btn, &QToolButton::clicked, [this]() {});
+  connect(save_map_btn, &QToolButton::clicked, [this]() {
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save Map files",
+                                                    "", "Map files (*.yaml,*.pgm,*.pgm.json)");
+    if (!fileName.isEmpty()) {
+      // 用户选择了文件夹，可以在这里进行相应的操作
+      LOG_INFO("用户选择的保存地图路径：" << fileName.toStdString());
+      display_manager_->SaveMap(fileName.toStdString());
+    } else {
+      // 用户取消了选择
+      LOG_INFO("取消保存地图");
+    }
+  });
+  connect(open_map_btn, &QToolButton::clicked, [this]() {
+    QString fileName = QFileDialog::getOpenFileName(nullptr, "OPen Map files",
+                                                    "", "Map files (*.yaml,*.pgm,*.pgm.json)");
+    if (!fileName.isEmpty()) {
+      // 用户选择了文件夹，可以在这里进行相应的操作
+      LOG_INFO("用户选择的保存地图路径：" << fileName.toStdString());
+      display_manager_->SaveMap(fileName.toStdString());
+    } else {
+      // 用户取消了选择
+      LOG_INFO("取消保存地图");
+    }
+  });
   connect(edit_map_btn, &QToolButton::clicked, [this, tools_edit_map_widget, edit_map_btn]() {
     if (edit_map_btn->text() == "编辑地图") {
       display_manager_->SetEditMapMode(Display::MapEditMode::kStartEdit);
@@ -512,8 +582,10 @@ void MainWindow::setupUi() {
   });
   connect(normal_cursor_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kMove); });
   connect(erase_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kErase); });
-  connect(edit_line_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kEditLine); });
+  connect(draw_line_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kDrawLine); });
   connect(add_region_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kRegion); });
+  connect(draw_pen_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kDrawWithPen); });
+  connect(add_topology_path_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kLinkTopology); });
   connect(display_manager_->GetDisplay(DISPLAY_MAP),
           SIGNAL(signalCursorPose(QPointF)), this,
           SLOT(signalCursorPose(QPointF)));

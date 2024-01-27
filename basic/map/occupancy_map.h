@@ -64,7 +64,6 @@ class OccupancyMap {
   //宽map坐标系下的长度
   int widthMap() { return cols * resolution; }
   int heightMap() { return rows * resolution; }
-
   Eigen::Vector3d GetOriginPoseBottomLeft() { return origin_pose; }
   Eigen::Vector3d GetOriginPoseTopLeft() {
     return Eigen::Vector3d(origin_x, origin_y + height() * resolution,

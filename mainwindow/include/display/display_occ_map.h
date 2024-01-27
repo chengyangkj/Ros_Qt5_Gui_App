@@ -21,6 +21,11 @@ class DisplayOccMap : public VirtualDisplay {
   bool UpdateData(const std::any &data) override;
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data);
+  void EraseMapRange(const QPointF &pose, double range);
+  OccupancyMap GetOccupancyMap();
+  void StartDrawLine(const QPointF &pose);
+  void EndDrawLine(const QPointF &pose, bool is_draw);
+  void DrawPoint(const QPointF &start);
 
  private:
   OccupancyMap map_data_;
@@ -29,7 +34,9 @@ class DisplayOccMap : public VirtualDisplay {
   QImage map_image_;
   Eigen::Vector3f sub_map_center_pose_;
   double sub_map_value_ = 1;
-
+  bool is_draw_line_ = false;
+  QPointF line_start_pose_;
+  QImage line_tmp_image_;  // 用于存储绘制线条的图像，以便在绘制完成后进行处理
  private:
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;

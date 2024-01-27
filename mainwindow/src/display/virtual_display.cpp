@@ -6,8 +6,7 @@ VirtualDisplay::VirtualDisplay(const std::string &display_type,
                                const int &z_value,
                                const std::string &parent_name,
                                std::string display_name)
-    : display_type_(display_type), display_name_(display_name),
-      parent_name_(parent_name) {
+    : display_type_(display_type), display_name_(display_name), parent_name_(parent_name) {
   //如果没有设置图层名 则以type作为名称
   if (display_name.empty()) {
     display_name_ = display_type;
@@ -30,9 +29,9 @@ QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
 void VirtualDisplay::parentItemChange(GraphicsItemChange change,
                                       const QVariant &value) {
   switch (change) {
-  case QGraphicsItem::ItemScaleHasChanged:
-    SetPoseInParent(pose_in_parent_);
-    break;
+    case QGraphicsItem::ItemScaleHasChanged:
+      SetPoseInParent(pose_in_parent_);
+      break;
   }
 }
 VirtualDisplay::~VirtualDisplay() {}
@@ -92,26 +91,34 @@ void VirtualDisplay::MovedBy(const qreal &x, const qreal &y) {
   update();
 }
 void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
-  if (!move_enable_) {
+  if (!enable_scale_) {
     // 如果当前图层不响应鼠标时间,则事件向下传递
     QGraphicsItem::wheelEvent(event);
     return;
   }
-  if (!enable_scale_)
+  //只有没有父级元素的才能主动响应鼠标放大缩小 否则由父级设置放大缩小
+  if (parent_ptr_ != nullptr) {
+    QGraphicsItem::wheelEvent(event);
     return;
+  }
+
   double beforeScaleValue = scale_value_;
   if (event->delta() > 0) {
-    //  qDebug()<<"放大";
-    scale_value_ *= 1.1; // 每次放大10%
+    scale_value_ *= 1.1;  // 每次放大10%
   } else {
-    //  qDebug()<<"缩小";
-    scale_value_ *= 0.9; // 每次缩小10%
+    scale_value_ *= 0.9;  // 每次缩小10%
   }
-  if (scale_value_ < 1) {
-    scale_value_ = 1;
+  //缩小的最小指
+  if (scale_value_ < min_scale_value_) {
+    scale_value_ = min_scale_value_;
     return;
   }
-  // qDebug()<<"scale:"<<scale_value_;
+  //放大最大值
+  if (scale_value_ > max_scale_value_) {
+    scale_value_ = max_scale_value_;
+    return;
+  }
+  // qDebug() << "scale:" << scale_value_;
   SetScaled(scale_value_);
 
   // 使放大缩小的效果看起来像是以鼠标中心点进行放大缩小
@@ -123,6 +130,7 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
             event->pos().y() * beforeScaleValue * 0.1);
   }
   update();
+  QGraphicsItem::wheelEvent(event);
 }
 void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (!move_enable_) {
@@ -182,7 +190,6 @@ void VirtualDisplay::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   pressed_button_ = event->button();
   pressed_pose_ = event->pos();
   if (event->button() == Qt::LeftButton) {
-
     is_mouse_press_ = true;
     start_pose_ = event->pos();
   } else if (event->button() == Qt::RightButton) {
@@ -216,4 +223,4 @@ void VirtualDisplay::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 
   update();
 }
-} // namespace Display
+}  // namespace Display

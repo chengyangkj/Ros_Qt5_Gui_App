@@ -310,5 +310,23 @@ void DisplayManager::StartReloc() {
 }
 void DisplayManager::SetEditMapMode(MapEditMode mode) { scene_manager_ptr_->SetEditMapMode(mode); }
 void DisplayManager::AddOneNavPoint() { scene_manager_ptr_->AddOneNavPoint(); }
-
+OccupancyMap &DisplayManager::GetMap() { return map_data_; }
+void DisplayManager::UpdateMap(OccupancyMap &) {
+  emit signalPubMap(map_data_);
+}
+void DisplayManager::SaveMap(const std::string &save_path) {}
+void DisplayManager::SetScaleBig() {
+  FactoryDisplay::Instance()
+      ->GetDisplay(DISPLAY_MAP)
+      ->SetScaled(
+          FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->GetScaleValue() *
+          1.3);
+}
+void DisplayManager::SetScaleSmall() {
+  FactoryDisplay::Instance()
+      ->GetDisplay(DISPLAY_MAP)
+      ->SetScaled(
+          FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->GetScaleValue() *
+          0.7);
+}
 }  // namespace Display

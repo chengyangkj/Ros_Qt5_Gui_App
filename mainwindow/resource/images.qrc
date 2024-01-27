@@ -168,12 +168,16 @@
         <file>images/unfocus.svg</file>
         <file>images/cursor_point_btn.svg</file>
         <file>images/erase_btn.svg</file>
-        <file>images/line_btn.svg</file>
         <file>images/point_btn.svg</file>
         <file>images/region_btn.svg</file>
         <file>images/robot_blue3.png</file>
         <file>images/robot_green.png</file>
         <file>images/robot_red3.png</file>
         <file>images/robot_yellow3.png</file>
+        <file>images/pen.svg</file>
+        <file>images/topo_link_btn.svg</file>
+        <file>images/pen_32.svg</file>
+        <file>images/line_btn_32.svg</file>
+        <file>images/line_btn.svg</file>
     </qresource>
 </RCC>
