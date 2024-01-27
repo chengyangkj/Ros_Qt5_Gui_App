@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/icon.png</file>
         <file>images/robot.png</file>
         <file>images/line.png</file>
         <file>images/offline.png</file>
@@ -16,7 +15,6 @@
         <file>images/false.png</file>
         <file>images/ok.png</file>
         <file>images/crosshair.svg</file>
-        <file>images/cursor.svg</file>
         <file>images/default_class_icon.png</file>
         <file>images/default_package_icon.png</file>
         <file>images/error.png</file>
@@ -133,8 +131,6 @@
         <file>images/close.png</file>
         <file>images/min.png</file>
         <file>images/max.png</file>
-        <file>images/cursor_pos.png</file>
-        <file>images/cursor_move.png</file>
         <file>images/toolbar_dash.png</file>
         <file>images/toolbar_map.png</file>
         <file>images/toolbar_other.png</file>
@@ -143,8 +139,6 @@
         <file>images/control.png</file>
         <file>images/status.png</file>
         <file>background/background.gif</file>
-        <file>images/car/car_background.JPG</file>
-        <file>images/car/car.JPG</file>
         <file>images/status/status_none.png</file>
         <file>images/status/status_warn.png</file>
         <file>images/status/status_normal.png</file>
@@ -152,19 +146,34 @@
         <file>images/mutil_pose.png</file>
         <file>images/robot_red.png</file>
         <file>images/robot_yellow.png</file>
-        <file>images/cursor_mutile_pose.png</file>
         <file>images/robot_blue.png</file>
         <file>background/loding.gif</file>
         <file>background/loding2.gif</file>
         <file>background/loding3.gif</file>
         <file>background/loding4.gif</file>
         <file>background/loding5.gif</file>
-        <file>images/save.png</file>
         <file>images/load.png</file>
         <file>images/robot.svg</file>
         <file>images/goal.svg</file>
         <file>images/target.svg</file>
         <file>images/add_32.svg</file>
-        <file>images/add_16.svg</file>
+        <file>images/edit.svg</file>
+        <file>images/save.svg</file>
+        <file>images/reloc1.svg</file>
+        <file>images/reloc2.svg</file>
+        <file>images/open.svg</file>
+        <file>images/big.svg</file>
+        <file>images/focus.svg</file>
+        <file>images/scale.svg</file>
+        <file>images/unfocus.svg</file>
+        <file>images/cursor_point_btn.svg</file>
+        <file>images/erase_btn.svg</file>
+        <file>images/line_btn.svg</file>
+        <file>images/point_btn.svg</file>
+        <file>images/region_btn.svg</file>
+        <file>images/robot_blue3.png</file>
+        <file>images/robot_green.png</file>
+        <file>images/robot_red3.png</file>
+        <file>images/robot_yellow3.png</file>
     </qresource>
 </RCC>

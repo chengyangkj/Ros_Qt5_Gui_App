@@ -47,6 +47,15 @@ namespace Display {
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
 #define DISPLAY_GOAL "GoalPose"
+enum MapEditMode {
+  kStartEdit = 0,
+  kStopEdit = 1,
+  kMove,      // 鼠标模式
+  kErase,     // 橡皮擦模式
+  kEditLine,  // 绘制线段模式
+  kAddPoint,  // 添加点位模式
+  kRegion,    // 添加区域模式
+};
 class VirtualDisplay : public QObject, public QGraphicsItem {
   Q_OBJECT
 

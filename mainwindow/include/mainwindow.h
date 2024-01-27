@@ -31,7 +31,6 @@
 #include "widgets/set_pose_widget.h"
 #include "widgets/speed_ctrl.h"
 #include "widgets/status_bar.h"
-#include "widgets/tools_bar.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -70,7 +69,6 @@ class MainWindow : public QMainWindow {
   QThread message_thread_;
   SpeedCtrlWidget *speed_ctrl_widget_;
   StatusBarWidget *status_bar_widget_;
-  ToolsBarWidget *tools_bar_widget_;
   NavGoalTableView *nav_goal_table_view_;
  signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);

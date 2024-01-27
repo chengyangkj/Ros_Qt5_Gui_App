@@ -5,6 +5,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include "config/topology_map.h"
+
 #include "display/point_shape.h"
 #include "widgets/nav_goal_widget.h"
 #include "widgets/set_pose_widget.h"
@@ -12,10 +13,6 @@ namespace Display {
 class DisplayManager;
 class SceneManager : public QGraphicsScene {
   Q_OBJECT
-  enum eMode {
-    kNone,
-    kAddNavGoal,
-  };
 
  private:
   SetPoseWidget *set_nav_pose_widget_;
@@ -25,10 +22,12 @@ class SceneManager : public QGraphicsScene {
   NavGoalWidget *nav_goal_widget_;
   QCursor nav_goal_cursor_;
   TopologyMap topology_map_;
-  eMode current_mode_{kNone};
+  MapEditMode current_mode_;
  signals:
   void signalTopologyMapUpdate(const TopologyMap &map);
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
+ public slots:
+  void SetEditMapMode(MapEditMode mode);
 
  public:
   SceneManager(QObject *parent = nullptr);
