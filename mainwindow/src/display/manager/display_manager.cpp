@@ -18,7 +18,6 @@ DisplayManager::DisplayManager() {
   scene_manager_ptr_ = new SceneManager();
   scene_manager_ptr_->Init(graphics_view_ptr_, this);
   // 设置绘制区域
-  graphics_view_ptr_->setSceneRect(QRectF(-500, -500, 1000, 1000));
   FactoryDisplay::Instance()->Init(graphics_view_ptr_, scene_manager_ptr_);
   connect(scene_manager_ptr_,
           SIGNAL(signalTopologyMapUpdate(const TopologyMap &)), this,
@@ -135,8 +134,6 @@ bool DisplayManager::UpdateDisplay(const std::string &display_type,
   if (display_type == DISPLAY_MAP) {
     display->UpdateDisplay(data);
     GetAnyData(OccupancyMap, data, map_data_);
-    graphics_view_ptr_->setSceneRect(
-        QRectF(-map_data_.width() / 2., -map_data_.height() / 2., map_data_.width(), map_data_.height()));
     // 所有图层更新地图数据
     for (auto [name, display] :
          FactoryDisplay::Instance()->GetTotalDisplayMap()) {
@@ -217,6 +214,7 @@ void DisplayManager::updateScaled(double value) {
 void DisplayManager::SetRelocMode(bool is_start) {
   is_reloc_mode_ = is_start;
   if (is_start) {
+    FocusDisplay("");
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
     auto current_scene = GetDisplay(DISPLAY_ROBOT)->scenePos();
@@ -228,8 +226,8 @@ void DisplayManager::SetRelocMode(bool is_start) {
   }
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, is_start);
 }
-void DisplayManager::FocusDisplay(const std::string &display_type) {
-  FactoryDisplay::Instance()->FocusDisplay(display_type);
+void DisplayManager::FocusDisplay(const std::string &display_name) {
+  FactoryDisplay::Instance()->SetFocusDisplay(display_name);
 }
 
 /**

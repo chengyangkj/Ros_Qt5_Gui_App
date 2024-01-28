@@ -39,7 +39,7 @@ class SceneManager : public QGraphicsScene {
  public slots:
   void SetEditMapMode(MapEditMode mode);
   void SaveTopologyMap(const std::string &file_path);
-  
+
  public:
   SceneManager(QObject *parent = nullptr);
   virtual ~SceneManager();
@@ -47,6 +47,7 @@ class SceneManager : public QGraphicsScene {
   void AddOneNavPoint();
   void LoadTopologyMap();
   void OpenTopologyMap(const std::string &file_path);
+
  private:
   void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
@@ -54,11 +55,11 @@ class SceneManager : public QGraphicsScene {
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
   void saveTopologyMap();
   void blindNavGoalWidget(Display::VirtualDisplay *);
-  void updateNavGoalWidgetPose(const Display::VirtualDisplay *);
+  void updateNavGoalWidgetPose( Display::VirtualDisplay *, bool is_move = true);
   std::string generatePointName(const std::string &prefix);
   void eraseScenePointRange(const QPointF &, double);
   void setEraseCursor();
   void drawPoint(const QPointF &);
-
+  void SetPointMoveEnable(bool is_enable);
 };
 }  // namespace Display

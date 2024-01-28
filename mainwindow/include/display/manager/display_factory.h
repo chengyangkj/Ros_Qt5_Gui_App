@@ -24,7 +24,7 @@ class FactoryDisplay : public QObject {
   // 设置图层放大缩小
   bool SetDisplayScaled(const std::string &display_name, const double &value);
   void AddDisplay(VirtualDisplay *display, const std::string &parent_name);
-  void FocusDisplay(const std::string &display_name);
+  void SetFocusDisplay(const std::string &display_name);
   void RemoveDisplay(const std::string &name);
   void RemoveDisplay(VirtualDisplay *display);
   int GetDisplaySize();

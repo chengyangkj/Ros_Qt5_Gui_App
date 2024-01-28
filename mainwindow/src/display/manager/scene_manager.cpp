@@ -62,31 +62,21 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
     LOG_INFO("Load Point:" << point.name)
   }
   LOG_INFO("Load Topology Map Success!")
+  SetPointMoveEnable(false);
+  emit signalTopologyMapUpdate(topology_map_);
 }
 void SceneManager::SetEditMapMode(MapEditMode mode) {
   current_mode_ = mode;
   switch (mode) {
     case kStartEdit:
       view_ptr_->setCursor(Qt::ArrowCursor);
-      for (auto point : topology_map_.points) {
-        auto display = FactoryDisplay::Instance()->GetDisplay(point.name);
-        if (display != nullptr) {
-          display->SetMoveEnable(true);
-        } else {
-          LOG_ERROR("not find display:" << point.name)
-        }
-      }
+
       //动态图层不可见
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(false);
       break;
     case kStopEdit: {
-      for (auto point : topology_map_.points) {
-        auto display = FactoryDisplay::Instance()->GetDisplay(point.name);
-        if (display != nullptr) {
-          display->SetMoveEnable(false);
-        }
-      }
+      SetPointMoveEnable(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
@@ -98,17 +88,21 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
     } break;
     case kMove: {
       view_ptr_->setCursor(Qt::OpenHandCursor);
+      SetPointMoveEnable(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
     } break;
     case kErase: {
+      SetPointMoveEnable(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(false);
       setEraseCursor();
     } break;
     case kDrawWithPen: {
+      SetPointMoveEnable(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(false);
       view_ptr_->setCursor(pen_cursor_);
     } break;
     case kDrawLine: {
+      SetPointMoveEnable(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(false);
       view_ptr_->setCursor(line_cursor_);
     } break;
@@ -117,12 +111,24 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
   }
   LOG_INFO("set edit mode:" << mode)
 }
+void SceneManager::SetPointMoveEnable(bool is_enable) {
+  nav_goal_widget_->SetEditEnabled(is_enable);
+  for (auto point : topology_map_.points) {
+    auto display = FactoryDisplay::Instance()->GetDisplay(point.name);
+    if (display != nullptr) {
+      display->SetMoveEnable(is_enable);
+    } else {
+      LOG_ERROR("not find display:" << point.name)
+    }
+  }
+}
 void SceneManager::saveTopologyMap() {
   Config::ConfigManager::Instacnce()->WriteTopologyMap(
       Config::ConfigManager::Instacnce()
           ->GetRootConfig()
           .topology_map_config.map_name,
       topology_map_);
+  LOG_INFO("save topology map");
   emit signalTopologyMapUpdate(topology_map_);
 }
 void SceneManager::AddOneNavPoint() {
@@ -137,7 +143,8 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos();  // 获取点击位置
   switch (current_mode_) {
     case MapEditMode::kStartEdit:
-    case MapEditMode::kStopEdit:
+    case MapEditMode::kStopEdit: {
+    } break;
     case MapEditMode::kMove: {
     } break;
     case MapEditMode::kDrawLine: {
@@ -158,7 +165,6 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       LOG_INFO("add one nav point size:" << topology_map_.points.size()
                                          << " name:" << name);
       curr_handle_display_ = goal_point;
-      blindNavGoalWidget(goal_point);
     } break;
     case MapEditMode::kErase: {
       eraseScenePointRange(position, 3);
@@ -169,11 +175,9 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     default:
       break;
   }
-
   QGraphicsItem *item =
       itemAt(position, views()[0]->transform());  // 获取点击位置下的 item
-
-  if (item != nullptr) {  // 判断是否获取到了 item
+  if (item != nullptr) {                          // 判断是否获取到了 item
     Display::VirtualDisplay *display =
         dynamic_cast<Display::VirtualDisplay *>(item);
     std::string display_type = display->GetDisplayType();
@@ -223,17 +227,38 @@ void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
       map_ptr->EndDrawLine(map_ptr->mapFromScene(position), true);
     } break;
-
+    case MapEditMode::kMove: {
+      if (curr_handle_display_ != nullptr) {
+        std::string display_type = curr_handle_display_->GetDisplayType();
+        if (display_type == DISPLAY_GOAL) {
+          LOG_INFO("release goal:" << curr_handle_display_->GetCurrentScenePose());
+          topology_map_.UpdatePoint(
+              curr_handle_display_->GetDisplayName(),
+              TopologyMap::PointInfo(
+                  display_manager_->scenePoseToWord(
+                      curr_handle_display_->GetCurrentScenePose()),
+                  curr_handle_display_->GetDisplayName()));
+        }
+      }
+    } break;
     default:
       break;
   }
+
 }  // namespace Display
 void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos();  // 获取点击位置
   //点位属性框跟随移动处理
   switch (current_mode_) {
+    case MapEditMode::kStopEdit: {
+      if (curr_handle_display_ != nullptr) {
+        std::string display_type = curr_handle_display_->GetDisplayType();
+        if (display_type == DISPLAY_GOAL) {
+          updateNavGoalWidgetPose(curr_handle_display_, false);
+        }
+      }
+    } break;
     case MapEditMode::kStartEdit:
-    case MapEditMode::kStopEdit:
     case MapEditMode::kMove: {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
@@ -292,10 +317,12 @@ void SceneManager::setEraseCursor() {
 
 void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
+  std::string name = display->GetDisplayName();
+  auto point_info = topology_map_.GetPoint(name);
   nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
   nav_goal_widget_->show();
   nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
-      .pose = display_manager_->scenePoseToWord(display->GetCurrentScenePose()),
+      .pose = point_info.ToRobotPose(),
       .name = QString::fromStdString(display->GetDisplayName())});
   nav_goal_widget_->disconnect();
 
@@ -327,13 +354,20 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
           });
 }
 void SceneManager::updateNavGoalWidgetPose(
-    const Display::VirtualDisplay *display) {
+    Display::VirtualDisplay *display, bool is_move) {
+  auto pose = display_manager_->scenePoseToWord(
+      curr_handle_display_->GetCurrentScenePose());
+  //如果点位没有移动 则从拓扑地图中读取
+  if (!is_move) {
+    std::string name = display->GetDisplayName();
+    auto point_info = topology_map_.GetPoint(name);
+    pose = point_info.ToRobotPose();
+  }
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
   nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
   nav_goal_widget_->show();
   nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
-      .pose = display_manager_->scenePoseToWord(
-          curr_handle_display_->GetCurrentScenePose()),
+      .pose = pose,
       .name = QString::fromStdString(curr_handle_display_->GetDisplayName())});
 }
 void SceneManager::eraseScenePointRange(const QPointF &pose, double range) {
@@ -350,6 +384,7 @@ void SceneManager::SaveTopologyMap(const std::string &file_path) {
   Config::ConfigManager::Instacnce()->WriteTopologyMap(
       file_path + ".topology",
       topology_map_);
+  saveTopologyMap();
 }
 SceneManager::~SceneManager() {}
 }  // namespace Display

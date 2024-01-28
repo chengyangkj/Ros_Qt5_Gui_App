@@ -5,6 +5,8 @@
 #include "display/manager/display_manager.h"
 namespace Display {
 ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
+  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setMouseTracking(true);  // 开启鼠标追踪，以便捕获鼠标移动事件
   QVBoxLayout *main_layout = new QVBoxLayout;
   main_layout->addItem(
@@ -68,14 +70,11 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
 
   connect(focus_robot_btn_, &QToolButton::clicked, [this]() {
     if (focus_robot_btn_->toolTip() == "聚焦机器人") {
-      auto display = FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT);
-      if (display != nullptr) {
-        std::cout << "focus display:" << DISPLAY_ROBOT << std::endl;
-        centerOn(display);
-      }
+      FactoryDisplay::Instance()->SetFocusDisplay(DISPLAY_ROBOT);
       focus_robot_btn_->setToolTip("取消聚焦机器人");
       focus_robot_btn_->setIcon(QIcon(":/images/focus.svg"));
     } else {
+      FactoryDisplay::Instance()->SetFocusDisplay("");
       focus_robot_btn_->setToolTip("聚焦机器人");
       focus_robot_btn_->setIcon(QIcon(":/images/unfocus.svg"));
     }
