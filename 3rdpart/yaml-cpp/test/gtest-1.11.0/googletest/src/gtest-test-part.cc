@@ -86,8 +86,8 @@ namespace internal {
 
 HasNewFatalFailureHelper::HasNewFatalFailureHelper()
     : has_new_fatal_failure_(false),
-      original_reporter_(GetUnitTestImpl()->
-                         GetTestPartResultReporterForCurrentThread()) {
+      original_reporter_(
+          GetUnitTestImpl()->GetTestPartResultReporterForCurrentThread()) {
   GetUnitTestImpl()->SetTestPartResultReporterForCurrentThread(this);
 }
 
@@ -98,8 +98,7 @@ HasNewFatalFailureHelper::~HasNewFatalFailureHelper() {
 
 void HasNewFatalFailureHelper::ReportTestPartResult(
     const TestPartResult& result) {
-  if (result.fatally_failed())
-    has_new_fatal_failure_ = true;
+  if (result.fatally_failed()) has_new_fatal_failure_ = true;
   original_reporter_->ReportTestPartResult(result);
 }
 
