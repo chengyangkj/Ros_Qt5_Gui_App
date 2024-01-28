@@ -38,6 +38,7 @@ class SceneManager : public QGraphicsScene {
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
  public slots:
   void SetEditMapMode(MapEditMode mode);
+  void SaveTopologyMap(const std::string &file_path);
 
  public:
   SceneManager(QObject *parent = nullptr);
@@ -58,5 +59,6 @@ class SceneManager : public QGraphicsScene {
   void eraseScenePointRange(const QPointF &, double);
   void setEraseCursor();
   void drawPoint(const QPointF &);
+
 };
 }  // namespace Display

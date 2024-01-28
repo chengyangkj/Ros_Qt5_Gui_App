@@ -11,7 +11,7 @@ add_library(${TARGET_NAME} STATIC
 ${SOURCE_FILE}
 ${INCLUDE_FILE}
 )
-target_link_libraries(${TARGET_NAME} ${Boost_LIBRARIES} Qt5::Core basic json_struct)
+target_link_libraries(${TARGET_NAME} ${Boost_LIBRARIES} Qt5::Core basic json_struct yaml-cpp::yaml-cpp)
 target_include_directories(${TARGET_NAME} PUBLIC include)
 
 #######test

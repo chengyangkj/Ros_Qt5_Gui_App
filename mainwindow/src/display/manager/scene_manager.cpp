@@ -335,5 +335,6 @@ void SceneManager::drawPoint(const QPointF &pose) {
   QPointF pose_map = map_ptr->mapFromScene(pose);
   map_ptr->DrawPoint(pose_map);
 }
+void SceneManager::SaveTopologyMap(const std::string &file_path) {}
 SceneManager::~SceneManager() {}
 }  // namespace Display

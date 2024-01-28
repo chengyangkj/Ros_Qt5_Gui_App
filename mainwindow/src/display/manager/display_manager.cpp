@@ -314,7 +314,9 @@ OccupancyMap &DisplayManager::GetMap() { return map_data_; }
 void DisplayManager::UpdateMap(OccupancyMap &) {
   emit signalPubMap(map_data_);
 }
-void DisplayManager::SaveMap(const std::string &save_path) {}
+void DisplayManager::SaveMap(const std::string &save_path) {
+  
+}
 void DisplayManager::SetScaleBig() {
   FactoryDisplay::Instance()
       ->GetDisplay(DISPLAY_MAP)
