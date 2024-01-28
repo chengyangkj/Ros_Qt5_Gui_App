@@ -42,7 +42,7 @@ class FactoryDisplay : public QObject {
   QTimer timer_coordinate_system_;
   std::string main_display_;
   std::map<std::string, VirtualDisplay *> total_display_map_;
-  SceneManager *scene_display_ptr_;
+  SceneManager *scene_manager_ptr_;
   bool initlizated_ = false;
   QGraphicsView *viewer_ptr_;
   std::atomic_bool run_flag_ = false;

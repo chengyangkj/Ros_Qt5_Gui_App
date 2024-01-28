@@ -59,7 +59,7 @@
 | 3D图层显示                  | 🏷️    |      |
 | 相机图像显示                | 🏷️    |      |
 
-大家如果有什么有意思的界面/功能性需求,可以提在[此处](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29),也欢迎大家发起Merge Request一起参与项目建设
+大家如果有什么有意思的界面/功能性需求,可以提在[此处](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29),如有Bug请提在[issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues),必将尽快修复!请在也欢迎大家发起Merge Request一起参与项目建设~
 
 此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
@@ -99,9 +99,11 @@
 
 # 一,Release 版本下载使用
 
+用户可以选择下载编译好的Release版本，不用自行手动编译,下载即用
+
 使用Release版本的前提:系统ROS环境已安装,并且source到环境变量中
 
-本仓库使用CI自动生成各平台的Release版本,在项目的[Release页面](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases)下载最新对应ROS版本的Release版本，理论上解压后即可使用。
+本仓库使用CI自动生成各平台的Release版本(目前只有X86_64版本,Arm环境需要自行编译),在项目的[Release页面](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases)下载最新对应ROS版本的Release版本，理论上解压后即可使用。
 使用方法:
 在终端进入解压后的文件夹路径,执行如下命令:
 
@@ -130,7 +132,7 @@ sudo apt-get install qtbase5-private-dev libqt5svg5-dev -y
 如果以上安装后还不行，可以执行如下指令安装全部依赖:
 
 ```
-sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev libeigen3-dev libgtest-dev -y
+sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev qtbase5-private-dev libeigen3-dev libgtest-dev -y
 
 ```
 

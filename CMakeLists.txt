@@ -29,7 +29,6 @@ set(BUILD_STATIC TRUE)
 set(BUILD_EXAMPLES OFF)
 add_subdirectory(3rdpart/dockWidget)
 add_subdirectory(3rdpart/JsonStruct)
-
 # modules
 add_subdirectory(common)
 add_subdirectory(basic)

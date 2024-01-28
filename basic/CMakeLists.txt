@@ -9,4 +9,5 @@ ${CMAKE_CURRENT_SOURCE_DIR}
 algorithm
 map
 point
+common
 )

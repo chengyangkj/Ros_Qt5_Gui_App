@@ -79,20 +79,86 @@ void DisplayOccMap::ParseOccupyMap() {
   // Eigen::matrix 坐标系与QImage坐标系不同,这里行列反着遍历
   map_image_ = QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_RGB32);
   QVector<QPointF> points;
+  //QImage坐标系
+  // **************x
+  // *
+  // *
+  // *
+  // y
 
   for (int i = 0; i < map_data_.Cols(); i++)
     for (int j = 0; j < map_data_.Rows(); j++) {
       double map_value = map_data_(j, i);
       QColor color;
       if (map_value > 0) {
-        color = Qt::black; // black
+        color = Qt::black;  // black
       } else if (map_value < 0) {
-        color = Qt::gray; // gray
+        color = Qt::gray;  // gray
       } else {
-        color = Qt::white; // white
+        color = Qt::white;  // white
       }
-      map_image_.setPixel(i, j, qRgb(color.red(), color.green(), color.blue()));
+      map_image_.setPixel(i, j, color.rgb());
     }
 }
+void DisplayOccMap::EraseMapRange(const QPointF &pose, double range) {
+  float x = pose.x();
+  float y = pose.y();
+  // 确保传入的坐标在图像范围内
+  if (x < 0 || x >= map_image_.width() || y < 0 || y >= map_image_.height()) {
+    return;
+  }
+  // 计算擦除范围的矩形区域
+  int left = qMax(0, static_cast<int>(x - range));
+  int top = qMax(0, static_cast<int>(y - range));
+  int right = qMin(map_image_.width() - 1, static_cast<int>(x + range));
+  int bottom = qMin(map_image_.height() - 1, static_cast<int>(y + range));
 
-} // namespace Display
+  // 循环遍历范围内的像素点，将其颜色设置为透明
+  for (int i = left; i <= right; ++i) {
+    for (int j = top; j <= bottom; ++j) {
+      map_image_.setPixelColor(i, j, Qt::white);
+    }
+  }
+  update();
+}
+OccupancyMap DisplayOccMap::GetOccupancyMap() {
+  OccupancyMap map = map_data_;
+  for (int i = 0; i < map_image_.width(); i++)
+    for (int j = 0; j < map_image_.height(); j++) {
+      QRgb pixelValue = map_image_.pixel(i, j);  // (x, y) 是指定位置的坐标
+      if (pixelValue == QColor(Qt::black).rgb()) {
+        map(j, i) = 100;
+      } else if (pixelValue == QColor(Qt::gray).rgb()) {
+        map(j, i) = -1;
+      } else {
+        map(j, i) = 0;
+      }
+    }
+
+  return map;
+}
+void DisplayOccMap::StartDrawLine(const QPointF &pose) {
+  line_start_pose_ = pose;
+}
+void DisplayOccMap::EndDrawLine(const QPointF &pose, bool is_draw) {
+  if (!is_draw_line_) {
+    line_tmp_image_ = map_image_;
+    is_draw_line_ = true;
+  }
+  map_image_ = line_tmp_image_;
+  QPainter painter(&map_image_);
+  painter.setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+  painter.drawLine(line_start_pose_, pose);
+  if (is_draw) {
+    //结束绘制
+    is_draw_line_ = false;
+  }
+  update();
+}
+void DisplayOccMap::DrawPoint(const QPointF &point) {
+  QPainter painter(&map_image_);
+  painter.setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+  painter.drawPoint(point);
+  update();
+}
+}  // namespace Display

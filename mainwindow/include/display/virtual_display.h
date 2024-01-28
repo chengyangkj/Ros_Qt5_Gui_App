@@ -47,6 +47,17 @@ namespace Display {
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
 #define DISPLAY_GOAL "GoalPose"
+enum MapEditMode {
+  kStartEdit = 0,
+  kStopEdit = 1,
+  kMove,          // 鼠标模式
+  kErase,         // 橡皮擦模式
+  kDrawLine,      // 绘制线段模式
+  kAddPoint,      // 添加点位模式
+  kRegion,        // 添加区域模式
+  kDrawWithPen,   //画笔
+  kLinkTopology,  // 拓扑图
+};
 class VirtualDisplay : public QObject, public QGraphicsItem {
   Q_OBJECT
 
@@ -74,6 +85,8 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   std::vector<VirtualDisplay *> children_;
   bool is_moving_{false};
   std::string display_name_;
+  double min_scale_value_{1};
+  double max_scale_value_{20};
  signals:
   void signalCursorPose(QPointF pose);
   void signalPoseUpdate(const RobotPose &pose);

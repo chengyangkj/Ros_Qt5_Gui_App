@@ -8,8 +8,8 @@ bool FactoryDisplay::Init(QGraphicsView *viewer, SceneManager *scene_ptr) {
   if (!initlizated_) {
     initlizated_ = true;
     viewer_ptr_ = viewer;
-    scene_display_ptr_ = scene_ptr;
-    viewer_ptr_->setScene(scene_display_ptr_);
+    scene_manager_ptr_ = scene_ptr;
+    viewer_ptr_->setScene(scene_manager_ptr_);
     viewer_ptr_->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     run_flag_ = true;
     connect(&timer_coordinate_system_, SIGNAL(timeout()), this,
@@ -43,7 +43,7 @@ void FactoryDisplay::RemoveDisplay(VirtualDisplay *display) {
   if (parent_ptr_ != nullptr) {
     parent_ptr_->RemoveChild(display);
   }
-} // namespace Display
+}  // namespace Display
 // 设置图层的scene坐标
 bool FactoryDisplay::SetDisplayScenePose(const std::string &display_name,
                                          const QPointF &pose) {
@@ -79,22 +79,25 @@ void FactoryDisplay::AddDisplay(VirtualDisplay *display,
     return;
   }
 
-  total_display_map_[display->GetDisplayType()] = display;
+  total_display_map_[display->GetDisplayName()] = display;
 
   if (!parent_name.empty()) {
     auto parent_ptr = GetDisplay(parent_name);
     if (parent_ptr == nullptr) {
-      std::cout << "not find parent display:" << parent_name << std::endl;
+      LOG_ERROR("not find parent display:" << parent_name << " current display:" << display->GetDisplayName())
       return;
     }
     parent_ptr->AddChild(display);
   }
-
-  scene_display_ptr_->addItem(display);
+  scene_manager_ptr_->addItem(display);
 }
 void FactoryDisplay::FocusDisplay(const std::string &display_name) {
-
   focus_display_name_ = display_name;
+  auto display = GetDisplay(focus_display_name_);
+  if (display != nullptr) {
+    std::cout << "focus display:" << focus_display_name_ << std::endl;
+    viewer_ptr_->centerOn(display);
+  }
 }
 void FactoryDisplay::RemoveDisplay(const std::string &name) {
   auto iter = total_display_map_.find(name);
@@ -133,10 +136,10 @@ bool FactoryDisplay::GetMoveEnable(const std::string &display_name) {
  * @return {*}
  */
 void FactoryDisplay::Process() {
-  // focus on
-  auto display = GetDisplay(focus_display_name_);
-  if (display != nullptr) {
-    viewer_ptr_->centerOn(display);
-  }
+  // // focus on
+  // auto display = GetDisplay(focus_display_name_);
+  // if (display != nullptr) {
+  //   viewer_ptr_->centerOn(display);
+  // }
 }
-} // namespace Display
+}  // namespace Display

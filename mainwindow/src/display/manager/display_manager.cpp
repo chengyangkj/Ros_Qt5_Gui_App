@@ -5,24 +5,26 @@
 #include "display/manager/display_manager.h"
 #include <Eigen/Eigen>
 #include <QOpenGLWidget>
-#include "algorithm.h"
-#include "logger/logger.h"
-
+#include <boost/filesystem.hpp>
 #include <fstream>
+#include "algorithm.h"
+#include "display/manager/scene_manager.h"
+#include "logger/logger.h"
 namespace Display {
 
 DisplayManager::DisplayManager() {
   graphics_view_ptr_ = new ViewManager();
-  scene_display_ptr_ = new SceneManager();
-  scene_display_ptr_->Init(graphics_view_ptr_, this);
+  graphics_view_ptr_->SetDisplayManagerPtr(this);
+  scene_manager_ptr_ = new SceneManager();
+  scene_manager_ptr_->Init(graphics_view_ptr_, this);
   // 设置绘制区域
-  graphics_view_ptr_->setSceneRect(QRectF(0, 0, 800, 800));
-  FactoryDisplay::Instance()->Init(graphics_view_ptr_, scene_display_ptr_);
-  connect(scene_display_ptr_,
+  graphics_view_ptr_->setSceneRect(QRectF(-500, -500, 1000, 1000));
+  FactoryDisplay::Instance()->Init(graphics_view_ptr_, scene_manager_ptr_);
+  connect(scene_manager_ptr_,
           SIGNAL(signalTopologyMapUpdate(const TopologyMap &)), this,
           SIGNAL(signalTopologyMapUpdate(const TopologyMap &)));
   connect(
-      scene_display_ptr_,
+      scene_manager_ptr_,
       SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)),
       this,
       SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)));
@@ -134,14 +136,14 @@ bool DisplayManager::UpdateDisplay(const std::string &display_type,
     display->UpdateDisplay(data);
     GetAnyData(OccupancyMap, data, map_data_);
     graphics_view_ptr_->setSceneRect(
-        QRectF(0, 0, map_data_.width(), map_data_.height()));
+        QRectF(-map_data_.width() / 2., -map_data_.height() / 2., map_data_.width(), map_data_.height()));
     // 所有图层更新地图数据
     for (auto [name, display] :
          FactoryDisplay::Instance()->GetTotalDisplayMap()) {
       display->UpdateMap(map_data_);
     }
     if (!init_flag_) {
-      scene_display_ptr_->LoadTopologyMap();
+      scene_manager_ptr_->LoadTopologyMap();
       init_flag_ = true;
     }
 
@@ -302,11 +304,73 @@ RobotPose DisplayManager::scenePoseToMap(const RobotPose &pose) {
 VirtualDisplay *DisplayManager::GetDisplay(const std::string &name) {
   return FactoryDisplay::Instance()->GetDisplay(name);
 }
-void DisplayManager::SetRelocPose() {
+void DisplayManager::StartReloc() {
   if (!set_reloc_pose_widget_->isVisible()) {
     SetRelocMode(true);
   }
 }
-void DisplayManager::AddOneNavPoint() { scene_display_ptr_->AddOneNavPoint(); }
+void DisplayManager::SetEditMapMode(MapEditMode mode) { scene_manager_ptr_->SetEditMapMode(mode); }
+void DisplayManager::AddOneNavPoint() { scene_manager_ptr_->AddOneNavPoint(); }
+OccupancyMap &DisplayManager::GetMap() { return map_data_; }
+void DisplayManager::UpdateMap(OccupancyMap &) {
+  emit signalPubMap(map_data_);
+}
+void DisplayManager::SaveMap(const std::string &save_path) {
+  LOG_INFO("start save topology map")
+  scene_manager_ptr_->SaveTopologyMap(save_path);
+  LOG_INFO("start save occ map")
+  auto display_map_ = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+  auto map = display_map_->GetOccupancyMap();
+  map.Save(save_path);
+}
+void DisplayManager::OpenMap(const std::string &path) {
+  boost::filesystem::path filepath(path);
+  //文件夹
+  std::string directory = filepath.parent_path().string();
+  LOG_INFO("Directory: " << directory);
 
+  // 获取文件名（不包括后缀）
+  std::string filenameWithoutExtension = filepath.stem().string();
+  LOG_INFO("Filename without extension: " << filenameWithoutExtension);
+  // 获取后缀名
+  std::string extension = filepath.extension().string();
+  LOG_INFO("Extension: " << extension);
+
+  if (extension == ".topology") {
+    scene_manager_ptr_->OpenTopologyMap(path);
+  } else if (extension == ".pgm" || extension == ".yaml") {
+    std::string topology_path =
+        directory + "/" + filenameWithoutExtension + ".topology";
+    std::string pgm_path =
+        directory + "/" + filenameWithoutExtension + ".pgm";
+    std::string yaml_path =
+        directory + "/" + filenameWithoutExtension + ".yaml";
+    if (boost::filesystem::exists(topology_path)) {
+      scene_manager_ptr_->OpenTopologyMap(topology_path);
+    }
+    if (boost::filesystem::exists(pgm_path) && boost::filesystem::exists(yaml_path)) {
+      auto display_map = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+      OccupancyMap map;
+      map.Load(pgm_path, yaml_path);
+      display_map->UpdateData(map);
+      map.Save("./test.pgm");
+    } else {
+      LOG_ERROR("pgm or yaml not exit! path:" << directory + "/" + filenameWithoutExtension)
+    }
+  }
+}
+void DisplayManager::SetScaleBig() {
+  FactoryDisplay::Instance()
+      ->GetDisplay(DISPLAY_MAP)
+      ->SetScaled(
+          FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->GetScaleValue() *
+          1.3);
+}
+void DisplayManager::SetScaleSmall() {
+  FactoryDisplay::Instance()
+      ->GetDisplay(DISPLAY_MAP)
+      ->SetScaled(
+          FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->GetScaleValue() *
+          0.7);
+}
 }  // namespace Display
