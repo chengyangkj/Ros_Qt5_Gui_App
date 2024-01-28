@@ -214,6 +214,7 @@ void DisplayManager::updateScaled(double value) {
 void DisplayManager::SetRelocMode(bool is_start) {
   is_reloc_mode_ = is_start;
   if (is_start) {
+    FocusDisplay("");
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
     auto current_scene = GetDisplay(DISPLAY_ROBOT)->scenePos();

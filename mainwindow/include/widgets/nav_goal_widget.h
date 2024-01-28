@@ -34,6 +34,7 @@ class NavGoalWidget : public QWidget {
   void SignalHandleOver(const HandleResult &flag, const RobotPose &pose);
  public slots:
   void SetPose(const PointInfo &pose);
+  void SetEditEnabled(bool flag);
  private slots:
   void SlotUpdateValue(double);
 

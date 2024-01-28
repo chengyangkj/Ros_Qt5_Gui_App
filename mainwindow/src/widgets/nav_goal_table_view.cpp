@@ -46,22 +46,13 @@ void NavGoalTableView::UpdateTopologyMap(const TopologyMap &_topology_map) {
 void NavGoalTableView::UpdateSelectPoint(const TopologyMap::PointInfo &point) {
   if (!this->isEnabled())
     return;
-  QModelIndexList selectedIndexes = selectionModel()->selectedRows();
-  if (selectedIndexes.size() == 1) {
-    QModelIndex modelIndex = model()->index(selectedIndexes[0].row(), 0);
-    QWidget *widget = indexWidget(modelIndex);
 
-    if (widget) {
-      QComboBox *comboBox = static_cast<QComboBox *>(widget);
+  QWidget *widget =
+      indexWidget(model()->index(table_model_->rowCount() - 1, 0));
+  if (widget) {
+    QComboBox *comboBox = static_cast<QComboBox *>(widget);
+    if (comboBox->currentText() == "")
       comboBox->setCurrentText(point.name.c_str());
-    }
-  } else {
-    QWidget *widget =
-        indexWidget(model()->index(table_model_->rowCount() - 1, 0));
-    if (widget) {
-      QComboBox *comboBox = static_cast<QComboBox *>(widget);
-      comboBox->setCurrentText(point.name.c_str());
-    }
   }
 }
 void NavGoalTableView::AddItem() {
@@ -69,6 +60,8 @@ void NavGoalTableView::AddItem() {
   for (auto point : topologyMap_.points) {
     comboBox->addItem(point.name.c_str());
   }
+  comboBox->addItem("");
+  comboBox->setCurrentText("");
   QLabel *label_status = new QLabel("None");
   QPushButton *button_remove = new QPushButton("Delete");
   QPushButton *button_run = new QPushButton("Run");

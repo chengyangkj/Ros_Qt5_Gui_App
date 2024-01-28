@@ -85,6 +85,12 @@ void NavGoalWidget::SlotUpdateValue(double value) {
   emit SignalPoseChanged(RobotPose(spinBox_x_->value(), spinBox_y_->value(),
                                    deg2rad(spinBox_theta_->value())));
 }
+void NavGoalWidget::SetEditEnabled(bool flag) {
+  spinBox_x_->setEnabled(flag);
+  spinBox_y_->setEnabled(flag);
+  spinBox_theta_->setEnabled(flag);
+  lineEdit_name_->setEnabled(flag);
+}
 void NavGoalWidget::SetPose(const PointInfo &info) {
   spinBox_x_->blockSignals(true);
   spinBox_y_->blockSignals(true);

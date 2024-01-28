@@ -6,8 +6,7 @@
  * @LastEditTime: 2023-10-06 14:03:03
  * @FilePath: /ROS2_Qt5_Gui_App/README.md
 -->
-[中文](./README.md) | English
-
+Simplified Chinese | [English](./README_en.md)
 ## Lightweight ROS1/ROS2 Mobile Robot Human-Machine Interaction Software
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
@@ -32,41 +31,36 @@
 </a>
 -->
 
+This project is developed based on Qt5 and built with CMake, and it can be used in both ROS1 and ROS2 systems with the same codebase. The project has integrated continuous integration (CI) to ensure usability across multiple ROS versions and system versions.
 
-This project is developed based on Qt5 and built using Module Cmake. It can be used in both ROS1 and ROS2 systems using the same set of code.
+During compilation, the software will automatically detect the ROS1/ROS2 environment variables and build accordingly, achieving ROS communication and UI isolation.
 
-During compilation, the software will automatically identify the ROS1/ROS2 environment variables and build accordingly, achieving isolation of ROS communication and interface.
+All the features of the software are self-drawn, making it easy to run on edge devices with lower performance.
 
-All features of the software are self-drawn and implemented, making it easy to run on some low-performance edge devices.
+Features/TODO:
 
-Currently, the software can achieve:
+| Feature                                 | Status | Remarks |
+| --------------------------------------- | ------ | ------- |
+| ROS1/ROS2 communication                 | ✅      |         |
+| Global/local map display                | ✅      |         |
+| Real-time robot position display        | ✅      |         |
+| Robot speed dashboard                   | ✅      |         |
+| Manual robot control                    | ✅      |         |
+| Robot relocation                        | ✅      |         |
+| Single/multi-point robot navigation     | ✅      |         |
+| Global/local planned trajectory display | ✅      |         |
+| Robot topological map function          | ✅      |         |
+| Battery level display                   | ✅      |         |
+| Map editing function                    | ✅      |         |
+| Robot navigation task chain             | ✅      |         |
+| Communication based on protobuf         | 🏷️      |         |
+| Eagle-eye view                          | 🏷️      |         |
+| 3D layer display                        | 🏷️      |         |
+| Camera image display                    | 🏷️      |         |
 
-  - ROS1/ROS2 communication
-  - Global map display
-  - Global/local cost map display
-  - Real-time robot position display
-  - Real-time robot speed display
-  - Manual robot control
-  - Robot relocation
-  - Robot navigation single point goal publishing
-  - Global/local planned trajectory display for the robot
-  - Robot topological map functionality, multi-navigation point single-point navigation
-  - Battery level display
-  
-Planned but not yet implemented (TODO List):
+If anyone has interesting interface/functional requirements, they can submit them [here](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29). If there are any bugs, please submit them to [issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues), and they will be fixed as soon as possible. Pull requests for project development are also welcome.
 
-  - Robot map editor functionality
-  - Robot topological map multi-point continuous navigation/topological map route drawing
-  - Robot navigation task chain
-  - Implementation of communication channel based on protobuf (custom communication protocol, completely freeing from ROS communication mechanism, achieving cross-platform operation of the software)
-  - Bird's eye view
-  - 3D view display based on OpenGL
-  - Camera image display
-
-
-This repository's mirror link for Chinese users: [gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
-
-This project has been integrated into CI to ensure the availability of multiple ROS versions/system versions, continuous integration, continuous optimization and iteration......
+This repository's domestic accelerated mirror link: [gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=chengyangkj/Ros_Qt5_Gui_App&type=Timeline&theme=dark" />
@@ -83,50 +77,68 @@ This project has been integrated into CI to ensure the availability of multiple 
 <!-- TOC -->
 ## Table of Contents
 
-- [Environment Installation](#environment-installation)
-- [Compilation](#compilation)
-  - [Clone/Download the Project:](#clonedownload-the-project)
-  - [Compile the Project](#compile-the-project)
-  - [Run the Project](#run-the-project)
-- [Usage Instructions](#usage-instructions)
-    - [Multi-Machine Communication Configuration](#multi-machine-communication-configuration)
-    - [Configuration File](#configuration-file)
-    - [Relocation Pose Publishing](#relocation-pose-publishing)
-    - [Setting Navigation Target Points](#setting-navigation-target-points)
-    - [Manual Robot Control](#manual-robot-control)
-    - [Speed Dashboard](#speed-dashboard)
-    - [Battery Level Display](#battery-level-display)
-- [Related Links](#related-links)
-- [Related Tutorials and Discussion Groups](#related-tutorials-and-discussion-groups)
+- [1. Release Version Download and Use](#1-release-version-download-and-use)
+- [2. Compilation](#2-compilation)
+  - [1. Environment Installation](#1-environment-installation)
+  - [2. Cloning/Downloading the Project:](#2-cloningdownloading-the-project)
+  - [3. Building the Project](#3-building-the-project)
+  - [4. Running the Project](#4-running-the-project)
+- [3. Usage Instructions](#3-usage-instructions)
+    - [3.1. Multi-Machine Communication Configuration](#31-multi-machine-communication-configuration)
+    - [3.2. Configuration File](#32-configuration-file)
+    - [3.3. Relocation Pose Publishing](#33-relocation-pose-publishing)
+    - [3.4. Map Editing](#34-map-editing)
+      - [3.4.1 Topological Map (Robot Navigation Point Setting)](#341-topological-map-robot-navigation-point-setting)
+      - [3.4.2 Eraser](#342-eraser)
+      - [3.4.3 Pen](#343-pen)
+      - [3.4.4 Line Drawing](#344-line-drawing)
+      - [3.4.5 Map Saving](#345-map-saving)
+      - [3.4.6 Map Loading](#346-map-loading)
+    - [3.5. Manual Robot Control](#35-manual-robot-control)
+    - [3.6. Speed Dashboard](#36-speed-dashboard)
+    - [3.7. Battery Level Display](#37-battery-level-display)
+    - [3.8 Multi-Point Continuous Navigation](#38-multi-point-continuous-navigation)
+- [4. Related Links](#4-related-links)
 
 <!-- /TOC -->
 
+# 1. Release Version Download and Use
 
-# Environment Installation 
+Users can choose to download the pre-compiled Release version, eliminating the need for manual compilation. Before using the Release version, the system's ROS environment must be installed and sourced into the environment variables.
 
-In theory, only the following basic packages need to be installed to compile this project:
+This repository uses CI to automatically generate Release versions for various platforms (currently only X86_64 versions; Arm environments need to be compiled independently). Download the latest Release version corresponding to the ROS version from the [Release page](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) of the project. In theory, you can use it after extracting the files.
+Usage:
+Navigate to the extracted folder path in the terminal and execute the following command:
+
+```
+sudo chmod a+x ./ros_qt5_gui_app
+./ros_qt5_gui_app
+```
+
+If the Release version cannot be used after downloading, you can refer to [2. Compilation](#2-compilation) for manual compilation and usage.
+
+# 2. Compilation
+
+Note that in order to ensure that this project is compatible with both ROS1 and ROS2, it does not use the native catkin_make/colcon build system of ROS1/ROS2 for construction. Instead, it uses standard CMake for building, which also means that this project will not be automatically recognized by ROS as a package.
+
+You can follow the tutorial below to build and run this project from scratch:
+
+## 1. Environment Installation 
+
+Theoretically, only the following basic packages need to be installed to compile this project:
 
 ```
 sudo apt-get update
-sudo apt-get install qtbase5-private-dev -y
+sudo apt-get install qtbase5-private-dev libqt5svg5-dev -y
 ```
 
-If the above installation is still not working, you can execute the following command to install all dependencies:
+If the above installation does not work, you can install all dependencies with the following command:
 
 ```
-sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools qtbase5-private-dev libeigen3-dev libgtest-dev -y
-
+sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev qtbase5-private-dev libeigen3-dev libgtest-dev -y
 ```
 
-# Compilation
-
-
-Note that, to ensure that this project is compatible with both ROS1 and ROS2, this project does not use the catkin_make/colcon build system of ROS1/ROS2 for building. Instead, it uses standard CMake for building. This also means that this project will not be automatically recognized as a functional package by ROS.
-You can refer to the following tutorial to build/run this project from scratch:
-
-
-## Clone/Download the Project:
-
+## 2. Cloning/Downloading the Project:
 
 ```
 mkdir -p ~/qt_ws
@@ -134,16 +146,15 @@ cd ~/qt_ws
 git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App
 ```
 
-Note: If downloading from GitHub is slow, you can use the following command to pull from Gitee
+Note: If the GitHub download speed is slow, you can use the following command to pull from Gitee:
 
 ```
 git clone https://gitee.com/chengyangkj/Ros_Qt5_Gui_App
-
 ```
 
-## Compile the Project
+## 3. Building the Project
 
-You can manually execute the following commands to compile the project (it will automatically identify whether it is a ROS1 or ROS2 environment based on environment variables):
+You can manually execute the following commands to build the project (it will automatically identify whether it is an ROS1 or ROS2 environment based on the environment variables):
 
 ```
 cd ~/qt_ws/ROS2_Qt5_Gui_App
@@ -151,165 +162,206 @@ mkdir -p build
 cd build
 cmake ..
 make
-
 ```
-Or you can execute the following script to specify the ROS version and perform a one-click compilation:
+
+Or you can execute the following script to specify the ROS version and perform one-click compilation:
 
 ```
 cd ~/qt_ws/ROS2_Qt5_Gui_App
-
 ```
-ROS1:
+For ROS1:
 
 ```
 sh ./build_ros1.sh
-
 ```
-ROS2
+
+For ROS2:
 
 ```
 sh ./build_ros2.sh
 ```
-## Run the Project
+
+## 4. Running the Project
 
 ```
 cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 ./ros_qt5_gui_app
-
 ```
 
-The software configuration file path (generated after running the software once) is located at:
+The software configuration file path (generated after running the software once) is:
 
 ```
-
-~/qt_ws/ROS2_Qt5_Gui_App/build/config.ini
-
+~/qt_ws/ROS2_Qt5_Gui_App/build/config.json
 ```
 
-# Usage Instructions
+# 3. Usage Instructions
 
-### Multi-Machine Communication Configuration
+### 3.1. Multi-Machine Communication Configuration
 
-For ROS beginners, a warm reminder: This configuration is not required if the software is running on a single machine, such as on the robot itself, and there is no need for cross-machine usage. However, if the software needs to be run on your own notebook to connect to a remote robot, configuration is needed. ROS1/ROS2 multi-machine communication relies entirely on ROS native (environment variables adding ROS_MASTER_URI and ROS_IP/ROS_DOMAINID), and is no longer manually specified by the user, reducing the burden for new users.
+For ROS beginners, if the software is running on a single machine without the need for cross-machine communication, this configuration is not necessary. It is only required when running the software on your own laptop to connect to a remote robot.
+
+ROS1/ROS2's multi-machine communication relies entirely on ROS's native (environment variable) configuration (ROS_MASTER_URI and ROS_IP/ROS_DOMAINID), and no longer needs to be manually specified by the user, reducing the burden on new users.
 
 ROS1:
 
-Configuration reference: [Multi-machine communication tutorial](https://blog.csdn.net/qq_38441692/article/details/98205852)
+Configuration reference: Multi-Machine Communication Tutorial [CSDN Blog](https://blog.csdn.net/qq_38441692/article/details/98205852)
 
 ROS2:
 
-Environment variable multi-machine configuration is the same as ROS_DOMAINID
+The environment variable multi-machine configuration is the same with ROS_DOMAINID.
 
-### Configuration File
+### 3.2. Configuration File
 
-After the first run, a config.ini file will be generated in the same directory as the executable. Modify this configuration file to take effect. For specific configuration instructions, please refer to [configuration file description](./doc/config.md)
+After the first run, the config.json file will be generated in the same directory as the executable program. Modify this configuration file (note the JSON format) to take effect after modification. For specific configuration instructions, see [Configuration File Description](./doc/config.md).
 
+### 3.3. Relocation Pose Publishing
 
-### Relocation Pose Publishing
+The program allows dragging to set the initial position of the robot (relocation). Compared to Rviz, dragging allows real-time viewing of laser matching, resulting in more accurate relocation (left-click and drag, right-click to rotate direction).
 
-The program allows for drag-and-drop setting of the initial position of the robot (relocation), and relative to Rviz, real-time laser matching can be viewed during dragging, resulting in more accurate relocation.
-
-![image.png](./doc/images/reloc.jpg)
+![image.png](./doc/images/reloc.png)
 
 ![image.png](./doc/images/reloc.gif)
 
-Note: If the settings are invalid, check the setting in config.ini:
+Note: If the setting is invalid, check the following settings in the config.json file:
 
 ```
-[Reloc]
-Topic=/initialpose  
+{
+      "display_name": "Reloc",
+      "topic": "/initialpose",
+      "enable": true
+}
 ```
-Replace "/initialpose" with the topic name your robot listens to for relocation.
+Replace "/initialpose" with the relocation topic name listened to by your robot.
 
-### Setting Navigation Target Points
+### 3.4. Map Editing
 
-The program allows for drag-and-drop setting of the robot's navigation target points (navigation). Use the instructions below to set the navigation target points:
+The program supports map editing functionality:
 
-![image.png](./doc/images/nav_goal_send.jpg)
+![image.png](./doc/images/edit_map.png)
+![image.png](./doc/images/edit_map2.png)
 
-![image.png](./doc/images/nav_goal_send2.jpg)
+#### 3.4.1 Topological Map (Robot Navigation Point Setting)
+
+The program also supports topological map functionality, allowing drag-and-drop setting of robot navigation target points (navigation). See the gif for a demonstration:
 
 ![image.png](./doc/images/set_nav_goal.gif)
 
-Note: If the settings are invalid, check the setting in config.ini:
+Note: If the navigation point publishing has no response and the setting is invalid, check the following settings in the config.json file:
 
 ```
-[NavGoal]
-Topic=/move_base_simple/goal
+{
+      "display_name": "NavGoal",
+      "topic": "/move_base_simple/goal",
+      "enable": true
+}
 ```
-Replace "/move_base_simple/goal" with the topic name your robot listens to for navigation target points.
+Replace "/move_base_simple/goal" with the navigation goal topic name listened to by your robot.
 
-### Manual Robot Control
+#### 3.4.2 Eraser
 
-The software supports publishing real-time velocity to the robot base:
+After clicking the eraser, you can erase obstacles in the map. See the gif for a demonstration:
+
+![image.png](./doc/images/erase.gif)
+
+#### 3.4.3 Pen
+
+Pen functionality
+
+![image.png](./doc/images/pencil.gif)
+
+#### 3.4.4 Line Drawing
+
+Line drawing
+
+![image.png](./doc/images/draw_line.gif)
+
+#### 3.4.5 Map Saving
+
+After editing the map, it is not automatically saved. You need to click the save button to save the map to the specified folder. If you intend to use it in ROS, you need to replace the map in your corresponding navigation package's map folder.
+
+Currently, the saved map includes:
+
+- *.pgm image data
+- *.yaml map description file
+- *.topology the custom topological map of the program, saving point information, etc.
+
+![image.png](./doc/images/save_map.png)
+
+#### 3.4.6 Map Loading
+
+Similarly, you can load a map by selecting the corresponding PGM map file and begin editing.
+
+### 3.5. Manual Robot Control
+
+The software supports publishing real-time speeds to the robot base:
 
 ![image.png](./doc/images/manual_control.jpg)
 
-The text on the corresponding buttons can be synchronized with the keyboard buttons.
+The text on the corresponding buttons can be invoked synchronously by keyboard buttons.
 
-Note: If the settings are invalid, check the setting in config.ini:
-
-```
-[Speed]
-Topic=/cmd_vel
+Note: If the setting is invalid, check the following settings in the config.json file:
 
 ```
-Replace "/cmd_vel" with the actual topic your robot listens to for speed control.
+{
+      "display_name": "Speed",
+      "topic": "/cmd_vel",
+      "enable": true
+}
+```
+Replace "/cmd_vel" with the actual topic listened to by your robot for speed control.
 
-### Speed Dashboard
+### 3.6. Speed Dashboard
 
-The software supports real-time display of the robot's speed:
+The software supports real-time display of robot speed:
 
 ![image.png](./doc/images/speed_dashboard.jpg)
 
-Note: If the settings are invalid, check the setting in config.ini:
+Note: If the setting is invalid, check the following settings in the config.json file:
 
 ```
-[Odometry]
-Topic=/odom
+{
+      "display_name": "Odometry",
+      "topic": "/odom",
+      "enable": true
+}
 ```
 
-Replace "/odom" with the topic where your robot publishes odometry.
+Replace "/odom" with the topic of odom published by the robot.
 
-### Battery Level Display
+### 3.7. Battery Level Display
 
-The software supports real-time display of the robot's battery level. Configure the topic name for battery level in the configuration file. The topic type for battery level is sensor_msgs::BatteryState.
+The software supports real-time display of robot battery level. In the configuration, provide the topic name for the battery level, with the topic type being sensor_msgs::BatteryState.
 
 ```
-[Battery]
-Topic=/battery
+{
+      "display_name": "Battery",
+      "topic": "/battery",
+      "enable": true
+}
 ```
-
 ![image.png](./doc/images/battery_state.png)
 
+### 3.8 Multi-Point Continuous Navigation
 
-# Related Links
+The software supports multi-point continuous navigation. To use this feature, refer to the gif for usage:
 
-| Link                                                                               | Supported Platforms                           | Features                                                                                                                                   |
-| ---------------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master)               | Win10 Ubuntu                                  | ROS + QWidget + QGraphicsview self-drawn visualization interface display                                                                   |
-| [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)             | Win10 Ubuntu                                  | ROS + QML + C++ mixed programming, qml self-drawn map, visual display of lidar, and other demos                                            |
-| [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)               | Win10 Ubuntu                                  | ROS + QWidget + Librviz for visualization, a version implemented in the "ROS Human-Machine Interaction Software Development" series course |
-| [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)         | Win10 Ubuntu                                  | ROS + QWidget + Librviz original layer API for layer management, no need to create layers manually                                         |
-| [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)     | Win10 Ubuntu                                  | Original package created by cakin_create_qt_pkg, cmakelist.txt configured for qt5, can be compiled and run directly                        |
-| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo)                        | ROS2                                          | Qt demo package running on ROS2 platform, cmakelist.txt configured for qt5, can be built using colcon                                      |
-| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)                | ROS2                                          | Identical to this repository/No longer maintained                                                                                          |
-| [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app) | Based on flutter for multi-platform operation | In progress.....                                                                                                                           |
+![image.png](./doc/images/multi_nav.png)
+
+Click "Start Task Chain" to start the task:
+
+![image.png](./doc/images/main.gif)
+
+# 4. Related Links
 
 
-# Related Tutorials and Discussion Groups
+| Friendly Name                                                                      | Supported Platforms                           | Function                                                                                                                                           |
+| ---------------------------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master)               | Win10 Ubuntu                                  | ROS + QWidget + QGraphicsview customized visual interface display                                                                                  |
+| [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi)             | Win10 Ubuntu                                  | ROS + QML + C++ hybrid programming, QML self-drawn map, visualization of LiDAR, etc. demo                                                          |
+| [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple)               | Win10 Ubuntu                                  | ROS + QWidget + Librviz visualization display, version implemented in the "ROS Human-Machine Interaction Software Development" course on CSDN blog |
+| [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree)         | Win10 Ubuntu                                  | ROS + QWidget + Librviz native layer API to manage layers without manual layer creation                                                            |
+| [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo)     | Win10 Ubuntu                                  | Original package created with cakin_create_qt_pkg, cmakelist.txt configured to qt5, can be compiled and run directly                               |
+| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo)                        | ROS2                                          | Qt demo package running on ROS2 platform, cmakelist.txt configured to qt5, can be compiled and used with colcon build                              |
+| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App)                | ROS2                                          | Identical to this repository/No longer maintained                                                                                                  |
+| [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app) | Implemented on Flutter for multi-platform use | Work in progress...                                                                                                                                |
 
- **Series of tutorial articles:**
-
-[ROS Robot GUI Program Development](https://blog.csdn.net/qq_38441692/category_9863968.html)
-
- **This series of courses has been launched on Guyue Academy, welcome interested friends to subscribe:**
-
- 1. [ROS Qt development environment setup and basic knowledge introduction](https://class.guyuehome.com/detail/p_5eba414d58533_Uh4XTbPi/6)
- 2. [Interface development of ROS Human-Machine Interaction Software](https://class.guyuehome.com/detail/p_5ec490a8d7bd7_b7ucPqUs/6)
- 3. [ROS Rviz component development method](https://class.guyuehome.com/detail/p_5edf2d27a1942_foy4nqci/6)
- 4. [How to implement ROS Windows Human-Machine Interaction Software](https://class.guyuehome.com/detail/p_5fc5ab97e4b04db7c091f475/6)
- 
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20200612194143186.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM4NDQxNjky,size_16,color_FFFFFF,t_70)
-
-**Development exchange QQ group:** 797497206

@@ -5,6 +5,8 @@
 #include "display/manager/display_manager.h"
 namespace Display {
 ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
+  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setMouseTracking(true);  // 开启鼠标追踪，以便捕获鼠标移动事件
   QVBoxLayout *main_layout = new QVBoxLayout;
   main_layout->addItem(
