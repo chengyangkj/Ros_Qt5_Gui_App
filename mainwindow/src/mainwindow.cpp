@@ -74,8 +74,9 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
     case MsgId::kBatteryState: {
       std::map<std::string, std::string> map =
           std::any_cast<std::map<std::string, std::string>>(data);
-      status_bar_widget_->SlotSetBatteryStatus(std::stod(map["percent"]),
+      this->SlotSetBatteryStatus(std::stod(map["percent"]),
                                                std::stod(map["voltage"]));
+      
     } break;
     default:
       break;
@@ -101,10 +102,6 @@ void MainWindow::setupUi() {
   dock_manager_ = new CDockManager(this);
   QVBoxLayout *center_layout = new QVBoxLayout();    //垂直
   QHBoxLayout *center_h_layout = new QHBoxLayout();  //水平
-
-  /////////////////////////////////////////////////////////////////状态栏
-  status_bar_widget_ = new StatusBarWidget();
-  // center_layout->addWidget(status_bar_widget_);
 
   ///////////////////////////////////////////////////////////////地图工具栏
   QHBoxLayout *horizontalLayout_tools = new QHBoxLayout();
@@ -203,6 +200,50 @@ void MainWindow::setupUi() {
       new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
   center_layout->addLayout(horizontalLayout_tools);
 
+  ///////////////////////////////////////////////////////////////////电池电量
+  battery_bar_ = new QProgressBar();
+  battery_bar_->setObjectName(QString::fromUtf8("battery_bar_"));
+  battery_bar_->setMaximumSize(QSize(90, 16777215));
+  battery_bar_->setAutoFillBackground(true);
+  battery_bar_->setStyleSheet(QString::fromUtf8(
+      "QProgressBar#battery_bar_\n"
+      "{\n"
+      "      border:none;   /*\346\227\240\350\276\271\346\241\206*/\n"
+      "      background:rgb(211, 215, 207);\n"
+      "      border-radius:5px;\n"
+      "      text-align:center;   "
+      "/*\346\226\207\346\234\254\347\232\204\344\275\215\347\275\256*/\n"
+      "      color: rgb(229, 229, 229);  "
+      "/*\346\226\207\346\234\254\351\242\234\350\211\262*/\n"
+      "}\n"
+      " \n"
+      "QProgressBar::chunk \n"
+      "{\n"
+      "      background-color:rgb(115, 210, 22);\n"
+      "      border-radius:4px;\n"
+      "}\n"
+      ""));
+
+  battery_bar_->setAlignment(Qt::AlignBottom | Qt::AlignHCenter);
+
+  horizontalLayout_tools->addWidget(battery_bar_);
+
+  QLabel *label_11 = new QLabel();
+  label_11->setObjectName(QString::fromUtf8("label_11"));
+  label_11->setMinimumSize(QSize(32, 32));
+  label_11->setMaximumSize(QSize(32, 32));
+  label_11->setPixmap(QPixmap(QString::fromUtf8(":/images/power-v.png")));
+
+  horizontalLayout_tools->addWidget(label_11);
+
+  label_power_ = new QLabel();
+  label_power_->setObjectName(QString::fromUtf8("label_power_"));
+  label_power_->setMinimumSize(QSize(50, 32));
+  label_power_->setMaximumSize(QSize(50, 32));
+  label_power_->setStyleSheet(QString::fromUtf8(""));
+
+  horizontalLayout_tools->addWidget(label_power_);
+  SlotSetBatteryStatus(0, 0);
   //////////////////////////////////////////////////////////////编辑地图工具栏
   QWidget *tools_edit_map_widget = new QWidget();
 
@@ -662,4 +703,8 @@ void MainWindow::updateOdomInfo(RobotState state) {
   //  QImage image(mysize,QImage::Format_RGB32);
   //           QPainter painter(&image);
   //           myscene->render(&painter);   //关键函数
+}
+void MainWindow::SlotSetBatteryStatus(double percent, double voltage) {
+  battery_bar_->setValue(percent);
+  label_power_->setText(QString::number(voltage, 'f', 2) + "V");
 }

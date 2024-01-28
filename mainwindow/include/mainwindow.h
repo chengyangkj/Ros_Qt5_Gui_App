@@ -30,7 +30,6 @@
 #include "widgets/nav_goal_table_view.h"
 #include "widgets/set_pose_widget.h"
 #include "widgets/speed_ctrl.h"
-#include "widgets/status_bar.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -49,6 +48,7 @@ class MainWindow : public QMainWindow {
   void RecvChannelMsg(const MsgId &id, const std::any &data);
   void updateOdomInfo(RobotState state);
   void RestoreState();
+  void SlotSetBatteryStatus(double percent, double voltage);
 
  protected:
   virtual void closeEvent(QCloseEvent *event) override;
@@ -68,11 +68,12 @@ class MainWindow : public QMainWindow {
   QLabel *label_pos_scene_;
   QThread message_thread_;
   SpeedCtrlWidget *speed_ctrl_widget_;
-  StatusBarWidget *status_bar_widget_;
   NavGoalTableView *nav_goal_table_view_;
+  QProgressBar *battery_bar_;
+  QLabel *label_power_;
  signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);
-
+ 
  private:
   void setupUi();
   bool openChannel();
