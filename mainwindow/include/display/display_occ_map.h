@@ -26,7 +26,6 @@ class DisplayOccMap : public VirtualDisplay {
   void StartDrawLine(const QPointF &pose);
   void EndDrawLine(const QPointF &pose, bool is_draw);
   void DrawPoint(const QPointF &start);
-
  private:
   OccupancyMap map_data_;
 

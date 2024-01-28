@@ -39,14 +39,14 @@ class SceneManager : public QGraphicsScene {
  public slots:
   void SetEditMapMode(MapEditMode mode);
   void SaveTopologyMap(const std::string &file_path);
-
+  
  public:
   SceneManager(QObject *parent = nullptr);
   virtual ~SceneManager();
   void Init(QGraphicsView *view_ptr, DisplayManager *manager);
   void AddOneNavPoint();
   void LoadTopologyMap();
-
+  void OpenTopologyMap(const std::string &file_path);
  private:
   void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;

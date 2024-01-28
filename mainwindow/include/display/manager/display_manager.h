@@ -71,6 +71,7 @@ class DisplayManager : public QObject {
   void UpdateTopicData(const MsgId &id, const std::any &data);
   void FocusDisplay(const std::string &display_type);
   void SaveMap(const std::string &save_path);
+  void OpenMap(const std::string &save_path);
   void SetScaleBig();
   void SetScaleSmall();
 

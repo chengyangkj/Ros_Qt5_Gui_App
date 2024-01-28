@@ -555,15 +555,20 @@ void MainWindow::setupUi() {
     }
   });
   connect(open_map_btn, &QToolButton::clicked, [this]() {
+    QStringList filters;
+    filters << "地图(*.pgm)"
+            << "拓扑地图(*.topology)"
+            << "地图配置(*.yaml)";
+
     QString fileName = QFileDialog::getOpenFileName(nullptr, "OPen Map files",
-                                                    "", "Map files (*.yaml,*.pgm,*.pgm.json)");
+                                                    "", filters.join(";;"));
     if (!fileName.isEmpty()) {
       // 用户选择了文件夹，可以在这里进行相应的操作
-      LOG_INFO("用户选择的保存地图路径：" << fileName.toStdString());
-      display_manager_->SaveMap(fileName.toStdString());
+      LOG_INFO("用户选择的打开地图路径：" << fileName.toStdString());
+      display_manager_->OpenMap(fileName.toStdString());
     } else {
       // 用户取消了选择
-      LOG_INFO("取消保存地图");
+      LOG_INFO("取消打开地图");
     }
   });
   connect(edit_map_btn, &QToolButton::clicked, [this, tools_edit_map_widget, edit_map_btn]() {

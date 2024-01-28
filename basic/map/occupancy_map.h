@@ -26,26 +26,109 @@
 #ifndef OCCUPANCY_MAP_H
 #define OCCUPANCY_MAP_H
 #include <Eigen/Dense>
+#include <fstream>
 #include <iostream>
-namespace basic {
+#include "logger/logger.h"
 
+#define OCC_GRID_UNKNOWN 0     //未知領域
+#define OCC_GRID_FREE 0        //free
+#define OCC_GRID_OCCUPIED 100  //占有領域
+
+namespace basic {
+struct MapConfig {
+  std::string image = "./";
+  double resolution = 0.1;
+  std::vector<double> origin;
+  int negate{0};
+  double occupied_thresh{0.25};
+  double free_thresh{0.65};
+  MapConfig() {
+    origin.resize(3);
+  }
+  MapConfig(std::vector<double> ori, double res) {
+    origin = ori;
+    resolution = res;
+  }
+  void Load(const std::string &filename) {
+    std::ifstream file(filename);
+    origin.clear();
+    if (file.is_open()) {
+      std::string line;
+      while (getline(file, line)) {
+        std::istringstream iss(line);
+        std::string key;
+        if (std::getline(iss, key, ':')) {
+          std::string value;
+          if (std::getline(iss, value)) {
+            // 移除值前后的空格
+            value = value.substr(value.find_first_not_of(" "), value.find_last_not_of(" ") + 1);
+
+            // 根据键解析对应的值
+            if (key == "image") {
+              image = value;
+            } else if (key == "resolution") {
+              resolution = std::stod(value);
+            } else if (key == "origin") {
+              std::istringstream issOrigin(value);
+              std::string originValue;
+              while (std::getline(issOrigin, originValue, ',')) {
+                origin.push_back(std::stod(originValue));
+              }
+            } else if (key == "negate") {
+              negate = std::stoi(value);
+            } else if (key == "occupied_thresh") {
+              occupied_thresh = std::stod(value);
+            } else if (key == "free_thresh") {
+              free_thresh = std::stod(value);
+            }
+          }
+        }
+      }
+      LOG_INFO("Successfully loaded params from ");
+      LOG_INFO("image: " << image);
+      LOG_INFO("resolution: " << resolution);
+      LOG_INFO("origin: ");
+      for (auto &o : origin) {
+        LOG_INFO(o << " ");
+      }
+      LOG_INFO("negate: " << negate);
+      LOG_INFO("occupied_thresh: " << occupied_thresh);
+      LOG_INFO("free_thresh: " << free_thresh);
+
+      file.close();
+    } else {
+      LOG_INFO("无法打开文件 " << filename);
+    }
+  }
+  void Save(const std::string &filename) {
+    std::ofstream file(filename);
+    if (file.is_open()) {
+      file << "image: " << image << std::endl;
+      file << "resolution: " << resolution << std::endl;
+      file << "origin: " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
+      file << "negate: " << negate << std::endl;
+      file << "occupied_thresh: " << occupied_thresh << std::endl;
+      file << "free_thresh: " << free_thresh << std::endl;
+      file.close();
+      LOG_INFO("配置已成功写入到文件 " << filename);
+    } else {
+      LOG_INFO("无法打开文件 " << filename);
+    }
+  }
+};
 class OccupancyMap {
  public:
-  double origin_x{0};                    // 地图原点x(栅格地图左下角)
-  double origin_y{0};                    // 地图原点y(栅格地图左下角)
-  double origin_theta{0};                // 地图原点theta(栅格地图左下角)
-  double resolution{0};                  // 地图分辨率
-  Eigen::Vector3d origin_pose{0, 0, 0};  // 地图原点位置(栅格地图左下角)
-  int rows{0};                           // 行(高)
-  int cols{0};                           // 列(宽)
-  Eigen::MatrixXi map_data;              // 地图数据,数据的地图已经被上下翻转
+  MapConfig map_config;
+  int rows{0};               // 行(高)
+  int cols{0};               // 列(宽)
+  Eigen::MatrixXi map_data;  // 地图数据,数据的地图已经被上下翻转
  public:
   OccupancyMap() {}
   OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res)
-      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]), origin_y(origin[1]), origin_theta(origin[2]), resolution(res), map_data(rows_, cols) {}
+      : map_config({origin[0], origin[1], origin[2]}, res), rows(rows_), cols(cols_), map_data(rows_, cols) {}
   OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
                Eigen::MatrixXi data)
-      : rows(rows_), cols(cols_), origin_pose(origin), origin_x(origin[0]), origin_y(origin[1]), origin_theta(origin[2]), resolution(res), map_data(data) {}
+      : map_config({origin[0], origin[1], origin[2]}, res), rows(rows_), cols(cols_), map_data(data) {}
   ~OccupancyMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
   Eigen::MatrixXi flip() { return map_data.colwise().reverse(); }
@@ -62,13 +145,8 @@ class OccupancyMap {
   int width() { return cols; }
   int height() { return rows; }
   //宽map坐标系下的长度
-  int widthMap() { return cols * resolution; }
-  int heightMap() { return rows * resolution; }
-  Eigen::Vector3d GetOriginPoseBottomLeft() { return origin_pose; }
-  Eigen::Vector3d GetOriginPoseTopLeft() {
-    return Eigen::Vector3d(origin_x, origin_y + height() * resolution,
-                           origin_pose[2]);
-  }
+  int widthMap() { return cols * map_config.resolution; }
+  int heightMap() { return rows * map_config.resolution; }
   /**
    * @description: 输入栅格地图的行与列号，返回该位置的全局坐标
    * @param {int&} c 列号
@@ -78,8 +156,8 @@ class OccupancyMap {
    * @return {*}
    */
   void idx2xy(const int &c, const int &r, double &x, double &y) {
-    x = origin_x + c * resolution;
-    y = origin_y + r * resolution;
+    x = map_config.origin[0] + c * map_config.resolution;
+    y = map_config.origin[1] + r * map_config.resolution;
   }
   /**
    * @description: 输入全局坐标，返回栅格地图的行与列号
@@ -90,8 +168,8 @@ class OccupancyMap {
    * @return {*}
    */
   void xy2idx(const double &x, const double &y, int &c, int &r) {
-    c = round(x - origin_x) / resolution;
-    r = round(y - origin_y) / resolution;
+    c = round(x - map_config.origin[0]) / map_config.resolution;
+    r = round(y - map_config.origin[1]) / map_config.resolution;
   }
   /**
    * @description:输入全局坐标，判断是否在栅格地图内
@@ -100,8 +178,8 @@ class OccupancyMap {
    * @return {*}
    */
   bool inMap(const double &x, const double &y) {
-    int c_idx = round((x - origin_x) / resolution);
-    int r_idx = round((y - origin_y) / resolution);
+    int c_idx = round((x - map_config.origin[0]) / map_config.resolution);
+    int r_idx = round((y - map_config.origin[1]) / map_config.resolution);
     return (c_idx >= 0 && r_idx >= 0 && c_idx < cols && r_idx < rows);
   }
   /**
@@ -119,8 +197,8 @@ class OccupancyMap {
    */
   void ScenePose2xy(const double &scene_x, const double &scene_y,
                     double &word_x, double &word_y) {
-    word_x = scene_x * resolution + origin_x;
-    word_y = (height() - scene_y) * resolution + origin_y;
+    word_x = scene_x * map_config.resolution + map_config.origin[0];
+    word_y = (height() - scene_y) * map_config.resolution + map_config.origin[1];
   }
   /**
    * @description:输入栅格坐标,返回世界坐标
@@ -128,8 +206,8 @@ class OccupancyMap {
    */
   void OccPose2xy(const double &scene_x, const double &scene_y,
                   double &word_x, double &word_y) {
-    word_y = scene_x * resolution + origin_x;
-    word_x = (height() - scene_y) * resolution + origin_y;
+    word_y = scene_x * map_config.resolution + map_config.origin[0];
+    word_x = (height() - scene_y) * map_config.resolution + map_config.origin[1];
   }
   /**
    * @description:
@@ -142,8 +220,8 @@ class OccupancyMap {
    */
   void xy2ScenePose(const double &word_x, const double &word_y, double &scene_x,
                     double &scene_y) {
-    scene_x = (word_x - origin_x) / resolution;
-    scene_y = height() - (word_y - origin_y) / resolution;
+    scene_x = (word_x - map_config.origin[0]) / map_config.resolution;
+    scene_y = height() - (word_y - map_config.origin[1]) / map_config.resolution;
   }
   /**
    * @description:
@@ -156,8 +234,8 @@ class OccupancyMap {
    */
   void xy2OccPose(const double &word_x, const double &word_y, double &scene_x,
                   double &scene_y) {
-    scene_y = (word_x - origin_x) / resolution;
-    scene_x = height() - (word_y - origin_y) / resolution;
+    scene_y = (word_x - map_config.origin[0]) / map_config.resolution;
+    scene_x = height() - (word_y - map_config.origin[1]) / map_config.resolution;
   }
   /**
    * @description: 获取带rgba颜色值的代价地图
@@ -208,6 +286,91 @@ class OccupancyMap {
       }
     }
     return res;
+  }
+  //保存地图到路径
+  void Save(std::string map_name) {
+    std::string mapdatafile = map_name + ".pgm";
+    printf("Writing map occupancy data to %s", mapdatafile.c_str());
+    FILE *out = fopen(mapdatafile.c_str(), "w");
+    if (!out) {
+      printf("Couldn't save map file to %s", mapdatafile.c_str());
+      return;
+    }
+
+    fprintf(out, "P5\n# CREATOR: map_saver.cpp %.3f m/pix\n%d %d\n255\n",
+            map_config.resolution, width(), height());
+    for (unsigned int y = 0; y < height(); y++) {
+      for (unsigned int x = 0; x < width(); x++) {
+        // unsigned int i = x + (height() - y - 1) * map->info.width;
+        if (map_data(y, x) >= 0 && map_data(y, x) <= map_config.free_thresh) {  // [0,free)
+          fputc(254, out);
+        } else if (map_data(y, x) >= map_config.occupied_thresh) {  // (occ,255]
+          fputc(000, out);
+        } else {  //occ [0.25,0.65]
+          fputc(205, out);
+        }
+      }
+    }
+
+    fclose(out);
+
+    std::string mapmetadatafile = map_name + ".yaml";
+    printf("Writing map occupancy data to %s", mapmetadatafile.c_str());
+
+    /*
+map_config.resolution: 0.100000
+origin: [0.000000, 0.000000, 0.000000]
+#
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+
+       */
+    map_config.image = map_name;
+    map_config.Save(mapmetadatafile);
+  }
+  void Load(const std::string &map_path, const std::string &yaml_path) {
+    //解析yaml
+    std::ifstream file(map_path);
+    if (file.is_open()) {
+      std::string line;
+      int width, height, maxVal;
+
+      // 读取 PGM 文件头信息
+      getline(file, line);      // 第一行是 "P5"，表示文件类型
+      getline(file, line);      // 第二行是注释，可以忽略
+      file >> width >> height;  // 第三行是宽度和高度
+      file >> maxVal;           // 第四行是最大像素值
+      //赋值行与列
+      rows = height;
+      cols = width;
+      LOG_INFO("reade from pgm width:" << width << " height:" << height << " maxVal:" << maxVal);
+      map_data = Eigen::MatrixXi(height, width);
+      // 读取地图数据
+      for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+          int8_t pixel = -2;
+          int8_t map_cell;
+          file >> pixel;
+          if (pixel == 0) {
+            map_cell = OCC_GRID_OCCUPIED;  //占用
+          } else if (pixel == 205) {
+            map_cell = OCC_GRID_UNKNOWN;
+          } else if (pixel == 254) {
+            map_cell = OCC_GRID_FREE;
+          } else {
+            map_cell = OCC_GRID_UNKNOWN;
+          }
+          map_data(i, j) = map_cell;
+        }
+      }
+      LOG_INFO("load map over");
+      file.close();
+    } else {
+      LOG_INFO("无法打开地图文件 " << map_path);
+    }
+    //解析yaml
+    map_config.Load(yaml_path);
   }
 };
 

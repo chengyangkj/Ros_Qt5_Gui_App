@@ -35,10 +35,21 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   line_cursor_ = QCursor(line_image, 0, line_image.height());
 }
 void SceneManager::LoadTopologyMap() {
+  OpenTopologyMap(Config::ConfigManager::Instacnce()
+                      ->GetRootConfig()
+                      .topology_map_config.map_name);
+}
+void SceneManager::OpenTopologyMap(const std::string &file_path) {
+  //删除原有点
+  for (auto point : topology_map_.points) {
+    auto display = FactoryDisplay::Instance()->GetDisplay(point.name);
+    if (display == nullptr) continue;
+    topology_map_.RemovePoint(display->GetDisplayName());
+    FactoryDisplay::Instance()->RemoveDisplay(display);
+    delete display;
+  }
   Config::ConfigManager::Instacnce()->ReadTopologyMap(
-      Config::ConfigManager::Instacnce()
-          ->GetRootConfig()
-          .topology_map_config.map_name,
+      file_path,
       topology_map_);
   for (auto &point : topology_map_.points) {
     auto goal_point =
@@ -335,6 +346,10 @@ void SceneManager::drawPoint(const QPointF &pose) {
   QPointF pose_map = map_ptr->mapFromScene(pose);
   map_ptr->DrawPoint(pose_map);
 }
-void SceneManager::SaveTopologyMap(const std::string &file_path) {}
+void SceneManager::SaveTopologyMap(const std::string &file_path) {
+  Config::ConfigManager::Instacnce()->WriteTopologyMap(
+      file_path + ".topology",
+      topology_map_);
+}
 SceneManager::~SceneManager() {}
 }  // namespace Display

@@ -5,6 +5,7 @@
 #include "display/manager/display_manager.h"
 #include <Eigen/Eigen>
 #include <QOpenGLWidget>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include "algorithm.h"
 #include "display/manager/scene_manager.h"
@@ -315,7 +316,48 @@ void DisplayManager::UpdateMap(OccupancyMap &) {
   emit signalPubMap(map_data_);
 }
 void DisplayManager::SaveMap(const std::string &save_path) {
-  
+  LOG_INFO("start save topology map")
+  scene_manager_ptr_->SaveTopologyMap(save_path);
+  LOG_INFO("start save occ map")
+  auto display_map_ = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+  auto map = display_map_->GetOccupancyMap();
+  map.Save(save_path);
+}
+void DisplayManager::OpenMap(const std::string &path) {
+  boost::filesystem::path filepath(path);
+  //文件夹
+  std::string directory = filepath.parent_path().string();
+  LOG_INFO("Directory: " << directory);
+
+  // 获取文件名（不包括后缀）
+  std::string filenameWithoutExtension = filepath.stem().string();
+  LOG_INFO("Filename without extension: " << filenameWithoutExtension);
+  // 获取后缀名
+  std::string extension = filepath.extension().string();
+  LOG_INFO("Extension: " << extension);
+
+  if (extension == ".topology") {
+    scene_manager_ptr_->OpenTopologyMap(path);
+  } else if (extension == ".pgm" || extension == ".yaml") {
+    std::string topology_path =
+        directory + "/" + filenameWithoutExtension + ".topology";
+    std::string pgm_path =
+        directory + "/" + filenameWithoutExtension + ".pgm";
+    std::string yaml_path =
+        directory + "/" + filenameWithoutExtension + ".yaml";
+    if (boost::filesystem::exists(topology_path)) {
+      scene_manager_ptr_->OpenTopologyMap(topology_path);
+    }
+    if (boost::filesystem::exists(pgm_path) && boost::filesystem::exists(yaml_path)) {
+      auto display_map = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+      OccupancyMap map;
+      map.Load(pgm_path, yaml_path);
+      display_map->UpdateData(map);
+      map.Save("./test.pgm");
+    } else {
+      LOG_ERROR("pgm or yaml not exit! path:" << directory + "/" + filenameWithoutExtension)
+    }
+  }
 }
 void DisplayManager::SetScaleBig() {
   FactoryDisplay::Instance()

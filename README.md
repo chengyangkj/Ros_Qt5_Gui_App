@@ -59,7 +59,7 @@
 | 3D图层显示                  | 🏷️    |      |
 | 相机图像显示                | 🏷️    |      |
 
-大家如果有什么有意思的界面/功能性需求,可以提在[此处](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29),也欢迎大家发起Merge Request一起参与项目建设
+大家如果有什么有意思的界面/功能性需求,可以提在[此处](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29),如有Bug请提在[issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues),必将尽快修复!请在也欢迎大家发起Merge Request一起参与项目建设~
 
 此仓库国内加速镜像链接:[gitee](https://gitee.com/chengyangkj/Ros_Qt5_Gui_App)
 
