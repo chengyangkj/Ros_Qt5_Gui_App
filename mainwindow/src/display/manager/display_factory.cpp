@@ -91,13 +91,8 @@ void FactoryDisplay::AddDisplay(VirtualDisplay *display,
   }
   scene_manager_ptr_->addItem(display);
 }
-void FactoryDisplay::FocusDisplay(const std::string &display_name) {
+void FactoryDisplay::SetFocusDisplay(const std::string &display_name) {
   focus_display_name_ = display_name;
-  auto display = GetDisplay(focus_display_name_);
-  if (display != nullptr) {
-    std::cout << "focus display:" << focus_display_name_ << std::endl;
-    viewer_ptr_->centerOn(display);
-  }
 }
 void FactoryDisplay::RemoveDisplay(const std::string &name) {
   auto iter = total_display_map_.find(name);
@@ -137,9 +132,9 @@ bool FactoryDisplay::GetMoveEnable(const std::string &display_name) {
  */
 void FactoryDisplay::Process() {
   // // focus on
-  // auto display = GetDisplay(focus_display_name_);
-  // if (display != nullptr) {
-  //   viewer_ptr_->centerOn(display);
-  // }
+  auto display = GetDisplay(focus_display_name_);
+  if (display != nullptr) {
+    viewer_ptr_->centerOn(display);
+  }
 }
 }  // namespace Display
