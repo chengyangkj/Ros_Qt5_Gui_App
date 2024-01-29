@@ -130,7 +130,6 @@ void VirtualDisplay::wheelEvent(QGraphicsSceneWheelEvent *event) {
             event->pos().y() * beforeScaleValue * 0.1);
   }
   update();
-  QGraphicsItem::wheelEvent(event);
 }
 void VirtualDisplay::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (!move_enable_) {
