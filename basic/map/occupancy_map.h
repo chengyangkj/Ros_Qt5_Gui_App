@@ -130,14 +130,12 @@ struct MapConfig {
   void Save(const std::string &filename) {
     std::ofstream file(filename);
     if (file.is_open()) {
-      YAML::Node node;
-      node["image"] = image;
-      node["resolution"] = resolution;
-      node["origin"] = origin;
-      node["negate"] = negate;
-      node["occupied_thresh"] = occupied_thresh;
-      node["free_thresh"] = free_thresh;
-      file << node;
+      file << "image: " << image << std::endl;
+      file << "resolution: " << resolution << std::endl;
+      file << "origin: [" << origin[0] << ", " << origin[1] << ", " << origin[2] << "]" << std::endl;
+      file << "negate: " << negate << std::endl;
+      file << "occupied_thresh: " << occupied_thresh << std::endl;
+      file << "free_thresh: " << free_thresh << std::endl;
       file.close();
       LOG_INFO("配置已成功写入到文件 " << filename);
     } else {
@@ -355,7 +353,9 @@ occupied_thresh: 0.65
 free_thresh: 0.196
 
        */
-    map_config.image = map_name;
+    boost::filesystem::path filepath(map_name);
+    std::string map_name_rel = filepath.stem().string();
+    map_config.image = "./" + map_name_rel + ".pgm";
     map_config.Save(mapmetadatafile);
   }
   bool Load(const std::string &yaml_path) {
