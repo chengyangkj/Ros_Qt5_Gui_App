@@ -351,7 +351,6 @@ void DisplayManager::OpenMap(const std::string &path) {
       OccupancyMap map;
       map.Load(pgm_path, yaml_path);
       display_map->UpdateData(map);
-      map.Save("./test.pgm");
     } else {
       LOG_ERROR("pgm or yaml not exit! path:" << directory + "/" + filenameWithoutExtension)
     }

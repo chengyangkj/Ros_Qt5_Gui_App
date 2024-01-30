@@ -62,6 +62,7 @@ struct MapConfig {
           if (std::getline(iss, value)) {
             // 移除值前后的空格
             value = value.substr(value.find_first_not_of(" "), value.find_last_not_of(" ") + 1);
+            std::cout << "value:" << value << std::endl;
 
             // 根据键解析对应的值
             if (key == "image") {
@@ -72,6 +73,9 @@ struct MapConfig {
               std::istringstream issOrigin(value);
               std::string originValue;
               while (std::getline(issOrigin, originValue, ',')) {
+                // 移除值前后的空格
+                originValue = originValue.substr(originValue.find_first_not_of(" "), originValue.find_last_not_of(" ") + 1);
+                std::cout << "origin value:" << originValue << std::endl;
                 origin.push_back(std::stod(originValue));
               }
             } else if (key == "negate") {
