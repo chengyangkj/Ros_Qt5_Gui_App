@@ -26,10 +26,11 @@
 #ifndef OCCUPANCY_MAP_H
 #define OCCUPANCY_MAP_H
 #include <Eigen/Dense>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
 #include "logger/logger.h"
-
+#include "yaml-cpp/yaml.h"
 #define OCC_GRID_UNKNOWN 0     //未知領域
 #define OCC_GRID_FREE 0        //free
 #define OCC_GRID_OCCUPIED 100  //占有領域
@@ -49,70 +50,94 @@ struct MapConfig {
     origin = ori;
     resolution = res;
   }
-  void Load(const std::string &filename) {
-    std::ifstream file(filename);
-    origin.clear();
-    if (file.is_open()) {
-      std::string line;
-      while (getline(file, line)) {
-        std::istringstream iss(line);
-        std::string key;
-        if (std::getline(iss, key, ':')) {
-          std::string value;
-          if (std::getline(iss, value)) {
-            // 移除值前后的空格
-            value = value.substr(value.find_first_not_of(" "), value.find_last_not_of(" ") + 1);
-            std::cout << "value:" << value << std::endl;
-
-            // 根据键解析对应的值
-            if (key == "image") {
-              image = value;
-            } else if (key == "resolution") {
-              resolution = std::stod(value);
-            } else if (key == "origin") {
-              std::istringstream issOrigin(value);
-              std::string originValue;
-              while (std::getline(issOrigin, originValue, ',')) {
-                // 移除值前后的空格
-                originValue = originValue.substr(originValue.find_first_not_of(" "), originValue.find_last_not_of(" ") + 1);
-                std::cout << "origin value:" << originValue << std::endl;
-                origin.push_back(std::stod(originValue));
-              }
-            } else if (key == "negate") {
-              negate = std::stoi(value);
-            } else if (key == "occupied_thresh") {
-              occupied_thresh = std::stod(value);
-            } else if (key == "free_thresh") {
-              free_thresh = std::stod(value);
-            }
-          }
-        }
-      }
-      LOG_INFO("Successfully loaded params from ");
-      LOG_INFO("image: " << image);
-      LOG_INFO("resolution: " << resolution);
-      LOG_INFO("origin: ");
-      for (auto &o : origin) {
-        LOG_INFO(o << " ");
-      }
-      LOG_INFO("negate: " << negate);
-      LOG_INFO("occupied_thresh: " << occupied_thresh);
-      LOG_INFO("free_thresh: " << free_thresh);
-
-      file.close();
-    } else {
-      LOG_INFO("无法打开文件 " << filename);
+  bool Load(const std::string &filename) {
+    std::ifstream fin(filename.c_str());
+    if (fin.fail()) {
+      LOG_ERROR("Map_server could not open " << filename.c_str());
+      return false;
     }
+    YAML::Node doc = YAML::Load(fin);
+    try {
+      resolution = doc["resolution"].as<double>();
+    } catch (YAML::InvalidScalar &) {
+      LOG_ERROR("The map does not contain a resolution tag or it is invalid.");
+      return false;
+    }
+    try {
+      negate = doc["negate"].as<int>();
+    } catch (YAML::InvalidScalar &) {
+      LOG_ERROR("The map does not contain a negate tag or it is invalid.");
+      return false;
+    }
+    try {
+      occupied_thresh = doc["occupied_thresh"].as<double>();
+    } catch (YAML::InvalidScalar &) {
+      LOG_ERROR("The map does not contain an occupied_thresh tag or it is invalid.");
+      return false;
+    }
+    try {
+      free_thresh = doc["free_thresh"].as<double>();
+    } catch (YAML::InvalidScalar &) {
+      LOG_ERROR("The map does not contain a free_thresh tag or it is invalid.");
+      return false;
+    }
+    //TODO support mode
+    // try {
+    //   std::string modeS = "";
+    //   doc["mode"] >> modeS;
+
+    //   if (modeS == "trinary")
+    //     mode = TRINARY;
+    //   else if (modeS == "scale")
+    //     mode = SCALE;
+    //   else if (modeS == "raw")
+    //     mode = RAW;
+    //   else {
+    //     LOG_ERROR("Invalid mode tag \"%s\".", modeS.c_str());
+    //     return false;
+    //   }
+    // } catch (YAML::Exception &) {
+    //   ROS_DEBUG("The map does not contain a mode tag or it is invalid... assuming Trinary");
+    //   mode = TRINARY;
+    // }
+    try {
+      origin = doc["origin"].as<std::vector<double>>();
+    } catch (YAML::InvalidScalar &) {
+      LOG_ERROR("The map does not contain an origin tag or it is invalid.");
+      return false;
+    }
+    try {
+      image = doc["image"].as<std::string>();
+      // TODO: make this path-handling more robust
+      if (image.size() == 0) {
+        LOG_ERROR("The image tag cannot be an empty string.");
+        return false;
+      }
+
+      boost::filesystem::path mapfpath(image);
+      if (!mapfpath.is_absolute()) {
+        boost::filesystem::path dir(filename);
+        dir = dir.parent_path();
+        mapfpath = dir / mapfpath;
+        image = mapfpath.string();
+      }
+    } catch (YAML::InvalidScalar &) {
+      LOG_ERROR("The map does not contain an image tag or it is invalid.");
+      return false;
+    }
+    return true;
   }
   void Save(const std::string &filename) {
     std::ofstream file(filename);
     if (file.is_open()) {
-      file << "image: " << image << std::endl;
-      file << "resolution: " << resolution << std::endl;
-      file << "origin: " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
-      file << "negate: " << negate << std::endl;
-      file << "occupied_thresh: " << occupied_thresh << std::endl;
-      file << "free_thresh: " << free_thresh << std::endl;
+      YAML::Node node;
+      node["image"] = image;
+      node["resolution"] = resolution;
+      node["origin"] = origin;
+      node["negate"] = negate;
+      node["occupied_thresh"] = occupied_thresh;
+      node["free_thresh"] = free_thresh;
+      file << node;
       file.close();
       LOG_INFO("配置已成功写入到文件 " << filename);
     } else {
@@ -333,9 +358,11 @@ free_thresh: 0.196
     map_config.image = map_name;
     map_config.Save(mapmetadatafile);
   }
-  void Load(const std::string &map_path, const std::string &yaml_path) {
+  bool Load(const std::string &yaml_path) {
     //解析yaml
-    std::ifstream file(map_path);
+    if (!map_config.Load(yaml_path)) return false;
+    //解析yaml
+    std::ifstream file(map_config.image);
     if (file.is_open()) {
       std::string line;
       int width, height, maxVal;
@@ -371,10 +398,10 @@ free_thresh: 0.196
       LOG_INFO("load map over");
       file.close();
     } else {
-      LOG_INFO("无法打开地图文件 " << map_path);
+      LOG_INFO("无法打开地图文件 " << map_config.image);
+      return true;
     }
-    //解析yaml
-    map_config.Load(yaml_path);
+    return true;
   }
 };
 

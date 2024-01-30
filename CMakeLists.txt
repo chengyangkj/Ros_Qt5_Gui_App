@@ -29,6 +29,7 @@ set(BUILD_STATIC TRUE)
 set(BUILD_EXAMPLES OFF)
 add_subdirectory(3rdpart/dockWidget)
 add_subdirectory(3rdpart/JsonStruct)
+add_subdirectory(3rdpart/yaml-cpp)
 # modules
 add_subdirectory(common)
 add_subdirectory(basic)
