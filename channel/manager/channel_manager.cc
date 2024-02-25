@@ -1,4 +1,5 @@
 #include "channel_manager.h"
+#include <boost/dll.hpp>
 
 #include <iostream>
 namespace fs = boost::filesystem;
@@ -18,7 +19,7 @@ bool ChannelManager::OpenChannelAuto() {
 std::vector<std::string> ChannelManager::DiscoveryAllChannel() {
   std::vector<std::string> res;
 
-  std::string libDir = "./lib/";
+  std::string libDir = boost::dll::program_location().parent_path().string() + "/lib/";
 
   for (fs::directory_entry &entry : fs::directory_iterator(libDir)) {
     if (fs::is_regular_file(entry.path())) {
