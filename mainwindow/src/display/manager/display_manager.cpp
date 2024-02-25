@@ -336,7 +336,7 @@ void DisplayManager::OpenMap(const std::string &path) {
 
   if (extension == ".topology") {
     scene_manager_ptr_->OpenTopologyMap(path);
-  } else if (extension == ".pgm" || extension == ".yaml") {
+  } else if (extension == ".yaml") {
     std::string topology_path =
         directory + "/" + filenameWithoutExtension + ".topology";
     std::string pgm_path =
@@ -346,12 +346,11 @@ void DisplayManager::OpenMap(const std::string &path) {
     if (boost::filesystem::exists(topology_path)) {
       scene_manager_ptr_->OpenTopologyMap(topology_path);
     }
-    if (boost::filesystem::exists(pgm_path) && boost::filesystem::exists(yaml_path)) {
-      auto display_map = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+    if (boost::filesystem::exists(yaml_path)) {
       OccupancyMap map;
-      map.Load(pgm_path, yaml_path);
-      display_map->UpdateData(map);
-      map.Save("./test.pgm");
+      bool ret = map.Load(yaml_path);
+      LOG_INFO("open map ret:" << ret);
+      UpdateDisplay(DISPLAY_MAP, map);
     } else {
       LOG_ERROR("pgm or yaml not exit! path:" << directory + "/" + filenameWithoutExtension)
     }

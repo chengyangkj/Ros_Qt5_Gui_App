@@ -75,8 +75,8 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
       std::map<std::string, std::string> map =
           std::any_cast<std::map<std::string, std::string>>(data);
       this->SlotSetBatteryStatus(std::stod(map["percent"]),
-                                               std::stod(map["voltage"]));
-      
+                                 std::stod(map["voltage"]));
+
     } break;
     default:
       break;
@@ -597,9 +597,9 @@ void MainWindow::setupUi() {
   });
   connect(open_map_btn, &QToolButton::clicked, [this]() {
     QStringList filters;
-    filters << "地图(*.pgm)"
-            << "拓扑地图(*.topology)"
-            << "地图配置(*.yaml)";
+    filters
+        << "地图(*.yaml)"
+        << "拓扑地图(*.topology)";
 
     QString fileName = QFileDialog::getOpenFileName(nullptr, "OPen Map files",
                                                     "", filters.join(";;"));
