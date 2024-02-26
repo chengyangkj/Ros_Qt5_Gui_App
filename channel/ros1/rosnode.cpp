@@ -20,6 +20,7 @@ RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
   SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
+  SET_DEFAULT_TOPIC_NAME("MoveBaseStatus", "/move_base/status")
   std::cout << "ros node start" << std::endl;
 }
 basic::RobotPose Convert(const geometry_msgs::Pose &pose) {
@@ -50,7 +51,7 @@ bool RosNode::Start() {
   int argc = 0;
   ros::init(argc, nullptr, "ros_qt5_gui_app", ros::init_options::AnonymousName);
   while (!ros::master::check()) {
-    std::cout << "wait ros master........" << std::endl;
+    LOG_ERROR("wait ros master........");
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
   }
   ros::start();
@@ -85,6 +86,8 @@ void RosNode::init() {
                                       &RosNode::OdometryCallback, this);
   battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Battery"), 1,
                                      &RosNode::BatteryCallback, this);
+  // move_base_status_subscriber_ = nh.subscribe(GET_TOPIC_NAME("MoveBaseStatus"), 1,
+  //                                             &RosNode::BatteryCallback, this);
   tf_listener_ = new tf::TransformListener();
 }
 bool RosNode::Stop() {
@@ -93,27 +96,27 @@ bool RosNode::Stop() {
 }
 void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
   switch (msg_id) {
-  case MsgId::kSetNavGoalPose: {
-    auto pose = std::any_cast<basic::RobotPose>(msg);
-    std::cout << "recv nav goal pose:" << pose << std::endl;
+    case MsgId::kSetNavGoalPose: {
+      auto pose = std::any_cast<basic::RobotPose>(msg);
+      std::cout << "recv nav goal pose:" << pose << std::endl;
 
-    PubNavGoal(pose);
+      PubNavGoal(pose);
 
-  } break;
-  case MsgId::kSetRelocPose: {
-    auto pose = std::any_cast<basic::RobotPose>(msg);
-    std::cout << "recv reloc pose:" << pose << std::endl;
-    PubRelocPose(pose);
+    } break;
+    case MsgId::kSetRelocPose: {
+      auto pose = std::any_cast<basic::RobotPose>(msg);
+      std::cout << "recv reloc pose:" << pose << std::endl;
+      PubRelocPose(pose);
 
-  } break;
-  case MsgId::kSetRobotSpeed: {
-    auto speed = std::any_cast<basic::RobotSpeed>(msg);
-    std::cout << "recv speed pose:" << speed << std::endl;
-    PubRobotSpeed(speed);
+    } break;
+    case MsgId::kSetRobotSpeed: {
+      auto speed = std::any_cast<basic::RobotSpeed>(msg);
+      std::cout << "recv speed pose:" << speed << std::endl;
+      PubRobotSpeed(speed);
 
-  } break;
-  default:
-    break;
+    } break;
+    default:
+      break;
   }
 }
 void RosNode::BatteryCallback(sensor_msgs::BatteryState::ConstPtr battery) {
@@ -122,8 +125,10 @@ void RosNode::BatteryCallback(sensor_msgs::BatteryState::ConstPtr battery) {
   map["voltage"] = std::to_string(battery->voltage);
   OnDataCallback(MsgId::kBatteryState, map);
 }
-void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
+// void RosNode::MbStatusCallback(actionlib_msgs::GoalStatusArray::ConstPtr msg) {
 
+// }
+void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
   basic::RobotState state =
       static_cast<basic::RobotState>(Convert(msg->pose.pose));
   state.vx = (double)msg->twist.twist.linear.x;
@@ -302,9 +307,9 @@ void RosNode::PubRelocPose(const RobotPose &pose) {
   geo_pose.header.stamp = ros::Time(0);
   geo_pose.pose.pose.position.x = pose.x;
   geo_pose.pose.pose.position.y = pose.y;
-  geometry_msgs::Quaternion q; // 初始化四元数（geometry_msgs类型）
+  geometry_msgs::Quaternion q;  // 初始化四元数（geometry_msgs类型）
   q = tf::createQuaternionMsgFromRollPitchYaw(
-      0, 0, pose.theta); // 欧拉角转四元数（geometry_msgs::Quaternion）
+      0, 0, pose.theta);  // 欧拉角转四元数（geometry_msgs::Quaternion）
   geo_pose.pose.pose.orientation = q;
   reloc_pose_publisher_.publish(geo_pose);
 }
@@ -314,9 +319,9 @@ void RosNode::PubNavGoal(const RobotPose &pose) {
   geo_pose.header.stamp = ros::Time(0);
   geo_pose.pose.position.x = pose.x;
   geo_pose.pose.position.y = pose.y;
-  geometry_msgs::Quaternion q; // 初始化四元数（geometry_msgs类型）
+  geometry_msgs::Quaternion q;  // 初始化四元数（geometry_msgs类型）
   q = tf::createQuaternionMsgFromRollPitchYaw(
-      0, 0, pose.theta); // 欧拉角转四元数（geometry_msgs::Quaternion）
+      0, 0, pose.theta);  // 欧拉角转四元数（geometry_msgs::Quaternion）
   geo_pose.pose.orientation = q;
   nav_goal_publisher_.publish(geo_pose);
 }
@@ -360,9 +365,8 @@ basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
     ret.theta = yaw;
 
   } catch (tf2::TransformException &ex) {
-
-    // LOG_ERROR("getTrasnsform error from:" << from << " to:" << to
-    //                                          << " error:" << ex.what());
+    LOG_ERROR("getTrasnsform error from:" << from << " to:" << to
+                                          << " error:" << ex.what());
   }
   return ret;
 }
