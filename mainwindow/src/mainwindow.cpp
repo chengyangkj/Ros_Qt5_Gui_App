@@ -491,10 +491,11 @@ void MainWindow::setupUi() {
   QPushButton *btn_add_one_goal = new QPushButton("Add Point");
   QHBoxLayout *horizontalLayout_15 = new QHBoxLayout();
   QPushButton *btn_start_task_chain = new QPushButton("Start Task Chain");
+  QCheckBox *loop_task_checkbox = new QCheckBox("Loop Task");
   QHBoxLayout *horizontalLayout_14 = new QHBoxLayout();
   horizontalLayout_15->addWidget(btn_add_one_goal);
   horizontalLayout_14->addWidget(btn_start_task_chain);
-
+  horizontalLayout_14->addWidget(loop_task_checkbox);
   QPushButton *btn_load_task_chain = new QPushButton("Load Task Chain");
   QPushButton *btn_save_task_chain = new QPushButton("Save Task Chain");
   QHBoxLayout *horizontalLayout_16 = new QHBoxLayout();
@@ -546,10 +547,10 @@ void MainWindow::setupUi() {
       btn_add_one_goal, &QPushButton::clicked,
       [this, nav_goal_list_dock_widget]() { nav_goal_table_view_->AddItem(); });
   connect(btn_start_task_chain, &QPushButton::clicked,
-          [this, btn_start_task_chain]() {
+          [this, btn_start_task_chain, loop_task_checkbox]() {
             if (btn_start_task_chain->text() == "Start Task Chain") {
               btn_start_task_chain->setText("Stop Task Chain");
-              nav_goal_table_view_->StartTaskChain();
+              nav_goal_table_view_->StartTaskChain(loop_task_checkbox->isChecked());
             } else {
               btn_start_task_chain->setText("Start Task Chain");
               nav_goal_table_view_->StopTaskChain();

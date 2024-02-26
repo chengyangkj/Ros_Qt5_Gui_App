@@ -80,36 +80,39 @@ void NavGoalTableView::AddItem() {
   setIndexWidget(table_model_->index(row, 2), button_remove);
   setIndexWidget(table_model_->index(row, 3), button_run);
 }
-void NavGoalTableView::StartTaskChain() {
+void NavGoalTableView::StartTaskChain(bool is_loop) {
   is_task_chain_running_ = true;
-  QtConcurrent::run([this]() {
-    for (int row = 0; row < table_model_->rowCount(); ++row) {
-      QComboBox *comboBoxName =
-          static_cast<QComboBox *>(indexWidget(model()->index(row, 0)));
-      QLabel *label_status =
-          static_cast<QLabel *>(indexWidget(model()->index(row, 1)));
-      label_status->setText("Running");
-      TopologyMap::PointInfo point =
-          topologyMap_.GetPoint(comboBoxName->currentText().toStdString());
-      if (point.name == "") {
-        label_status->setText("Point Not Found!");
-        continue;
-      }
-      RobotPose target_pose = point.ToRobotPose();
-      emit signalSendNavGoal(target_pose);
-      RobotPose diff = absoluteDifference(target_pose, robot_pose_);
-      while (diff.mod() > 0.2 || fabs(diff.theta) > deg2rad(15)) {
-        LOG_INFO("Task chain is running diff:" << diff << " mode:" << diff.mod() << " deg:" << rad2deg(fabs(diff.theta)));
-        diff = absoluteDifference(target_pose, robot_pose_);
-        if (!is_task_chain_running_) {
-          emit signalTaskFinish();
-          LOG_INFO("Task chain is stopped");
-          return;
+  QtConcurrent::run([this, is_loop]() {
+    do {
+      for (int row = 0; row < table_model_->rowCount(); ++row) {
+        QComboBox *comboBoxName =
+            static_cast<QComboBox *>(indexWidget(model()->index(row, 0)));
+        QLabel *label_status =
+            static_cast<QLabel *>(indexWidget(model()->index(row, 1)));
+        label_status->setText("Running");
+        TopologyMap::PointInfo point =
+            topologyMap_.GetPoint(comboBoxName->currentText().toStdString());
+        if (point.name == "") {
+          label_status->setText("Point Not Found!");
+          continue;
         }
-        QThread::msleep(100);
+        RobotPose target_pose = point.ToRobotPose();
+        emit signalSendNavGoal(target_pose);
+        RobotPose diff = absoluteDifference(target_pose, robot_pose_);
+        while (diff.mod() > 0.2 || fabs(diff.theta) > deg2rad(15)) {
+          LOG_INFO("Task chain is running diff:" << diff << " mode:" << diff.mod() << " deg:" << rad2deg(fabs(diff.theta)));
+          diff = absoluteDifference(target_pose, robot_pose_);
+          if (!is_task_chain_running_) {
+            emit signalTaskFinish();
+            LOG_INFO("Task chain is stopped");
+            return;
+          }
+          QThread::msleep(100);
+        }
+        label_status->setText("Finish");
       }
-      label_status->setText("Finish");
-    }
+    } while (is_loop);
+
     LOG_INFO("Task chain is finished");
     emit signalTaskFinish();
   });
