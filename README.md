@@ -56,10 +56,10 @@
 | 机器人导航任务链            | ✅    |      |
 | 地图加载                    | ✅    |      |
 | 地图保存                    | ✅    |      |
-| 基于protobuf的通信          | 🏷️    |      |
+| 基于rosbridge的通信          | ✍    |      |
 | 鹰眼视图                    | 🏷️    |      |
 | 3D图层显示                  | 🏷️    |      |
-| 相机图像显示                | 🏷️    |      |
+| 相机图像显示                | ✍    |      |
 | 拓扑点位的路径规划                | 🏷️    |      |
 大家如果有什么有意思的界面/功能性需求,可以提在[此处](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29),如有Bug请提在[issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues),必将尽快修复!请在也欢迎大家发起Merge Request一起参与项目建设~
 
@@ -209,7 +209,11 @@ cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 
 # 三,IDE配置说明(QtCreator/Vscode)
 
-==此部分为针对新手做的温馨提示,如果你已经是一个ROS/C++/Qt老手,可以跳过此部分==
+```
+
+💡 此部分为针对新手做的温馨提示,如果你已经是一个ROS/C++/Qt老手,可以跳过此部分
+
+```
 
 很多ROS初学者学习Qt都存在一个误区:拼命的去下载QtCreator,如果QtCreator有问题安装失败,就卡在这,影响学习进度,但是其实QtCreator与Vscode一样,可以把他当作一个纯文本编辑器.
 实际上Ubuntu系统默认都自带的有Qt库,就比如前面的[3,编译项目](#3编译项目),并没有要求安装QtCreator,只需要使用apt-get安装一些系统缺失的,没有默认安装的qt库,就能正常编译通过
