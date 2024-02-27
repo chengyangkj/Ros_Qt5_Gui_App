@@ -121,16 +121,16 @@
 ```
 sudo chmod a+x ./ros_qt5_gui_app
 ./ros_qt5_gui_app
-
 ```
 如果Release版本下载后使用不了，可以参考[二,编译](#二编译)进行自行编译使用
 
 # 二,编译
 
 
-注意，为了保证此项目同时兼容ROS1与ROS2，此项目不使用ROS1/ROS2的catkin_make/colcon构建系统进行够建，而是使用标准CMake进行构建，这也就意味着，本项目不会被ROS自动识别为功能包
+```
+💡 注意，为了保证此项目同时兼容ROS1与ROS2，此项目不使用ROS1/ROS2的catkin_make/colcon构建系统进行够建，而是使用标准CMake进行构建，这也就意味着，本项目不会被ROS自动识别为功能包
 可以参考以下教程从0开始构建/运行此项目:
-
+```
 ## 1,环境安装 
 
 理论上只需要安装如下基础包就可以编译此项目:
@@ -144,7 +144,6 @@ sudo apt-get install qtbase5-private-dev libqt5svg5-dev -y
 
 ```
 sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev qtbase5-private-dev libeigen3-dev libgtest-dev -y
-
 ```
 
 ## 2,克隆/下载本项目:
@@ -210,9 +209,7 @@ cd ~/qt_ws/ROS2_Qt5_Gui_App/build
 # 三,IDE配置说明(QtCreator/Vscode)
 
 ```
-
 💡 此部分为针对新手做的温馨提示,如果你已经是一个ROS/C++/Qt老手,可以跳过此部分
-
 ```
 
 很多ROS初学者学习Qt都存在一个误区:拼命的去下载QtCreator,如果QtCreator有问题安装失败,就卡在这,影响学习进度,但是其实QtCreator与Vscode一样,可以把他当作一个纯文本编辑器.
@@ -276,7 +273,9 @@ qtcretor
 
 ### 4.1,多机通信配置
 
-针对于ROS新手的温馨提示:此项配置,如果是单机使用即本软件运行在机器人身上,没有跨机器使用就不用配置，直接跳过即可.如果需要将本软件运行在自己的笔记本上,去连接远程的机器人的情况下需要进行配置
+```
+💡 针对于ROS新手的温馨提示:此项配置,如果是单机使用即本软件运行在机器人身上,没有跨机器使用就不用配置，直接跳过即可.如果需要将本软件运行在自己的笔记本上,去连接远程的机器人的情况下需要进行配置
+```
 
 ROS1/ROS2的多机通信完全依赖ROS原生(环境变量添加ROS_MASTER_URI与ROS_IP/ROS_DOMAINID),不再由用户手动指定,减轻新手使用负担
 
