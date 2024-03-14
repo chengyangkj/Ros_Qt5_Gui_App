@@ -69,8 +69,8 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
   current_mode_ = mode;
   switch (mode) {
     case kStartEdit:
-      view_ptr_->setCursor(Qt::ArrowCursor);
-
+      view_ptr_->setCursor(Qt::OpenHandCursor);
+      SetPointMoveEnable(true);
       //动态图层不可见
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(false);
