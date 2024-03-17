@@ -6,10 +6,10 @@
  * @LastEditTime: 2023-10-15 02:49:39
  * @FilePath: ////src/display/robot_map.cpp
  */
+#include "display/display_occ_map.h"
+#include <QtConcurrent>
 #include <algorithm>
 #include <iostream>
-
-#include "display/display_occ_map.h"
 namespace Display {
 DisplayOccMap::DisplayOccMap(const std::string &display_type,
                              const int &z_value, std::string parent_name)
@@ -28,8 +28,7 @@ bool DisplayOccMap::UpdateData(const std::any &data) {
   }
 
   ParseOccupyMap();
-  SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
-  update();
+
   // std::cout << "map update calling:" << map_image_.width() << " "
   //           << map_image_.height() << std::endl;
   return true;
@@ -76,29 +75,34 @@ void DisplayOccMap::paint(QPainter *painter,
   painter->drawImage(0, 0, map_image_);
 }
 void DisplayOccMap::ParseOccupyMap() {
-  // Eigen::matrix 坐标系与QImage坐标系不同,这里行列反着遍历
-  map_image_ = QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_RGB32);
-  QVector<QPointF> points;
-  //QImage坐标系
-  // **************x
-  // *
-  // *
-  // *
-  // y
+  QtConcurrent::run([this]() {
+    // Eigen::matrix 坐标系与QImage坐标系不同,这里行列反着遍历
+    map_image_ = QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_RGB32);
+    QVector<QPointF> points;
+    //QImage坐标系
+    // **************x
+    // *
+    // *
+    // *
+    // y
 
-  for (int i = 0; i < map_data_.Cols(); i++)
-    for (int j = 0; j < map_data_.Rows(); j++) {
-      double map_value = map_data_(j, i);
-      QColor color;
-      if (map_value > 0) {
-        color = Qt::black;  // black
-      } else if (map_value < 0) {
-        color = Qt::gray;  // gray
-      } else {
-        color = Qt::white;  // white
+    for (int i = 0; i < map_data_.Cols(); i++)
+      for (int j = 0; j < map_data_.Rows(); j++) {
+        double map_value = map_data_(j, i);
+        QColor color;
+        if (map_value > 0) {
+          color = Qt::black;  // black
+        } else if (map_value < 0) {
+          color = Qt::gray;  // gray
+        } else {
+          color = Qt::white;  // white
+        }
+        map_image_.setPixel(i, j, color.rgb());
       }
-      map_image_.setPixel(i, j, color.rgb());
-    }
+
+    SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
+    update();
+  });
 }
 void DisplayOccMap::EraseMapRange(const QPointF &pose, double range) {
   float x = pose.x();
