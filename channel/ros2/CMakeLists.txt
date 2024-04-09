@@ -11,6 +11,7 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_kdl REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread)
 add_library(${TARGET_NAME} SHARED
     ${SOURCE_FILE} 
@@ -22,7 +23,7 @@ PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-ament_target_dependencies(${TARGET_NAME} PUBLIC rclcpp  Boost nav_msgs tf2 tf2_geometry_msgs  tf2_ros sensor_msgs tf2_kdl )
+ament_target_dependencies(${TARGET_NAME} PUBLIC rclcpp  Boost nav_msgs tf2 tf2_geometry_msgs  tf2_ros sensor_msgs tf2_kdl cv_bridge )
 target_link_libraries(${TARGET_NAME} 
 PUBLIC
 basic

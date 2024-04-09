@@ -10,6 +10,7 @@
 #include "mainwindow.h"
 #include <QDebug>
 #include <iostream>
+#include <opencv2/opencv.hpp>
 #include "AutoHideDockContainer.h"
 #include "DockAreaTabBar.h"
 #include "DockAreaTitleBar.h"
@@ -20,6 +21,7 @@
 #include "algorithm.h"
 #include "logger/logger.h"
 #include "ui_mainwindow.h"
+
 #include "widgets/speed_ctrl.h"
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
@@ -78,10 +80,20 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
                                  std::stod(map["voltage"]));
 
     } break;
+    case MsgId::kImage: {
+      auto location_to_mat = std::any_cast<std::pair<std::string, cv::Mat>>(data);
+      this->SlotRecvImage(location_to_mat.first, location_to_mat.second);
+    } break;
     default:
       break;
   }
   display_manager_->UpdateTopicData(id, data);
+}
+void MainWindow::SlotRecvImage(const std::string &location, cv::Mat data) {
+  static std::mutex mutex_;
+  if (image_widget_map_.count(location)) {
+    image_widget_map_[location]->UpdateImage(data);
+  }
 }
 void MainWindow::SendChannelMsg(const MsgId &id, const std::any &data) {
   channel_manager_.SendMessage(id, data);
@@ -453,8 +465,8 @@ void MainWindow::setupUi() {
   center_widget->setLayout(center_layout);
   CDockWidget *CentralDockWidget = new CDockWidget("CentralWidget");
   CentralDockWidget->setWidget(center_widget);
-  auto *CentralDockArea = dock_manager_->setCentralWidget(CentralDockWidget);
-  CentralDockArea->setAllowedAreas(DockWidgetArea::OuterDockAreas);
+  center_docker_area_ = dock_manager_->setCentralWidget(CentralDockWidget);
+  center_docker_area_->setAllowedAreas(DockWidgetArea::OuterDockAreas);
 
   //////////////////////////////////////////////////////////速度仪表盘
   ads::CDockWidget *DashBoardDockWidget = new ads::CDockWidget("DashBoard");
@@ -464,7 +476,7 @@ void MainWindow::setupUi() {
   speed_dash_board_ = new DashBoard(speed_dashboard_widget);
   auto dashboard_area =
       dock_manager_->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea,
-                                   DashBoardDockWidget, CentralDockArea);
+                                   DashBoardDockWidget, center_docker_area_);
   ui->menuView->addAction(DashBoardDockWidget->toggleViewAction());
 
   ////////////////////////////////////////////////////////速度控制
@@ -511,8 +523,8 @@ void MainWindow::setupUi() {
   nav_goal_list_dock_widget->setMinimumSize(200, 150);
   nav_goal_list_dock_widget->setMaximumSize(480, 9999);
   dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
-                               nav_goal_list_dock_widget, CentralDockArea);
-  nav_goal_list_dock_widget->toggleView(true);
+                               nav_goal_list_dock_widget, center_docker_area_);
+  nav_goal_list_dock_widget->toggleView(false);
   connect(nav_goal_table_view_, &NavGoalTableView::signalSendNavGoal,
           [this](const RobotPose &pose) {
             SendChannelMsg(MsgId::kSetNavGoalPose, pose);
@@ -569,6 +581,22 @@ void MainWindow::setupUi() {
       SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)),
       nav_goal_table_view_,
       SLOT(UpdateSelectPoint(const TopologyMap::PointInfo &)));
+
+  //////////////////////////////////////////////////////图片
+
+  for (auto one_image : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
+    LOG_INFO("init image window location:" << one_image.location << " topic:" << one_image.topic);
+    image_widget_map_[one_image.location] = new ImageWidget();
+    ads::CDockWidget *dock_widget = new ads::CDockWidget(std::string("image/" + one_image.location).c_str());
+    dock_widget->setWidget(image_widget_map_[one_image.location]);
+
+    dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
+                                 dock_widget,
+                                 center_docker_area_);
+    dock_widget->toggleView(true);
+    ui->menuView->addAction(dock_widget->toggleViewAction());
+  }
+
   //////////////////////////////////////////////////////槽链接
 
   connect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
@@ -652,9 +680,12 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   // Delete dock manager here to delete all floating widgets. This ensures
   // that all top level windows of the dock manager are properly closed
   // write state
+
+  channel_manager_.CloseChannel();
   SaveState();
   dock_manager_->deleteLater();
   QMainWindow::closeEvent(event);
+  LOG_INFO("ros qt5 gui app close!");
 }
 void MainWindow::SaveState() {
   QSettings settings("state.ini", QSettings::IniFormat);

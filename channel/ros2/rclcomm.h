@@ -9,7 +9,9 @@
  */
 #ifndef RCLCOMM_H
 #define RCLCOMM_H
+#include "sensor_msgs/msg/image.hpp"
 
+#include <cv_bridge/cv_bridge.h>
 #include <rclcpp/rclcpp.hpp>
 #include "algorithm.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
@@ -73,6 +75,7 @@ class rclcomm : public VirtualChannelNode {
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr local_path_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr global_path_subscriber_;
+  std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> image_subscriber_list_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> transform_listener_;
   std::shared_ptr<rclcpp::Node> node;

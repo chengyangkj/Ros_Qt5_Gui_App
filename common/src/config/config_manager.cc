@@ -38,7 +38,11 @@ void ConfigManager::Init(const std::string &config_path) {
   }
   ReadRootConfig();
 }
-ConfigManager::~ConfigManager() {}
+ConfigManager::~ConfigManager() {
+  std::string pretty_json = JS::serializeStruct(config_root_);
+
+  writeStringToFile(config_path_, pretty_json);
+}
 bool ConfigManager::ReadRootConfig() {
   std::lock_guard<std::mutex> lock(mutex_);
   std::ifstream file(config_path_);

@@ -7,9 +7,9 @@
  * @Description: ros2通讯类
  */
 #include "rclcomm.h"
+#include <fstream>
 #include "config/config_manager.h"
 #include "logger/logger.h"
-#include <fstream>
 rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME("NavGoal", "/goal_pose")
   SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
@@ -22,6 +22,12 @@ rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
   SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
+  if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
+    Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
+        Config::ImageDisplayConfig{.location = "front",
+                                   .topic = "/camera/front/image_raw",
+                                   .enable = true});
+  }
 }
 bool rclcomm::Start() {
   rclcpp::init(0, nullptr);
@@ -64,6 +70,7 @@ bool rclcomm::Start() {
           std::bind(&rclcomm::globalCostMapCallback, this,
                     std::placeholders::_1),
           sub1_obt);
+
   laser_scan_subscriber_ =
       node->create_subscription<sensor_msgs::msg::LaserScan>(
           GET_TOPIC_NAME("LaserScan"), 20,
@@ -86,6 +93,62 @@ bool rclcomm::Start() {
       GET_TOPIC_NAME("Odometry"), 20,
       std::bind(&rclcomm::odom_callback, this, std::placeholders::_1),
       sub1_obt);
+  for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
+    LOG_INFO("image location:" << one_image_display.location << "topic:" << one_image_display.topic);
+    image_subscriber_list_.emplace_back(
+        node->create_subscription<sensor_msgs::msg::Image>(
+            one_image_display.topic, 1, [this, one_image_display](const sensor_msgs::msg::Image::SharedPtr msg) {
+              cv::Mat conversion_mat_;
+              try {
+                // 深拷贝转换为opencv类型
+                cv_bridge::CvImageConstPtr cv_ptr = cv_bridge::toCvShare(
+                    msg, sensor_msgs::image_encodings::RGB8);
+                conversion_mat_ = cv_ptr->image;
+              } catch (cv_bridge::Exception &e) {
+                try {
+                  cv_bridge::CvImageConstPtr cv_ptr = cv_bridge::toCvShare(msg);
+                  if (msg->encoding == "CV_8UC3") {
+                    // assuming it is rgb
+                    conversion_mat_ = cv_ptr->image;
+                  } else if (msg->encoding == "8UC1") {
+                    // convert gray to rgb
+                    cv::cvtColor(cv_ptr->image, conversion_mat_, CV_GRAY2RGB);
+                  } else if (msg->encoding == "16UC1" ||
+                             msg->encoding == "32FC1") {
+                    double min = 0;
+                    double max = 10;
+                    if (msg->encoding == "16UC1") max *= 1000;
+                    // if (ui_.dynamic_range_check_box->isChecked()) {
+                    //   // dynamically adjust range based on min/max in image
+                    //   cv::minMaxLoc(cv_ptr->image, &min, &max);
+                    //   if (min == max) {
+                    //     // completely homogeneous images are displayed in gray
+                    //     min = 0;
+                    //     max = 2;
+                    //   }
+                    // }
+                    cv::Mat img_scaled_8u;
+                    cv::Mat(cv_ptr->image - min).convertTo(img_scaled_8u, CV_8UC1, 255. / (max - min));
+                    cv::cvtColor(img_scaled_8u, conversion_mat_, CV_GRAY2RGB);
+                  } else {
+                    LOG_ERROR("image from " << msg->encoding
+                                            << " to 'rgb8' an exception was thrown (%s)"
+                                            << e.what());
+                    return;
+                  }
+                } catch (cv_bridge::Exception &e) {
+                  LOG_ERROR(
+                      "image from "
+                      << msg->encoding
+                      << " to 'rgb8' an exception was thrown (%s)" << e.what());
+
+                  return;
+                }
+              }
+              OnDataCallback(MsgId::kImage, std::pair<std::string, cv::Mat>(one_image_display.location, conversion_mat_));
+            }));
+  }
+
   tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node->get_clock());
   transform_listener_ =
       std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
@@ -98,27 +161,27 @@ bool rclcomm::Stop() {
 }
 void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
   switch (msg_id) {
-  case MsgId::kSetNavGoalPose: {
-    auto pose = std::any_cast<basic::RobotPose>(msg);
-    std::cout << "recv nav goal pose:" << pose << std::endl;
+    case MsgId::kSetNavGoalPose: {
+      auto pose = std::any_cast<basic::RobotPose>(msg);
+      std::cout << "recv nav goal pose:" << pose << std::endl;
 
-    PubNavGoal(pose);
+      PubNavGoal(pose);
 
-  } break;
-  case MsgId::kSetRelocPose: {
-    auto pose = std::any_cast<basic::RobotPose>(msg);
-    std::cout << "recv reloc pose:" << pose << std::endl;
-    PubRelocPose(pose);
+    } break;
+    case MsgId::kSetRelocPose: {
+      auto pose = std::any_cast<basic::RobotPose>(msg);
+      std::cout << "recv reloc pose:" << pose << std::endl;
+      PubRelocPose(pose);
 
-  } break;
-  case MsgId::kSetRobotSpeed: {
-    auto speed = std::any_cast<basic::RobotSpeed>(msg);
-    std::cout << "recv reloc pose:" << speed << std::endl;
-    PubRobotSpeed(speed);
+    } break;
+    case MsgId::kSetRobotSpeed: {
+      auto speed = std::any_cast<basic::RobotSpeed>(msg);
+      std::cout << "recv reloc pose:" << speed << std::endl;
+      PubRobotSpeed(speed);
 
-  } break;
-  default:
-    break;
+    } break;
+    default:
+      break;
   }
 }
 void rclcomm::BatteryCallback(
@@ -158,7 +221,6 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     ret.theta = yaw;
 
   } catch (tf2::TransformException &ex) {
-
     LOG_ERROR("getTrasnsform error from:" << from << " to:" << to
                                           << " error:" << ex.what());
   }

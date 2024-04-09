@@ -15,10 +15,18 @@ struct TopologyMapConfig {
   std::string map_name = "./default_topology_map.json";
   JS_OBJ(map_name);
 };
+struct ImageDisplayConfig {
+  std::string location;
+  std::string topic;
+  bool enable = true;
+
+  JS_OBJ(location, topic, enable);
+};
 struct ConfigRoot {
   std::vector<DisplayConfig> display_config;
   TopologyMapConfig topology_map_config;
-  JS_OBJ(display_config, topology_map_config);
+  std::vector<ImageDisplayConfig> images;
+  JS_OBJ(display_config, images, topology_map_config);
 };
 
 }  // namespace Config

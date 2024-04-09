@@ -102,7 +102,8 @@ topology_map_config
 }
 ```
 
-### 拓扑地图名
+
+### 10，拓扑地图名
 
 软件初始化时会读取此配置，用于加载/保存拓扑地图
 
@@ -116,3 +117,25 @@ topology_map_config
 ```
 拓扑地图包含以下信息：
  - 导航目标点
+  
+### 11，机器人图片显示
+
+软件移植了rqt image view的图片显示功能,支持实时显示多路机器人相机图片,在配置中配置话题名
+软件默认配置front的图片类型，根据自己需要进行添加或删除
+
+```
+
+  "images": [
+    {
+      "location": "front",
+      "topic": "/camera/rgb/image_raw",
+      "enable": true
+    },
+    {
+      "location": "front/depth",
+      "topic": "/camera/depth/image_raw",
+      "enable": true
+    }
+  ],
+
+```

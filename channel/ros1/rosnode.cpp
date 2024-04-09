@@ -21,6 +21,12 @@ RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
   SET_DEFAULT_TOPIC_NAME("MoveBaseStatus", "/move_base/status")
+  if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
+    Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
+        Config::ImageDisplayConfig{.location = "front",
+                                   .topic = "/camera/rgb/image_raw",
+                                   .enable = true});
+  }
   std::cout << "ros node start" << std::endl;
 }
 basic::RobotPose Convert(const geometry_msgs::Pose &pose) {
@@ -86,6 +92,64 @@ void RosNode::init() {
                                       &RosNode::OdometryCallback, this);
   battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Battery"), 1,
                                      &RosNode::BatteryCallback, this);
+
+  for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
+    LOG_INFO("image location:" << one_image_display.location << " topic:" << one_image_display.topic);
+    image_subscriber_list_.emplace_back(nh.subscribe(
+        one_image_display.topic, 1,
+        boost::function<void(const sensor_msgs::ImageConstPtr &)>(
+            [this, one_image_display](const sensor_msgs::ImageConstPtr &msg) {
+              cv::Mat conversion_mat_;
+              try {
+                // 深拷贝转换为opencv类型
+                cv_bridge::CvImageConstPtr cv_ptr = cv_bridge::toCvShare(
+                    msg, sensor_msgs::image_encodings::RGB8);
+                conversion_mat_ = cv_ptr->image;
+              } catch (cv_bridge::Exception &e) {
+                try {
+                  cv_bridge::CvImageConstPtr cv_ptr = cv_bridge::toCvShare(msg);
+                  if (msg->encoding == "CV_8UC3") {
+                    // assuming it is rgb
+                    conversion_mat_ = cv_ptr->image;
+                  } else if (msg->encoding == "8UC1") {
+                    // convert gray to rgb
+                    cv::cvtColor(cv_ptr->image, conversion_mat_, CV_GRAY2RGB);
+                  } else if (msg->encoding == "16UC1" ||
+                             msg->encoding == "32FC1") {
+                    double min = 0;
+                    double max = 10;
+                    if (msg->encoding == "16UC1") max *= 1000;
+                    // if (ui_.dynamic_range_check_box->isChecked()) {
+                    //   // dynamically adjust range based on min/max in image
+                    //   cv::minMaxLoc(cv_ptr->image, &min, &max);
+                    //   if (min == max) {
+                    //     // completely homogeneous images are displayed in gray
+                    //     min = 0;
+                    //     max = 2;
+                    //   }
+                    // }
+                    cv::Mat img_scaled_8u;
+                    cv::Mat(cv_ptr->image - min).convertTo(img_scaled_8u, CV_8UC1, 255. / (max - min));
+                    cv::cvtColor(img_scaled_8u, conversion_mat_, CV_GRAY2RGB);
+                  } else {
+                    LOG_ERROR("image from " << msg->encoding
+                                            << " to 'rgb8' an exception was thrown (%s)"
+                                            << e.what());
+                    return;
+                  }
+                } catch (cv_bridge::Exception &e) {
+                  LOG_ERROR(
+                      "image from "
+                      << msg->encoding
+                      << " to 'rgb8' an exception was thrown (%s)" << e.what());
+
+                  return;
+                }
+              }
+              OnDataCallback(MsgId::kImage, std::pair<std::string, cv::Mat>(one_image_display.location, conversion_mat_));
+            })));
+  }
+
   // move_base_status_subscriber_ = nh.subscribe(GET_TOPIC_NAME("MoveBaseStatus"), 1,
   //                                             &RosNode::BatteryCallback, this);
   tf_listener_ = new tf::TransformListener();
@@ -119,6 +183,7 @@ void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
       break;
   }
 }
+
 void RosNode::BatteryCallback(sensor_msgs::BatteryState::ConstPtr battery) {
   std::map<std::string, std::string> map;
   map["percent"] = std::to_string(battery->percentage);
