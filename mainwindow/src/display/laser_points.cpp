@@ -52,7 +52,6 @@ void LaserPoints::computeBoundRect(
 }
 bool LaserPoints::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {
-
   return true;
 }
 void LaserPoints::drawLaser(QPainter *painter, int id,
@@ -75,13 +74,13 @@ void LaserPoints::drawLaser(QPainter *painter, int id,
   // qDebug() << "boundRet:" << bounding_rect_ << std::endl;
 }
 void LaserPoints::Id2Color(int id, int &R, int &G, int &B) {
-#define LocationColorJudge(JudegeId, color)                                    \
-  if (id == JudegeId) {                                                        \
-    R = color & 0xFF0000;                                                      \
-    R >>= 16;                                                                  \
-    G = color & 0x00FF00;                                                      \
-    G >>= 8;                                                                   \
-    B = color & 0x0000FF;                                                      \
+#define LocationColorJudge(JudegeId, color) \
+  if (id == JudegeId) {                     \
+    R = color & 0xFF0000;                   \
+    R >>= 16;                               \
+    G = color & 0x00FF00;                   \
+    G >>= 8;                                \
+    B = color & 0x0000FF;                   \
   }
   LocationColorJudge(0, 0xFF6347);
   LocationColorJudge(1, 0xff6600);
@@ -105,4 +104,4 @@ void LaserPoints::Id2Color(int id, int &R, int &G, int &B) {
   LocationColorJudge(-20, 0x551A8B);
   LocationColorJudge(10, 0x00FF33);
 }
-} // namespace Display
+}  // namespace Display

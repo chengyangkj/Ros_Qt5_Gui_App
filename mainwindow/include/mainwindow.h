@@ -52,7 +52,8 @@ class MainWindow : public QMainWindow {
   void updateOdomInfo(RobotState state);
   void RestoreState();
   void SlotSetBatteryStatus(double percent, double voltage);
-  void SlotRecvImage(const std::string &location,  cv::Mat data);
+  void SlotRecvImage(const std::string &location, std::shared_ptr<cv::Mat> data);
+
  protected:
   virtual void closeEvent(QCloseEvent *event) override;
 

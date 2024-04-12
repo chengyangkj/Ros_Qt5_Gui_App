@@ -7,6 +7,7 @@
  * @Description: ros1通讯类
  */
 #include "rosnode.h"
+#include <opencv2/opencv.hpp>
 #include "config/config_manager.h"
 RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME("NavGoal", "/move_base_simple/goal")
@@ -146,7 +147,8 @@ void RosNode::init() {
                   return;
                 }
               }
-              OnDataCallback(MsgId::kImage, std::pair<std::string, cv::Mat>(one_image_display.location, conversion_mat_));
+
+              OnDataCallback(MsgId::kImage, std::pair<std::string, std::shared_ptr<cv::Mat>>(one_image_display.location, std::make_shared<cv::Mat>(conversion_mat_)));
             })));
   }
 

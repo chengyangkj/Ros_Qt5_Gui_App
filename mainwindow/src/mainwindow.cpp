@@ -81,7 +81,8 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
 
     } break;
     case MsgId::kImage: {
-      auto location_to_mat = std::any_cast<std::pair<std::string, cv::Mat>>(data);
+      auto location_to_mat = std::any_cast<std::pair<std::string, std::shared_ptr<cv::Mat>>>(data);
+
       this->SlotRecvImage(location_to_mat.first, location_to_mat.second);
     } break;
     default:
@@ -89,8 +90,7 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
   }
   display_manager_->UpdateTopicData(id, data);
 }
-void MainWindow::SlotRecvImage(const std::string &location, cv::Mat data) {
-  static std::mutex mutex_;
+void MainWindow::SlotRecvImage(const std::string &location, std::shared_ptr<cv::Mat> data) {
   if (image_widget_map_.count(location)) {
     image_widget_map_[location]->UpdateImage(data);
   }
@@ -600,7 +600,7 @@ void MainWindow::setupUi() {
   //////////////////////////////////////////////////////槽链接
 
   connect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
-          this, SLOT(RecvChannelMsg(const MsgId &, const std::any &)));
+          this, SLOT(RecvChannelMsg(const MsgId &, const std::any &)), Qt::BlockingQueuedConnection);
   connect(display_manager_, &Display::DisplayManager::signalPub2DPose,
           [this](const RobotPose &pose) {
             SendChannelMsg(MsgId::kSetRelocPose, pose);
