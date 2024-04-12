@@ -91,8 +91,9 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
   display_manager_->UpdateTopicData(id, data);
 }
 void MainWindow::SlotRecvImage(const std::string &location, std::shared_ptr<cv::Mat> data) {
-  if (image_widget_map_.count(location)) {
-    image_widget_map_[location]->UpdateImage(data);
+  if (image_frame_map_.count(location)) {
+    QImage image(data->data, data->cols, data->rows, data->step[0], QImage::Format_RGB888);
+    image_frame_map_[location]->setImage(image);
   }
 }
 void MainWindow::SendChannelMsg(const MsgId &id, const std::any &data) {
@@ -586,9 +587,9 @@ void MainWindow::setupUi() {
 
   for (auto one_image : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
     LOG_INFO("init image window location:" << one_image.location << " topic:" << one_image.topic);
-    image_widget_map_[one_image.location] = new ImageWidget();
+    image_frame_map_[one_image.location] = new RatioLayoutedFrame();
     ads::CDockWidget *dock_widget = new ads::CDockWidget(std::string("image/" + one_image.location).c_str());
-    dock_widget->setWidget(image_widget_map_[one_image.location]);
+    dock_widget->setWidget(image_frame_map_[one_image.location]);
 
     dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
                                  dock_widget,

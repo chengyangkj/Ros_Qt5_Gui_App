@@ -33,6 +33,7 @@
 #include "widgets/nav_goal_table_view.h"
 #include "widgets/set_pose_widget.h"
 #include "widgets/speed_ctrl.h"
+#include "widgets/ratio_layouted_frame.h"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -76,7 +77,7 @@ class MainWindow : public QMainWindow {
   QProgressBar *battery_bar_;
   QLabel *label_power_;
   ads::CDockAreaWidget *center_docker_area_;
-  std::map<std::string, ImageWidget *> image_widget_map_;
+  std::map<std::string, RatioLayoutedFrame *> image_frame_map_;
  signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);
   
