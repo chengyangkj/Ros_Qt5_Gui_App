@@ -682,7 +682,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   // that all top level windows of the dock manager are properly closed
   // write state
 
-  channel_manager_.CloseChannel();
+  disconnect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
+             this, SLOT(RecvChannelMsg(const MsgId &, const std::any &)));
   SaveState();
   dock_manager_->deleteLater();
   QMainWindow::closeEvent(event);

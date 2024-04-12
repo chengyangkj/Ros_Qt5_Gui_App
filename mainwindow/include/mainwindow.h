@@ -29,7 +29,6 @@
 #include "display/manager/display_manager.h"
 #include "point_type.h"
 #include "widgets/dashboard.h"
-#include "widgets/image_widget.h"
 #include "widgets/nav_goal_table_view.h"
 #include "widgets/set_pose_widget.h"
 #include "widgets/speed_ctrl.h"
