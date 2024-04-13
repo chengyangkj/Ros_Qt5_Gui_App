@@ -40,7 +40,7 @@ void ConfigManager::Init(const std::string &config_path) {
 }
 ConfigManager::~ConfigManager() {
   std::string pretty_json = JS::serializeStruct(config_root_);
-
+  std::cout << "write json" << std::endl;
   writeStringToFile(config_path_, pretty_json);
 }
 bool ConfigManager::ReadRootConfig() {
@@ -58,7 +58,7 @@ bool ConfigManager::ReadRootConfig() {
   }
   return true;
 }
-bool ConfigManager::WriteRootConfig() {
+bool ConfigManager::StoreConfig() {
   std::lock_guard<std::mutex> lock(mutex_);
   std::string pretty_json = JS::serializeStruct(config_root_);
   writeStringToFile(config_path_, pretty_json);
@@ -89,7 +89,7 @@ void ConfigManager::SetDefaultTopicName(const std::string &frame_name,
   } else if (iter->topic == "") {
     iter->topic = topic_name;
   }
-  WriteRootConfig();
+  StoreConfig();
 }
 
 bool ConfigManager::ReadTopologyMap(const std::string &map_path,

@@ -49,9 +49,8 @@ namespace Display {
 #define DISPLAY_GOAL "GoalPose"
 #define DISPLAY_SHAPE "RobotShape"
 enum MapEditMode {
-  kStartEdit = 0,
-  kStopEdit = 1,
-  kMove,          // 鼠标模式
+  kStop = 0,
+  kNormal,        // 正常编辑模式
   kErase,         // 橡皮擦模式
   kDrawLine,      // 绘制线段模式
   kAddPoint,      // 添加点位模式

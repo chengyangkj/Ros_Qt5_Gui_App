@@ -644,11 +644,11 @@ void MainWindow::setupUi() {
   });
   connect(edit_map_btn, &QToolButton::clicked, [this, tools_edit_map_widget, edit_map_btn]() {
     if (edit_map_btn->text() == "编辑地图") {
-      display_manager_->SetEditMapMode(Display::MapEditMode::kStartEdit);
+      display_manager_->SetEditMapMode(Display::MapEditMode::kNormal);
       edit_map_btn->setText("结束编辑");
       tools_edit_map_widget->show();
     } else {
-      display_manager_->SetEditMapMode(Display::MapEditMode::kStopEdit);
+      display_manager_->SetEditMapMode(Display::MapEditMode::kStop);
       edit_map_btn->setText("编辑地图");
       tools_edit_map_widget->hide();
     }
@@ -656,7 +656,7 @@ void MainWindow::setupUi() {
   connect(add_point_btn, &QToolButton::clicked, [this]() {
     display_manager_->SetEditMapMode(Display::MapEditMode::kAddPoint);
   });
-  connect(normal_cursor_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kMove); });
+  connect(normal_cursor_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kNormal); });
   connect(erase_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kErase); });
   connect(draw_line_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kDrawLine); });
   connect(add_region_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kRegion); });

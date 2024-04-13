@@ -28,6 +28,7 @@ rclcomm::rclcomm() {
                                    .topic = "/camera/front/image_raw",
                                    .enable = true});
   }
+  Config::ConfigManager::Instacnce()->StoreConfig();
 }
 bool rclcomm::Start() {
   rclcpp::init(0, nullptr);

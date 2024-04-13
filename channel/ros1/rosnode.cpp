@@ -27,7 +27,9 @@ RosNode::RosNode(/* args */) {
         Config::ImageDisplayConfig{.location = "front",
                                    .topic = "/camera/rgb/image_raw",
                                    .enable = true});
+
   }
+  Config::ConfigManager::Instacnce()->StoreConfig();
   std::cout << "ros node start" << std::endl;
 }
 basic::RobotPose Convert(const geometry_msgs::Pose &pose) {

@@ -25,10 +25,10 @@ class ConfigManager {
   ConfigManager(const ConfigManager &) = delete;
   ConfigManager &operator=(const ConfigManager &) = delete;
   bool ReadRootConfig();
-  bool WriteRootConfig();
 
  public:
   ~ConfigManager();
+  bool StoreConfig();
   void Init(const std::string &config_path);
   static bool writeStringToFile(const std::string &filePath,
                                 const std::string &content);

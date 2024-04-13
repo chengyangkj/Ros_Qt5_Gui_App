@@ -8,7 +8,7 @@
 #include "display/point_shape.h"
 #include "logger/logger.h"
 namespace Display {
-SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent), current_mode_(MapEditMode::kStopEdit) {}
+SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent), current_mode_(MapEditMode::kStop) {}
 void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   // 1s自动保存1次 拓扑地图
 
@@ -68,14 +68,7 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
 void SceneManager::SetEditMapMode(MapEditMode mode) {
   current_mode_ = mode;
   switch (mode) {
-    case kStartEdit:
-      view_ptr_->setCursor(Qt::OpenHandCursor);
-      SetPointMoveEnable(true);
-      //动态图层不可见
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(false);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(false);
-      break;
-    case kStopEdit: {
+    case kStop: {
       SetPointMoveEnable(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(true);
@@ -86,10 +79,12 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
     case kAddPoint: {
       view_ptr_->setCursor(nav_goal_cursor_);
     } break;
-    case kMove: {
+    case kNormal: {
       view_ptr_->setCursor(Qt::OpenHandCursor);
       SetPointMoveEnable(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
+      FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(false);
+      FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(false);
     } break;
     case kErase: {
       SetPointMoveEnable(false);
@@ -142,10 +137,9 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   }
   QPointF position = mouseEvent->scenePos();  // 获取点击位置
   switch (current_mode_) {
-    case MapEditMode::kStartEdit:
-    case MapEditMode::kStopEdit: {
+    case MapEditMode::kStop: {
     } break;
-    case MapEditMode::kMove: {
+    case MapEditMode::kNormal: {
     } break;
     case MapEditMode::kDrawLine: {
       auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
@@ -227,7 +221,7 @@ void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
       map_ptr->EndDrawLine(map_ptr->mapFromScene(position), true);
     } break;
-    case MapEditMode::kMove: {
+    case MapEditMode::kNormal: {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
         if (display_type == DISPLAY_GOAL) {
@@ -250,7 +244,7 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos();  // 获取点击位置
   //点位属性框跟随移动处理
   switch (current_mode_) {
-    case MapEditMode::kStopEdit: {
+    case MapEditMode::kStop: {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
         if (display_type == DISPLAY_GOAL) {
@@ -258,8 +252,7 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
         }
       }
     } break;
-    case MapEditMode::kStartEdit:
-    case MapEditMode::kMove: {
+    case MapEditMode::kNormal: {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
         if (display_type == DISPLAY_GOAL) {
