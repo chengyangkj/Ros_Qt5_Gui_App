@@ -12,7 +12,7 @@
 #include "QDebug"
 #include "algorithm.h"
 using namespace basic;
-
+#define circle_radius 20
 namespace Display {
 PointShape::PointShape(const ePointType &type, const std::string &display_type,
                        const std::string &display_name, const int &z_value,

@@ -11,13 +11,6 @@
 #pragma once
 #include "algorithm.h"
 
-#include "display/manager/view_manager.h"
-#include "display_cost_map.h"
-#include "display_factory.h"
-#include "display_occ_map.h"
-#include "display_path.h"
-#include "laser_points.h"
-
 #include <Eigen/Dense>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -29,7 +22,14 @@
 #include <map>
 #include "config/config_manager.h"
 #include "config/topology_map.h"
+#include "display/manager/view_manager.h"
+#include "display_cost_map.h"
+#include "display_factory.h"
+#include "display_occ_map.h"
+#include "display_path.h"
+#include "laser_points.h"
 #include "point_shape.h"
+#include "robot_shape.h"
 #include "widgets/set_pose_widget.h"
 // group
 #define GROUP_MAP "Group_Map"

@@ -47,6 +47,7 @@ namespace Display {
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
 #define DISPLAY_GOAL "GoalPose"
+#define DISPLAY_SHAPE "RobotShape"
 enum MapEditMode {
   kStartEdit = 0,
   kStopEdit = 1,

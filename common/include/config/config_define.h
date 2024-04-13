@@ -22,11 +22,24 @@ struct ImageDisplayConfig {
 
   JS_OBJ(location, topic, enable);
 };
+struct Point {
+  double x;
+  double y;
+  JS_OBJ(x, y);
+};
+struct RobotShapedConfig {
+  std::vector<Point> shaped_points;
+  bool is_ellipse{false};
+  std::string color{"0x00000FF"};
+  float opacity{0.5};
+  JS_OBJ(shaped_points, is_ellipse, color, opacity);
+};
 struct ConfigRoot {
   std::vector<DisplayConfig> display_config;
   TopologyMapConfig topology_map_config;
   std::vector<ImageDisplayConfig> images;
-  JS_OBJ(display_config, images, topology_map_config);
+  RobotShapedConfig robot_shape_config;
+  JS_OBJ(display_config, images, topology_map_config, robot_shape_config);
 };
 
 }  // namespace Config

@@ -39,7 +39,7 @@ DisplayManager::DisplayManager() {
   new LaserPoints(DISPLAY_LASER, 2, DISPLAY_MAP);
   new DisplayPath(DISPLAY_GLOBAL_PATH, 6, DISPLAY_MAP);
   new DisplayPath(DISPLAY_LOCAL_PATH, 6, DISPLAY_MAP);
-
+  new RobotShape(DISPLAY_SHAPE, 8, DISPLAY_MAP);
   // defalut display config
 
   SetDisplayConfig(DISPLAY_GLOBAL_PATH + "/Color", Color(0, 0, 255));
@@ -206,6 +206,7 @@ DisplayManager::transLaserPoint(const std::vector<Point> &point) {
 void DisplayManager::UpdateRobotPose(const RobotPose &pose) {
   robot_pose_ = pose;
   GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(wordPose2Map(pose));
+  GetDisplay(DISPLAY_SHAPE)->UpdateDisplay(wordPose2Map(pose));
 }
 
 void DisplayManager::updateScaled(double value) {
