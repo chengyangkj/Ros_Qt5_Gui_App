@@ -21,6 +21,10 @@ VirtualDisplay::VirtualDisplay(const std::string &display_type,
   this->setZValue(z_value);
   transform_ = this->transform();
 }
+
+void VirtualDisplay::CenterOnScene(QPointF pose){
+    FactoryDisplay::Instance()-> CenterOnScene(pose);
+}
 QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
                                     const QVariant &value) {
   emit signalItemChange(change, value);
