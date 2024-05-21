@@ -143,13 +143,13 @@ sudo chmod a+x ./ros_qt5_gui_app
 
 ```
 sudo apt-get update
-sudo apt-get install qtbase5-private-dev libqt5svg5-dev -y
+sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev -y
 ```
 
 如果以上安装后还不行，可以执行如下指令安装全部依赖:
 
 ```
-sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev qtbase5-private-dev libeigen3-dev libgtest-dev -y
+sudo apt-get install qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev qtbase5-private-dev libeigen3-dev libgtest-dev libsdl-image1.2-dev libsdl1.2-dev -y
 ```
 
 ## 2,克隆/下载本项目:
