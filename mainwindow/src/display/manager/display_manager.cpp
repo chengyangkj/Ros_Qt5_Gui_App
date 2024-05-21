@@ -144,6 +144,7 @@ bool DisplayManager::UpdateDisplay(const std::string &display_type,
       init_flag_ = true;
     }
 
+    FocusOnMapCenter();
   } else if (display_type == DISPLAY_ROBOT) {
     //重定位时屏蔽位置更新
     if (!is_reloc_mode_) {
@@ -177,6 +178,15 @@ bool DisplayManager::UpdateDisplay(const std::string &display_type,
   }
   return true;
 }
+
+void DisplayManager::FocusOnMapCenter(){
+  QTimer::singleShot(1000,[this](){  //地图更新时，聚焦在map 0,0 点
+    double x, y;
+    map_data_.xy2ScenePose(0, 0, x, y);
+    graphics_view_ptr_->centerOn(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->mapToScene(x,y));});
+
+}
+
 /**
  * @description:坐标系转换为图元坐标系
  * @return {*}

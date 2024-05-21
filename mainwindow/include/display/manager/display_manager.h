@@ -103,6 +103,7 @@ class DisplayManager : public QObject {
   void SetFocusOn(const std::string &display_type) {
     focus_display_ = display_type;
   }
+  void FocusOnMapCenter();
 };
 
 }  // namespace Display

@@ -31,18 +31,28 @@
 #include <iostream>
 #include "logger/logger.h"
 #include "yaml-cpp/yaml.h"
+#include <SDL/SDL_image.h>
 #define OCC_GRID_UNKNOWN 0     //未知領域
 #define OCC_GRID_FREE 0        //free
 #define OCC_GRID_OCCUPIED 100  //占有領域
+// We use SDL_image to load the image from disk
+// compute linear index for given map coords
+#define MAP_IDX(sx, i, j) ((sx) * (j) + (i))
 
 namespace basic {
 struct MapConfig {
+  enum MapMode{
+    TRINARY,
+    SCALE,
+    RAW
+  };
   std::string image = "./";
   double resolution = 0.1;
   std::vector<double> origin;
   int negate{0};
   double occupied_thresh{0.25};
   double free_thresh{0.65};
+  MapMode mode;
   MapConfig() {
     origin.resize(3);
   }
@@ -81,25 +91,25 @@ struct MapConfig {
       LOG_ERROR("The map does not contain a free_thresh tag or it is invalid.");
       return false;
     }
-    //TODO support mode
-    // try {
-    //   std::string modeS = "";
-    //   doc["mode"] >> modeS;
 
-    //   if (modeS == "trinary")
-    //     mode = TRINARY;
-    //   else if (modeS == "scale")
-    //     mode = SCALE;
-    //   else if (modeS == "raw")
-    //     mode = RAW;
-    //   else {
-    //     LOG_ERROR("Invalid mode tag \"%s\".", modeS.c_str());
-    //     return false;
-    //   }
-    // } catch (YAML::Exception &) {
-    //   ROS_DEBUG("The map does not contain a mode tag or it is invalid... assuming Trinary");
-    //   mode = TRINARY;
-    // }
+     try {
+       std::string modeS = "";
+       modeS=doc["mode"].as<std::string>();
+
+       if (modeS == "trinary")
+         mode = TRINARY;
+       else if (modeS == "scale")
+         mode = SCALE;
+       else if (modeS == "raw")
+         mode = RAW;
+       else {
+         LOG_ERROR("Invalid mode tag "<< modeS);
+         return false;
+       }
+     } catch (YAML::Exception &) {
+       LOG_INFO("The map does not contain a mode tag or it is invalid... assuming Trinary");
+       mode = TRINARY;
+     }
     try {
       origin = doc["origin"].as<std::vector<double>>();
     } catch (YAML::InvalidScalar &) {
@@ -361,46 +371,91 @@ free_thresh: 0.196
   bool Load(const std::string &yaml_path) {
     //解析yaml
     if (!map_config.Load(yaml_path)) return false;
-    //解析yaml
-    std::ifstream file(map_config.image);
-    if (file.is_open()) {
-      std::string line;
-      int width, height, maxVal;
 
-      // 读取 PGM 文件头信息
-      getline(file, line);      // 第一行是 "P5"，表示文件类型
-      getline(file, line);      // 第二行是注释，可以忽略
-      file >> width >> height;  // 第三行是宽度和高度
-      file >> maxVal;           // 第四行是最大像素值
-      //赋值行与列
-      rows = height;
-      cols = width;
-      LOG_INFO("reade from pgm width:" << width << " height:" << height << " maxVal:" << maxVal);
-      map_data = Eigen::MatrixXi(height, width);
-      // 读取地图数据
-      for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-          int8_t pixel = -2;
-          int8_t map_cell;
-          file >> pixel;
-          if (pixel == 0) {
-            map_cell = OCC_GRID_OCCUPIED;  //占用
-          } else if (pixel == 205) {
-            map_cell = OCC_GRID_UNKNOWN;
-          } else if (pixel == 254) {
-            map_cell = OCC_GRID_FREE;
-          } else {
-            map_cell = OCC_GRID_UNKNOWN;
-          }
-          map_data(i, j) = map_cell;
-        }
-      }
-      LOG_INFO("load map over");
-      file.close();
-    } else {
-      LOG_INFO("无法打开地图文件 " << map_config.image);
-      return true;
+    SDL_Surface* img;
+    unsigned char* pixels;
+    unsigned char* p;
+    unsigned char value;
+    int rowstride, n_channels, avg_channels;
+    unsigned int i,j;
+    int k;
+    double occ;
+    int alpha;
+    int color_sum;
+    double color_avg;
+    // Load the image using SDL.  If we get NULL back, the image load failed.
+    if(!(img = IMG_Load(map_config.image.c_str())))
+    {
+      LOG_ERROR(std::string("failed to open image file \"") +
+                           std::string(map_config.image) + std::string("\": ") + IMG_GetError());
+      return false;
     }
+    int height = img->h;
+    int width = img->w;
+    rows = height;
+    cols = width;
+    LOG_INFO("reade from pgm width:" << width << " height:" << height);
+    map_data = Eigen::MatrixXi(height, width);
+    rowstride = img->pitch;
+    n_channels = img->format->BytesPerPixel;
+    // NOTE: Trinary mode still overrides here to preserve existing behavior.
+    // Alpha will be averaged in with color channels when using trinary mode.
+    if (map_config.mode==MapConfig::MapMode::TRINARY || !img->format->Amask)
+      avg_channels = n_channels;
+    else
+      avg_channels = n_channels - 1;
+
+    // Copy pixel data into the map structure
+    pixels = (unsigned char*)(img->pixels);
+    for(j = 0; j < height; j++)
+    {
+      for (i = 0; i < width; i++)
+      {
+        // Compute mean of RGB for this pixel
+        p = pixels + j*rowstride + i*n_channels;
+        color_sum = 0;
+        for(k=0;k<avg_channels;k++)
+          color_sum += *(p + (k));
+        color_avg = color_sum / (double)avg_channels;
+
+        if (n_channels == 1)
+          alpha = 1;
+        else
+          alpha = *(p+n_channels-1);
+
+        if(map_config.negate)
+          color_avg = 255 - color_avg;
+
+        if(map_config.mode==MapConfig::MapMode::RAW){
+          value = color_avg;
+          map_data(j,i) = value;
+          continue;
+        }
+
+
+        // If negate is true, we consider blacker pixels free, and whiter
+        // pixels occupied.  Otherwise, it's vice versa.
+        occ = (255 - color_avg) / 255.0;
+
+        // Apply thresholds to RGB means to determine occupancy values for
+        // map.  Note that we invert the graphics-ordering of the pixels to
+        // produce a map with cell (0,0) in the lower-left corner.
+        if(occ > map_config.occupied_thresh)
+          value = +100;
+        else if(occ < map_config.free_thresh)
+          value = 0;
+        else if(map_config.mode==MapConfig::MapMode::TRINARY || alpha < 1.0)
+          value = -1;
+        else {
+          double ratio = (occ - map_config.free_thresh) / (map_config.occupied_thresh - map_config.free_thresh);
+          value = 1 + 98 * ratio;
+        }
+
+        map_data(j,i) = value;
+      }
+    }
+
+    SDL_FreeSurface(img);
     return true;
   }
 };

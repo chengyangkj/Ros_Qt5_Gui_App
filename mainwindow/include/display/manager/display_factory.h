@@ -34,7 +34,9 @@ class FactoryDisplay : public QObject {
   bool GetMoveEnable(const std::string &display_name);
   bool SetDisplayPoseInParent(const std::string &display_name,
                               const RobotPose &pose);
-
+  void CenterOnScene(QPointF pose){
+    viewer_ptr_->centerOn(pose);
+  }
  private slots:
   void Process();
 

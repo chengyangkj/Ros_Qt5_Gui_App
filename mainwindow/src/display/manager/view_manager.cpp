@@ -9,13 +9,20 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setMouseTracking(true);  // 开启鼠标追踪，以便捕获鼠标移动事件
   QVBoxLayout *main_layout = new QVBoxLayout;
-  main_layout->addItem(
-      new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+  QHBoxLayout *center_layout = new QHBoxLayout;
+  QVBoxLayout *left_bar_layout = new QVBoxLayout;
+  center_layout->addLayout(left_bar_layout);
+  center_layout->addItem(
+      new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
+  main_layout->addLayout(center_layout);
+
   // 创建一个水平布局
   QHBoxLayout *bottom_bar_layout = new QHBoxLayout;
   bottom_bar_layout->addItem(
       new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
   main_layout->addLayout(bottom_bar_layout);
+
   // 创建工具按钮并添加到布局中
 
   QToolButton *set_big_btn_ = new QToolButton();
@@ -28,8 +35,8 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   border: none;"
       "   background-color: transparent;"
       "}"
-      "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "QToolButton:hover {"
+      "  cursor: pointer;"
       "}");
   bottom_bar_layout->addWidget(set_big_btn_);
   QToolButton *set_small_btn_ = new QToolButton();
@@ -42,8 +49,8 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   border: none;"
       "   background-color: transparent;"
       "}"
-      "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "QToolButton:hover {"
+      "  cursor: pointer;"
       "}");
   bottom_bar_layout->addWidget(set_small_btn_);
   focus_robot_btn_ = new QToolButton();
@@ -55,15 +62,67 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   border: none;"
       "   background-color: transparent;"
       "}"
-      "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "QToolButton:hover {"
+      "  cursor: pointer;"
       "}");
   focus_robot_btn_->setIconSize(QSize(25, 25));
   bottom_bar_layout->addWidget(focus_robot_btn_);
 
   setViewportMargins(0, 0, 0, bottom_bar_layout->sizeHint().height());
-  // 将布局添加到视口的小部件上
 
+  //左侧工具
+  QHBoxLayout *display_config_layout = new QHBoxLayout;
+  QToolButton *display_list_show_btn = new QToolButton();
+  display_list_show_btn->setIcon(QIcon(":/images/display.png"));
+  display_list_show_btn->setIconSize(QSize(25, 25));
+  display_list_show_btn->setToolTip("放大");
+  display_list_show_btn->setStyleSheet(
+      "QToolButton {"
+      "   border: none;"
+      "   background-color: transparent;"
+      "}"
+      "QToolButton:hover {"
+      "   cursor: pointer;"
+      "}");
+  display_config_layout->addWidget(display_list_show_btn);
+
+  //图层列表面板
+  QHBoxLayout *display_btn_list_layout = new QHBoxLayout;
+  QToolButton *display_laser_btn_ = new QToolButton();
+  display_laser_btn_->setIcon(QIcon(":/images/classes/LaserScan.png"));
+  display_laser_btn_->setIconSize(QSize(25, 25));
+  display_laser_btn_->setToolTip("放大");
+  display_laser_btn_->setStyleSheet(
+      "QToolButton {"
+      "   border: none;"
+      "   background-color: transparent;"
+      "}"
+      "QToolButton:hover {"
+      "   cursor: pointer;"
+      "}");
+  display_btn_list_layout->addWidget(display_laser_btn_);
+
+  QWidget *display_btn_list_widget = new QWidget();
+
+  display_btn_list_widget->setLayout(display_btn_list_layout);
+  display_btn_list_widget->hide();
+  display_btn_list_widget->setStyleSheet("QWidget { margin: 0px; padding: 0px;border: 1px solid red;  }");
+  display_btn_list_layout->setSpacing(0);
+  display_config_layout->addWidget(display_btn_list_widget);
+  display_config_layout->addItem(
+      new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
+  left_bar_layout->addItem(display_config_layout);
+  left_bar_layout->addItem(
+      new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+  setViewportMargins(left_bar_layout->sizeHint().width(), 0, 0, 0);
+  connect(display_list_show_btn, &QToolButton::clicked, [this, display_btn_list_widget]() {
+    if (display_btn_list_widget->isHidden()) {
+      display_btn_list_widget->show();
+    } else {
+      display_btn_list_widget->hide();
+    }
+  });
+  // 将布局添加到视口的小部件上
   viewport()->setLayout(main_layout);
 
   //connect
