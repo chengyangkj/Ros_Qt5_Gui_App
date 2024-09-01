@@ -81,7 +81,9 @@
 
 ![image.png](./doc/images/main.gif)
 
-基于flutter的ROS1/ROS2跨平台移动机器人人机交互软件已正式开源,如有需要请移步至[ROS_Flutter_Gui_App](https://github.com/chengyangkj/ROS_Flutter_Gui_App)
+基于flutter的ROS1/ROS2跨平台移动机器人人机交互软件已正式开源:
+![flutter.png](./doc/images/flutter.png)
+如有需要请移步至[ROS_Flutter_Gui_App](https://github.com/chengyangkj/ROS_Flutter_Gui_App)
 
 
 <!-- TOC -->
