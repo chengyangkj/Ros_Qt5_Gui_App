@@ -6,7 +6,7 @@
  * @FilePath: /ROS2_Qt5_Gui_App/README.md
 -->
 简体中文 | [English](./README_en.md)
-## 轻量级ROS1/ROS2移动机器人人机交互软件
+*轻量级ROS1/ROS2移动机器人人机交互软件*
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
 ![GitHub stars](https://img.shields.io/github/stars/chengyangkj/Ros_Qt5_Gui_App?style=flat-square)
@@ -75,7 +75,7 @@
     <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=chengyangkj/Ros_Qt5_Gui_App&type=Timeline" width="75%" />
   </picture>
 
-## 项目截图
+*项目截图*
 
 ![image.png](./doc/images/main.png)
 
@@ -85,11 +85,10 @@
 ![flutter.png](./doc/images/flutter.png)
 如有需要请移步至[ROS_Flutter_Gui_App](https://github.com/chengyangkj/ROS_Flutter_Gui_App)
 
+*目录*
 
 <!-- TOC -->
 
-    - [轻量级ROS1/ROS2移动机器人人机交互软件](#轻量级ros1ros2移动机器人人机交互软件)
-    - [项目截图](#项目截图)
 - [一,Release 版本下载使用](#一release-版本下载使用)
 - [二,编译](#二编译)
     - [1 ,环境安装](#1-环境安装)
