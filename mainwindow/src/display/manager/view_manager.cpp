@@ -71,20 +71,20 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
   setViewportMargins(0, 0, 0, bottom_bar_layout->sizeHint().height());
 
   //左侧工具
-  QHBoxLayout *display_config_layout = new QHBoxLayout;
-  QToolButton *display_list_show_btn = new QToolButton();
-  display_list_show_btn->setIcon(QIcon(":/images/display.png"));
-  display_list_show_btn->setIconSize(QSize(25, 25));
-  display_list_show_btn->setToolTip("放大");
-  display_list_show_btn->setStyleSheet(
-      "QToolButton {"
-      "   border: none;"
-      "   background-color: transparent;"
-      "}"
-      "QToolButton:hover {"
-      "   cursor: pointer;"
-      "}");
-  display_config_layout->addWidget(display_list_show_btn);
+  // QHBoxLayout *display_config_layout = new QHBoxLayout;
+  // QToolButton *display_list_show_btn = new QToolButton();
+  // display_list_show_btn->setIcon(QIcon(":/images/display.png"));
+  // display_list_show_btn->setIconSize(QSize(25, 25));
+  // display_list_show_btn->setToolTip("放大");
+  // display_list_show_btn->setStyleSheet(
+  //     "QToolButton {"
+  //     "   border: none;"
+  //     "   background-color: transparent;"
+  //     "}"
+  //     "QToolButton:hover {"
+  //     "   cursor: pointer;"
+  //     "}");
+  // display_config_layout->addWidget(display_list_show_btn);
 
   //图层列表面板
   QHBoxLayout *display_btn_list_layout = new QHBoxLayout;
