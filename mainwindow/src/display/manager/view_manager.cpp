@@ -86,42 +86,44 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
   //     "}");
   // display_config_layout->addWidget(display_list_show_btn);
 
-  //图层列表面板
-  QHBoxLayout *display_btn_list_layout = new QHBoxLayout;
-  QToolButton *display_laser_btn_ = new QToolButton();
-  display_laser_btn_->setIcon(QIcon(":/images/classes/LaserScan.png"));
-  display_laser_btn_->setIconSize(QSize(25, 25));
-  display_laser_btn_->setToolTip("放大");
-  display_laser_btn_->setStyleSheet(
-      "QToolButton {"
-      "   border: none;"
-      "   background-color: transparent;"
-      "}"
-      "QToolButton:hover {"
-      "   cursor: pointer;"
-      "}");
-  display_btn_list_layout->addWidget(display_laser_btn_);
+  // //图层列表面板
+  // QHBoxLayout *display_btn_list_layout = new QHBoxLayout;
+  // QToolButton *display_laser_btn_ = new QToolButton();
+  // display_laser_btn_->setIcon(QIcon(":/images/classes/LaserScan.png"));
+  // display_laser_btn_->setIconSize(QSize(25, 25));
+  // display_laser_btn_->setToolTip("放大");
+  // display_laser_btn_->setStyleSheet(
+  //     "QToolButton {"
+  //     "   border: none;"
+  //     "   background-color: transparent;"
+  //     "}"
+  //     "QToolButton:hover {"
+  //     "   cursor: pointer;"
+  //     "}");
+  // display_btn_list_layout->addWidget(display_laser_btn_);
 
-  QWidget *display_btn_list_widget = new QWidget();
+  // QWidget *display_btn_list_widget = new QWidget();
 
-  display_btn_list_widget->setLayout(display_btn_list_layout);
-  display_btn_list_widget->hide();
-  display_btn_list_widget->setStyleSheet("QWidget { margin: 0px; padding: 0px;border: 1px solid red;  }");
-  display_btn_list_layout->setSpacing(0);
-  display_config_layout->addWidget(display_btn_list_widget);
-  display_config_layout->addItem(
-      new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-  left_bar_layout->addItem(display_config_layout);
-  left_bar_layout->addItem(
-      new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
-  setViewportMargins(left_bar_layout->sizeHint().width(), 0, 0, 0);
-  connect(display_list_show_btn, &QToolButton::clicked, [this, display_btn_list_widget]() {
-    if (display_btn_list_widget->isHidden()) {
-      display_btn_list_widget->show();
-    } else {
-      display_btn_list_widget->hide();
-    }
-  });
+  // display_btn_list_widget->setLayout(display_btn_list_layout);
+  // display_btn_list_widget->hide();
+  // display_btn_list_widget->setStyleSheet("QWidget { margin: 0px; padding: 0px;border: 1px solid red;  }");
+  // display_btn_list_layout->setSpacing(0);
+  // display_config_layout->addWidget(display_btn_list_widget);
+  // display_config_layout->addItem(
+  //     new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
+  // left_bar_layout->addItem(display_config_layout);
+  // left_bar_layout->addItem(
+  //     new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding));
+  // setViewportMargins(left_bar_layout->sizeHint().width(), 0, 0, 0);
+  // connect(display_list_show_btn, &QToolButton::clicked, [this, display_btn_list_widget]() {
+  //   if (display_btn_list_widget->isHidden()) {
+  //     display_btn_list_widget->show();
+  //   } else {
+  //     display_btn_list_widget->hide();
+  //   }
+  // });
+
+
   // 将布局添加到视口的小部件上
   viewport()->setLayout(main_layout);
 

@@ -20,7 +20,7 @@ jobs:
       image: ${{matrix.os-ros.image}}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1
 
       - name: Set up ROS
         uses: ros-tooling/setup-ros@v0.6
