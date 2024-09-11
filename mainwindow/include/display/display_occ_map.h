@@ -34,6 +34,7 @@ class DisplayOccMap : public VirtualDisplay {
   Eigen::Vector3f sub_map_center_pose_;
   double sub_map_value_ = 1;
   bool is_draw_line_ = false;
+  bool init_flag_{false};
   QPointF line_start_pose_;
   QImage line_tmp_image_;  // 用于存储绘制线条的图像，以便在绘制完成后进行处理
  private:

@@ -70,12 +70,11 @@ void DisplayOccMap::ParseOccupyMap() {
           color = Qt::black;  // black
         } else if (map_value == 0) {
           color = Qt::white;  // gray
-        } else if(map_value == 255){
+        } else if (map_value == 255) {
           color = Qt::gray;  // white
-        }else{
+        } else {
           color = Qt::white;
         }
-
 
         map_image_.setPixel(i, j, color.rgb());
       }
@@ -85,7 +84,10 @@ void DisplayOccMap::ParseOccupyMap() {
     //以0 0点为中心
     double x, y;
     map_data_.xy2ScenePose(0, 0, x, y);
-    CenterOnScene(mapToScene(x,y));
+    if (not init_flag_) {
+      CenterOnScene(mapToScene(x, y));
+      init_flag_ = true;
+    }
   });
 }
 void DisplayOccMap::EraseMapRange(const QPointF &pose, double range) {
