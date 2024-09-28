@@ -142,10 +142,7 @@ sudo chmod a+x ./ros_qt5_gui_app
 
 >💡 注意，为了保证此项目同时兼容ROS1与ROS2，此项目不使用ROS1/ROS2的catkin_make/colcon构建系统进行够建，而是使用标准CMake进行构建，这也就意味着，本项目不会被ROS自动识别为功能包
 
-bilibili教程：
-
-<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1003134929&bvid=BV1ex4y1a7or&cid=1505288719&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true">
-</iframe>
+[bilibili教程](https://www.bilibili.com/video/BV1ex4y1a7or/?vd_source=75c00cfe4b6a37d574e447ad1e864d29)
 
 可以参考以下教程从0开始构建/运行此项目:
 
