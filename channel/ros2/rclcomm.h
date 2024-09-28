@@ -54,7 +54,7 @@ class rclcomm : public VirtualChannelNode {
   void PubRelocPose(const RobotPose &pose);
   void PubNavGoal(const RobotPose &pose);
   void PubRobotSpeed(const RobotSpeed &speed);
-  basic::RobotPose getTrasnsform(std::string from, std::string to);
+  basic::RobotPose getTransform(std::string from, std::string to);
   void SendMessage(const MsgId &msg_id, const std::any &msg) override;
 
  private:

@@ -54,31 +54,37 @@ void DisplayOccMap::paint(QPainter *painter,
 void DisplayOccMap::ParseOccupyMap() {
   QtConcurrent::run([this]() {
     // Eigen::matrix 坐标系与QImage坐标系不同,这里行列反着遍历
-    map_image_ = QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_RGB32);
-    QVector<QPointF> points;
     //QImage坐标系
     // **************x
     // *
     // *
     // *
     // y
-    for (int i = 0; i < map_data_.Cols(); i++)
+    map_image_ = QImage(map_data_.Cols(), map_data_.Rows(), QImage::Format_ARGB32);
+
+    // 遍历地图数据，设置每个像素的颜色
+    for (int i = 0; i < map_data_.Cols(); i++) {
       for (int j = 0; j < map_data_.Rows(); j++) {
         double map_value = map_data_(j, i);
         QColor color;
-        if (map_value == 100) {
-          color = Qt::black;  // black
-        } else if (map_value == 0) {
-          color = Qt::white;  // gray
-        } else if (map_value == 255) {
-          color = Qt::gray;  // white
-        } else {
+
+        if (map_value > 0) {
+          // 将 map_value 从 0-100 映射到透明度 0-255 范围
+          int alpha = static_cast<int>(std::clamp(map_value * 2.55, 0.0, 255.0));
+          color = QColor(0, 0, 0, alpha);  // 黑色, 透明度根据占据值动态调整
+        } else if (map_value == 0 || map_value == -1) {
+          // 自由区域和未知区域都设为白色
           color = Qt::white;
+        } else {
+          color = Qt::white;  // 默认白色
         }
 
-        map_image_.setPixel(i, j, color.rgb());
+        // 使用 RGBA 颜色值绘制像素
+        map_image_.setPixel(i, j, color.rgba());
       }
+    }
 
+    // 更新边界矩形
     SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
     update();
     //以0 0点为中心
@@ -111,22 +117,41 @@ void DisplayOccMap::EraseMapRange(const QPointF &pose, double range) {
   }
   update();
 }
+
 OccupancyMap DisplayOccMap::GetOccupancyMap() {
   OccupancyMap map = map_data_;
-  for (int i = 0; i < map_image_.width(); i++)
+
+  for (int i = 0; i < map_image_.width(); i++) {
     for (int j = 0; j < map_image_.height(); j++) {
-      QRgb pixelValue = map_image_.pixel(i, j);  // (x, y) 是指定位置的坐标
-      if (pixelValue == QColor(Qt::black).rgb()) {
-        map(j, i) = 100;
-      } else if (pixelValue == QColor(Qt::gray).rgb()) {
-        map(j, i) = -1;
+      QRgb pixelValue = map_image_.pixel(i, j);  // 获取指定位置的像素值
+      QColor color(pixelValue);                  // 从像素值创建 QColor 对象
+
+      // 提取Alpha通道值，范围是 0-255
+      int alpha = color.alpha();
+
+      // 如果颜色是黑色且 alpha > 0，表示占据栅格
+      if (color == QColor(Qt::black) && alpha > 0) {
+        // 将 alpha 映射回 0-100 的栅格值 (之前是将 0-100 映射到 0-255 的透明度)
+        int map_value = static_cast<int>(alpha / 2.55);  // 反向还原栅格值
+        map(j, i) = map_value;                           // 还原栅格数据
+      }
+      // 如果颜色是白色，表示自由区域或未知区域
+      else if (color == QColor(Qt::white)) {
+        // 原始数据可能是自由区域或未知区域
+        if (alpha == 255) {
+          map(j, i) = 0;  // 自由区域
+        } else {
+          map(j, i) = -1;  // 未知区域
+        }
       } else {
-        map(j, i) = 0;
+        map(j, i) = -1;  // 未知区域，或其他情况
       }
     }
+  }
 
   return map;
 }
+
 void DisplayOccMap::StartDrawLine(const QPointF &pose) {
   line_start_pose_ = pose;
 }

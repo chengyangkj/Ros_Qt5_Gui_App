@@ -42,7 +42,7 @@ class RosNode : public VirtualChannelNode {
   void PubNavGoal(const RobotPose &pose);
   void PubRelocPose(const RobotPose &pose);
   void GetRobotPose();
-  basic::RobotPose GetTrasnsform(std::string from, std::string to);
+  basic::RobotPose getTransform(std::string from, std::string to);
 
  private:
   ros::Publisher nav_goal_publisher_;

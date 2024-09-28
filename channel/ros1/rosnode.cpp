@@ -254,7 +254,7 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     origin_pose.y = pose_map_frame.point.y + cost_map.heightMap();
     origin_pose.theta = 0;
   } catch (tf2::TransformException &ex) {
-    // LOG_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
+    // LOG_ERROR("getTransform localCostMapCallback error:" << ex.what());
   }
 
   double map_o_x, map_o_y;
@@ -316,7 +316,7 @@ void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
       laser_points.push_back(p);
     }
     laser_points.id = 0;
-    // basic::RobotPose pose = getTrasnsform(msg->header.frame_id,
+    // basic::RobotPose pose = getTransform(msg->header.frame_id,
     // "base_link"); std::cout << "get transform" << pose.x << " " << pose.y
     // << " " << pose.theta
     //           << std::endl;
@@ -408,7 +408,7 @@ void RosNode::PubRobotSpeed(const RobotSpeed &speed) {
   speed_publisher_.publish(twist);
 }
 void RosNode::GetRobotPose() {
-  OnDataCallback(MsgId::kRobotPose, GetTrasnsform("base_link", "map"));
+  OnDataCallback(MsgId::kRobotPose, getTransform("base_link", "map"));
 }
 /**
  * @description: 获取坐标变化
@@ -416,7 +416,7 @@ void RosNode::GetRobotPose() {
  * @param {string} to 基坐标系
  * @return {basic::RobotPose}from变换到to坐标系下，需要变换的坐标
  */
-basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
+basic::RobotPose RosNode::getTransform(std::string from, std::string to) {
   basic::RobotPose ret;
   try {
     tf::StampedTransform transform;
@@ -434,7 +434,7 @@ basic::RobotPose RosNode::GetTrasnsform(std::string from, std::string to) {
     ret.theta = yaw;
 
   } catch (tf2::TransformException &ex) {
-    LOG_ERROR("getTrasnsform error from:" << from << " to:" << to
+    LOG_ERROR("getTransform error from:" << from << " to:" << to
                                           << " error:" << ex.what());
   }
   return ret;

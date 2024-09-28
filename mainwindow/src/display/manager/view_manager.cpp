@@ -34,9 +34,6 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
-      "}"
-      "QToolButton:hover {"
-      "  cursor: pointer;"
       "}");
   bottom_bar_layout->addWidget(set_big_btn_);
   QToolButton *set_small_btn_ = new QToolButton();
@@ -48,9 +45,6 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
-      "}"
-      "QToolButton:hover {"
-      "  cursor: pointer;"
       "}");
   bottom_bar_layout->addWidget(set_small_btn_);
   focus_robot_btn_ = new QToolButton();
@@ -61,9 +55,6 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
-      "}"
-      "QToolButton:hover {"
-      "  cursor: pointer;"
       "}");
   focus_robot_btn_->setIconSize(QSize(25, 25));
   bottom_bar_layout->addWidget(focus_robot_btn_);
@@ -80,9 +71,6 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
-      "}"
-      "QToolButton:hover {"
-      "   cursor: pointer;"
       "}");
   display_config_layout->addWidget(display_list_show_btn);
 
@@ -96,9 +84,6 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
-      "}"
-      "QToolButton:hover {"
-      "   cursor: pointer;"
       "}");
   display_btn_list_layout->addWidget(display_laser_btn_);
 

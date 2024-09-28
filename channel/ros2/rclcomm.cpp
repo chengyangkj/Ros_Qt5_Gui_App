@@ -193,7 +193,7 @@ void rclcomm::BatteryCallback(
   OnDataCallback(MsgId::kBatteryState, map);
 }
 void rclcomm::getRobotPose() {
-  OnDataCallback(MsgId::kRobotPose, getTrasnsform("base_link", "map"));
+  OnDataCallback(MsgId::kRobotPose, getTransform("base_link", "map"));
 }
 /**
  * @description: 获取坐标变化
@@ -201,7 +201,7 @@ void rclcomm::getRobotPose() {
  * @param {string} to 基坐标系
  * @return {basic::RobotPose}from变换到to坐标系下，需要变换的坐标
  */
-basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
+basic::RobotPose rclcomm::getTransform(std::string from, std::string to) {
   basic::RobotPose ret;
   try {
     geometry_msgs::msg::TransformStamped transform =
@@ -222,8 +222,8 @@ basic::RobotPose rclcomm::getTrasnsform(std::string from, std::string to) {
     ret.theta = yaw;
 
   } catch (tf2::TransformException &ex) {
-    LOG_ERROR("getTrasnsform error from:" << from << " to:" << to
-                                          << " error:" << ex.what());
+    LOG_ERROR("getTransform error from:" << from << " to:" << to
+                                         << " error:" << ex.what());
   }
   return ret;
 }
@@ -402,7 +402,7 @@ void rclcomm::localCostMapCallback(
     origin_pose.y = pose_map_frame.pose.position.y + cost_map.heightMap();
     origin_pose.theta = yaw;
   } catch (tf2::TransformException &ex) {
-    LOG_ERROR("getTrasnsform localCostMapCallback error:" << ex.what());
+    LOG_ERROR("getTransform localCostMapCallback error:" << ex.what());
   }
 
   double map_o_x, map_o_y;
@@ -434,6 +434,7 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
     occ_map_(x, y) = msg->data[i];
   }
   occ_map_.SetFlip();
+  // std::cout << "recv map:" << occ_map_.rows << "," << occ_map_.cols << std::endl;
   OnDataCallback(MsgId::kOccupancyMap, occ_map_);
 }
 
