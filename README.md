@@ -79,12 +79,9 @@
 
 ![image.png](./doc/images/main.png)
  
-- 建图
-![mapping.png](./doc/images/mapping.gif)
-
-- 导航 
-
 ![image.png](./doc/images/main.gif)
+
+![mapping.png](./doc/images/mapping.gif)
 
 基于flutter的ROS1/ROS2跨平台移动机器人人机交互软件已正式开源:
 ![flutter.png](./doc/images/flutter.png)
@@ -142,7 +139,10 @@ sudo chmod a+x ./ros_qt5_gui_app
 
 # 二,编译
 
-<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1003134929&bvid=BV1ex4y1a7or&cid=1505288719&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+
+[![](https://bb-embed.herokuapp.com/embed?v=BV1jS4y1w7SW)](https://player.bilibili.com/player.html?isOutside=true&aid=1003134929&bvid=BV1ex4y1a7or&cid=1505288719&p=1)
+
 
 
 >💡 注意，为了保证此项目同时兼容ROS1与ROS2，此项目不使用ROS1/ROS2的catkin_make/colcon构建系统进行够建，而是使用标准CMake进行构建，这也就意味着，本项目不会被ROS自动识别为功能包
