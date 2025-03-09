@@ -28,39 +28,75 @@ sudo apt-get install qtcreator
 ## 代码结构
 
 ```
-.
-├── doc/                    # 项目文档
-│   ├── images/            # 文档图片
-│   ├── configuration.md   # 配置说明
-│   ├── usage.md          # 使用指南
-│   ├── development.md    # 开发指南
-│   └── faq.md           # 常见问题
-├── include/               # 头文件
-│   ├── common/           # 通用工具类头文件
-│   ├── widgets/          # 界面组件头文件
-│   └── ros_bridge/       # ROS通信接口头文件
-├── src/                   # 源代码
-│   ├── common/           # 通用工具类实现
-│   │   ├── configuration.cpp    # 配置管理
-│   │   ├── global.cpp          # 全局变量
-│   │   └── topic_manager.cpp   # 话题管理
-│   ├── widgets/          # Qt界面组件
-│   │   ├── main_window.cpp     # 主窗口
-│   │   ├── map_widget.cpp      # 地图组件
-│   │   ├── control_panel.cpp   # 控制面板
-│   │   └── dashboard.cpp       # 仪表盘组件
-│   ├── ros_bridge/       # ROS通信接口
-│   │   ├── ros_bridge.cpp      # ROS桥接层
-│   │   ├── topic_subscriber.cpp # 话题订阅
-│   │   └── topic_publisher.cpp  # 话题发布
-│   └── main.cpp          # 程序入口
-├── resources/            # 资源文件
-│   ├── images/          # 图标等图片资源
-│   ├── qss/            # 样式表
-│   └── translations/   # 多语言翻译文件
-├── scripts/             # 辅助脚本
-├── test/                # 测试代码
-└── CMakeLists.txt      # CMake构建文件
+src
+├── CMakeLists.txt
+├── basic
+├── channel
+│   ├── CMakeLists.txt
+│   ├── manager
+│   ├── ros1
+│   ├── ros2
+├── common
+│   ├── CMakeLists.txt
+│   ├── include
+│   │   ├── config
+│   │   └── logger
+│   └── src
+│       ├── config
+│       │   ├── config_manager.cc
+│       │   └── topologyMap_test.cpp
+│       └── logger
+│           ├── easylogging++.cc
+│           └── logger.cc
+├── core
+│   ├── CMakeLists.txt
+│   ├── main.cpp
+│   └── runtime
+├── mainwindow
+│   ├── CMakeLists.txt
+│   ├── include
+│   │   ├── display
+│   │   ├── mainwindow.h
+│   │   └── widgets
+│   ├── resource
+│   │   ├── background
+│   │   ├── images
+│   │   ├── images.qrc
+│   │   ├── media
+│   │   │   ├── refresh_return.wav
+│   │   │   └── start_return.wav
+│   │   └── media.qrc
+│   ├── src
+│   │   ├── display
+│   │   │   ├── display_cost_map.cpp
+│   │   │   ├── display_demo.cpp
+│   │   │   ├── display_occ_map.cpp
+│   │   │   ├── display_path.cpp
+│   │   │   ├── laser_points.cpp
+│   │   │   ├── manager
+│   │   │   │   ├── display_factory.cpp
+│   │   │   │   ├── display_manager.cpp
+│   │   │   │   ├── scene_manager.cpp
+│   │   │   │   └── view_manager.cpp
+│   │   │   ├── point_shape.cpp
+│   │   │   ├── robot_shape.cpp
+│   │   │   └── virtual_display.cpp
+│   │   ├── mainwindow.cpp
+│   │   └── widgets
+│   │       ├── dashboard.cpp
+│   │       ├── joystick.cpp
+│   │       ├── nav_goal_table_view.cpp
+│   │       ├── nav_goal_widget.cpp
+│   │       ├── ratio_layouted_frame.cpp
+│   │       └── set_pose_widget.cpp
+│   └── ui
+│       └── mainwindow.ui
+└── plugin
+    ├── CMakeLists.txt
+    └── task_processor
+        ├── task_processor.cpp
+        ├── task_processor.h
+        └── task_processor_test.cc
 ```
 
 ## 开发规范

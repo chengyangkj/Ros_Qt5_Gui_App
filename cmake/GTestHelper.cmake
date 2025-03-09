@@ -1,12 +1,11 @@
 macro(AddTest)
 if(BUILD_WITH_TEST)
 
-include(TargetNameHelper)
-GetTargetName()
 # 查找 GTest 库
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 file(GLOB_RECURSE SRC_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  *_test.cpp *_test.cc)
+
 # 添加可执行文件
 add_executable(${TARGET_NAME}_test ${SRC_FILE})
 

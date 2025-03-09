@@ -4,7 +4,7 @@
 #include <QThread>
 #include <QTimer>
 #include "display/manager/scene_manager.h"
-#include "virtual_display.h"
+#include "display/virtual_display.h"
 namespace Display {
 class FactoryDisplay : public QObject {
   Q_OBJECT
