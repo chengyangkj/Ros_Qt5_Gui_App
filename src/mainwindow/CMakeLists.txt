@@ -31,5 +31,5 @@ target_include_directories(
   include/display/
  ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(${TARGET_NAME} Qt5::Widgets Qt5::Core Qt5::Concurrent Qt5::Svg qt${QT_VERSION_MAJOR}advanceddocking json_struct common basic channel plugin ${OpenCV_LIBS})
+target_link_libraries(${TARGET_NAME} Qt5::Widgets Qt5::Core Qt5::Concurrent Qt5::Svg dockwidget::dockwidget json_struct common basic channel plugin ${OpenCV_LIBS})
 

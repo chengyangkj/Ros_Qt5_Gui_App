@@ -30,19 +30,24 @@ file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*
 file(GLOB_RECURSE SOURCE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*.cpp manager/*.cc)
 file(GLOB_RECURSE test_files ${CMAKE_SOURCE_DIR} *_test.cc *_test.cpp)
 list(REMOVE_ITEM SOURCE_FILE ${test_files})
+
 add_library(channel STATIC
 ${QT_MOC_HPP}
 ${SOURCE_FILE}
 )
+
 target_link_libraries(channel PUBLIC Boost::filesystem pthread dl common)
+
 target_include_directories(channel PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}
 manager
 )
+
 set_target_properties(channel PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
+
 #######test
 find_library(DL_LIBRARY dl)
 set(TEST_LINK_LIBRARIES channel ${DL_LIBRARY})

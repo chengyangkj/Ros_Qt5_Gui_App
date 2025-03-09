@@ -3718,3 +3718,10 @@
 [2025-03-09 15:15:51,692][ERROR] getTransform error from:base_link to:map error:Lookup would require extrapolation 0.016059236s into the past.  Requested time 1741504551.688590765 but the earliest data is at time 1741504551.704649925, when looking up transform from frame [base_link] to frame [map]
 [2025-03-09 15:15:51,841][INFO] Load Topology Map Success!
 [2025-03-09 15:16:25,865][INFO] ros qt5 gui app close!
+[2025-03-09 16:11:56,913][INFO]  MainWindow init thread id0x7fa6484c0d40
+[2025-03-09 16:11:56,999][INFO] init image window location:front topic:/camera/rgb/image_raw
+[2025-03-09 16:11:57,551][INFO] image location:front topic:/camera/rgb/image_raw
+[2025-03-09 16:11:57,670][ERROR] getTransform error from:base_link to:map error:"map" passed to lookupTransform argument target_frame does not exist. 
+[2025-03-09 16:11:58,126][INFO] ros_qt5_gui_app init!
+[2025-03-09 16:11:58,211][INFO] Load Topology Map Success!
+[2025-03-09 16:12:00,551][INFO] ros qt5 gui app close!
