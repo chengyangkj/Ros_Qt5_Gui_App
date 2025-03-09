@@ -1,0 +1,97 @@
+{
+  "display_config": [
+    {
+      "display_name": "NavGoal",
+      "topic": "/move_base_simple/goal",
+      "enable": true
+    },
+    {
+      "display_name": "Reloc",
+      "topic": "/initialpose",
+      "enable": true
+    },
+    {
+      "display_name": "Map",
+      "topic": "/map",
+      "enable": true
+    },
+    {
+      "display_name": "LocalCostMap",
+      "topic": "/move_base/local_costmap/costmap",
+      "enable": true
+    },
+    {
+      "display_name": "GlobalCostMap",
+      "topic": "/move_base/global_costmap/costmap",
+      "enable": true
+    },
+    {
+      "display_name": "LaserScan",
+      "topic": "/scan",
+      "enable": true
+    },
+    {
+      "display_name": "GlobalPlan",
+      "topic": "/move_base/DWAPlannerROS/global_plan",
+      "enable": true
+    },
+    {
+      "display_name": "LocalPlan",
+      "topic": "/move_base/DWAPlannerROS/local_plan",
+      "enable": true
+    },
+    {
+      "display_name": "Odometry",
+      "topic": "/odom",
+      "enable": true
+    },
+    {
+      "display_name": "Speed",
+      "topic": "/cmd_vel",
+      "enable": true
+    },
+    {
+      "display_name": "Battery",
+      "topic": "/battery",
+      "enable": true
+    },
+    {
+      "display_name": "MoveBaseStatus",
+      "topic": "/move_base/status",
+      "enable": true
+    }
+  ],
+  "images": [
+    {
+      "location": "front",
+      "topic": "/camera/rgb/image_raw",
+      "enable": true
+    }
+  ],
+  "topology_map_config": {
+    "map_name": "./default_topology_map.json"
+  },
+  "robot_shape_config": {
+    "shaped_points": [
+      {
+        "x": 0.5,
+        "y": 0.5
+      },
+      {
+        "x": 0.5,
+        "y": -0.5
+      },
+      {
+        "x": -0.5,
+        "y": -0.5
+      },
+      {
+        "x": -0.5,
+        "y": 0.5
+      }
+    ],
+    "is_ellipse": false,
+    "color": "0x00000FF",
+    "opacity": 0.5
+  }
+}

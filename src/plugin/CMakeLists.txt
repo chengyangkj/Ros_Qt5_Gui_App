@@ -1,7 +1,5 @@
-
-include(TargetNameHelper)
+set(TARGET_NAME plugin)
 include(GTestHelper)
-GetTargetName()
 
 file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} *.cpp *.cc)
 file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  *.h *.hpp)

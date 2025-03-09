@@ -1,7 +1,5 @@
-
-include(TargetNameHelper)
+set(TARGET_NAME common)
 include(GTestHelper)
-GetTargetName()
 
 file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} src/*.cpp src/*.cc)
 list(FILTER SOURCE_FILE EXCLUDE REGEX "(.*_test\\.cpp$)|(.*_test\\.cc$)")

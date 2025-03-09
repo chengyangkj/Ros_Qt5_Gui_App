@@ -1,5 +1,4 @@
-include(TargetNameHelper)
-GetTargetName()
+set(TARGET_NAME channel_ros2)
 
 file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} *.cpp *.cc)
 file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  *.h *.hpp)
@@ -13,6 +12,7 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread)
+
 add_library(${TARGET_NAME} SHARED
     ${SOURCE_FILE} 
     ${INCLUDE_FILE}

@@ -60,7 +60,7 @@ bool RosNode::Start() {
   int argc = 0;
   ros::init(argc, nullptr, "ros_qt5_gui_app", ros::init_options::AnonymousName);
   while (!ros::master::check()) {
-    LOG_ERROR("wait ros master........");
+    LOG_ERROR("The Ros Master is not running, please check the ros master or run 'roscore' first, waitting for 300ms...");
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
   }
   ros::start();
