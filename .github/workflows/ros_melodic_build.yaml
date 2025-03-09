@@ -66,6 +66,7 @@ jobs:
           && make install
 
       - name: Build
+        shell: bash
         run: |
           source /opt/ros/melodic/setup.bash \
           && rm -rf build \
@@ -76,6 +77,7 @@ jobs:
           && make install
 
       - name: Test
+        shell: bash
         run: |
           source /opt/ros/melodic/setup.bash \
           && cd build \
