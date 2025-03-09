@@ -39,6 +39,7 @@ jobs:
       - name: Install Dependencies
         run: |
           apt-get update && apt-get install -y \
+          ros-melodic-desktop-full \
           qtbase5-dev \
           qt5-qmake \
           libqt5svg5-dev \
