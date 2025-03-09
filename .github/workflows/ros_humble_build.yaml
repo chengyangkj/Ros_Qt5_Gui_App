@@ -68,21 +68,6 @@ jobs:
           tar -czvf release_package.tar.gz ./*
           mv release_package.tar.gz $GITHUB_WORKSPACE/release_package.tar.gz
 
-      - name: Wait for Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        shell: bash
-        run: |
-          # Wait for up to 5 minutes for the release to be created
-          for i in {1..30}; do
-            if gh release view ${GITHUB_REF#refs/tags/}; then
-              exit 0
-            fi
-            sleep 10
-          done
-          exit 1
-        env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-
       - name: Upload Release Asset
         if: startsWith(github.ref, 'refs/tags/v')
         env:
