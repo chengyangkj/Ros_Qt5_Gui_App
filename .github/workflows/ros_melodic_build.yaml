@@ -30,7 +30,8 @@ jobs:
           libeigen3-dev \
           libgtest-dev \
           libsdl-image1.2-dev \
-          libsdl1.2-dev
+          libsdl1.2-dev \
+          wget
 
       - name: Update gtest
         run: |

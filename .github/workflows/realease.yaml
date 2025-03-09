@@ -30,7 +30,6 @@ jobs:
     strategy:
       matrix:
         os-ros: 
-          - { image: 'ubuntu:bionic', ros: 'melodic' }
           - { image: 'ubuntu:focal', ros: 'foxy' }
           - { image: 'ubuntu:jammy', ros: 'humble' }
           - { image: 'ubuntu:focal', ros: 'noetic' } 
