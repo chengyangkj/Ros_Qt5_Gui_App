@@ -129,14 +129,14 @@ For details, visit [ROS_Flutter_Gui_App](https://github.com/chengyangkj/ROS_Flut
 
 | Branch | Supported Platforms | Description |
 |--------|-------------------|-------------|
-| [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master) | Win10 Ubuntu | ROS + QWidget + QGraphicsview custom visualization interface |
-| [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi) | Win10 Ubuntu | ROS + QML + C++ hybrid programming demo |
-| [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple) | Win10 Ubuntu | ROS + QWidget + Librviz visualization display |
-| [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree) | Win10 Ubuntu | ROS + QWidget + Librviz native layer API management |
-| [ros_qt_demo](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_qt_demo) | Win10 Ubuntu | Original package created with cakin_create_qt_pkg |
-| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo) | ROS2 | Qt demo package for ROS2 platform |
-| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App) | ROS2 | Same as this repo/No longer maintained |
-| [Flutter App](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/ros_flutter_app) | Multi-platform (Flutter) | In development... |
+| [master](https://github.com/chengyangkj/ROS_Qt5_Gui_App/tree/master) | Win10 Ubuntu | ROS + QWidget + QGraphicsview custom visualization interface display |
+| [qml_hmi](https://github.com/chengyangkj/ROS_Qt5_Gui_App/tree/qml_hmi) | Win10 Ubuntu | ROS + QML + C++ hybrid programming, QML self-drawn map, lidar and other visualization demos |
+| [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple) | Win10 Ubuntu | ROS + QWidget + Librviz visualization display, CSDN blog "ROS Human-Machine Interaction Software Development" course implementation version |
+| [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree) | Win10 Ubuntu | ROS + QWidget + Librviz native layer API management, no need to manually create layers |
+| [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo) | Win10 Ubuntu | Original package created using cakin_create_qt_pkg, cmakelist.txt configured for qt5, can be directly compiled and run |
+| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo) | ROS2 | Qt demo package running on ROS2 platform, cmakelist.txt configured for qt5, can be built using colcon build |
+| [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App) | ROS2 | Same as this repository/no longer maintained |
+| [Flutter App](https://github.com/chengyangkj/ROS_Flutter_Gui_App) | Multi-platform (Flutter) | Implemented |
 
 ## 💬 Discussion Group
 
