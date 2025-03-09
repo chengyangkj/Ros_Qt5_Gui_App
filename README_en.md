@@ -107,6 +107,8 @@ make
 
 [Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues) and [Pull Requests](https://github.com/chengyangkj/Ros_Qt5_Gui_App/pulls) are welcome.
 
+If you have any ideas or suggestions, feel free to submit them to [🌟 Wishlist/Requirements](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29). They might be implemented someday!
+
 ## 📊 Star History
 
 <div align="center">

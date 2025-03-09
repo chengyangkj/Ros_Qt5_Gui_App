@@ -52,10 +52,6 @@
 | 地图加载/保存 | ✅ | |
 | 相机图像显示 | ✅ | 移植自 rqt_image_view |
 | 机器人车身轮廓显示 | ✅ | 支持配置异形车身 |
-| 基于 rosbridge 的通信 | 🏷️ | 开发中 |
-| 3D 图层显示 | 🏷️ | 开发中 |
-| 拓扑点位的路径规划 | 🏷️ | 开发中 |
-| 机器人历史轨迹录制 | 🏷️ | 开发中 |
 
 ### 🖼️ 界面预览
 
@@ -103,9 +99,12 @@ make
 - [开发指南](./doc/development.md)
 - [常见问题](./doc/faq.md)
 
+
 ## 🤝 贡献
 
 欢迎提交 [Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues) 和 [Pull Requests](https://github.com/chengyangkj/Ros_Qt5_Gui_App/pulls)。
+
+如果有什么想法或者建议，欢迎提交 [🌟心愿/需求单](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29) 说不定哪天就实现了呢
 
 ## 📊 Star 历史
 
