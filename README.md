@@ -66,12 +66,23 @@
 - Ubuntu 18.04+
 - ROS1/ROS2 环境
 - Qt5 基础环境
+- CMake 3.16+ 
 
 ### 安装依赖
 
 ```bash
 sudo apt-get update
 sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev -y
+```
+
+### CMake 升级
+
+ubuntu 18.04 默认安装的是 3.10.2 版本，需要升级到 3.16+ 版本, Ubuntu20.04及以上可跳过此步骤
+
+```bash
+wget https://cmake.org/files/v3.16/cmake-3.16.4-Linux-x86_64.sh -O cmake-install.sh
+chmod +x cmake-install.sh
+sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 ```
 
 ### 编译构建
