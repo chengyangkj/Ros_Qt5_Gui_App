@@ -11,30 +11,26 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os-ros: 
-          - { image: 'ubuntu:bionic', ros: 'melodic' }
-
     container:
-      image: ${{matrix.os-ros.image}}
+      image: ros:melodic
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
 
-      - name: Set up ROS
-        run: |
-          sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-          apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-          apt-get update
-          apt-get install ros-melodic-desktop-full -y
-          rosdep init
-          rosdep update
-          echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-          source ~/.bashrc
-
       - name: Install Dependencies
-        run: sudo apt-get install qtbase5-dev qt5-qmake libqt5svg5-dev qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev libsdl-image1.2-dev libsdl1.2-dev -y
+        run: |
+          apt-get update && apt-get install -y \
+          qtbase5-dev \
+          qt5-qmake \
+          libqt5svg5-dev \
+          qtbase5-dev-tools \
+          qtbase5-private-dev \
+          qt5* \
+          libeigen3-dev \
+          libgtest-dev \
+          libsdl-image1.2-dev \
+          libsdl1.2-dev
 
       - name: Update gtest
         run: |
@@ -45,22 +41,20 @@ jobs:
           && cd build \
           && cmake .. \
           && make -j$(nproc) \
-          && sudo make install
+          && make install
 
       - name: Build
         run: |
-          /bin/bash -c \
-          "source /opt/ros/${{matrix.os-ros.ros}}/setup.bash \
-          && sudo apt-get install qtbase5-dev qt5-qmake libqt5svg5-dev qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y  \
+          source /opt/ros/melodic/setup.bash \
           && rm -rf build \
           && mkdir build/ \
           && cd build/ \
-          && cmake .. -DBUILD_WITH_TEST=ON\
+          && cmake .. -DBUILD_WITH_TEST=ON \
           && make -j$(nproc) \
-          && make install"
+          && make install
+
       - name: Test
         run: |
-          /bin/bash -c \
-          "source /opt/ros/${{matrix.os-ros.ros}}/setup.bash \
+          source /opt/ros/melodic/setup.bash \
           && cd build \
-          && make test"
+          && make test
