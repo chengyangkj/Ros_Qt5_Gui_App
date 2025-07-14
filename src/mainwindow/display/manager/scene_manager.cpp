@@ -40,28 +40,58 @@ void SceneManager::LoadTopologyMap() {
                       .topology_map_config.map_name);
 }
 void SceneManager::OpenTopologyMap(const std::string &file_path) {
-  //删除原有点
-  for (auto point : topology_map_.points) {
-    auto display = FactoryDisplay::Instance()->GetDisplay(point.name);
-    if (display == nullptr) continue;
-    topology_map_.RemovePoint(display->GetDisplayName());
-    FactoryDisplay::Instance()->RemoveDisplay(display);
-    delete display;
+  // 先保存当前拓扑地图中的点名称列表，用于后续删除
+  std::vector<std::string> old_point_names;
+  for (const auto &point : topology_map_.points) {
+    old_point_names.push_back(point.name);
   }
-  Config::ConfigManager::Instacnce()->ReadTopologyMap(
-      file_path,
-      topology_map_);
+  
+  // 读取新的拓扑地图数据
+  TopologyMap new_topology_map;
+  if (!Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, new_topology_map)) {
+    LOG_ERROR("Failed to read topology map from: " << file_path);
+    return;
+  }
+  
+  // 删除原有的显示对象
+  for (const auto &point_name : old_point_names) {
+    auto display = FactoryDisplay::Instance()->GetDisplay(point_name);
+    if (display != nullptr) {
+      FactoryDisplay::Instance()->RemoveDisplay(display);
+      delete display;
+    }
+  }
+  
+  // 清空当前拓扑地图并更新为新数据
+  topology_map_ = new_topology_map;
+  
+  // 确保地图数据已经加载，获取地图数据引用
+  auto &map_data = display_manager_->GetMap();
+  if (map_data.Rows() == 0 || map_data.Cols() == 0) {
+    LOG_WARN("Map data not loaded yet, topology points may have incorrect positions");
+  }
+  
+  // 为每个点创建显示对象
   for (auto &point : topology_map_.points) {
-    auto goal_point =
-        (new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL,
-                        point.name, 8, DISPLAY_MAP));
-
+    auto goal_point = new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL,
+                                   point.name, 8, DISPLAY_MAP);
+    
     goal_point->SetRotateEnable(true)->SetMoveEnable(false)->setVisible(true);
-    goal_point->UpdateDisplay(
-        display_manager_->wordPose2Map(point.ToRobotPose()));
-    LOG_INFO("Load Point:" << point.name)
+    
+    // 使用统一的坐标转换：世界坐标 -> 地图坐标
+    auto robot_pose = point.ToRobotPose();
+    auto map_pose = display_manager_->wordPose2Map(robot_pose);
+    goal_point->UpdateDisplay(map_pose);
+    
+    // 验证坐标转换的一致性
+    validateCoordinateTransformation(robot_pose, "LoadPoint_" + point.name);
+    
+    LOG_INFO("Load Point: " << point.name << " at world pose(" 
+             << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
+             << ") -> map pose(" << map_pose.x << ", " << map_pose.y << ", " << map_pose.theta << ")");
   }
-  LOG_INFO("Load Topology Map Success!")
+  
+  LOG_INFO("Load Topology Map Success! Total points: " << topology_map_.points.size());
   SetPointMoveEnable(false);
   emit signalTopologyMapUpdate(topology_map_);
 }
@@ -118,12 +148,17 @@ void SceneManager::SetPointMoveEnable(bool is_enable) {
   }
 }
 void SceneManager::saveTopologyMap() {
+  // 保存前验证所有点的坐标一致性
+  for (auto &point : topology_map_.points) {
+    validateCoordinateTransformation(point.ToRobotPose(), "SavePoint_" + point.name);
+  }
+  
   Config::ConfigManager::Instacnce()->WriteTopologyMap(
       Config::ConfigManager::Instacnce()
           ->GetRootConfig()
           .topology_map_config.map_name,
       topology_map_);
-  LOG_INFO("save topology map");
+  LOG_INFO("Save topology map with " << topology_map_.points.size() << " points");
   emit signalTopologyMapUpdate(topology_map_);
 }
 void SceneManager::AddOneNavPoint() {
@@ -147,17 +182,26 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     } break;
     case MapEditMode::kAddPoint: {
       std::string name = generatePointName("NAV_POINT");
-      auto goal_point = (new PointShape(PointShape::ePointType::kNavGoal,
-                                        DISPLAY_GOAL, name, 8, DISPLAY_MAP));
+      auto goal_point = new PointShape(PointShape::ePointType::kNavGoal,
+                                      DISPLAY_GOAL, name, 8, DISPLAY_MAP);
       goal_point->SetRotateEnable(true)->SetMoveEnable(true)->setVisible(true);
-      goal_point->UpdateDisplay(display_manager_->scenePoseToMap(
-          basic::RobotPose(position.x(), position.y(), 0)));
-      topology_map_.AddPoint(TopologyMap::PointInfo(
-          display_manager_->scenePoseToWord(
-              basic::RobotPose(position.x(), position.y(), 0)),
-          name));
-      LOG_INFO("add one nav point size:" << topology_map_.points.size()
-                                         << " name:" << name);
+      
+      // 统一的坐标转换：场景坐标 -> 世界坐标 -> 地图坐标
+      auto scene_pose = basic::RobotPose(position.x(), position.y(), 0);
+      auto world_pose = display_manager_->scenePoseToWord(scene_pose);
+      auto map_pose = display_manager_->wordPose2Map(world_pose);
+      
+      goal_point->UpdateDisplay(map_pose);
+      topology_map_.AddPoint(TopologyMap::PointInfo(world_pose, name));
+      
+      // 验证坐标转换的一致性
+      validateCoordinateTransformation(world_pose, "AddPoint_" + name);
+      
+      LOG_INFO("Add nav point: " << name << " at scene pose(" 
+               << scene_pose.x << ", " << scene_pose.y << ", " << scene_pose.theta 
+               << ") -> world pose(" << world_pose.x << ", " << world_pose.y << ", " << world_pose.theta
+               << ") -> map pose(" << map_pose.x << ", " << map_pose.y << ", " << map_pose.theta << ")");
+      LOG_INFO("Total points: " << topology_map_.points.size());
       curr_handle_display_ = goal_point;
     } break;
     case MapEditMode::kErase: {
@@ -225,13 +269,16 @@ void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
         if (display_type == DISPLAY_GOAL) {
-          LOG_INFO("release goal:" << curr_handle_display_->GetCurrentScenePose());
-          topology_map_.UpdatePoint(
-              curr_handle_display_->GetDisplayName(),
-              TopologyMap::PointInfo(
-                  display_manager_->scenePoseToWord(
-                      curr_handle_display_->GetCurrentScenePose()),
-                  curr_handle_display_->GetDisplayName()));
+          auto scene_pose = curr_handle_display_->GetCurrentScenePose();
+          auto world_pose = display_manager_->scenePoseToWord(scene_pose);
+          auto point_name = curr_handle_display_->GetDisplayName();
+          
+          // 更新拓扑地图中的点坐标
+          topology_map_.UpdatePoint(point_name, TopologyMap::PointInfo(world_pose, point_name));
+          
+          LOG_INFO("Update point: " << point_name << " to scene pose(" 
+                   << scene_pose.x << ", " << scene_pose.y << ", " << scene_pose.theta 
+                   << ") -> world pose(" << world_pose.x << ", " << world_pose.y << ", " << world_pose.theta << ")");
         }
       }
     } break;
@@ -343,7 +390,16 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
           });
   connect(nav_goal_widget_, &NavGoalWidget::SignalPoseChanged,
           [this, display](const RobotPose &pose) {
-            display->UpdateDisplay(display_manager_->wordPose2Map(pose));
+            // 更新显示位置：世界坐标 -> 地图坐标
+            auto map_pose = display_manager_->wordPose2Map(pose);
+            display->UpdateDisplay(map_pose);
+            
+            // 同步更新拓扑地图中的点坐标
+            topology_map_.UpdatePoint(display->GetDisplayName(), TopologyMap::PointInfo(pose, display->GetDisplayName()));
+            
+            LOG_INFO("Widget update point: " << display->GetDisplayName() << " to world pose(" 
+                     << pose.x << ", " << pose.y << ", " << pose.theta 
+                     << ") -> map pose(" << map_pose.x << ", " << map_pose.y << ", " << map_pose.theta << ")");
           });
 }
 void SceneManager::updateNavGoalWidgetPose(
@@ -379,5 +435,28 @@ void SceneManager::SaveTopologyMap(const std::string &file_path) {
       topology_map_);
   saveTopologyMap();
 }
+
+void SceneManager::validateCoordinateTransformation(const basic::RobotPose &world_pose, const std::string &context) {
+  // 验证坐标转换的一致性
+  auto map_pose = display_manager_->wordPose2Map(world_pose);
+  auto scene_pose = display_manager_->wordPose2Scene(world_pose);
+  auto back_world_pose = display_manager_->scenePoseToWord(scene_pose);
+  
+  const double tolerance = 0.01; // 1cm tolerance
+  double position_error = std::sqrt(std::pow(world_pose.x - back_world_pose.x, 2) + 
+                                   std::pow(world_pose.y - back_world_pose.y, 2));
+  double angle_error = std::abs(world_pose.theta - back_world_pose.theta);
+  
+  if (position_error > tolerance || angle_error > tolerance) {
+    LOG_WARN("Coordinate transformation error in " << context 
+             << " - Position error: " << position_error 
+             << " m, Angle error: " << angle_error << " rad");
+    LOG_WARN("Original world pose: (" << world_pose.x << ", " << world_pose.y << ", " << world_pose.theta << ")");
+    LOG_WARN("Back-converted world pose: (" << back_world_pose.x << ", " << back_world_pose.y << ", " << back_world_pose.theta << ")");
+  } else {
+    LOG_INFO("Coordinate transformation validated for " << context);
+  }
+}
+
 SceneManager::~SceneManager() {}
 }  // namespace Display

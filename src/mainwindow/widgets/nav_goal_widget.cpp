@@ -3,6 +3,7 @@
 #include <QDoubleSpinBox>
 #include <QLabel>
 #include <QPushButton>
+#include <QShortcut>
 NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   QVBoxLayout *layout = new QVBoxLayout(this);
   layout->setSpacing(0);
@@ -50,6 +51,11 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   QPushButton *button_send = new QPushButton("Move");
   QPushButton *button_remove = new QPushButton("Delete");
   QPushButton *button_cancel = new QPushButton("Close");
+  
+  // 为删除按钮添加快捷键
+  button_remove->setShortcut(QKeySequence::Delete);
+  button_remove->setToolTip("Delete point (Delete/Backspace)");
+  
   layout_button->addWidget(button_send);
   layout_button->addWidget(button_remove);
   layout_button->addWidget(button_cancel);
