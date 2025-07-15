@@ -47,7 +47,7 @@ namespace Display {
 #define DISPLAY_REGION "Region"
 #define DISPLAY_TAG "Tag"
 #define DISPLAY_GOAL "GoalPose"
-#define DISPLAY_SHAPE "RobotShape"
+#define DISPLAY_ROBOT_FOOTPRINT ToString(MsgId::kRobotFootprint)
 enum MapEditMode {
   kStop = 0,
   kNormal,        // 正常编辑模式
