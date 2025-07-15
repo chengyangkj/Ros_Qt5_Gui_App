@@ -10,7 +10,6 @@
 namespace Display {
 SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent), current_mode_(MapEditMode::kStop) {}
 void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
-  // 1s自动保存1次 拓扑地图
 
   display_manager_ = manager;
   view_ptr_ = view_ptr;
@@ -65,12 +64,6 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
   // 清空当前拓扑地图并更新为新数据
   topology_map_ = new_topology_map;
   
-  // 确保地图数据已经加载，获取地图数据引用
-  auto &map_data = display_manager_->GetMap();
-  if (map_data.Rows() == 0 || map_data.Cols() == 0) {
-    LOG_WARN("Map data not loaded yet, topology points may have incorrect positions");
-  }
-  
   // 为每个点创建显示对象
   for (auto &point : topology_map_.points) {
     auto goal_point = new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL,
@@ -83,8 +76,6 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
     auto map_pose = display_manager_->wordPose2Map(robot_pose);
     goal_point->UpdateDisplay(map_pose);
     
-    // 验证坐标转换的一致性
-    validateCoordinateTransformation(robot_pose, "LoadPoint_" + point.name);
     
     LOG_INFO("Load Point: " << point.name << " at world pose(" 
              << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
@@ -148,10 +139,7 @@ void SceneManager::SetPointMoveEnable(bool is_enable) {
   }
 }
 void SceneManager::saveTopologyMap() {
-  // 保存前验证所有点的坐标一致性
-  for (auto &point : topology_map_.points) {
-    validateCoordinateTransformation(point.ToRobotPose(), "SavePoint_" + point.name);
-  }
+
   
   Config::ConfigManager::Instacnce()->WriteTopologyMap(
       Config::ConfigManager::Instacnce()
@@ -193,9 +181,7 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       
       goal_point->UpdateDisplay(map_pose);
       topology_map_.AddPoint(TopologyMap::PointInfo(world_pose, name));
-      
-      // 验证坐标转换的一致性
-      validateCoordinateTransformation(world_pose, "AddPoint_" + name);
+
       
       LOG_INFO("Add nav point: " << name << " at scene pose(" 
                << scene_pose.x << ", " << scene_pose.y << ", " << scene_pose.theta 
@@ -436,27 +422,6 @@ void SceneManager::SaveTopologyMap(const std::string &file_path) {
   saveTopologyMap();
 }
 
-void SceneManager::validateCoordinateTransformation(const basic::RobotPose &world_pose, const std::string &context) {
-  // 验证坐标转换的一致性
-  auto map_pose = display_manager_->wordPose2Map(world_pose);
-  auto scene_pose = display_manager_->wordPose2Scene(world_pose);
-  auto back_world_pose = display_manager_->scenePoseToWord(scene_pose);
-  
-  const double tolerance = 0.01; // 1cm tolerance
-  double position_error = std::sqrt(std::pow(world_pose.x - back_world_pose.x, 2) + 
-                                   std::pow(world_pose.y - back_world_pose.y, 2));
-  double angle_error = std::abs(world_pose.theta - back_world_pose.theta);
-  
-  if (position_error > tolerance || angle_error > tolerance) {
-    LOG_WARN("Coordinate transformation error in " << context 
-             << " - Position error: " << position_error 
-             << " m, Angle error: " << angle_error << " rad");
-    LOG_WARN("Original world pose: (" << world_pose.x << ", " << world_pose.y << ", " << world_pose.theta << ")");
-    LOG_WARN("Back-converted world pose: (" << back_world_pose.x << ", " << back_world_pose.y << ", " << back_world_pose.theta << ")");
-  } else {
-    LOG_INFO("Coordinate transformation validated for " << context);
-  }
-}
 
 SceneManager::~SceneManager() {}
 }  // namespace Display

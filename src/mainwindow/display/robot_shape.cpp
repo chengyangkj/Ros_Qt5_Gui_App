@@ -33,18 +33,14 @@ RobotShape::~RobotShape() {}
 bool RobotShape::UpdateData(const std::any &data) {
   try {
     // 检查是否是RobotFootprint数据
-    if (display_type_ == ToString(MsgId::kRobotFootprint)) {
-      GetAnyData(RobotPath, data, robot_footprint_);
-      updateFootprintPath();
-    } else {
-      // 兼容原有的RobotPose数据
-      GetAnyData(RobotPose, data, robot_pose_);
-    }
+    GetAnyData(RobotPath, data, robot_footprint_);
+    updateFootprintPath();
+  
     rotate_value_ = 0;
     SetPoseInParent(robot_pose_);
     update();
   } catch (const std::bad_any_cast &e) {
-    std::cout << e.what() << '\n';
+    LOG_ERROR("RobotShape UpdateData error: " << e.what());
   }
   return true;
 }

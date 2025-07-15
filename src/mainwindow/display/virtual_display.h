@@ -31,7 +31,7 @@ using namespace basic;
     try {                                   \
       res_data = std::any_cast<type>(data); \
     } catch (const std::bad_any_cast &e) {  \
-      std::cout << e.what() << '\n';        \
+      LOG_ERROR("GetAnyData error: " << e.what());        \
     }                                       \
   }
 

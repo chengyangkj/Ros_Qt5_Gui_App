@@ -208,7 +208,6 @@ DisplayManager::transLaserPoint(const std::vector<Point> &point) {
 void DisplayManager::UpdateRobotPose(const RobotPose &pose) {
   robot_pose_ = pose;
   GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(wordPose2Map(pose));
-  GetDisplay(DISPLAY_ROBOT_FOOTPRINT)->UpdateDisplay(wordPose2Map(pose));
 }
 
 void DisplayManager::updateScaled(double value) {
@@ -337,27 +336,28 @@ void DisplayManager::OpenMap(const std::string &path) {
   std::string extension = filepath.extension().string();
   LOG_INFO("Extension: " << extension);
 
-  if (extension == ".topology") {
-    scene_manager_ptr_->OpenTopologyMap(path);
-  } else if (extension == ".yaml") {
-    std::string topology_path =
-        directory + "/" + filenameWithoutExtension + ".topology";
-    std::string pgm_path =
-        directory + "/" + filenameWithoutExtension + ".pgm";
-    std::string yaml_path =
-        directory + "/" + filenameWithoutExtension + ".yaml";
-    if (boost::filesystem::exists(topology_path)) {
-      scene_manager_ptr_->OpenTopologyMap(topology_path);
-    }
-    if (boost::filesystem::exists(yaml_path)) {
-      OccupancyMap map;
-      bool ret = map.Load(yaml_path);
-      LOG_INFO("open map ret:" << ret);
-      UpdateDisplay(DISPLAY_MAP, map);
-    } else {
-      LOG_ERROR("pgm or yaml not exit! path:" << directory + "/" + filenameWithoutExtension)
-    }
+
+  std::string topology_path =
+      directory + "/" + filenameWithoutExtension + ".topology";
+  std::string pgm_path =
+      directory + "/" + filenameWithoutExtension + ".pgm";
+  std::string yaml_path =
+      directory + "/" + filenameWithoutExtension + ".yaml";
+
+  if (boost::filesystem::exists(yaml_path)) {
+    OccupancyMap map;
+    bool ret = map.Load(yaml_path);
+    LOG_INFO("open map ret:" << ret);
+    UpdateDisplay(DISPLAY_MAP, map);
+  } else {
+    LOG_ERROR("pgm or yaml not exit! path:" << directory + "/" + filenameWithoutExtension)
   }
+
+  if (boost::filesystem::exists(topology_path)) {
+    LOG_INFO("open topology map path:" << topology_path);
+    scene_manager_ptr_->OpenTopologyMap(topology_path);
+  }
+  
 }
 void DisplayManager::SetScaleBig() {
   FactoryDisplay::Instance()

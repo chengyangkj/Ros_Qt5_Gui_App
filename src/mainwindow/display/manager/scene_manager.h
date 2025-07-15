@@ -61,7 +61,6 @@ class SceneManager : public QGraphicsScene {
   void setEraseCursor();
   void drawPoint(const QPointF &);
   void SetPointMoveEnable(bool is_enable);
-  void validateCoordinateTransformation(const basic::RobotPose &world_pose, const std::string &context);
   void cleanupTopologyDisplays(const std::vector<std::string> &point_names);
   PointShape* createTopologyPointDisplay(const TopologyMap::PointInfo &point_info);
 };

@@ -20,7 +20,7 @@ bool DisplayCostMap::UpdateData(const std::any &data) {
     if (data.type() == typeid(OccupancyMap))
       cost_map_data_ = std::any_cast<OccupancyMap>(data);
   } catch (const std::bad_any_cast &e) {
-    std::cout << e.what() << '\n';
+    LOG_ERROR("DisplayCostMap UpdateData error: " << e.what());
     return false;
   }
   ParseCostMap();

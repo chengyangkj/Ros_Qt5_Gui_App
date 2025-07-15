@@ -23,7 +23,7 @@ bool DisplayOccMap::UpdateData(const std::any &data) {
     }
 
   } catch (const std::bad_any_cast &e) {
-    std::cout << e.what() << '\n';
+    LOG_ERROR("DisplayOccMap UpdateData error: " << e.what());
     return false;
   }
 

@@ -17,7 +17,7 @@ Logger::Logger() {
   //是否写入文件
   defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
   //是否输出控制台
-  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
+  defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
   // filename
   defaultConf.setGlobally(el::ConfigurationType::Filename,
                           "ros_qt_gui_app.log");
@@ -29,19 +29,16 @@ Logger::Logger() {
   el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortOnFatalLog);
 }
 Logger::~Logger() {}
-void Logger::Log(LogLevel level, const std::stringstream& message) {
+void Logger::Log(LogLevel level, const std::stringstream& message, const char* file, int line) {
   switch (level) {
     case LogLevel::INFO:
-      std::cout << "[INFO] " << message.str() << std::endl;
-      LOG(INFO) << message.str();
+      LOG(INFO) << "[" << file << ":" << line << "] " << message.str();
       break;
     case LogLevel::ERROR:
-      std::cerr << "[ERROR] " << message.str() << std::endl;
-      LOG(ERROR) << message.str();
+      LOG(ERROR) << "[" << file << ":" << line << "] " << message.str();
       break;
     case LogLevel::WARN:
-      std::cerr << "[WARN] " << message.str() << std::endl;
-      LOG(WARNING) << message.str();
+      LOG(WARNING) << "[" << file << ":" << line << "] " << message.str();
       break;
   }
 }

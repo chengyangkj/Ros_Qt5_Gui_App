@@ -23,7 +23,7 @@ bool DisplayDemo::UpdateData(const std::any &data) {
 
     update();
   } catch (const std::bad_any_cast &e) {
-    std::cout << e.what() << '\n';
+    LOG_ERROR("DisplayDemo UpdateData error: " << e.what());
   }
   return true;
 }
