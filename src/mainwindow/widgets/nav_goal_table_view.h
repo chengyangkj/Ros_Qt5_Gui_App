@@ -5,7 +5,7 @@
 #include <QTableView>
 #include <mutex>
 #include "config/task_chain.h"
-#include "config/topology_map.h"
+#include "map/topology_map.h"
 using namespace basic;
 class NavGoalTableView : public QTableView {
   Q_OBJECT

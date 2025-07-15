@@ -21,7 +21,7 @@
 #include <functional>
 #include <map>
 #include "config/config_manager.h"
-#include "config/topology_map.h"
+#include "map/topology_map.h"
 #include "display/manager/view_manager.h"
 #include "display/display_cost_map.h"
 #include "display/manager/display_factory.h"

@@ -91,6 +91,7 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   void signalCursorPose(QPointF pose);
   void signalPoseUpdate(const RobotPose &pose);
   void signalItemChange(GraphicsItemChange change, const QVariant &value);
+  void signalPositionChanged(); // 新增：位置变化信号
 
  public:
   VirtualDisplay(const std::string &display_type, const int &z_value,

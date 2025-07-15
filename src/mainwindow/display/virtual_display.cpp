@@ -28,8 +28,15 @@ void VirtualDisplay::CenterOnScene(QPointF pose){
 QVariant VirtualDisplay::itemChange(GraphicsItemChange change,
                                     const QVariant &value) {
   emit signalItemChange(change, value);
+  
+  // 当位置发生变化时发出专用信号
+  if (change == QGraphicsItem::ItemPositionHasChanged) {
+    emit signalPositionChanged();
+  }
+  
   return QGraphicsItem::itemChange(change, value);
 }
+
 void VirtualDisplay::parentItemChange(GraphicsItemChange change,
                                       const QVariant &value) {
   switch (change) {
@@ -38,7 +45,9 @@ void VirtualDisplay::parentItemChange(GraphicsItemChange change,
       break;
   }
 }
+
 VirtualDisplay::~VirtualDisplay() {}
+
 void VirtualDisplay::SetPoseInParent(const RobotPose &pose) {
   pose_in_parent_ = pose;
   if (parent_ptr_ == nullptr)
@@ -46,6 +55,9 @@ void VirtualDisplay::SetPoseInParent(const RobotPose &pose) {
   QPointF scene_pose =
       parent_ptr_->mapToScene(QPointF(pose_in_parent_.x, pose_in_parent_.y));
   setPos(scene_pose);
+  
+  // 位置更新后发出信号
+  emit signalPositionChanged();
 }
 bool VirtualDisplay::SetDisplayConfig(const std::string &config_name,
                                       const std::any &config_data) {

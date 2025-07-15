@@ -4,9 +4,10 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
-#include "config/topology_map.h"
+#include "map/topology_map.h"
 
 #include "display/point_shape.h"
+#include "display/topology_line.h"
 #include "widgets/nav_goal_widget.h"
 #include "widgets/set_pose_widget.h"
 namespace Display {
@@ -33,6 +34,18 @@ class SceneManager : public QGraphicsScene {
   QCursor rect_cursor_;
   QCursor region_cursor_;
   QCursor pen_cursor_;
+  
+  // 拓扑连接相关
+  QString first_selected_point_;
+  bool is_linking_mode_{false};
+  std::vector<TopologyLine*> topology_lines_;
+  TopologyLine* selected_topology_line_{nullptr};
+  
+  // 预览线段相关
+  TopologyLine* preview_line_{nullptr};
+  QPointF first_point_pos_;
+  bool is_drawing_line_{false};
+  
  signals:
   void signalTopologyMapUpdate(const TopologyMap &map);
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
@@ -53,6 +66,7 @@ class SceneManager : public QGraphicsScene {
   void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
   void saveTopologyMap();
   void blindNavGoalWidget(Display::VirtualDisplay *);
   void updateNavGoalWidgetPose( Display::VirtualDisplay *, bool is_move = true);
@@ -63,5 +77,15 @@ class SceneManager : public QGraphicsScene {
   void SetPointMoveEnable(bool is_enable);
   void cleanupTopologyDisplays(const std::vector<std::string> &point_names);
   PointShape* createTopologyPointDisplay(const TopologyMap::PointInfo &point_info);
+  
+  // 拓扑连接相关方法
+  void handleTopologyLinking(const QString &point_name);
+  void createTopologyLine(const QString &from, const QString &to, bool bidirectional = false);
+  void updateTopologyLinePositions();
+  void clearTopologyLineSelection();
+  void deleteSelectedTopologyLine();
+  std::string generateRouteId(const QString &from, const QString &to);
+  TopologyLine* findTopologyLine(const QString &route_id);
+  void loadTopologyRoutes();
 };
 }  // namespace Display

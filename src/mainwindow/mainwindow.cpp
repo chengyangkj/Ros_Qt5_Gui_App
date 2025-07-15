@@ -325,7 +325,7 @@ void MainWindow::setupUi() {
   add_topology_path_btn->setIcon(add_topology_path_btn_icon);
   layout_tools_edit_map->addWidget(add_topology_path_btn);
   //TODO 拓扑点连接
-  add_topology_path_btn->setEnabled(false);
+  add_topology_path_btn->setEnabled(true);
   //添加区域按钮
   QToolButton *add_region_btn = new QToolButton();
   add_region_btn->setStyleSheet(
