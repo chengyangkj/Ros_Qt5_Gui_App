@@ -17,6 +17,7 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 #include "geometry_msgs/msg/twist.hpp"
+#include "geometry_msgs/msg/polygon_stamped.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "nav_msgs/msg/path.hpp"
@@ -45,6 +46,7 @@ class rclcomm : public VirtualChannelNode {
   void BatteryCallback(const sensor_msgs::msg::BatteryState::SharedPtr msg);
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
+  void robotFootprintCallback(const geometry_msgs::msg::PolygonStamped::SharedPtr msg);
 
  public:
   bool Start() override;
@@ -75,6 +77,8 @@ class rclcomm : public VirtualChannelNode {
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odometry_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr local_path_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr global_path_subscriber_;
+  rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr
+      robot_footprint_subscriber_;
   std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> image_subscriber_list_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> transform_listener_;

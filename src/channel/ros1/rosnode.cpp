@@ -22,6 +22,7 @@ RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
   SET_DEFAULT_TOPIC_NAME("MoveBaseStatus", "/move_base/status")
+  SET_DEFAULT_TOPIC_NAME("RobotFootprint", "/move_base/local_costmap/published_footprint")
   if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
     Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
@@ -95,6 +96,8 @@ void RosNode::init() {
                                       &RosNode::OdometryCallback, this);
   battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Battery"), 1,
                                      &RosNode::BatteryCallback, this);
+  robot_footprint_subscriber_ = nh.subscribe(GET_TOPIC_NAME("RobotFootprint"), 1,
+                                             &RosNode::RobotFootprintCallback, this);
 
   for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
     LOG_INFO("image location:" << one_image_display.location << " topic:" << one_image_display.topic);
@@ -438,4 +441,29 @@ basic::RobotPose RosNode::getTransform(std::string from, std::string to) {
                                           << " error:" << ex.what());
   }
   return ret;
+}
+
+void RosNode::RobotFootprintCallback(geometry_msgs::PolygonStamped::ConstPtr msg) {
+  try {
+    geometry_msgs::PointStamped point_map_frame;
+    geometry_msgs::PointStamped point_footprint_frame;
+    basic::RobotPath footprint;
+    
+    for (const auto& point : msg->polygon.points) {
+      point_footprint_frame.point.x = point.x;
+      point_footprint_frame.point.y = point.y;
+      point_footprint_frame.header.frame_id = msg->header.frame_id;
+      
+      tf_listener_->transformPoint("map", point_footprint_frame, point_map_frame);
+      
+      basic::Point p;
+      p.x = point_map_frame.point.x;
+      p.y = point_map_frame.point.y;
+      footprint.push_back(p);
+    }
+    
+    OnDataCallback(MsgId::kRobotFootprint, footprint);
+  } catch (tf2::TransformException &ex) {
+    LOG_ERROR("RobotFootprintCallback transform error: " << ex.what());
+  }
 }

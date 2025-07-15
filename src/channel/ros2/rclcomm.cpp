@@ -22,6 +22,7 @@ rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
   SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
+  SET_DEFAULT_TOPIC_NAME("RobotFootprint", "/local_costmap/published_footprint")
   if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
     Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
@@ -93,6 +94,10 @@ bool rclcomm::Start() {
   odometry_subscriber_ = node->create_subscription<nav_msgs::msg::Odometry>(
       GET_TOPIC_NAME("Odometry"), 20,
       std::bind(&rclcomm::odom_callback, this, std::placeholders::_1),
+      sub1_obt);
+  robot_footprint_subscriber_ = node->create_subscription<geometry_msgs::msg::PolygonStamped>(
+      GET_TOPIC_NAME("RobotFootprint"), 20,
+      std::bind(&rclcomm::robotFootprintCallback, this, std::placeholders::_1),
       sub1_obt);
   for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
     LOG_INFO("image location:" << one_image_display.location << "topic:" << one_image_display.topic);
@@ -472,4 +477,29 @@ void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
 
   // Publish it and resolve any remaining callbacks
   speed_publisher_->publish(twist);
+}
+
+void rclcomm::robotFootprintCallback(const geometry_msgs::msg::PolygonStamped::SharedPtr msg) {
+  try {
+    geometry_msgs::msg::PointStamped point_map_frame;
+    geometry_msgs::msg::PointStamped point_footprint_frame;
+    basic::RobotPath footprint;
+    
+    for (const auto& point : msg->polygon.points) {
+      point_footprint_frame.point.x = point.x;
+      point_footprint_frame.point.y = point.y;
+      point_footprint_frame.header.frame_id = msg->header.frame_id;
+      
+      tf_buffer_->transform(point_footprint_frame, point_map_frame, "map");
+      
+      basic::Point p;
+      p.x = point_map_frame.point.x;
+      p.y = point_map_frame.point.y;
+      footprint.push_back(p);
+    }
+    
+    OnDataCallback(MsgId::kRobotFootprint, footprint);
+  } catch (tf2::TransformException &ex) {
+    LOG_ERROR("robotFootprintCallback transform error: " << ex.what());
+  }
 }

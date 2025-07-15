@@ -3,6 +3,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Twist.h>
+#include <geometry_msgs/PolygonStamped.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <nav_msgs/Odometry.h>
 #include <nav_msgs/Path.h>
@@ -37,6 +38,7 @@ class RosNode : public VirtualChannelNode {
   void GlobalPathCallback(nav_msgs::Path::ConstPtr path);
   void LocalPathCallback(nav_msgs::Path::ConstPtr path);
   void BatteryCallback(sensor_msgs::BatteryState::ConstPtr path);
+  void RobotFootprintCallback(geometry_msgs::PolygonStamped::ConstPtr msg);
   // void MbStatusCallback(actionlib_msgs::GoalStatusArray::ConstPtr msg);
   void PubRobotSpeed(const RobotSpeed &speed);
   void PubNavGoal(const RobotPose &pose);
@@ -57,6 +59,7 @@ class RosNode : public VirtualChannelNode {
   ros::Subscriber global_path_subscriber_;
   ros::Subscriber local_path_subscriber_;
   ros::Subscriber battery_subscriber_;
+  ros::Subscriber robot_footprint_subscriber_;
   ros::Subscriber move_base_status_subscriber_;
   std::vector<ros::Subscriber> image_subscriber_list_;
   basic::OccupancyMap occ_map_;

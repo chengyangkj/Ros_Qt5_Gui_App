@@ -6,7 +6,8 @@
       OneValue(kGlobalCostMap, ) OneValue(kRobotPose, ) OneValue(kLaserScan, ) \
           OneValue(kLocalPath, ) OneValue(kGlobalPath, ) OneValue(kOdomPose, ) \
               OneValue(kSetNavGoalPose, ) OneValue(kSetRelocPose, )            \
-                  OneValue(kSetRobotSpeed, ) OneValue(kBatteryState, ) OneValue(kImage, )
+                  OneValue(kSetRobotSpeed, ) OneValue(kBatteryState, ) OneValue(kImage, ) \
+                  OneValue(kRobotFootprint, )
 
 DECLARE_ENUM(MsgId, SOME_ENUM)
 DEFINE_ENUM(MsgId, SOME_ENUM)

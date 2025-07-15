@@ -13,6 +13,7 @@
 #include <QColor>
 #include <QGraphicsItem>
 #include <QGraphicsSceneWheelEvent>
+#include <limits>
 #include "config/config_manager.h"
 #include "virtual_display.h"
 namespace Display {
@@ -21,11 +22,13 @@ class RobotShape : public VirtualDisplay {
  private:
   QPainterPath path_;
   RobotPose robot_pose_{0, 0, 0};
+  RobotPath robot_footprint_;  // 存储RobotFootprint数据
   QColor color_{0x1E90FF};
   float opacity_{0.5};
 
  private:
   void drawFrame(QPainter *painter);
+  void updateFootprintPath();  // 更新RobotFootprint路径
 
  public:
   RobotShape(const std::string &display_type, const int &z_value,
