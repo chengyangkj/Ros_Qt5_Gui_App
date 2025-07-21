@@ -12,13 +12,12 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QPainter>
 #include <QPainterPath>
-#include <QGraphicsLineItem>
 #include "virtual_display.h"
 #include "map/topology_map.h"
 
 using namespace basic;
 namespace Display {
-class TopologyLine : public QGraphicsLineItem {
+class TopologyLine : public VirtualDisplay {
   
  private:
   // 现代化配色方案
@@ -33,7 +32,6 @@ class TopologyLine : public QGraphicsLineItem {
   int line_width_{4};                               // 稍微加粗
   int arrow_size_{20};                              // 加大箭头
   bool is_highlighted_{false};
-  std::string display_name_;
   
   // 关联的点位显示对象
   QGraphicsItem* start_item_{nullptr};
@@ -52,7 +50,7 @@ class TopologyLine : public QGraphicsLineItem {
   void drawSingleMovingArrow(QPainter *painter, const QPointF &pos, const QPointF &direction, const QColor &color, qreal size);
   void drawFlowingLight(QPainter *painter, const QPointF &start, const QPointF &end, const QColor &color);
   QPointF calculateArrowHead(const QPointF &start, const QPointF &end, double angle);
-  QRectF boundingRect() const override;
+  QRectF calculateDynamicBoundingRect() const;
   
   // 计算双向连接的偏移位置
   std::pair<QPointF, QPointF> calculateOffsetPositions(const QPointF &start_pos, const QPointF &end_pos) const;
@@ -60,6 +58,10 @@ class TopologyLine : public QGraphicsLineItem {
   TopologyLine(QGraphicsItem* from_item, QGraphicsItem* to_item = nullptr, 
                const std::string &display_name = "");
   ~TopologyLine();
+  
+  // 实现VirtualDisplay的纯虚函数
+  bool UpdateData(const std::any &data) override;
+  void updateBoundingRect();
   
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
@@ -76,7 +78,6 @@ class TopologyLine : public QGraphicsLineItem {
   QGraphicsItem* GetFromItem() const { return start_item_; }
   QGraphicsItem* GetToItem() const { return end_item_; }
   bool IsPartOfBidirectional() const { return is_part_of_bidirectional_; }
-  std::string GetDisplayName() const { return display_name_; }
   
   // 设置是否为双向连接的一部分
   void SetPartOfBidirectional(bool is_part_of_bidirectional) { 

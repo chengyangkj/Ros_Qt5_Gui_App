@@ -16,30 +16,22 @@ namespace Display {
 
 TopologyLine::TopologyLine(QGraphicsItem* from_item, QGraphicsItem* to_item, 
                            const std::string &display_name)
-    : QGraphicsLineItem(), start_item_(from_item), end_item_(to_item), 
-      is_part_of_bidirectional_(false), display_name_(display_name) {
+    : VirtualDisplay("TopologyLine", 8, "MAP", display_name), start_item_(from_item), end_item_(to_item), 
+      is_part_of_bidirectional_(false) {
   
   // 设置可以接收鼠标和悬停事件
   setAcceptHoverEvents(true);
   setAcceptedMouseButtons(Qt::AllButtons);
   setFlag(ItemIsSelectable, true);
   
-  // 设置线段样式
-  QPen pen(line_color_, line_width_);
-  setPen(pen);
-  
-  // 设置Z值确保在最上层
-  setZValue(8);
+  // 设置初始bounding rect，会动态更新
+  updateBoundingRect();
 }
 
 TopologyLine::~TopologyLine() {
 }
 
-QRectF TopologyLine::boundingRect() const {
- 
-  
-  return QRectF(-5000, -5000, 10000, 10000);
-}
+
 
 
 void TopologyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -48,6 +40,9 @@ void TopologyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   if (!start_item_) {
     return; // 如果没有起点item，不绘制
   }
+  
+  // 动态更新bounding rect
+  updateBoundingRect();
   
   QPointF start_pos = start_item_->scenePos();
   QPointF end_pos;
@@ -362,21 +357,18 @@ QPainterPath TopologyLine::shape() const {
 }
 
 void TopologyLine::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-  if (event->button() == Qt::LeftButton) {
-    SetSelected(!is_selected_);
-    LOG_INFO("TopologyLine selected: " << GetDisplayName());
-  }
-  QGraphicsLineItem::mousePressEvent(event);
+  SetHighlighted(false);
+  QGraphicsItem::mousePressEvent(event);
 }
 
 void TopologyLine::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
   SetHighlighted(true);
-  QGraphicsLineItem::hoverEnterEvent(event);
+  QGraphicsItem::hoverEnterEvent(event);
 }
 
 void TopologyLine::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
   SetHighlighted(false);
-  QGraphicsLineItem::hoverLeaveEvent(event);
+  QGraphicsItem::hoverLeaveEvent(event);
 }
 
 std::pair<QPointF, QPointF> TopologyLine::calculateOffsetPositions(const QPointF &start_pos, const QPointF &end_pos) const {
@@ -454,6 +446,54 @@ void TopologyLine::advance(int step) {
   
   // 正常模式始终有动画，预览模式和选中状态有特殊效果
   update();
+}
+
+QRectF TopologyLine::calculateDynamicBoundingRect() const {
+  if (!start_item_) {
+    return QRectF(0, 0, 1, 1);
+  }
+  
+  QPointF start_pos = start_item_->scenePos();
+  QPointF end_pos;
+  
+  if (is_preview_mode_) {
+    end_pos = preview_end_pos_;
+  } else if (end_item_) {
+    end_pos = end_item_->scenePos();
+  } else {
+    return QRectF(start_pos.x()-10, start_pos.y()-10, 20, 20);
+  }
+  
+  // 计算偏移后的位置
+  if (is_part_of_bidirectional_ && !is_preview_mode_) {
+    auto offset_positions = calculateOffsetPositions(start_pos, end_pos);
+    start_pos = offset_positions.first;
+    end_pos = offset_positions.second;
+  }
+  
+  // 计算包含起点和终点的矩形，并添加一些边距
+  qreal left = qMin(start_pos.x(), end_pos.x()) - 20;
+  qreal top = qMin(start_pos.y(), end_pos.y()) - 20;
+  qreal right = qMax(start_pos.x(), end_pos.x()) + 20;
+  qreal bottom = qMax(start_pos.y(), end_pos.y()) + 20;
+  
+  // 转换为本地坐标系
+  QPointF scene_top_left(left, top);
+  QPointF local_top_left = mapFromScene(scene_top_left);
+  
+  return QRectF(local_top_left.x(), local_top_left.y(), 
+                right - left, bottom - top);
+}
+
+void TopologyLine::updateBoundingRect() {
+  QRectF new_rect = calculateDynamicBoundingRect();
+  SetBoundingRect(new_rect);
+}
+
+bool TopologyLine::UpdateData(const std::any &data) {
+  // TopologyLine不需要从外部数据更新，只需要跟随关联的item位置
+  updateBoundingRect();
+  return true;
 }
 
 }  // namespace Display 
