@@ -29,12 +29,11 @@ struct TopologyMap {
   struct RouteInfo {
     std::string from;
     std::string to;
-    bool bidirectional{false};  // 是否双向
     std::string route_id;       // 路径ID，用于显示和管理
-    JS_OBJ(from, to, bidirectional, route_id);
+    JS_OBJ(from, to, route_id);
     RouteInfo() {}
-    RouteInfo(const std::string &_from, const std::string &_to, bool _bidirectional = false)
-        : from(_from), to(_to), bidirectional(_bidirectional) {
+    RouteInfo(const std::string &_from, const std::string &_to)
+        : from(_from), to(_to) {
       route_id = from + "->" + to;
     }
   };
@@ -123,5 +122,10 @@ struct TopologyMap {
                             return route.from == from && route.to == to;
                           });
     return it != routes.end();
+  }
+  
+  // 判断两个点之间是否为双向连接（同时存在from->to和to->from两个路径）
+  bool IsBidirectional(const std::string &from, const std::string &to) {
+    return HasRoute(from, to) && HasRoute(to, from);
   }
 };

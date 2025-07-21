@@ -40,7 +40,7 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
                              robot_svg_renderer_.defaultSize().height()));
     } break;
   }
-  // this->setCursor(Qt::);
+  setZValue(9);
 }
 QVariant PointShape::itemChange(GraphicsItemChange change,
                                 const QVariant &value) {

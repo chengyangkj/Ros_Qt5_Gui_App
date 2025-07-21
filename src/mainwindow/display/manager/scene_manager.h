@@ -80,12 +80,13 @@ class SceneManager : public QGraphicsScene {
   
   // 拓扑连接相关方法
   void handleTopologyLinking(const QString &point_name);
-  void createTopologyLine(const QString &from, const QString &to, bool bidirectional = false);
+  void createTopologyLine(const QString &from, const QString &to);
   void updateTopologyLinePositions();
   void clearTopologyLineSelection();
   void deleteSelectedTopologyLine();
   std::string generateRouteId(const QString &from, const QString &to);
   TopologyLine* findTopologyLine(const QString &route_id);
   void loadTopologyRoutes();
+  void updateAllTopologyLinesBidirectionalStatus();
 };
 }  // namespace Display

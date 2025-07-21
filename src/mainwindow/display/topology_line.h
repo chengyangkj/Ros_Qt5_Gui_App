@@ -19,15 +19,19 @@
 using namespace basic;
 namespace Display {
 class TopologyLine : public QGraphicsLineItem {
-  // 移除Q_OBJECT宏，因为QGraphicsLineItem不继承自QObject
   
  private:
-  QColor line_color_{Qt::blue};
-  QColor selected_color_{Qt::red};
-  bool is_bidirectional_{false};
+  // 现代化配色方案
+  QColor line_color_{QColor(64, 158, 255)};        // 现代蓝色
+  QColor selected_color_{QColor(255, 107, 129)};   // 现代红色
+  QColor highlighted_color_{QColor(135, 206, 250)}; // 高亮蓝色
+  QColor preview_color_{QColor(160, 160, 160)};     // 预览灰色
+  QColor shadow_color_{QColor(0, 0, 0, 60)};        // 阴影颜色
+  
+  bool is_part_of_bidirectional_{false};              // 是否是双向连接的一部分
   bool is_selected_{false};
-  int line_width_{3};
-  int arrow_size_{15};
+  int line_width_{4};                               // 稍微加粗
+  int arrow_size_{20};                              // 加大箭头
   bool is_highlighted_{false};
   std::string display_name_;
   
@@ -38,14 +42,23 @@ class TopologyLine : public QGraphicsLineItem {
   // 预览模式相关
   bool is_preview_mode_{false};
   QPointF preview_end_pos_;
+  
+  // 动画效果相关
+  qreal animation_offset_{0.0};
 
  private:
-  void drawArrow(QPainter *painter, const QPointF &start, const QPointF &end);
+  void drawStaticArrow(QPainter *painter, const QPointF &start, const QPointF &end, const QColor &color);
+  void drawMovingArrows(QPainter *painter, const QPointF &start, const QPointF &end, const QColor &color);
+  void drawSingleMovingArrow(QPainter *painter, const QPointF &pos, const QPointF &direction, const QColor &color, qreal size);
+  void drawFlowingLight(QPainter *painter, const QPointF &start, const QPointF &end, const QColor &color);
   QPointF calculateArrowHead(const QPointF &start, const QPointF &end, double angle);
   QRectF boundingRect() const override;
+  
+  // 计算双向连接的偏移位置
+  std::pair<QPointF, QPointF> calculateOffsetPositions(const QPointF &start_pos, const QPointF &end_pos) const;
  public:
   TopologyLine(QGraphicsItem* from_item, QGraphicsItem* to_item = nullptr, 
-               bool bidirectional = false, const std::string &display_name = "");
+               const std::string &display_name = "");
   ~TopologyLine();
   
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
@@ -62,8 +75,14 @@ class TopologyLine : public QGraphicsLineItem {
   // 获取连接信息
   QGraphicsItem* GetFromItem() const { return start_item_; }
   QGraphicsItem* GetToItem() const { return end_item_; }
-  bool IsBidirectional() const { return is_bidirectional_; }
+  bool IsPartOfBidirectional() const { return is_part_of_bidirectional_; }
   std::string GetDisplayName() const { return display_name_; }
+  
+  // 设置是否为双向连接的一部分
+  void SetPartOfBidirectional(bool is_part_of_bidirectional) { 
+    is_part_of_bidirectional_ = is_part_of_bidirectional; 
+    update(); 
+  }
   
   // 预览模式控制
   void SetPreviewMode(bool preview_mode) { is_preview_mode_ = preview_mode; update(); }
@@ -73,6 +92,9 @@ class TopologyLine : public QGraphicsLineItem {
   // 重写点击检测
   bool contains(const QPointF &point) const override;
   QPainterPath shape() const override;
+  
+  // 动画支持
+  void advance(int step) override;
 
  protected:
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;

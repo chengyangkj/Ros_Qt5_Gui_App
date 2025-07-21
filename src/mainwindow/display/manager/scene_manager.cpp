@@ -550,7 +550,7 @@ void SceneManager::handleTopologyLinking(const QString &point_name) {
       first_point_pos_ = first_display->scenePos();
       
       // 创建预览线段
-      preview_line_ = new TopologyLine(first_display, nullptr, false, "preview");
+      preview_line_ = new TopologyLine(first_display, nullptr, "preview");
       preview_line_->SetPreviewMode(true);
       preview_line_->SetPreviewEndPos(first_point_pos_);
       addItem(preview_line_);
@@ -580,7 +580,7 @@ void SceneManager::handleTopologyLinking(const QString &point_name) {
       LOG_WARN("连接已存在: " << first_selected_point_.toStdString() << " -> " << second_point.toStdString());
     } else {
       // 直接创建单向连接
-      createTopologyLine(first_selected_point_, second_point, false);
+      createTopologyLine(first_selected_point_, second_point);
       LOG_INFO("创建单向连接: " << first_selected_point_.toStdString() << " -> " << second_point.toStdString());
     }
     
@@ -597,11 +597,11 @@ void SceneManager::handleTopologyLinking(const QString &point_name) {
   }
 }
 
-void SceneManager::createTopologyLine(const QString &from, const QString &to, bool bidirectional) {
+void SceneManager::createTopologyLine(const QString &from, const QString &to) {
   std::string route_id = generateRouteId(from, to);
   
-  // 创建路径信息并添加到拓扑地图（现在都是单向连接）
-  TopologyMap::RouteInfo route(from.toStdString(), to.toStdString(), false);
+  // 创建路径信息并添加到拓扑地图
+  TopologyMap::RouteInfo route(from.toStdString(), to.toStdString());
   route.route_id = route_id;
   topology_map_.AddRoute(route);
   
@@ -611,13 +611,21 @@ void SceneManager::createTopologyLine(const QString &from, const QString &to, bo
   
   if (from_display && to_display) {
     // 创建新的TopologyLine对象
-    TopologyLine *line = new TopologyLine(from_display, to_display, false, route_id);
+    TopologyLine *line = new TopologyLine(from_display, to_display, route_id);
     topology_lines_.push_back(line);
     
     // 添加到场景中
     addItem(line);
     
-    LOG_INFO("创建拓扑连接: " << from.toStdString() << " -> " << to.toStdString() << " (单向)");
+    // 检查并设置是否为双向连接的一部分
+    bool is_part_of_bidirectional = topology_map_.IsBidirectional(from.toStdString(), to.toStdString());
+    line->SetPartOfBidirectional(is_part_of_bidirectional);
+    
+    // 如果这个连接使得反向连接也变成双向，需要更新反向连接的显示
+    updateAllTopologyLinesBidirectionalStatus();
+    
+    LOG_INFO("创建拓扑连接: " << from.toStdString() << " -> " << to.toStdString() 
+             << (is_part_of_bidirectional ? " (双向)" : " (单向)"));
   } else {
     LOG_ERROR("无法找到连接点位: " << from.toStdString() << " 或 " << to.toStdString());
   }
@@ -652,6 +660,9 @@ void SceneManager::deleteSelectedTopologyLine() {
     LOG_INFO("删除拓扑连线: " << selected_topology_line_->GetDisplayName());
     delete selected_topology_line_;
     selected_topology_line_ = nullptr;
+    
+    // 删除路径后，需要更新所有连线的双向状态
+    updateAllTopologyLinesBidirectionalStatus();
   }
 }
 
@@ -676,17 +687,40 @@ void SceneManager::loadTopologyRoutes() {
     auto to_display = FactoryDisplay::Instance()->GetDisplay(route.to);
     
     if (from_display && to_display) {
-      TopologyLine *line = new TopologyLine(from_display, to_display,
-                                           route.bidirectional, route.route_id);
+      TopologyLine *line = new TopologyLine(from_display, to_display, route.route_id);
       topology_lines_.push_back(line);
       
       // 添加到场景中
       addItem(line);
       
+      // 检查并设置是否为双向连接的一部分
+      bool is_part_of_bidirectional = topology_map_.IsBidirectional(route.from, route.to);
+      line->SetPartOfBidirectional(is_part_of_bidirectional);
+      
       LOG_INFO("Load topology route: " << route.from << " -> " << route.to 
-               << (route.bidirectional ? " (双向)" : " (单向)"));
+               << (is_part_of_bidirectional ? " (双向)" : " (单向)"));
     } else {
       LOG_ERROR("无法找到连接点位: " << route.from << " 或 " << route.to);
+    }
+  }
+}
+
+void SceneManager::updateAllTopologyLinesBidirectionalStatus() {
+  // 更新所有拓扑连线的双向状态
+  for (auto line : topology_lines_) {
+    if (line && line->GetFromItem() && line->GetToItem()) {
+      // 获取起点和终点的显示名称
+      VirtualDisplay* from_display = dynamic_cast<VirtualDisplay*>(line->GetFromItem());
+      VirtualDisplay* to_display = dynamic_cast<VirtualDisplay*>(line->GetToItem());
+      
+      if (from_display && to_display) {
+        std::string from_name = from_display->GetDisplayName();
+        std::string to_name = to_display->GetDisplayName();
+        
+        // 检查并更新是否为双向连接的一部分
+        bool is_part_of_bidirectional = topology_map_.IsBidirectional(from_name, to_name);
+        line->SetPartOfBidirectional(is_part_of_bidirectional);
+      }
     }
   }
 }
