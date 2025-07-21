@@ -21,6 +21,7 @@
 #include "algorithm.h"
 #include "logger/logger.h"
 #include "ui_mainwindow.h"
+#include <QButtonGroup>
 
 #include "widgets/speed_ctrl.h"
 using namespace ads;
@@ -267,13 +268,22 @@ void MainWindow::setupUi() {
       QString::fromUtf8(" layout_tools_edit_map"));
   //地图编辑 设置鼠标按钮
   QToolButton *normal_cursor_btn = new QToolButton();
+  normal_cursor_btn->setCheckable(true);
   normal_cursor_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
+      "   border-radius: 4px;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(100, 149, 237, 0.2);"
       "}"
       "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "   background-color: rgba(100, 149, 237, 0.4);"
+      "}"
+      "QToolButton:checked {"
+      "   background-color: rgba(100, 149, 237, 0.3);"
+      "   border: 2px solid #6495ED;"
       "}");
   normal_cursor_btn->setToolTip("鼠标");
   normal_cursor_btn->setCursor(Qt::PointingHandCursor);
@@ -288,13 +298,22 @@ void MainWindow::setupUi() {
   //添加点位按钮
 
   QToolButton *add_point_btn = new QToolButton();
+  add_point_btn->setCheckable(true);
   add_point_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
+      "   border-radius: 4px;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(100, 149, 237, 0.2);"
       "}"
       "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "   background-color: rgba(100, 149, 237, 0.4);"
+      "}"
+      "QToolButton:checked {"
+      "   background-color: rgba(100, 149, 237, 0.3);"
+      "   border: 2px solid #6495ED;"
       "}");
   add_point_btn->setToolTip("添加工位点");
   add_point_btn->setCursor(Qt::PointingHandCursor);
@@ -307,13 +326,22 @@ void MainWindow::setupUi() {
   layout_tools_edit_map->addWidget(add_point_btn);
 
   QToolButton *add_topology_path_btn = new QToolButton();
+  add_topology_path_btn->setCheckable(true);
   add_topology_path_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
+      "   border-radius: 4px;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(100, 149, 237, 0.2);"
       "}"
       "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "   background-color: rgba(100, 149, 237, 0.4);"
+      "}"
+      "QToolButton:checked {"
+      "   background-color: rgba(100, 149, 237, 0.3);"
+      "   border: 2px solid #6495ED;"
       "}");
   add_topology_path_btn->setToolTip("连接工位点");
   add_topology_path_btn->setCursor(Qt::PointingHandCursor);
@@ -328,13 +356,22 @@ void MainWindow::setupUi() {
   add_topology_path_btn->setEnabled(true);
   //添加区域按钮
   QToolButton *add_region_btn = new QToolButton();
+  add_region_btn->setCheckable(true);
   add_region_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
+      "   border-radius: 4px;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(100, 149, 237, 0.2);"
       "}"
       "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "   background-color: rgba(100, 149, 237, 0.4);"
+      "}"
+      "QToolButton:checked {"
+      "   background-color: rgba(100, 149, 237, 0.3);"
+      "   border: 2px solid #6495ED;"
       "}");
   add_region_btn->setToolTip("添加区域");
   add_region_btn->setCursor(Qt::PointingHandCursor);
@@ -358,13 +395,22 @@ void MainWindow::setupUi() {
   //橡皮擦按钮
 
   QToolButton *erase_btn = new QToolButton();
+  erase_btn->setCheckable(true);
   erase_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
+      "   border-radius: 4px;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(100, 149, 237, 0.2);"
       "}"
       "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "   background-color: rgba(100, 149, 237, 0.4);"
+      "}"
+      "QToolButton:checked {"
+      "   background-color: rgba(100, 149, 237, 0.3);"
+      "   border: 2px solid #6495ED;"
       "}");
   erase_btn->setToolTip("橡皮擦");
   erase_btn->setCursor(Qt::PointingHandCursor);
@@ -377,13 +423,22 @@ void MainWindow::setupUi() {
   layout_tools_edit_map->addWidget(erase_btn);
   //画笔按钮
   QToolButton *draw_pen_btn = new QToolButton();
+  draw_pen_btn->setCheckable(true);
   draw_pen_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
+      "   border-radius: 4px;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(100, 149, 237, 0.2);"
       "}"
       "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "   background-color: rgba(100, 149, 237, 0.4);"
+      "}"
+      "QToolButton:checked {"
+      "   background-color: rgba(100, 149, 237, 0.3);"
+      "   border: 2px solid #6495ED;"
       "}");
   draw_pen_btn->setToolTip("线条");
   draw_pen_btn->setCursor(Qt::PointingHandCursor);
@@ -398,13 +453,22 @@ void MainWindow::setupUi() {
   //线段按钮
 
   QToolButton *draw_line_btn = new QToolButton();
+  draw_line_btn->setCheckable(true);
   draw_line_btn->setStyleSheet(
       "QToolButton {"
       "   border: none;"
       "   background-color: transparent;"
+      "   border-radius: 4px;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(100, 149, 237, 0.2);"
       "}"
       "QToolButton:pressed {"
-      "   background-color: lightblue;"
+      "   background-color: rgba(100, 149, 237, 0.4);"
+      "}"
+      "QToolButton:checked {"
+      "   background-color: rgba(100, 149, 237, 0.3);"
+      "   border: 2px solid #6495ED;"
       "}");
   draw_line_btn->setToolTip("线条");
   draw_line_btn->setCursor(Qt::PointingHandCursor);
@@ -419,6 +483,20 @@ void MainWindow::setupUi() {
 
   layout_tools_edit_map->addItem(
       new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
+  
+  // 创建按钮组实现互斥选择
+  QButtonGroup *edit_map_button_group = new QButtonGroup(this);
+  edit_map_button_group->addButton(normal_cursor_btn);
+  edit_map_button_group->addButton(add_point_btn);
+  edit_map_button_group->addButton(add_topology_path_btn);
+  edit_map_button_group->addButton(add_region_btn);
+  edit_map_button_group->addButton(erase_btn);
+  edit_map_button_group->addButton(draw_pen_btn);
+  edit_map_button_group->addButton(draw_line_btn);
+  
+  // 默认选中normal_cursor_btn
+  normal_cursor_btn->setChecked(true);
+  
   tools_edit_map_widget->hide();
   center_h_layout->addWidget(tools_edit_map_widget);
   center_layout->addLayout(center_h_layout);

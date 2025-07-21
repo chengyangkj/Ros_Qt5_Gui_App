@@ -20,6 +20,7 @@ RobotShape::RobotShape(const std::string &display_type, const int &z_value,
   // 初始化空的路径
   path_ = QPainterPath();
   SetBoundingRect(QRectF(0, 0, 0, 0));
+  setZValue(10);
 }
 
 void RobotShape::paint(QPainter *painter,
