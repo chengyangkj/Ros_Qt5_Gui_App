@@ -68,5 +68,11 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
           cd build/install/bin
-          tar -czvf release_package.tar.gz ./*
-          mv release_package.tar.gz $GITHUB_WORKSPACE/release_package.tar.gz
+          tar -czvf ros_qt5_gui_app_foxy_x86_64.tar.gz ./*
+
+      - name: Upload Artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v3
+        with:
+          name: ros_qt5_gui_app_foxy_x86_64
+          path: build/install/bin/ros_qt5_gui_app_foxy_x86_64.tar.gz
