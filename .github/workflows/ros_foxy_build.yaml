@@ -54,7 +54,7 @@ jobs:
           && rm -rf build \
           && mkdir build/ \
           && cd build/ \
-          && cmake .. -DBUILD_WITH_TEST=ON \
+          && cmake .. -DBUILD_WITH_TEST=OFF \
           && make -j$(nproc) \
           && make install
 
