@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: osrf/ros:humble-desktop
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

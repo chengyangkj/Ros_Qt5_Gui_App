@@ -14,14 +14,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ros:melodic
+      image: osrf/ros:melodic-desktop
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+
       - name: Install Dependencies
         run: |
           apt-get update && apt-get install -y \
-          ros-melodic-desktop-full \
           qtbase5-dev \
           qt5-qmake \
           libqt5svg5-dev \
@@ -33,12 +36,6 @@ jobs:
           libsdl-image1.2-dev \
           libsdl1.2-dev \
           wget
-          
-      - name: update cmake
-        run: |
-          wget https://cmake.org/files/v3.16/cmake-3.16.4-Linux-x86_64.sh -O cmake-install.sh \
-          && chmod +x cmake-install.sh \
-          && sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 
       - name: Update gtest
         run: |
@@ -52,7 +49,6 @@ jobs:
           && make install
 
       - name: Build
-        shell: bash
         run: |
           source /opt/ros/melodic/setup.bash \
           && rm -rf build \
@@ -63,7 +59,6 @@ jobs:
           && make install
 
       - name: Test
-        shell: bash
         run: |
           source /opt/ros/melodic/setup.bash \
           && cd build \

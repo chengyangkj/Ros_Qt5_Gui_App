@@ -13,24 +13,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os-ros: 
-          - { image: 'ubuntu:focal', ros: 'foxy' }
-
     container:
-      image: ${{matrix.os-ros.image}}
+      image: osrf/ros:foxy-desktop
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up ROS
-        uses: ros-tooling/setup-ros@v0.7
-        with:
-          required-ros-distributions: ${{matrix.os-ros.ros}}
-
       - name: Install Dependencies
-        run: sudo apt-get install qtbase5-dev qt5-qmake libqt5svg5-dev qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev -y
+        run: |
+          apt-get update && apt-get install -y \
+          qtbase5-dev \
+          qt5-qmake \
+          libqt5svg5-dev \
+          qtbase5-dev-tools \
+          qtbase5-private-dev \
+          qt5* \
+          libeigen3-dev \
+          libgtest-dev \
+          libsdl-image1.2-dev \
+          libsdl1.2-dev \
+          wget
 
       - name: Update gtest
         run: |
@@ -41,28 +46,23 @@ jobs:
           && cd build \
           && cmake .. \
           && make -j$(nproc) \
-          && sudo make install
+          && make install
 
       - name: Build
-        shell: bash
         run: |
-          /bin/bash -c \
-          "source /opt/ros/${{matrix.os-ros.ros}}/setup.bash \
-          && sudo apt-get install qtbase5-dev qt5-qmake libqt5svg5-dev qtbase5-dev-tools qtbase5-private-dev qt5* libeigen3-dev libgtest-dev libsdl-image1.2-dev libsdl1.2-dev -y  \
+          source /opt/ros/foxy/setup.bash \
           && rm -rf build \
           && mkdir build/ \
           && cd build/ \
-          && cmake .. -DBUILD_WITH_TEST=ON\
+          && cmake .. -DBUILD_WITH_TEST=ON \
           && make -j$(nproc) \
-          && make install"
+          && make install
 
       - name: Test
-        shell: bash
         run: |
-          /bin/bash -c \
-          "source /opt/ros/${{matrix.os-ros.ros}}/setup.bash \
+          source /opt/ros/foxy/setup.bash \
           && cd build \
-          && make test"
+          && make test
 
       - name: Package Release
         if: startsWith(github.ref, 'refs/tags/v')
