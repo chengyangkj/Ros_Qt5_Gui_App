@@ -47,7 +47,7 @@ bool RobotShape::UpdateData(const std::any &data) {
 }
 
 void RobotShape::updateFootprintPath() {
-  path_.clear();
+  path_ = QPainterPath(); // 创建新的空路径来替代 clear()
   
   if (robot_footprint_.empty()) {
     SetBoundingRect(QRectF(0, 0, 0, 0));

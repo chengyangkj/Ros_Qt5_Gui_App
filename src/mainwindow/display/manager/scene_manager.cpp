@@ -614,9 +614,8 @@ void SceneManager::handleTopologyLinking(const QString &point_name) {
 void SceneManager::createTopologyLine(const QString &from, const QString &to) {
   std::string route_id = generateRouteId(from, to);
   
-  // 创建路径信息并添加到拓扑地图
-  TopologyMap::RouteInfo route(from.toStdString(), to.toStdString());
-  topology_map_.AddRoute(route);
+  // 添加路径到拓扑地图
+  topology_map_.AddRoute(from.toStdString(), to.toStdString());
   
   // 获取起点和终点的QGraphicsItem对象
   auto from_display = FactoryDisplay::Instance()->GetDisplay(from.toStdString());
@@ -694,26 +693,30 @@ TopologyLine* SceneManager::findTopologyLine(const QString &route_id) {
 
 void SceneManager::loadTopologyRoutes() {
   // 为现有的路径创建显示对象
-  for (const auto &route : topology_map_.routes) {
-    // 获取起点和终点的QGraphicsItem对象
-    auto from_display = FactoryDisplay::Instance()->GetDisplay(route.from);
-    auto to_display = FactoryDisplay::Instance()->GetDisplay(route.to);
-    
-    if (from_display && to_display) {
-      TopologyLine *line = new TopologyLine(from_display, to_display, route.GetRouteId());
-      topology_lines_.push_back(line);
+  for (const auto &from_routes : topology_map_.routes) {
+    const std::string &from = from_routes.first;
+    for (const std::string &to : from_routes.second) {
+      // 获取起点和终点的QGraphicsItem对象
+      auto from_display = FactoryDisplay::Instance()->GetDisplay(from);
+      auto to_display = FactoryDisplay::Instance()->GetDisplay(to);
       
-      // 添加到场景中
-      addItem(line);
-      
-      // 检查并设置是否为双向连接的一部分
-      bool is_part_of_bidirectional = topology_map_.IsBidirectional(route.from, route.to);
-      line->SetPartOfBidirectional(is_part_of_bidirectional);
-      
-      LOG_INFO("Load topology route: " << route.from << " -> " << route.to 
-               << (is_part_of_bidirectional ? " (双向)" : " (单向)"));
-    } else {
-      LOG_ERROR("无法找到连接点位: " << route.from << " 或 " << route.to);
+      if (from_display && to_display) {
+        std::string route_id = from + "->" + to;
+        TopologyLine *line = new TopologyLine(from_display, to_display, route_id);
+        topology_lines_.push_back(line);
+        
+        // 添加到场景中
+        addItem(line);
+        
+        // 检查并设置是否为双向连接的一部分
+        bool is_part_of_bidirectional = topology_map_.IsBidirectional(from, to);
+        line->SetPartOfBidirectional(is_part_of_bidirectional);
+        
+        LOG_INFO("Load topology route: " << from << " -> " << to 
+                 << (is_part_of_bidirectional ? " (双向)" : " (单向)"));
+      } else {
+        LOG_ERROR("无法找到连接点位: " << from << " 或 " << to);
+      }
     }
   }
 }
