@@ -7,7 +7,6 @@ on:
       - "ROS2:Foxy(20.04)"
       - "ROS2:Galactic(20.04)"
       - "ROS1:Noetic(20.04)"
-      - "ROS1:Melodic(18.04)"
     types:
       - completed
     tags:

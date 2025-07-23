@@ -72,27 +72,3 @@ jobs:
           source /opt/ros/melodic/setup.bash \
           && cd build \
           && make test
-
-      - name: Package Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          cd build/install/bin
-          tar -czvf ros_qt5_gui_app_melodic_x86_64.tar.gz ./*
-
-      - name: Update glibc
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          apt-get update && apt-get install -y wget
-          cd /tmp
-          wget http://ftp.debian.org/debian/pool/main/g/glibc/libc6_2.28-10_amd64.deb
-          wget http://ftp.debian.org/debian/pool/main/g/glibc/libc-bin_2.28-10_amd64.deb
-          wget http://ftp.debian.org/debian/pool/main/g/glibc/locales_2.28-10_all.deb
-          dpkg -i libc6_2.28-10_amd64.deb libc-bin_2.28-10_amd64.deb locales_2.28-10_all.deb || true
-          apt-get install -f -y
-
-      - name: Upload Artifact
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-artifact@v4
-        with:
-          name: ros_qt5_gui_app_melodic_x86_64
-          path: build/install/bin/ros_qt5_gui_app_melodic_x86_64.tar.gz
