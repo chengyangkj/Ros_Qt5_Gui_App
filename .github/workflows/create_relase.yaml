@@ -1,48 +1,57 @@
 name: AutoRelease
 
 on:
-  workflow_run:
-    workflows: 
-      - "ROS2:Humble(22.04)"
-      - "ROS2:Foxy(20.04)"
-      - "ROS2:Galactic(20.04)"
-      - "ROS1:Noetic(20.04)"
-    types:
-      - completed
+  push:
     tags:
       - 'v*'
 
 jobs:
   create_release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     steps:
       - name: Get tag name
         id: get_tag
         run: |
-          TAG_NAME=$(echo "${{ github.event.workflow_run.head_branch }}" | sed 's/refs\/tags\///')
+          TAG_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: Wait for other workflows
+        run: |
+          sleep 300  # 等待5分钟让其他工作流完成
 
       - name: Download Artifacts
         uses: actions/github-script@v6
         with:
           script: |
-            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            const allArtifacts = [];
+            const runs = await github.rest.actions.listWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              run_id: context.payload.workflow_run.id
+              event: 'push',
+              status: 'completed',
+              created: `>${new Date(Date.now() - 10 * 60 * 1000).toISOString()}`  // 最近10分钟内的运行
             });
             
-            for (const artifact of artifacts.data.artifacts) {
-              const download = await github.rest.actions.downloadArtifact({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                artifact_id: artifact.id,
-                archive_format: 'zip'
-              });
-              
-              const fs = require('fs');
-              fs.writeFileSync(`${artifact.name}.zip`, Buffer.from(download.data));
+            for (const run of runs.data.workflow_runs) {
+              if (run.head_sha === context.sha) {
+                const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run.id
+                });
+                
+                for (const artifact of artifacts.data.artifacts) {
+                  const download = await github.rest.actions.downloadArtifact({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    artifact_id: artifact.id,
+                    archive_format: 'zip'
+                  });
+                  
+                  const fs = require('fs');
+                  fs.writeFileSync(`${artifact.name}.zip`, Buffer.from(download.data));
+                }
+              }
             }
 
       - name: Create Release
@@ -60,7 +69,7 @@ jobs:
         run: |
           for zip in *.zip
           do
-            unzip "$zip"
+            unzip "$zip" || true
           done
 
       - name: Upload Release Assets
