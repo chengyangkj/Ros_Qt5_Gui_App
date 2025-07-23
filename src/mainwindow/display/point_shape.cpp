@@ -25,6 +25,7 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
   moveBy(0, 0);
   switch (type_) {
     case kRobot: {
+      setZValue(10);
       robot_svg_renderer_.load(QString("://images/robot.svg"));
       deg_offset_ = 45;
       SetBoundingRect(QRectF(0 - robot_svg_renderer_.defaultSize().width() / 2,
@@ -34,6 +35,7 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
     case kParticle: {
     } break;
     case kNavGoal: {
+      setZValue(9);
       robot_svg_renderer_.load(QString("://images/target.svg"));
       deg_offset_ = 0;
       SetBoundingRect(QRectF(0 - robot_svg_renderer_.defaultSize().width() / 2,
@@ -41,7 +43,7 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
                              robot_svg_renderer_.defaultSize().height()));
     } break;
   }
-  setZValue(9);
+ 
 }
 QVariant PointShape::itemChange(GraphicsItemChange change,
                                 const QVariant &value) {

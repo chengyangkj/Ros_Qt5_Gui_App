@@ -9,7 +9,7 @@ ${SOURCE_FILE}
 ${INCLUDE_FILE}
 )
 
-target_link_libraries(${TARGET_NAME} ${Boost_LIBRARIES} Qt5::Core basic json_struct::json_struct yaml-cpp::yaml-cpp)
+target_link_libraries(${TARGET_NAME} ${Boost_LIBRARIES} Qt5::Core basic nlohmann_json::nlohmann_json yaml-cpp::yaml-cpp)
 target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(TARGETS ${TARGET_NAME}
@@ -19,5 +19,5 @@ install(TARGETS ${TARGET_NAME}
 )
 
 #######test
-set(TEST_LINK_LIBRARIES Qt5::Core basic json_struct ${TARGET_NAME})
+set(TEST_LINK_LIBRARIES Qt5::Core basic nlohmann_json ${TARGET_NAME})
 AddTest()

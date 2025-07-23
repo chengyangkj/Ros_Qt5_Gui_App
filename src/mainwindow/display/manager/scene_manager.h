@@ -11,6 +11,18 @@
 #include "widgets/nav_goal_widget.h"
 #include "widgets/set_pose_widget.h"
 namespace Display {
+
+enum MapEditMode {
+  kStop = 0,
+  kNormal,        // 正常编辑模式
+  kErase,         // 橡皮擦模式
+  kDrawLine,      // 绘制线段模式
+  kAddPoint,      // 添加点位模式
+  kRegion,        // 添加区域模式
+  kDrawWithPen,   //画笔
+  kLinkTopology,  // 拓扑图
+};
+
 class DisplayManager;
 class SceneManager : public QGraphicsScene {
   Q_OBJECT

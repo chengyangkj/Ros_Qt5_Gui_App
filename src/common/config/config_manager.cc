@@ -2,6 +2,7 @@
 #include <QFile>
 #include <boost/dll.hpp>
 #include <fstream>
+#include <nlohmann/json.hpp>
 
 #include "boost/filesystem.hpp"
 namespace Config {
@@ -32,35 +33,37 @@ void ConfigManager::Init(const std::string &config_path) {
   config_path_ = config_path;
   // 配置不存在 写入默认配置
   if (!boost::filesystem::exists(config_path_)) {
-    std::string pretty_json = JS::serializeStruct(config_root_);
+    nlohmann::json j = config_root_;
+    std::string pretty_json = j.dump(2);
 
     writeStringToFile(config_path_, pretty_json);
   }
   ReadRootConfig();
 }
 ConfigManager::~ConfigManager() {
-  std::string pretty_json = JS::serializeStruct(config_root_);
+  nlohmann::json j = config_root_;
+  std::string pretty_json = j.dump(2);
   std::cout << "write json" << std::endl;
   writeStringToFile(config_path_, pretty_json);
 }
 bool ConfigManager::ReadRootConfig() {
   std::lock_guard<std::mutex> lock(mutex_);
   std::ifstream file(config_path_);
-  std::string json((std::istreambuf_iterator<char>(file)),
-                   std::istreambuf_iterator<char>());
-  file.close();
-  JS::ParseContext parseContext(json);
-  // JS::ParseContext has the member
-  if (parseContext.parseTo(config_root_) != JS::Error::NoError) {
-    std::string errorStr = parseContext.makeErrorString();
-    fprintf(stderr, "Error parsing config.json error: %s\n", errorStr.c_str());
+  try {
+    nlohmann::json j;
+    file >> j;
+    config_root_ = j.get<Config::ConfigRoot>();
+  } catch (const std::exception& e) {
+    fprintf(stderr, "Error parsing config.json error: %s\n", e.what());
     std::exit(1);
   }
+  file.close();
   return true;
 }
 bool ConfigManager::StoreConfig() {
   std::lock_guard<std::mutex> lock(mutex_);
-  std::string pretty_json = JS::serializeStruct(config_root_);
+  nlohmann::json j = config_root_;
+  std::string pretty_json = j.dump(2);
   writeStringToFile(config_path_, pretty_json);
   return true;
 }
@@ -110,16 +113,16 @@ bool ConfigManager::ReadTopologyMap(const std::string &map_path,
   }
 
   std::ifstream file(fullPath);
-  std::string json((std::istreambuf_iterator<char>(file)),
-                   std::istreambuf_iterator<char>());
-  file.close();
-  JS::ParseContext parseContext(json);
-  // JS::ParseContext has the member
-  if (parseContext.parseTo(map) != JS::Error::NoError) {
-    std::string errorStr = parseContext.makeErrorString();
-    fprintf(stderr, "Error parsing struct %s\n", errorStr.c_str());
+  try {
+    nlohmann::json j;
+    file >> j;
+    map = j.get<TopologyMap>();
+  } catch (const std::exception& e) {
+    fprintf(stderr, "Error parsing struct %s\n", e.what());
+    file.close();
     return false;
   }
+  file.close();
   return true;
 }
 
@@ -139,7 +142,8 @@ bool ConfigManager::WriteTopologyMap(const std::string &map_path,
     // 将路径转换为字符串
     fullPath = absolutePath.string();
   }
-  std::string pretty_json = JS::serializeStruct(topology_map);
+  nlohmann::json j = topology_map;
+  std::string pretty_json = j.dump(2);
   return writeStringToFile(fullPath, pretty_json);
 }
 

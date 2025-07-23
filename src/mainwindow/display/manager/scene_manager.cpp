@@ -431,12 +431,27 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
   std::string name = display->GetDisplayName();
   auto point_info = topology_map_.GetPoint(name);
-  nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
-  nav_goal_widget_->show();
-  nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
-      .pose = point_info.ToRobotPose(),
-      .name = QString::fromStdString(display->GetDisplayName())});
+  LOG_INFO("blind nav goal widget display name:" << name <<" world pose:" << point_info.ToRobotPose());
+  //先断开上一个点位的信号链接
   nav_goal_widget_->disconnect();
+  nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+  nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
+    .pose = point_info.ToRobotPose(),
+    .name = QString::fromStdString(display->GetDisplayName())});
+  nav_goal_widget_->show();
+
+  connect(nav_goal_widget_, &NavGoalWidget::SignalPointNameChanged,
+          [this, display](const QString &new_name) {
+            std::string old_name = display->GetDisplayName();
+            // 先更新拓扑地图中的点名称
+            topology_map_.UpdatePointName(old_name, new_name.toStdString());
+            // 使用安全的方法更新显示对象名称和映射表
+            if (!FactoryDisplay::Instance()->UpdateDisplayName(old_name, new_name.toStdString())) {
+              LOG_ERROR("Failed to update display name from " << old_name << " to " << new_name.toStdString());
+              return;
+            }
+            LOG_INFO("Successfully updated point name: " << old_name << " -> " << new_name.toStdString());
+          });
 
   connect(nav_goal_widget_, &NavGoalWidget::SignalHandleOver,
           [this, display](const NavGoalWidget::HandleResult &flag,
@@ -506,7 +521,7 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
 void SceneManager::updateNavGoalWidgetPose(
     Display::VirtualDisplay *display, bool is_move) {
   auto pose = display_manager_->scenePoseToWord(
-      curr_handle_display_->GetCurrentScenePose());
+      display->GetCurrentScenePose());
   //如果点位没有移动 则从拓扑地图中读取
   if (!is_move) {
     std::string name = display->GetDisplayName();
@@ -518,7 +533,7 @@ void SceneManager::updateNavGoalWidgetPose(
   nav_goal_widget_->show();
   nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
       .pose = pose,
-      .name = QString::fromStdString(curr_handle_display_->GetDisplayName())});
+      .name = QString::fromStdString(display->GetDisplayName())});
 }
 void SceneManager::eraseScenePointRange(const QPointF &pose, double range) {
   auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
@@ -602,7 +617,6 @@ void SceneManager::createTopologyLine(const QString &from, const QString &to) {
   
   // 创建路径信息并添加到拓扑地图
   TopologyMap::RouteInfo route(from.toStdString(), to.toStdString());
-  route.route_id = route_id;
   topology_map_.AddRoute(route);
   
   // 获取起点和终点的QGraphicsItem对象
@@ -687,7 +701,7 @@ void SceneManager::loadTopologyRoutes() {
     auto to_display = FactoryDisplay::Instance()->GetDisplay(route.to);
     
     if (from_display && to_display) {
-      TopologyLine *line = new TopologyLine(from_display, to_display, route.route_id);
+      TopologyLine *line = new TopologyLine(from_display, to_display, route.GetRouteId());
       topology_lines_.push_back(line);
       
       // 添加到场景中

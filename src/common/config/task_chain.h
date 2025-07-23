@@ -1,7 +1,7 @@
 #pragma once
-#include "json_struct/json_struct.h"
+#include <nlohmann/json.hpp>
 #include "topology_map.h"
 struct TaskChain {
   std::vector<TopologyMap::PointInfo> points;
-  JS_OBJ(points);
 };
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TaskChain, points);

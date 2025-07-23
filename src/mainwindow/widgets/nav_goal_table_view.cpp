@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QtConcurrent>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include "algorithm.h"
 #include "config/config_manager.h"
 #include "logger/logger.h"
@@ -121,16 +122,16 @@ bool NavGoalTableView::LoadTaskChain(const std::string &name) {
   // 清空模型
   table_model_->removeRows(0, table_model_->rowCount());
   std::ifstream file(name);
-  std::string json((std::istreambuf_iterator<char>(file)),
-                   std::istreambuf_iterator<char>());
-  file.close();
-  JS::ParseContext parseContext(json);
-  // JS::ParseContext has the member
-  if (parseContext.parseTo(task_chain_) != JS::Error::NoError) {
-    std::string errorStr = parseContext.makeErrorString();
-    fprintf(stderr, "Error parsing struct %s\n", errorStr.c_str());
+  try {
+    nlohmann::json j;
+    file >> j;
+    task_chain_ = j.get<TaskChain>();
+  } catch (const std::exception& e) {
+    fprintf(stderr, "Error parsing struct %s\n", e.what());
+    file.close();
     return false;
   }
+  file.close();
   for (auto point : task_chain_.points) {
     QComboBox *comboBox = new QComboBox();
     bool find_point = false;
@@ -182,7 +183,8 @@ bool NavGoalTableView::SaveTaskChain(const std::string &name) {
     }
     task_chain_.points.push_back(point);
   }
-  std::string pretty_json = JS::serializeStruct(task_chain_);
+  nlohmann::json j = task_chain_;
+  std::string pretty_json = j.dump(2);
   return Config::ConfigManager::writeStringToFile(name, pretty_json);
 }
 void NavGoalTableView::StopTaskChain() {

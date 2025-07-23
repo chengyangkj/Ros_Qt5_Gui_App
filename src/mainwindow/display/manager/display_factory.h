@@ -37,6 +37,8 @@ class FactoryDisplay : public QObject {
   void CenterOnScene(QPointF pose){
     viewer_ptr_->centerOn(pose);
   }
+  // 安全地更新显示对象名称
+  bool UpdateDisplayName(const std::string &old_name, const std::string &new_name);
  private slots:
   void Process();
 

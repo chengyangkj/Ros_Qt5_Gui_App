@@ -86,6 +86,9 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
                           RobotPose(spinBox_x_->value(), spinBox_y_->value(),
                                     deg2rad(spinBox_theta_->value())));
   });
+  connect(lineEdit_name_, &QLineEdit::editingFinished, [this]() {
+    emit SignalPointNameChanged(lineEdit_name_->text());
+  });
 }
 void NavGoalWidget::SlotUpdateValue(double value) {
   emit SignalPoseChanged(RobotPose(spinBox_x_->value(), spinBox_y_->value(),

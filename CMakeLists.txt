@@ -17,7 +17,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INSTALL_PREFIX ./install)
 
 # 依赖
-include(GetJsonStruct)
+include(Getnlohmann)
 include(GetDockWidget)
 include(GetYamlCpp)
 include(GTestHelper)

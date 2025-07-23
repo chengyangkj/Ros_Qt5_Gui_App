@@ -48,19 +48,14 @@ namespace Display {
 #define DISPLAY_TAG "Tag"
 #define DISPLAY_GOAL "GoalPose"
 #define DISPLAY_ROBOT_FOOTPRINT ToString(MsgId::kRobotFootprint)
-enum MapEditMode {
-  kStop = 0,
-  kNormal,        // 正常编辑模式
-  kErase,         // 橡皮擦模式
-  kDrawLine,      // 绘制线段模式
-  kAddPoint,      // 添加点位模式
-  kRegion,        // 添加区域模式
-  kDrawWithPen,   //画笔
-  kLinkTopology,  // 拓扑图
-};
+
+
+
+class FactoryDisplay;
 class VirtualDisplay : public QObject, public QGraphicsItem {
   Q_OBJECT
-
+ 
+ friend class FactoryDisplay;
  public:
   std::string display_type_{"null"};
   QPointF pressed_pose_;
@@ -149,7 +144,6 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   RobotPose GetPoseInParent() { return pose_in_parent_; }
   std::string GetParentName() { return parent_name_; }
   std::string GetDisplayName() { return display_name_; }
-  void SetDisplayName(const std::string &name) { display_name_ = name; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {
     setPos(pose - GetOriginPose());
@@ -161,6 +155,7 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   void Update();
 
  private:
+  void SetDisplayName(const std::string &name) { display_name_ = name; }
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;

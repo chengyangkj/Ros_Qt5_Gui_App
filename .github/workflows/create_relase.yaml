@@ -39,7 +39,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up ROS
-        uses: ros-tooling/setup-ros@v0.6
+        uses: ros-tooling/setup-ros@v0.7
         with:
           required-ros-distributions: ${{matrix.os-ros.ros}}
 

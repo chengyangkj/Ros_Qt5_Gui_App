@@ -137,4 +137,32 @@ void FactoryDisplay::Process() {
     viewer_ptr_->centerOn(display);
   }
 }
+// 安全地更新显示对象名称
+bool FactoryDisplay::UpdateDisplayName(const std::string &old_name, const std::string &new_name) {
+  // 检查旧名称是否存在
+  auto iter = total_display_map_.find(old_name);
+  if (iter == total_display_map_.end()) {
+    LOG_ERROR("Display with old name not found: " << old_name);
+    return false;
+  }
+  
+  // 检查新名称是否已经存在
+  if (total_display_map_.find(new_name) != total_display_map_.end()) {
+    LOG_ERROR("Display with new name already exists: " << new_name);
+    return false;
+  }
+  
+  // 获取显示对象指针
+  VirtualDisplay* display = iter->second;
+  
+  // 更新显示对象的内部名称
+  display->SetDisplayName(new_name);
+  
+  // 更新映射表：先添加新的映射，再删除旧的映射
+  total_display_map_[new_name] = display;
+  total_display_map_.erase(iter);
+  
+  LOG_INFO("Successfully updated display name: " << old_name << " -> " << new_name);
+  return true;
+}
 }  // namespace Display

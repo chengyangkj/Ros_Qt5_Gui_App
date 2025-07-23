@@ -9,9 +9,9 @@ ${SOURCE_FILE}
 ${INCLUDE_FILE}
 )
 
-target_link_libraries(${TARGET_NAME} ${Boost_LIBRARIES} Qt5::Core basic json_struct)
+target_link_libraries(${TARGET_NAME} ${Boost_LIBRARIES} Qt5::Core basic nlohmann_json)
 target_include_directories(${TARGET_NAME} PUBLIC include)
 
 #######test
-# set(TEST_LINK_LIBRARIES Qt5::Core basic json_struct ${TARGET_NAME})
+# set(TEST_LINK_LIBRARIES Qt5::Core basic nlohmann_json ${TARGET_NAME})
 # AddTest()
