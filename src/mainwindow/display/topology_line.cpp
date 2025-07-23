@@ -474,22 +474,25 @@ QRectF TopologyLine::calculateDynamicBoundingRect() const {
   }
   
   // 计算包含起点和终点的矩形，并添加一些边距
-  qreal left = qMin(start_pos.x(), end_pos.x());
-  qreal top = qMin(start_pos.y(), end_pos.y());
-  qreal right = qMax(start_pos.x(), end_pos.x());
-  qreal bottom = qMax(start_pos.y(), end_pos.y());
+  qreal left = qMin(start_pos.x(), end_pos.x()) - 20;
+  qreal top = qMin(start_pos.y(), end_pos.y()) - 20;
+  qreal right = qMax(start_pos.x(), end_pos.x()) + 20;
+  qreal bottom = qMax(start_pos.y(), end_pos.y()) + 20;
   
   // 转换为本地坐标系
   QPointF scene_top_left(left, top);
+  QPointF scene_bottom_right(right, bottom);
   QPointF local_top_left = mapFromScene(scene_top_left);
+  QPointF local_bottom_right = mapFromScene(scene_bottom_right);
   
   return QRectF(local_top_left.x(), local_top_left.y(), 
-                right - left, bottom - top);
+                local_bottom_right.x() - local_top_left.x(), 
+                local_bottom_right.y() - local_top_left.y());
 }
 
 void TopologyLine::updateBoundingRect() {
   QRectF new_rect = calculateDynamicBoundingRect();
-  SetBoundingRect(QRectF(0,0,5000,5000));
+  SetBoundingRect(new_rect);
 }
 
 bool TopologyLine::UpdateData(const std::any &data) {

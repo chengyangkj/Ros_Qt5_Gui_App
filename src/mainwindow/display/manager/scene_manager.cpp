@@ -103,7 +103,6 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
   
   LOG_INFO("Load Topology Map Success! Total points: " << topology_map_.points.size() 
            << ", Total routes: " << topology_map_.routes.size());
-  SetPointMoveEnable(false);
   emit signalTopologyMapUpdate(topology_map_);
 }
 void SceneManager::SetEditMapMode(MapEditMode mode) {
