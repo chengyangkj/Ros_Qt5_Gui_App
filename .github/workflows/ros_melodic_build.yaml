@@ -22,6 +22,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
 
+      - name: Update Cmake
+        run: |
+          apt-get update && apt-get install -y wget
+          wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0-linux-x86_64.sh \
+          && chmod +x cmake-3.20.0-linux-x86_64.sh \
+          && ./cmake-3.20.0-linux-x86_64.sh --prefix=/usr/local --skip-license \
+          && ln -sf /usr/local/bin/cmake /usr/bin/cmake \
+          && cmake --version
+
       - name: Install Dependencies
         run: |
           apt-get update && apt-get install -y \
