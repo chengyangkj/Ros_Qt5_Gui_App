@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload Artifact
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: ros_qt5_gui_app_melodic_x86_64
           path: build/install/bin/ros_qt5_gui_app_melodic_x86_64.tar.gz

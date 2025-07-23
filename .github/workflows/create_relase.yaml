@@ -10,16 +10,20 @@ on:
       - "ROS1:Melodic(18.04)"
     types:
       - completed
-    branches:
-      - master
     tags:
       - 'v*'
 
 jobs:
   create_release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'refs/tags/v') }}
     runs-on: ubuntu-latest
     steps:
+      - name: Get tag name
+        id: get_tag
+        run: |
+          TAG_NAME=$(echo "${{ github.event.workflow_run.head_branch }}" | sed 's/refs\/tags\///')
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
       - name: Download Artifacts
         uses: actions/github-script@v6
         with:
@@ -48,8 +52,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.get_tag.outputs.tag_name }}
+          release_name: Release ${{ steps.get_tag.outputs.tag_name }}
           draft: false
           prerelease: false
 
