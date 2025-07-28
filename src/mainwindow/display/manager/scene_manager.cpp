@@ -21,6 +21,7 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   nav_goal_widget_ = new NavGoalWidget(view_ptr_);
   nav_goal_widget_->hide();
   topology_route_widget_ = new TopologyRouteWidget(view_ptr_);
+  topology_route_widget_->SetSupportControllers(topology_map_.map_property.support_controllers);
   topology_route_widget_->hide();
   QPixmap goal_image;
   goal_image.load("://images/add_32.svg");
@@ -81,6 +82,7 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
   
   // 清空当前拓扑地图并更新为新数据
   topology_map_ = new_topology_map;
+  topology_route_widget_->SetSupportControllers(topology_map_.map_property.support_controllers);
   
   // 为每个点创建显示对象
   for (auto &point : topology_map_.points) {
@@ -547,12 +549,11 @@ void SceneManager::blindTopologyRouteWidget(TopologyLine* line, bool is_edit) {
   
   // 先断开上一个路径的信号链接
   topology_route_widget_->disconnect();
-  topology_route_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+  topology_route_widget_->move(QPoint(view_pos.x()+10, view_pos.y()+10));
   
   // 设置路径信息
   TopologyRouteWidget::RouteInfo info;
   info.route_name = QString::fromStdString(route_id);
-  info.direction = route_info.direction;
   info.controller = route_info.controller;
   topology_route_widget_->SetRouteInfo(info);
   topology_route_widget_->SetEditMode(is_edit);
@@ -565,13 +566,11 @@ void SceneManager::blindTopologyRouteWidget(TopologyLine* line, bool is_edit) {
             
             // 更新拓扑地图中的路径属性
             TopologyMap::RouteInfo route_info;
-            route_info.direction = info.direction;
             route_info.controller = info.controller;
             topology_map_.SetRouteInfo(route_id, route_info);
             
             LOG_INFO("更新路径属性: " << route_id 
-                     << " 方向: " << (info.direction == RouteDirection::Forward ? "前进" : "后退")
-                     << " 控制器: " << (info.controller == ControllerType::MPPI ? "MPPI" : "DWB"));
+                      << " 控制器: " << info.controller);
           });
   
   connect(topology_route_widget_, &TopologyRouteWidget::SignalHandleOver,
@@ -601,7 +600,7 @@ void SceneManager::updateNavGoalWidgetPose(
     pose = point_info.ToRobotPose();
   }
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
-  nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+  nav_goal_widget_->move(QPoint(view_pos.x()+10, view_pos.y()+10));
   nav_goal_widget_->show();
   nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
       .pose = pose,
@@ -726,6 +725,14 @@ void SceneManager::clearTopologyLineSelection() {
     selected_topology_line_->SetSelected(false);
     selected_topology_line_ = nullptr;
   }
+
+  if(preview_line_){
+    removeItem(preview_line_);
+    delete preview_line_;
+    preview_line_ = nullptr;
+    first_selected_point_.clear();
+    is_drawing_line_ = false;
+  }
 }
 
 void SceneManager::deleteSelectedTopologyLine() {
@@ -769,7 +776,8 @@ void SceneManager::loadTopologyRoutes() {
   // 为现有的路径创建显示对象
   for (const auto &from_routes : topology_map_.routes) {
     const std::string &from = from_routes.first;
-    for (const std::string &to : from_routes.second) {
+    for (const auto &route : from_routes.second) {
+      const std::string &to = route.first;
       // 获取起点和终点的QGraphicsItem对象
       auto from_display = FactoryDisplay::Instance()->GetDisplay(from);
       auto to_display = FactoryDisplay::Instance()->GetDisplay(to);

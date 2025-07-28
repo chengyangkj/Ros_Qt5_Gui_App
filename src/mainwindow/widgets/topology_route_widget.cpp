@@ -128,26 +128,12 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   layout_name->addWidget(lineEdit_route_name_);
   layout->addLayout(layout_name);
   
-  // 路径方向
-  QHBoxLayout *layout_direction = new QHBoxLayout();
-  layout_direction->setSpacing(6);
-  QLabel *label_direction = new QLabel("方向:");
-  label_direction->setMinimumSize(50, 20);
-  comboBox_direction_ = new QComboBox();
-  comboBox_direction_->addItem("前进", static_cast<int>(RouteDirection::Forward));
-  comboBox_direction_->addItem("后退", static_cast<int>(RouteDirection::Backward));
-  layout_direction->addWidget(label_direction);
-  layout_direction->addWidget(comboBox_direction_);
-  layout->addLayout(layout_direction);
-  
   // 控制器类型
   QHBoxLayout *layout_controller = new QHBoxLayout();
   layout_controller->setSpacing(6);
   QLabel *label_controller = new QLabel("控制器:");
   label_controller->setMinimumSize(50, 20);
   comboBox_controller_ = new QComboBox();
-  comboBox_controller_->addItem("MPPI", static_cast<int>(ControllerType::MPPI));
-  comboBox_controller_->addItem("DWB", static_cast<int>(ControllerType::DWB));
   layout_controller->addWidget(label_controller);
   layout_controller->addWidget(comboBox_controller_);
   layout->addLayout(layout_controller);
@@ -174,62 +160,57 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   this->setLayout(layout);
   
   // 连接信号槽
-  connect(comboBox_direction_, QOverload<int>::of(&QComboBox::currentIndexChanged),
-          this, &TopologyRouteWidget::SlotUpdateValue);
   connect(comboBox_controller_, QOverload<int>::of(&QComboBox::currentIndexChanged),
           this, &TopologyRouteWidget::SlotUpdateValue);
   
   connect(button_delete_, &QPushButton::clicked, [this]() {
     RouteInfo info;
     info.route_name = lineEdit_route_name_->text();
-    info.direction = static_cast<RouteDirection>(comboBox_direction_->currentData().toInt());
-    info.controller = static_cast<ControllerType>(comboBox_controller_->currentData().toInt());
+    info.controller = comboBox_controller_->currentText().toStdString();
     emit SignalHandleOver(HandleResult::kDelete, info);
   });
   
   connect(button_cancel_, &QPushButton::clicked, [this]() {
     RouteInfo info;
     info.route_name = lineEdit_route_name_->text();
-    info.direction = static_cast<RouteDirection>(comboBox_direction_->currentData().toInt());
-    info.controller = static_cast<ControllerType>(comboBox_controller_->currentData().toInt());
+    info.controller = comboBox_controller_->currentText().toStdString();
     emit SignalHandleOver(HandleResult::kCancel, info);
   });
 }
 
 void TopologyRouteWidget::SetEditMode(bool is_edit) {
-  comboBox_direction_->setEnabled(is_edit);
   comboBox_controller_->setEnabled(is_edit);
   button_delete_->setEnabled(is_edit);
+}
+
+void TopologyRouteWidget::SetSupportControllers(const std::vector<std::string> &controllers) {
+  comboBox_controller_->clear();
+  for (const auto &controller : controllers) {
+    comboBox_controller_->addItem(controller.c_str());
+    std::cout << "add controller:" << controller << std::endl;
+  }
+  
 }
 
 void TopologyRouteWidget::SlotUpdateValue() {
   RouteInfo info;
   info.route_name = lineEdit_route_name_->text();
-  info.direction = static_cast<RouteDirection>(comboBox_direction_->currentData().toInt());
-  info.controller = static_cast<ControllerType>(comboBox_controller_->currentData().toInt());
+  info.controller = comboBox_controller_->currentText().toStdString();
   emit SignalRouteInfoChanged(info);
 }
 
 void TopologyRouteWidget::SetRouteInfo(const RouteInfo &info) {
   lineEdit_route_name_->blockSignals(true);
-  comboBox_direction_->blockSignals(true);
   comboBox_controller_->blockSignals(true);
   
   lineEdit_route_name_->setText(info.route_name);
   
-  // 设置方向
-  int direction_index = comboBox_direction_->findData(static_cast<int>(info.direction));
-  if (direction_index >= 0) {
-    comboBox_direction_->setCurrentIndex(direction_index);
-  }
-  
   // 设置控制器
-  int controller_index = comboBox_controller_->findData(static_cast<int>(info.controller));
+  int controller_index = comboBox_controller_->findText(info.controller.c_str());
   if (controller_index >= 0) {
     comboBox_controller_->setCurrentIndex(controller_index);
   }
   
   lineEdit_route_name_->blockSignals(false);
-  comboBox_direction_->blockSignals(false);
   comboBox_controller_->blockSignals(false);
 } 

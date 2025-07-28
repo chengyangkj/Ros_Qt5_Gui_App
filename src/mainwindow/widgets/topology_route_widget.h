@@ -18,8 +18,7 @@ class TopologyRouteWidget : public QWidget {
   
   struct RouteInfo {
     QString route_name;
-    RouteDirection direction;
-    ControllerType controller;
+    std::string controller;
   };
 
  protected:
@@ -27,7 +26,6 @@ class TopologyRouteWidget : public QWidget {
 
  private:
   QLineEdit *lineEdit_route_name_;
-  QComboBox *comboBox_direction_;
   QComboBox *comboBox_controller_;
   QPushButton *button_delete_;
   QPushButton *button_cancel_;
@@ -39,6 +37,7 @@ class TopologyRouteWidget : public QWidget {
  public slots:
   void SetRouteInfo(const RouteInfo &info);
   void SetEditMode(bool is_edit);
+  void SetSupportControllers(const std::vector<std::string> &controllers);
   
  private slots:
   void SlotUpdateValue();
