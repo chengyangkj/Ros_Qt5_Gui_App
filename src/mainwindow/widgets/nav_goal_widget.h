@@ -24,18 +24,24 @@ class NavGoalWidget : public QWidget {
     QString name;
   };
 
+ protected:
+  void paintEvent(QPaintEvent *event) override;
+
  private:
   QDoubleSpinBox *spinBox_x_;
   QDoubleSpinBox *spinBox_y_;
   QDoubleSpinBox *spinBox_theta_;
   QLineEdit *lineEdit_name_;
+  QPushButton *button_send_;
+  QPushButton *button_remove_;
+  QPushButton *button_cancel_;
  signals:
   void SignalPoseChanged(const RobotPose &pose);
   void SignalHandleOver(const HandleResult &flag, const RobotPose &pose);
   void SignalPointNameChanged(const QString &name);
  public slots:
   void SetPose(const PointInfo &pose);
-  void SetEditEnabled(bool flag);
+  void SetEditMode(bool is_edit);
  private slots:
   void SlotUpdateValue(double);
 

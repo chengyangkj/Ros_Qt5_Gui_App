@@ -70,6 +70,7 @@ class MainWindow : public QMainWindow {
 
   QLabel *label_pos_map_;
   QLabel *label_pos_scene_;
+  QLabel *label_pos_robot_;
   QThread message_thread_;
   SpeedCtrlWidget *speed_ctrl_widget_;
   NavGoalTableView *nav_goal_table_view_;

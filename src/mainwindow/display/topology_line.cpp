@@ -16,7 +16,7 @@ namespace Display {
 
 TopologyLine::TopologyLine(QGraphicsItem* from_item, QGraphicsItem* to_item, 
                            const std::string &display_name)
-    : VirtualDisplay("TopologyLine", 8, "MAP", display_name), start_item_(from_item), end_item_(to_item), 
+    : VirtualDisplay(DISPLAY_TOPOLINE, 8, "MAP", display_name), start_item_(from_item), end_item_(to_item), 
       is_part_of_bidirectional_(false) {
   
   // 设置可以接收鼠标和悬停事件

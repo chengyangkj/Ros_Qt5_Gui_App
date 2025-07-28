@@ -10,11 +10,12 @@
 #include "display/topology_line.h"
 #include "widgets/nav_goal_widget.h"
 #include "widgets/set_pose_widget.h"
+#include "widgets/topology_route_widget.h"
 namespace Display {
 
 enum MapEditMode {
-  kStop = 0,
-  kNormal,        // 正常编辑模式
+  kStopEdit = 0,
+  kMoveCursor,        // 正常编辑模式
   kErase,         // 橡皮擦模式
   kDrawLine,      // 绘制线段模式
   kAddPoint,      // 添加点位模式
@@ -33,6 +34,7 @@ class SceneManager : public QGraphicsScene {
   Display::VirtualDisplay *curr_handle_display_{nullptr};
   DisplayManager *display_manager_;
   NavGoalWidget *nav_goal_widget_;
+  TopologyRouteWidget *topology_route_widget_;
 
   TopologyMap topology_map_;
   MapEditMode current_mode_;
@@ -80,8 +82,9 @@ class SceneManager : public QGraphicsScene {
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
   void saveTopologyMap();
-  void blindNavGoalWidget(Display::VirtualDisplay *);
+  void blindNavGoalWidget(Display::VirtualDisplay *, bool is_edit = false);
   void updateNavGoalWidgetPose( Display::VirtualDisplay *, bool is_move = true);
+  void blindTopologyRouteWidget(TopologyLine* line, bool is_edit = false);
   std::string generatePointName(const std::string &prefix);
   void eraseScenePointRange(const QPointF &, double);
   void setEraseCursor();

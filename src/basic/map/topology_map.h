@@ -13,7 +13,41 @@ NLOHMANN_JSON_SERIALIZE_ENUM(PointType, {
   {PointType::NavGoal, "NavGoal"}
 });
 
+// 路径方向枚举
+enum class RouteDirection {
+  Forward,    // 前进
+  Backward    // 后退
+};
+
+// nlohmann/json 序列化支持
+NLOHMANN_JSON_SERIALIZE_ENUM(RouteDirection, {
+  {RouteDirection::Forward, "Forward"},
+  {RouteDirection::Backward, "Backward"}
+});
+
+// 控制器类型枚举
+enum class ControllerType {
+  MPPI,       // MPPI控制器
+  DWB         // DWB控制器
+};
+
+// nlohmann/json 序列化支持
+NLOHMANN_JSON_SERIALIZE_ENUM(ControllerType, {
+  {ControllerType::MPPI, "MPPI"},
+  {ControllerType::DWB, "DWB"}
+});
+
 struct TopologyMap {
+  // 路径属性结构体
+  struct RouteInfo {
+    RouteDirection direction{RouteDirection::Forward};
+    ControllerType controller{ControllerType::MPPI};
+    
+    RouteInfo() = default;
+    RouteInfo(RouteDirection dir, ControllerType ctrl) 
+        : direction(dir), controller(ctrl) {}
+  };
+  
   struct PointInfo {
     double x;
     double y;
@@ -37,6 +71,8 @@ struct TopologyMap {
   std::string map_name;
   std::vector<PointInfo> points;
   std::map<std::string, std::set<std::string>> routes;
+  // 路径属性映射：route_id -> RouteInfo
+  std::map<std::string, RouteInfo> route_properties;
   
   void AddPoint(const PointInfo &point) { points.push_back(point); }
   void RemovePoint(const std::string &name) {
@@ -53,6 +89,22 @@ struct TopologyMap {
     // 删除以该点为终点的所有路径
     for (auto &route : routes) {
       route.second.erase(name);
+    }
+    
+    // 删除相关的路径属性
+    std::vector<std::string> routes_to_remove;
+    for (const auto &prop : route_properties) {
+      size_t arrow_pos = prop.first.find("->");
+      if (arrow_pos != std::string::npos) {
+        std::string from = prop.first.substr(0, arrow_pos);
+        std::string to = prop.first.substr(arrow_pos + 2);
+        if (from == name || to == name) {
+          routes_to_remove.push_back(prop.first);
+        }
+      }
+    }
+    for (const auto &route_id : routes_to_remove) {
+      route_properties.erase(route_id);
     }
   }
   
@@ -88,6 +140,23 @@ struct TopologyMap {
         route.second.insert(new_name);
       }
     }
+    
+    // 更新路径属性中的点名称
+    std::map<std::string, RouteInfo> new_properties;
+    for (const auto &prop : route_properties) {
+      size_t arrow_pos = prop.first.find("->");
+      if (arrow_pos != std::string::npos) {
+        std::string from = prop.first.substr(0, arrow_pos);
+        std::string to = prop.first.substr(arrow_pos + 2);
+        
+        std::string new_from = (from == old_name) ? new_name : from;
+        std::string new_to = (to == old_name) ? new_name : to;
+        std::string new_route_id = new_from + "->" + new_to;
+        
+        new_properties[new_route_id] = prop.second;
+      }
+    }
+    route_properties = new_properties;
   }
 
   PointInfo GetPoint(const std::string &name) {
@@ -107,6 +176,12 @@ struct TopologyMap {
   void AddRoute(const std::string &from, const std::string &to) {
     if (from == to) return;  // 防止自环
     routes[from].insert(to);
+    
+    // 为新路径设置默认属性
+    std::string route_id = from + "->" + to;
+    if (route_properties.count(route_id) == 0) {
+      route_properties[route_id] = RouteInfo();
+    }
   }
   
   void RemoveRoute(const std::string &route_id) {
@@ -125,6 +200,10 @@ struct TopologyMap {
         routes.erase(from);
       }
     }
+    
+    // 删除路径属性
+    std::string route_id = from + "->" + to;
+    route_properties.erase(route_id);
   }
   
   bool HasRoute(const std::string &from, const std::string &to) {
@@ -133,6 +212,18 @@ struct TopologyMap {
   
   bool IsBidirectional(const std::string &from, const std::string &to) {
     return HasRoute(from, to) && HasRoute(to, from);
+  }
+  
+  // 路径属性管理方法
+  RouteInfo GetRouteInfo(const std::string &route_id) {
+    if (route_properties.count(route_id) > 0) {
+      return route_properties[route_id];
+    }
+    return RouteInfo(); // 返回默认属性
+  }
+  
+  void SetRouteInfo(const std::string &route_id, const RouteInfo &info) {
+    route_properties[route_id] = info;
   }
   
   std::vector<std::pair<std::string, std::string>> GetRoutes() {
@@ -148,6 +239,7 @@ struct TopologyMap {
 
 // 嵌套结构体的 nlohmann/json 序列化支持
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::PointInfo, x, y, theta, name, type);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::RouteInfo, direction, controller);
 
 // TopologyMap 的 nlohmann/json 序列化支持
 inline void to_json(nlohmann::json& j, const TopologyMap& map) {
@@ -162,7 +254,8 @@ inline void to_json(nlohmann::json& j, const TopologyMap& map) {
   j = nlohmann::json{
     {"map_name", map.map_name},
     {"points", map.points},
-    {"routes", routes_vec}
+    {"routes", routes_vec},
+    {"route_properties", map.route_properties}
   };
 }
 
@@ -174,5 +267,10 @@ inline void from_json(const nlohmann::json& j, TopologyMap& map) {
   auto routes_array = j.at("routes").get<std::vector<std::pair<std::string, std::string>>>();
   for (const auto &route : routes_array) {
     map.routes[route.first].insert(route.second);
+  }
+  
+  // 读取路径属性（如果存在）
+  if (j.contains("route_properties")) {
+    j.at("route_properties").get_to(map.route_properties);
   }
 }

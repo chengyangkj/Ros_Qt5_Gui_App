@@ -11,7 +11,7 @@
 #include "display/virtual_display.h"
 #include "logger/logger.h"
 namespace Display {
-SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent), current_mode_(MapEditMode::kStop) {}
+SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent), current_mode_(MapEditMode::kStopEdit) {}
 void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
 
   display_manager_ = manager;
@@ -20,6 +20,8 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   set_nav_pose_widget_->hide();
   nav_goal_widget_ = new NavGoalWidget(view_ptr_);
   nav_goal_widget_->hide();
+  topology_route_widget_ = new TopologyRouteWidget(view_ptr_);
+  topology_route_widget_->hide();
   QPixmap goal_image;
   goal_image.load("://images/add_32.svg");
   QMatrix matrix;
@@ -122,7 +124,7 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
   }
   
   switch (mode) {
-    case kStop: {
+    case kStopEdit: {
       SetPointMoveEnable(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(true);
@@ -133,7 +135,7 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
     case kAddPoint: {
       view_ptr_->setCursor(nav_goal_cursor_);
     } break;
-    case kNormal: {
+    case kMoveCursor: {
       view_ptr_->setCursor(Qt::OpenHandCursor);
       SetPointMoveEnable(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
@@ -168,7 +170,7 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
   LOG_INFO("set edit mode:" << mode)
 }
 void SceneManager::SetPointMoveEnable(bool is_enable) {
-  nav_goal_widget_->SetEditEnabled(is_enable);
+  nav_goal_widget_->SetEditMode(is_enable);
   for (auto point : topology_map_.points) {
     auto display = FactoryDisplay::Instance()->GetDisplay(point.name);
     if (display != nullptr) {
@@ -200,12 +202,25 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     right_pressed_ = true;
   }
   QPointF position = mouseEvent->scenePos();  // 获取点击位置
-  
+  QGraphicsItem *click_item = itemAt(position, views()[0]->transform());
+  Display::VirtualDisplay *display = dynamic_cast<Display::VirtualDisplay *>(click_item);
+
+  if (display != nullptr) {                          // 判断是否获取到了 item
+    curr_handle_display_ = display;
+    //点击在地图上，隐藏窗体
+    if(display->GetDisplayType() == DISPLAY_MAP) {
+      if (topology_route_widget_->isVisible()) {
+        topology_route_widget_->hide();
+      }
+      if(nav_goal_widget_->isVisible()) {
+        nav_goal_widget_->hide();
+      }
+    }
+  }
 
   switch (current_mode_) {
-    case MapEditMode::kStop: {
-    } break;
-    case MapEditMode::kNormal: {
+    case MapEditMode::kStopEdit: 
+    case MapEditMode::kMoveCursor: {
     } break;
     case MapEditMode::kDrawLine: {
       auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
@@ -241,23 +256,13 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     } break;
     case MapEditMode::kLinkTopology: {
       // 拓扑连接模式特殊处理
-      QGraphicsItem *item = itemAt(position, views()[0]->transform());
-      if (item != nullptr) {
-     
-        Display::VirtualDisplay *display = dynamic_cast<Display::VirtualDisplay *>(item);
+      if (click_item != nullptr) {
+        Display::VirtualDisplay *display = dynamic_cast<Display::VirtualDisplay *>(click_item);
         // LOG_INFO("点击到item: " << display->GetDisplayName());
         if (display && display->GetDisplayType() == DISPLAY_GOAL) {
           LOG_INFO("点击到点位: " << display->GetDisplayName());
           handleTopologyLinking(QString::fromStdString(display->GetDisplayName()));
           return; // 直接返回，不执行后面的通用处理
-        } else if (dynamic_cast<TopologyLine*>(item)) {
-          // 点击到拓扑连线
-          clearTopologyLineSelection();
-          TopologyLine* line = dynamic_cast<TopologyLine*>(item);
-          line->SetSelected(true);
-          selected_topology_line_ = line;
-          LOG_INFO("选中拓扑连线: " << line->GetDisplayName());
-          return;
         }
       }
       clearTopologyLineSelection(); // 点击空白处清除选择
@@ -267,28 +272,31 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     default:
       break;
   }
-  QGraphicsItem *item =
-      itemAt(position, views()[0]->transform());  // 获取点击位置下的 item
-  if (item != nullptr) {                          // 判断是否获取到了 item
-    Display::VirtualDisplay *display =
-        dynamic_cast<Display::VirtualDisplay *>(item);
-    std::string display_type = display->GetDisplayType();
 
-    //点击到目标点弹窗
-    if (display_type == DISPLAY_GOAL) {
-      curr_handle_display_ = display;
-      // 窗体初始化
-      blindNavGoalWidget(display);
-      emit signalCurrentSelectPointChanged(
-          TopologyMap::PointInfo(TopologyMap::PointInfo(
-              display_manager_->scenePoseToWord(
-                  basic::RobotPose(position.x(), position.y(), 0)),
-              display->GetDisplayName())));
-    } else if (display_type != DISPLAY_GOAL && curr_handle_display_ != nullptr && curr_handle_display_->GetDisplayType() == DISPLAY_GOAL) {
-      curr_handle_display_ = nullptr;
-      nav_goal_widget_->hide();
-    }
+  //控件点击事件
+  
+  if (display != nullptr && display->GetDisplayType() == DISPLAY_TOPOLINE) {
+    // 点击到拓扑连线
+    clearTopologyLineSelection();
+    TopologyLine* line = dynamic_cast<TopologyLine*>(click_item);
+    line->SetSelected(true);
+    selected_topology_line_ = line;
+    LOG_INFO("选中拓扑连线: " << line->GetDisplayName());
+    
+    // 弹出拓扑路径属性窗体
+    blindTopologyRouteWidget(line,current_mode_ != MapEditMode::kStopEdit);
+    return;
+  }else if(display != nullptr && display->GetDisplayType() == DISPLAY_GOAL) {
+    // 窗体初始化
+    blindNavGoalWidget(display,current_mode_ != MapEditMode::kStopEdit);
+    emit signalCurrentSelectPointChanged(
+        TopologyMap::PointInfo(TopologyMap::PointInfo(
+            display_manager_->scenePoseToWord(
+                basic::RobotPose(position.x(), position.y(), 0)),
+            display->GetDisplayName())));
   }
+
+
   QGraphicsScene::mousePressEvent(mouseEvent);
 }
 std::string SceneManager::generatePointName(const std::string &prefix) {
@@ -319,7 +327,7 @@ void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
       map_ptr->EndDrawLine(map_ptr->mapFromScene(position), true);
     } break;
-    case MapEditMode::kNormal: {
+    case MapEditMode::kMoveCursor: {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
         if (display_type == DISPLAY_GOAL) {
@@ -347,7 +355,7 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QPointF position = mouseEvent->scenePos();  // 获取点击位置
   //点位属性框跟随移动处理
   switch (current_mode_) {
-    case MapEditMode::kStop: {
+    case MapEditMode::kStopEdit: {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
         if (display_type == DISPLAY_GOAL) {
@@ -355,7 +363,7 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
         }
       }
     } break;
-    case MapEditMode::kNormal: {
+    case MapEditMode::kMoveCursor: {
       if (curr_handle_display_ != nullptr) {
         std::string display_type = curr_handle_display_->GetDisplayType();
         if (display_type == DISPLAY_GOAL) {
@@ -391,6 +399,7 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   }
 
   QGraphicsScene::mouseMoveEvent(mouseEvent);
+
 }
 void SceneManager::wheelEvent(QGraphicsSceneWheelEvent *event) {
   switch (current_mode_) {
@@ -426,7 +435,7 @@ void SceneManager::setEraseCursor() {
   view_ptr_->setCursor(eraser_cursor_);
 }
 
-void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
+void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_edit) {
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
   std::string name = display->GetDisplayName();
   auto point_info = topology_map_.GetPoint(name);
@@ -437,6 +446,7 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
   nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
     .pose = point_info.ToRobotPose(),
     .name = QString::fromStdString(display->GetDisplayName())});
+  nav_goal_widget_->SetEditMode(is_edit);
   nav_goal_widget_->show();
 
   connect(nav_goal_widget_, &NavGoalWidget::SignalPointNameChanged,
@@ -517,6 +527,69 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display) {
                      << ") -> map pose(" << map_pose.x << ", " << map_pose.y << ", " << map_pose.theta << ")");
           });
 }
+
+void SceneManager::blindTopologyRouteWidget(TopologyLine* line, bool is_edit) {
+  if (!line) return;
+  
+  // 获取路径信息
+  std::string route_id = line->GetDisplayName();
+  auto route_info = topology_map_.GetRouteInfo(route_id);
+  
+  // 计算窗体位置（在线段中点附近）
+  QGraphicsItem* from_item = line->GetFromItem();
+  QGraphicsItem* to_item = line->GetToItem();
+  if (!from_item || !to_item) return;
+  
+  QPointF from_pos = from_item->scenePos();
+  QPointF to_pos = to_item->scenePos();
+  QPointF mid_pos = (from_pos + to_pos) / 2.0;
+  QPointF view_pos = view_ptr_->mapFromScene(mid_pos);
+  
+  // 先断开上一个路径的信号链接
+  topology_route_widget_->disconnect();
+  topology_route_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+  
+  // 设置路径信息
+  TopologyRouteWidget::RouteInfo info;
+  info.route_name = QString::fromStdString(route_id);
+  info.direction = route_info.direction;
+  info.controller = route_info.controller;
+  topology_route_widget_->SetRouteInfo(info);
+  topology_route_widget_->SetEditMode(is_edit);
+  topology_route_widget_->show();
+  
+  // 连接信号槽
+  connect(topology_route_widget_, &TopologyRouteWidget::SignalRouteInfoChanged,
+          [this, line](const TopologyRouteWidget::RouteInfo &info) {
+            std::string route_id = info.route_name.toStdString();
+            
+            // 更新拓扑地图中的路径属性
+            TopologyMap::RouteInfo route_info;
+            route_info.direction = info.direction;
+            route_info.controller = info.controller;
+            topology_map_.SetRouteInfo(route_id, route_info);
+            
+            LOG_INFO("更新路径属性: " << route_id 
+                     << " 方向: " << (info.direction == RouteDirection::Forward ? "前进" : "后退")
+                     << " 控制器: " << (info.controller == ControllerType::MPPI ? "MPPI" : "DWB"));
+          });
+  
+  connect(topology_route_widget_, &TopologyRouteWidget::SignalHandleOver,
+          [this, line](const TopologyRouteWidget::HandleResult &flag,
+                       const TopologyRouteWidget::RouteInfo &info) {
+            if (flag == TopologyRouteWidget::HandleResult::kDelete) {
+              LOG_INFO("删除路径: " << info.route_name.toStdString());
+              
+              // 删除选中的拓扑连线
+              deleteSelectedTopologyLine();
+              
+              topology_route_widget_->hide();
+            } else {
+              topology_route_widget_->hide();
+            }
+          });
+}
+
 void SceneManager::updateNavGoalWidgetPose(
     Display::VirtualDisplay *display, bool is_move) {
   auto pose = display_manager_->scenePoseToWord(
@@ -657,12 +730,13 @@ void SceneManager::clearTopologyLineSelection() {
 
 void SceneManager::deleteSelectedTopologyLine() {
   if (selected_topology_line_) {
+    std::string route_id = selected_topology_line_->GetDisplayName();
+    LOG_INFO("delete route_id: " << route_id);
     // 从拓扑地图中删除路径
-    topology_map_.RemoveRoute(selected_topology_line_->GetDisplayName());
+    topology_map_.RemoveRoute(route_id);
     
     // 从场景中移除
-    removeItem(selected_topology_line_);
-    
+    removeItem(selected_topology_line_);    
     // 从显示列表中删除
     auto it = std::find(topology_lines_.begin(), topology_lines_.end(), selected_topology_line_);
     if (it != topology_lines_.end()) {
@@ -753,6 +827,10 @@ SceneManager::~SceneManager() {
     removeItem(preview_line_);
     delete preview_line_;
     preview_line_ = nullptr;
+  }
+  // 隐藏路径属性窗体
+  if (topology_route_widget_) {
+    topology_route_widget_->hide();
   }
 }
 }  // namespace Display

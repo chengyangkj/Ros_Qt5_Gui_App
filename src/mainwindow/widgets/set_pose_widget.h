@@ -14,6 +14,9 @@
 using namespace basic;
 class SetPoseWidget : public QWidget {
   Q_OBJECT
+ protected:
+  void paintEvent(QPaintEvent *event) override;
+
  private:
   QDoubleSpinBox *spinBox_x_;
   QDoubleSpinBox *spinBox_y_;
@@ -23,6 +26,7 @@ class SetPoseWidget : public QWidget {
   void SignalHandleOver(const bool &is_submit, const RobotPose &pose);
  public slots:
   void SetPose(const RobotPose &pose);
+
  private slots:
   void SlotUpdateValue(double);
 

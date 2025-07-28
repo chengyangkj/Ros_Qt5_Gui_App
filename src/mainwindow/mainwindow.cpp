@@ -73,6 +73,8 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
       break;
     case MsgId::kRobotPose: {
       nav_goal_table_view_->UpdateRobotPose(std::any_cast<RobotPose>(data));
+      auto robot_pose = std::any_cast<RobotPose>(data);
+      label_pos_robot_->setText("Robot Pose:(" +  QString::number(robot_pose.x).mid(0, 4)  + "," + QString::number(robot_pose.y).mid(0, 4) + "," + QString::number(robot_pose.theta).mid(0, 4) + ")");
     } break;
     case MsgId::kBatteryState: {
       std::map<std::string, std::string> map =
@@ -533,6 +535,11 @@ void MainWindow::setupUi() {
 
   horizontalLayout_12->addWidget(label_pos_scene_);
 
+  label_pos_robot_ = new QLabel();
+  label_pos_robot_->setObjectName(QString::fromUtf8("label_pos_robot_"));
+  label_pos_robot_->setStyleSheet(QString::fromUtf8(""));
+  horizontalLayout_12->addWidget(label_pos_robot_);
+
   horizontalLayout_12->addItem(
       new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
@@ -722,11 +729,11 @@ void MainWindow::setupUi() {
   });
   connect(edit_map_btn, &QToolButton::clicked, [this, tools_edit_map_widget, edit_map_btn]() {
     if (edit_map_btn->text() == "编辑地图") {
-      display_manager_->SetEditMapMode(Display::MapEditMode::kNormal);
+      display_manager_->SetEditMapMode(Display::MapEditMode::kMoveCursor);
       edit_map_btn->setText("结束编辑");
       tools_edit_map_widget->show();
     } else {
-      display_manager_->SetEditMapMode(Display::MapEditMode::kStop);
+      display_manager_->SetEditMapMode(Display::MapEditMode::kStopEdit);
       edit_map_btn->setText("编辑地图");
       tools_edit_map_widget->hide();
     }
@@ -734,7 +741,7 @@ void MainWindow::setupUi() {
   connect(add_point_btn, &QToolButton::clicked, [this]() {
     display_manager_->SetEditMapMode(Display::MapEditMode::kAddPoint);
   });
-  connect(normal_cursor_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kNormal); });
+  connect(normal_cursor_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kMoveCursor); });
   connect(erase_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kErase); });
   connect(draw_line_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kDrawLine); });
   connect(add_region_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kRegion); });
