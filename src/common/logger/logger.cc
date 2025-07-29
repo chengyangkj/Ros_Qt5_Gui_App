@@ -7,8 +7,8 @@ Logger* Logger::Instance() {
   return &logger;
 }
 Logger::Logger() {
-  int argc;
-  char** argv;
+  int argc=0;
+  char** argv=nullptr;
   START_EASYLOGGINGPP(argc, argv);
   el::Configurations defaultConf;
   defaultConf.setToDefault();
