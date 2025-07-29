@@ -78,7 +78,7 @@ void DisplayManager::slotRobotScenePoseChanged(const RobotPose &pose) {
     robot_pose_.theta = pose.theta;
     QPointF view_pos =
         graphics_view_ptr_->mapFromScene(QPointF(pose.x, pose.y));
-    set_reloc_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+    set_reloc_pose_widget_->move(QPoint(view_pos.x()+10, view_pos.y()+10));
     set_reloc_pose_widget_->SetPose(
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
   }
@@ -221,7 +221,7 @@ void DisplayManager::SetRelocMode(bool is_start) {
         RobotPose(robot_pose_.x, robot_pose_.y, robot_pose_.theta));
     auto current_scene = GetDisplay(DISPLAY_ROBOT)->scenePos();
     QPointF view_pos = graphics_view_ptr_->mapFromScene(current_scene);
-    set_reloc_pose_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+    set_reloc_pose_widget_->move(QPoint(view_pos.x()+10, view_pos.y()+10));
     set_reloc_pose_widget_->show();
   } else {
     set_reloc_pose_widget_->hide();

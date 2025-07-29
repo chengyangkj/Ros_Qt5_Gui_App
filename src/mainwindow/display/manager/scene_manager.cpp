@@ -444,7 +444,7 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
   LOG_INFO("blind nav goal widget display name:" << name <<" world pose:" << point_info.ToRobotPose());
   //先断开上一个点位的信号链接
   nav_goal_widget_->disconnect();
-  nav_goal_widget_->move(QPoint(view_pos.x(), view_pos.y()));
+  nav_goal_widget_->move(QPoint(view_pos.x()+10, view_pos.y()+10));
   nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
     .pose = point_info.ToRobotPose(),
     .name = QString::fromStdString(display->GetDisplayName())});
