@@ -50,8 +50,8 @@ struct TopologyMap {
   };
   
   std::string map_name;
-  std::vector<PointInfo> points;
   PropertyInfo map_property;
+  std::vector<PointInfo> points;
 
   //from->to
   std::map<std::string, std::map<std::string, RouteInfo>> routes;
@@ -192,18 +192,4 @@ struct TopologyMap {
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::PointInfo, x, y, theta, name, type);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::RouteInfo, controller);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::PropertyInfo, support_controllers);
-
-// TopologyMap 的 nlohmann/json 序列化支持
-inline void to_json(nlohmann::json& j, const TopologyMap& map) {
-  j = nlohmann::json{
-    {"map_name", map.map_name},
-    {"points", map.points},
-    {"routes", map.routes}
-  };
-}
-
-inline void from_json(const nlohmann::json& j, TopologyMap& map) {
-  j.at("map_name").get_to(map.map_name);
-  j.at("points").get_to(map.points);
-  j.at("routes").get_to(map.routes);
-}
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap, map_name, map_property,points, routes);
