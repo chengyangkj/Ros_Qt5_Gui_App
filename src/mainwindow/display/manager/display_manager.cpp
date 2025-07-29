@@ -332,6 +332,8 @@ void DisplayManager::OpenMap(const std::string &path) {
   // 获取文件名（不包括后缀）
   std::string filenameWithoutExtension = filepath.stem().string();
   LOG_INFO("Filename without extension: " << filenameWithoutExtension);
+  //去掉filepath后缀
+  map_path_ = filepath.parent_path().string() + "/"+filenameWithoutExtension;
   // 获取后缀名
   std::string extension = filepath.extension().string();
   LOG_INFO("Extension: " << extension);

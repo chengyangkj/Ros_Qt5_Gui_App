@@ -54,6 +54,9 @@ class DisplayManager : public QObject {
   SetPoseWidget *set_reloc_pose_widget_;
   SceneManager *scene_manager_ptr_;
   bool init_flag_{false};
+  std::string map_path_{"./map"};
+
+
  signals:
   void cursorPosMap(QPointF);
   void signalPub2DPose(const RobotPose &pose);
@@ -103,6 +106,8 @@ class DisplayManager : public QObject {
   void SetFocusOn(const std::string &display_type) {
     focus_display_ = display_type;
   }
+  std::string GetMapPath() { return map_path_; }
+  
 };
 
 }  // namespace Display

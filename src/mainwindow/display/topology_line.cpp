@@ -28,6 +28,8 @@ TopologyLine::TopologyLine(QGraphicsItem* from_item, QGraphicsItem* to_item,
   updateBoundingRect();
   SetScaleEnable(false);
   setZValue(8);
+  
+
 }
 
 TopologyLine::~TopologyLine() {
@@ -45,6 +47,11 @@ void TopologyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   
   // 动态更新bounding rect
   updateBoundingRect();
+  
+  // 确保边界矩形有效
+  if (bounding_rect_.isEmpty()) {
+    updateBoundingRect();
+  }
   
   QPointF start_pos = start_item_->scenePos();
   QPointF end_pos;
@@ -446,6 +453,9 @@ void TopologyLine::advance(int step) {
     animation_offset_ = 0.0;
   }
   
+  // 更新边界矩形
+  updateBoundingRect();
+  
   // 正常模式始终有动画，预览模式和选中状态有特殊效果
   update();
 }
@@ -479,20 +489,17 @@ QRectF TopologyLine::calculateDynamicBoundingRect() const {
   qreal right = qMax(start_pos.x(), end_pos.x()) + 20;
   qreal bottom = qMax(start_pos.y(), end_pos.y()) + 20;
   
-  // 转换为本地坐标系
-  QPointF scene_top_left(left, top);
-  QPointF scene_bottom_right(right, bottom);
-  QPointF local_top_left = mapFromScene(scene_top_left);
-  QPointF local_bottom_right = mapFromScene(scene_bottom_right);
-  
-  return QRectF(local_top_left.x(), local_top_left.y(), 
-                local_bottom_right.x() - local_top_left.x(), 
-                local_bottom_right.y() - local_top_left.y());
+  // 直接返回场景坐标系中的矩形，不需要转换为本地坐标系
+  return QRectF(left, top, right - left, bottom - top);
 }
 
 void TopologyLine::updateBoundingRect() {
   QRectF new_rect = calculateDynamicBoundingRect();
-  SetBoundingRect(new_rect);
+  if (!new_rect.isEmpty()) {
+    SetBoundingRect(new_rect);
+    // 强制更新显示
+    update();
+  }
 }
 
 bool TopologyLine::UpdateData(const std::any &data) {
