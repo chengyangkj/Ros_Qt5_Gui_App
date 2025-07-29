@@ -23,8 +23,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const allArtifacts = [];
-            const runs = await github.rest.actions.listWorkflowRuns({
+            const fs = require('fs');
+            
+            // 获取当前仓库的所有workflow runs
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
               event: 'push',
@@ -32,24 +34,43 @@ jobs:
               created: `>${new Date(Date.now() - 10 * 60 * 1000).toISOString()}`  // 最近10分钟内的运行
             });
             
+            console.log(`Found ${runs.data.workflow_runs.length} workflow runs`);
+            
             for (const run of runs.data.workflow_runs) {
+              console.log(`Checking run ${run.id} with SHA ${run.head_sha}, current SHA: ${context.sha}`);
+              
+              // 只处理与当前commit相关的runs
               if (run.head_sha === context.sha) {
-                const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  run_id: run.id
-                });
+                console.log(`Processing run ${run.id}`);
                 
-                for (const artifact of artifacts.data.artifacts) {
-                  const download = await github.rest.actions.downloadArtifact({
+                try {
+                  const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    artifact_id: artifact.id,
-                    archive_format: 'zip'
+                    run_id: run.id
                   });
                   
-                  const fs = require('fs');
-                  fs.writeFileSync(`${artifact.name}.zip`, Buffer.from(download.data));
+                  console.log(`Found ${artifacts.data.artifacts.length} artifacts in run ${run.id}`);
+                  
+                  for (const artifact of artifacts.data.artifacts) {
+                    console.log(`Downloading artifact: ${artifact.name}`);
+                    
+                    try {
+                      const download = await github.rest.actions.downloadArtifact({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        artifact_id: artifact.id,
+                        archive_format: 'zip'
+                      });
+                      
+                      fs.writeFileSync(`${artifact.name}.zip`, Buffer.from(download.data));
+                      console.log(`Successfully downloaded ${artifact.name}.zip`);
+                    } catch (error) {
+                      console.error(`Failed to download artifact ${artifact.name}:`, error.message);
+                    }
+                  }
+                } catch (error) {
+                  console.error(`Failed to get artifacts for run ${run.id}:`, error.message);
                 }
               }
             }
@@ -69,7 +90,10 @@ jobs:
         run: |
           for zip in *.zip
           do
-            unzip "$zip" || true
+            if [ -f "$zip" ]; then
+              echo "Unzipping $zip"
+              unzip "$zip" || true
+            fi
           done
 
       - name: Upload Release Assets
@@ -81,15 +105,23 @@ jobs:
             const fs = require('fs');
             const release_id = '${{ steps.create_release.outputs.id }}';
             
+            console.log('Looking for files to upload...');
             const files = fs.readdirSync('.');
+            
             for (const file of files) {
-              if (file.endsWith('.tar.gz')) {
-                await github.rest.repos.uploadReleaseAsset({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  release_id: release_id,
-                  name: file,
-                  data: fs.readFileSync(file)
-                });
+              if (file.endsWith('.tar.gz') || file.endsWith('.zip') || file.endsWith('.deb') || file.endsWith('.rpm')) {
+                console.log(`Uploading ${file} to release`);
+                try {
+                  await github.rest.repos.uploadReleaseAsset({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    release_id: release_id,
+                    name: file,
+                    data: fs.readFileSync(file)
+                  });
+                  console.log(`Successfully uploaded ${file}`);
+                } catch (error) {
+                  console.error(`Failed to upload ${file}:`, error.message);
+                }
               }
             }
