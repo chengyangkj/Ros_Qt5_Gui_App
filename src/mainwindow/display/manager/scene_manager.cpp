@@ -210,7 +210,7 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if (display != nullptr) {                          // 判断是否获取到了 item
     curr_handle_display_ = display;
     //点击在地图上，隐藏窗体
-    if(display->GetDisplayType() == DISPLAY_MAP) {
+    if(display->GetDisplayType() == DISPLAY_MAP || display->GetDisplayType() == DISPLAY_LOCAL_COST_MAP || display->GetDisplayType() == DISPLAY_GLOBAL_COST_MAP) {
       if (topology_route_widget_->isVisible()) {
         topology_route_widget_->hide();
       }
