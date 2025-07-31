@@ -29,10 +29,33 @@ TopologyLine::TopologyLine(QGraphicsItem* from_item, QGraphicsItem* to_item,
   SetScaleEnable(false);
   setZValue(8);
   
-
+  // 监听关联item的位置变化
+  connectToItems();
 }
 
 TopologyLine::~TopologyLine() {
+}
+
+void TopologyLine::connectToItems() {
+  // 监听起点item的位置变化
+  if (start_item_) {
+    VirtualDisplay* start_display = dynamic_cast<VirtualDisplay*>(start_item_);
+    if (start_display) {
+      connect(start_display, &VirtualDisplay::signalPositionChanged, this, [this]() {
+        updateBoundingRect();
+      });
+    }
+  }
+  
+  // 监听终点item的位置变化
+  if (end_item_) {
+    VirtualDisplay* end_display = dynamic_cast<VirtualDisplay*>(end_item_);
+    if (end_display) {
+      connect(end_display, &VirtualDisplay::signalPositionChanged, this, [this]() {
+        updateBoundingRect();
+      });
+    }
+  }
 }
 
 
@@ -53,24 +76,28 @@ void TopologyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     updateBoundingRect();
   }
   
-  QPointF start_pos = start_item_->scenePos();
+  QPointF start_pos = mapFromScene(start_item_->scenePos());
   QPointF end_pos;
   
   if (is_preview_mode_) {
     // 预览模式：使用预设的终点位置
-    end_pos = preview_end_pos_;
+    end_pos = mapFromScene(preview_end_pos_);
   } else if (end_item_) {
     // 正常模式：使用终点item的位置
-    end_pos = end_item_->scenePos();
+    end_pos = mapFromScene(end_item_->scenePos());
   } else {
     return; // 既不是预览模式也没有终点item，不绘制
   }
   
   // 如果是双向连接的一部分，添加并行偏移
   if (is_part_of_bidirectional_ && !is_preview_mode_) {
-    auto offset_positions = calculateOffsetPositions(start_pos, end_pos);
-    start_pos = offset_positions.first;
-    end_pos = offset_positions.second;
+    // 先转换回场景坐标计算偏移
+    QPointF scene_start = start_item_->scenePos();
+    QPointF scene_end = end_item_->scenePos();
+    auto offset_positions = calculateOffsetPositions(scene_start, scene_end);
+    // 再转换为本地坐标
+    start_pos = mapFromScene(offset_positions.first);
+    end_pos = mapFromScene(offset_positions.second);
   }
   
   // 设置绘制属性
@@ -312,15 +339,17 @@ bool TopologyLine::contains(const QPointF &point) const {
     return false;
   }
   
-  // 获取实时位置
-  QPointF start_pos = start_item_->scenePos();
-  QPointF end_pos = end_item_->scenePos();
+  // 转换为本地坐标
+  QPointF start_pos = mapFromScene(start_item_->scenePos());
+  QPointF end_pos = mapFromScene(end_item_->scenePos());
   
   // 如果是双向连接的一部分，应用相同的偏移
   if (is_part_of_bidirectional_) {
-    auto offset_positions = calculateOffsetPositions(start_pos, end_pos);
-    start_pos = offset_positions.first;
-    end_pos = offset_positions.second;
+    QPointF scene_start = start_item_->scenePos();
+    QPointF scene_end = end_item_->scenePos();
+    auto offset_positions = calculateOffsetPositions(scene_start, scene_end);
+    start_pos = mapFromScene(offset_positions.first);
+    end_pos = mapFromScene(offset_positions.second);
   }
   
   QPainterPath path;
@@ -342,15 +371,17 @@ QPainterPath TopologyLine::shape() const {
     return QPainterPath();
   }
   
-  // 获取实时位置
-  QPointF start_pos = start_item_->scenePos();
-  QPointF end_pos = end_item_->scenePos();
+  // 转换为本地坐标
+  QPointF start_pos = mapFromScene(start_item_->scenePos());
+  QPointF end_pos = mapFromScene(end_item_->scenePos());
   
   // 如果是双向连接的一部分，应用相同的偏移
   if (is_part_of_bidirectional_) {
-    auto offset_positions = calculateOffsetPositions(start_pos, end_pos);
-    start_pos = offset_positions.first;
-    end_pos = offset_positions.second;
+    QPointF scene_start = start_item_->scenePos();
+    QPointF scene_end = end_item_->scenePos();
+    auto offset_positions = calculateOffsetPositions(scene_start, scene_end);
+    start_pos = mapFromScene(offset_positions.first);
+    end_pos = mapFromScene(offset_positions.second);
   }
   
   QPainterPath path;
@@ -453,8 +484,12 @@ void TopologyLine::advance(int step) {
     animation_offset_ = 0.0;
   }
   
-  // 更新边界矩形
-  updateBoundingRect();
+  // 每隔一定帧数更新边界矩形，避免过于频繁
+  static int frame_count = 0;
+  frame_count++;
+  if (frame_count % 5 == 0) { // 每5帧更新一次
+    updateBoundingRect();
+  }
   
   // 正常模式始终有动画，预览模式和选中状态有特殊效果
   update();
@@ -473,7 +508,7 @@ QRectF TopologyLine::calculateDynamicBoundingRect() const {
   } else if (end_item_) {
     end_pos = end_item_->scenePos();
   } else {
-    return QRectF(start_pos.x()-10, start_pos.y()-10, 20, 20);
+    return QRectF(start_pos.x()-50, start_pos.y()-50, 100, 100);
   }
   
   // 计算偏移后的位置
@@ -483,17 +518,21 @@ QRectF TopologyLine::calculateDynamicBoundingRect() const {
     end_pos = offset_positions.second;
   }
   
-  // 计算包含起点和终点的矩形，并添加一些边距
-  qreal left = qMin(start_pos.x(), end_pos.x()) - 20;
-  qreal top = qMin(start_pos.y(), end_pos.y()) - 20;
-  qreal right = qMax(start_pos.x(), end_pos.x()) + 20;
-  qreal bottom = qMax(start_pos.y(), end_pos.y()) + 20;
+  // 计算包含起点和终点的矩形，并添加足够的边距
+  qreal margin = 50; // 增加边距确保完整显示
+  qreal left = qMin(start_pos.x(), end_pos.x()) - margin;
+  qreal top = qMin(start_pos.y(), end_pos.y()) - margin;
+  qreal right = qMax(start_pos.x(), end_pos.x()) + margin;
+  qreal bottom = qMax(start_pos.y(), end_pos.y()) + margin;
   
-  // 直接返回场景坐标系中的矩形，不需要转换为本地坐标系
-  return QRectF(left, top, right - left, bottom - top);
+  // 转换为相对于自身位置的本地坐标系
+  QPointF current_pos = pos();
+  return QRectF(left - current_pos.x(), top - current_pos.y(), 
+                right - left, bottom - top);
 }
 
 void TopologyLine::updateBoundingRect() {
+  prepareGeometryChange(); // 告诉场景几何形状即将改变
   QRectF new_rect = calculateDynamicBoundingRect();
   if (!new_rect.isEmpty()) {
     SetBoundingRect(new_rect);

@@ -51,6 +51,7 @@ class TopologyLine : public VirtualDisplay {
   void drawFlowingLight(QPainter *painter, const QPointF &start, const QPointF &end, const QColor &color);
   QPointF calculateArrowHead(const QPointF &start, const QPointF &end, double angle);
   QRectF calculateDynamicBoundingRect() const;
+  void connectToItems();
   
   // 计算双向连接的偏移位置
   std::pair<QPointF, QPointF> calculateOffsetPositions(const QPointF &start_pos, const QPointF &end_pos) const;
