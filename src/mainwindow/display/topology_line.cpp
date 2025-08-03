@@ -71,8 +71,8 @@ void TopologyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   // 动态更新bounding rect
   updateBoundingRect();
   
-  // 确保边界矩形有效
-  if (bounding_rect_.isEmpty()) {
+  // 确保边界矩形有效，如果无效则重新计算
+  if (bounding_rect_.isEmpty() || bounding_rect_.width() < 10 || bounding_rect_.height() < 10) {
     updateBoundingRect();
   }
   
@@ -484,10 +484,10 @@ void TopologyLine::advance(int step) {
     animation_offset_ = 0.0;
   }
   
-  // 每隔一定帧数更新边界矩形，避免过于频繁
+  // 更频繁地更新边界矩形，确保移动时线段不会消失
   static int frame_count = 0;
   frame_count++;
-  if (frame_count % 5 == 0) { // 每5帧更新一次
+  if (frame_count % 2 == 0) { // 每2帧更新一次，提高更新频率
     updateBoundingRect();
   }
   
@@ -519,11 +519,29 @@ QRectF TopologyLine::calculateDynamicBoundingRect() const {
   }
   
   // 计算包含起点和终点的矩形，并添加足够的边距
-  qreal margin = 50; // 增加边距确保完整显示
+  qreal margin = 100; // 增加更大的边距确保完整显示，包括箭头和阴影
   qreal left = qMin(start_pos.x(), end_pos.x()) - margin;
   qreal top = qMin(start_pos.y(), end_pos.y()) - margin;
   qreal right = qMax(start_pos.x(), end_pos.x()) + margin;
   qreal bottom = qMax(start_pos.y(), end_pos.y()) + margin;
+  
+  // 确保边界矩形有最小尺寸，防止线段消失
+  qreal min_width = 200;
+  qreal min_height = 200;
+  qreal width = right - left;
+  qreal height = bottom - top;
+  
+  if (width < min_width) {
+    qreal center_x = (left + right) / 2;
+    left = center_x - min_width / 2;
+    right = center_x + min_width / 2;
+  }
+  
+  if (height < min_height) {
+    qreal center_y = (top + bottom) / 2;
+    top = center_y - min_height / 2;
+    bottom = center_y + min_height / 2;
+  }
   
   // 转换为相对于自身位置的本地坐标系
   QPointF current_pos = pos();
@@ -534,11 +552,17 @@ QRectF TopologyLine::calculateDynamicBoundingRect() const {
 void TopologyLine::updateBoundingRect() {
   prepareGeometryChange(); // 告诉场景几何形状即将改变
   QRectF new_rect = calculateDynamicBoundingRect();
-  if (!new_rect.isEmpty()) {
-    SetBoundingRect(new_rect);
-    // 强制更新显示
-    update();
+  
+  // 确保边界矩形有效，即使为空也要设置一个最小矩形
+  if (new_rect.isEmpty()) {
+    // 如果计算出的矩形为空，使用一个默认的最小矩形
+    QPointF current_pos = pos();
+    new_rect = QRectF(-100, -100, 200, 200);
   }
+  
+  SetBoundingRect(new_rect);
+  // 强制更新显示
+  update();
 }
 
 bool TopologyLine::UpdateData(const std::any &data) {
