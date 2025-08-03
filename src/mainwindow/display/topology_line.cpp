@@ -484,12 +484,7 @@ void TopologyLine::advance(int step) {
     animation_offset_ = 0.0;
   }
   
-  // 更频繁地更新边界矩形，确保移动时线段不会消失
-  static int frame_count = 0;
-  frame_count++;
-  if (frame_count % 2 == 0) { // 每2帧更新一次，提高更新频率
-    updateBoundingRect();
-  }
+   updateBoundingRect();
   
   // 正常模式始终有动画，预览模式和选中状态有特殊效果
   update();
@@ -526,8 +521,8 @@ QRectF TopologyLine::calculateDynamicBoundingRect() const {
   qreal bottom = qMax(start_pos.y(), end_pos.y()) + margin;
   
   // 确保边界矩形有最小尺寸，防止线段消失
-  qreal min_width = 200;
-  qreal min_height = 200;
+  qreal min_width = 400;
+  qreal min_height = 400;
   qreal width = right - left;
   qreal height = bottom - top;
   
