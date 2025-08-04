@@ -715,7 +715,8 @@ void MainWindow::setupUi() {
           });
   connect(btn_load_task_chain, &QPushButton::clicked, [this]() {
     QString fileName = QFileDialog::getOpenFileName(nullptr, "Open JSON file",
-                                                    "", "JSON files (*.json)");
+                                                    "", "JSON files (*.json)",
+                                                    nullptr, QFileDialog::DontUseNativeDialog);
 
     // 如果用户选择了文件，则输出文件名
     if (!fileName.isEmpty()) {
@@ -725,7 +726,8 @@ void MainWindow::setupUi() {
   });
   connect(btn_save_task_chain, &QPushButton::clicked, [this]() {
     QString fileName = QFileDialog::getSaveFileName(nullptr, "Save JSON file",
-                                                    "", "JSON files (*.json)");
+                                                    "", "JSON files (*.json)",
+                                                    nullptr, QFileDialog::DontUseNativeDialog);
 
     // 如果用户选择了文件，则输出文件名
     if (!fileName.isEmpty()) {
@@ -804,7 +806,8 @@ void MainWindow::setupUi() {
 
   connect(re_save_map_btn, &QToolButton::clicked, [this]() {
     QString fileName = QFileDialog::getSaveFileName(nullptr, "Save Map files",
-                                                    "", "Map files (*.yaml,*.pgm,*.pgm.json)");
+                                                    "", "Map files (*.yaml,*.pgm,*.pgm.json)",
+                                                    nullptr, QFileDialog::DontUseNativeDialog);
     if (!fileName.isEmpty()) {
       // 用户选择了文件夹，可以在这里进行相应的操作
       LOG_INFO("用户选择的保存地图路径：" << fileName.toStdString());
@@ -837,7 +840,8 @@ void MainWindow::setupUi() {
         << "拓扑地图(*.topology)";
 
     QString fileName = QFileDialog::getOpenFileName(nullptr, "OPen Map files",
-                                                    "", filters.join(";;"));
+                                                    "", filters.join(";;"),
+                                                    nullptr, QFileDialog::DontUseNativeDialog);
     if (!fileName.isEmpty()) {
       // 用户选择了文件夹，可以在这里进行相应的操作
       LOG_INFO("用户选择的打开地图路径：" << fileName.toStdString());
