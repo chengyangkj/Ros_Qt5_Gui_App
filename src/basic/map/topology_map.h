@@ -18,9 +18,12 @@ struct TopologyMap {
   // 路径属性结构体
   struct RouteInfo {
     std::string controller{"FollowPath"};
+    double speed_limit{1.0};  // 默认最大速度1.0
     RouteInfo() = default;
     RouteInfo(std::string ctrl) 
         :  controller(ctrl) {}
+    RouteInfo(std::string ctrl, double speed) 
+        :  controller(ctrl), speed_limit(speed) {}
     
   };
   
@@ -190,6 +193,6 @@ struct TopologyMap {
 
 // 嵌套结构体的 nlohmann/json 序列化支持
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::PointInfo, x, y, theta, name, type);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::RouteInfo, controller);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::RouteInfo, controller, speed_limit);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::PropertyInfo, support_controllers);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap, map_name, map_property,points, routes);

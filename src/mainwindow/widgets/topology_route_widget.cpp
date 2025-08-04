@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QPainter>
+#include <QDoubleSpinBox>
 
 void TopologyRouteWidget::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
@@ -61,6 +62,49 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
       background-color: #f5f5f5;
       color: #999999;
       border: 1px solid #e0e0e0;
+    }
+    QDoubleSpinBox {
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      padding: 4px 6px;
+      background-color: #fafafa;
+      color: #333333;
+      font-size: 11px;
+      min-height: 20px;
+      max-height: 24px;
+    }
+    QDoubleSpinBox:focus {
+      border: 2px solid #4a90e2;
+      background-color: #ffffff;
+    }
+    QDoubleSpinBox:disabled {
+      background-color: #f5f5f5;
+      color: #999999;
+      border: 1px solid #e0e0e0;
+    }
+    QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+      border: none;
+      background-color: #f0f0f0;
+      width: 16px;
+      border-radius: 2px;
+    }
+    QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+      background-color: #e0e0e0;
+    }
+    QDoubleSpinBox::up-button:pressed, QDoubleSpinBox::down-button:pressed {
+      background-color: #d0d0d0;
+    }
+    QDoubleSpinBox::up-arrow {
+      image: none;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 4px solid #666666;
+    }
+    QDoubleSpinBox::down-arrow {
+      image: none;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid #666666;
     }
     QComboBox::drop-down {
       border: none;
@@ -138,6 +182,21 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   layout_controller->addWidget(comboBox_controller_);
   layout->addLayout(layout_controller);
   
+  // 速度限制
+  QHBoxLayout *layout_speed = new QHBoxLayout();
+  layout_speed->setSpacing(6);
+  QLabel *label_speed = new QLabel("速度限制:");
+  label_speed->setMinimumSize(50, 20);
+  spinBox_speed_limit_ = new QDoubleSpinBox();
+  spinBox_speed_limit_->setRange(0.1, 10.0);  // 设置范围0.1到10.0
+  spinBox_speed_limit_->setValue(1.0);  // 默认值
+  spinBox_speed_limit_->setSuffix(" m/s");  // 添加单位后缀
+  spinBox_speed_limit_->setDecimals(2);  // 显示两位小数
+  spinBox_speed_limit_->setSingleStep(0.1);  // 步进值0.1
+  layout_speed->addWidget(label_speed);
+  layout_speed->addWidget(spinBox_speed_limit_);
+  layout->addLayout(layout_speed);
+  
   // 按钮区域
   QVBoxLayout *layout_button = new QVBoxLayout();
   layout_button->setSpacing(4);
@@ -163,10 +222,18 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   connect(comboBox_controller_, QOverload<int>::of(&QComboBox::currentIndexChanged),
           this, &TopologyRouteWidget::SlotUpdateValue);
   
+  connect(spinBox_speed_limit_, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+          this, &TopologyRouteWidget::SlotUpdateValue);
+  
   connect(button_delete_, &QPushButton::clicked, [this]() {
     RouteInfo info;
     info.route_name = lineEdit_route_name_->text();
     info.controller = comboBox_controller_->currentText().toStdString();
+    
+    // 验证速度限制输入
+    double speed_limit = spinBox_speed_limit_->value();
+    info.speed_limit = (speed_limit > 0) ? speed_limit : 1.0;
+    
     emit SignalHandleOver(HandleResult::kDelete, info);
   });
   
@@ -174,12 +241,18 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
     RouteInfo info;
     info.route_name = lineEdit_route_name_->text();
     info.controller = comboBox_controller_->currentText().toStdString();
+    
+    // 验证速度限制输入
+    double speed_limit = spinBox_speed_limit_->value();
+    info.speed_limit = (speed_limit > 0) ? speed_limit : 1.0;
+    
     emit SignalHandleOver(HandleResult::kCancel, info);
   });
 }
 
 void TopologyRouteWidget::SetEditMode(bool is_edit) {
   comboBox_controller_->setEnabled(is_edit);
+  spinBox_speed_limit_->setEnabled(is_edit);
   button_delete_->setEnabled(is_edit);
 }
 
@@ -196,12 +269,27 @@ void TopologyRouteWidget::SlotUpdateValue() {
   RouteInfo info;
   info.route_name = lineEdit_route_name_->text();
   info.controller = comboBox_controller_->currentText().toStdString();
+  
+  // 验证速度限制输入
+  double speed_limit = spinBox_speed_limit_->value();
+  if (speed_limit > 0 && speed_limit <= 10.0) {  // 限制在0.1到10.0之间
+    info.speed_limit = speed_limit;
+  } else {
+    // 如果输入无效，使用默认值
+    info.speed_limit = 1.0;
+    spinBox_speed_limit_->setValue(1.0);
+  }
+  
   emit SignalRouteInfoChanged(info);
 }
 
 void TopologyRouteWidget::SetRouteInfo(const RouteInfo &info) {
+  if(IsAnyControlBeingEdited()){
+    return;
+  }
   lineEdit_route_name_->blockSignals(true);
   comboBox_controller_->blockSignals(true);
+  spinBox_speed_limit_->blockSignals(true);
   
   lineEdit_route_name_->setText(info.route_name);
   
@@ -211,6 +299,16 @@ void TopologyRouteWidget::SetRouteInfo(const RouteInfo &info) {
     comboBox_controller_->setCurrentIndex(controller_index);
   }
   
+  // 设置速度限制
+  spinBox_speed_limit_->setValue(info.speed_limit);
+  
   lineEdit_route_name_->blockSignals(false);
   comboBox_controller_->blockSignals(false);
+  spinBox_speed_limit_->blockSignals(false);
+} 
+
+bool TopologyRouteWidget::IsAnyControlBeingEdited() const {
+  // 检查是否有任何输入控件正在获得焦点
+  return comboBox_controller_->hasFocus() || 
+         spinBox_speed_limit_->hasFocus();
 } 

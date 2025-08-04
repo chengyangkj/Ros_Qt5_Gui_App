@@ -10,6 +10,8 @@
 #include "display/point_shape.h"
 #include "display/virtual_display.h"
 #include "logger/logger.h"
+#include <QMessageBox>
+
 namespace Display {
 SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent), current_mode_(MapEditMode::kStopEdit) {}
 void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
@@ -450,22 +452,10 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
   nav_goal_widget_->SetEditMode(is_edit);
   nav_goal_widget_->show();
 
-  connect(nav_goal_widget_, &NavGoalWidget::SignalPointNameChanged,
-          [this, display](const QString &new_name) {
-            std::string old_name = display->GetDisplayName();
-            // 先更新拓扑地图中的点名称
-            topology_map_.UpdatePointName(old_name, new_name.toStdString());
-            // 使用安全的方法更新显示对象名称和映射表
-            if (!FactoryDisplay::Instance()->UpdateDisplayName(old_name, new_name.toStdString())) {
-              LOG_ERROR("Failed to update display name from " << old_name << " to " << new_name.toStdString());
-              return;
-            }
-            LOG_INFO("Successfully updated point name: " << old_name << " -> " << new_name.toStdString());
-          });
 
   connect(nav_goal_widget_, &NavGoalWidget::SignalHandleOver,
           [this, display](const NavGoalWidget::HandleResult &flag,
-                          const RobotPose &pose) {
+                          const RobotPose &pose,const QString &new_name) {
             if (flag == NavGoalWidget::HandleResult::kSend) {
               emit display_manager_->signalPub2DGoal(pose);
               nav_goal_widget_->hide();
@@ -507,6 +497,30 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
               delete display;
               nav_goal_widget_->hide();
 
+            } else if (flag == NavGoalWidget::HandleResult::kSave) {
+              std::string old_name = display->GetDisplayName();
+              auto iter=std::find_if(topology_map_.points.begin(), topology_map_.points.end(), [new_name](const TopologyMap::PointInfo &point) {
+                return point.name == new_name.toStdString();
+              });
+  
+              if (iter != topology_map_.points.end()) {
+                LOG_ERROR("Point already exists: " << new_name.toStdString());
+                QMessageBox::warning(nullptr, "失败", "点位名称已存在");
+                return;
+              }
+  
+              // 先更新拓扑地图中的点名称
+              topology_map_.UpdatePointName(old_name, new_name.toStdString());
+              // 使用安全的方法更新显示对象名称和映射表
+              if (!FactoryDisplay::Instance()->UpdateDisplayName(old_name, new_name.toStdString())) {
+                LOG_ERROR("Failed to update display name from " << old_name << " to " << new_name.toStdString());
+                return;
+              }
+
+              updateAllTopologyLinesStatus();
+       
+              nav_goal_widget_->hide();
+              LOG_INFO("Successfully updated point name: " << old_name << " -> " << new_name.toStdString());
             } else {
               curr_handle_display_ = nullptr;
               nav_goal_widget_->hide();
@@ -554,6 +568,7 @@ void SceneManager::blindTopologyRouteWidget(TopologyLine* line, bool is_edit) {
   TopologyRouteWidget::RouteInfo info;
   info.route_name = QString::fromStdString(route_id);
   info.controller = route_info.controller;
+  info.speed_limit = route_info.speed_limit;  // 设置速度限制
   topology_route_widget_->SetRouteInfo(info);
   topology_route_widget_->SetEditMode(is_edit);
   topology_route_widget_->show();
@@ -566,10 +581,12 @@ void SceneManager::blindTopologyRouteWidget(TopologyLine* line, bool is_edit) {
             // 更新拓扑地图中的路径属性
             TopologyMap::RouteInfo route_info;
             route_info.controller = info.controller;
+            route_info.speed_limit = info.speed_limit;  // 更新速度限制
             topology_map_.SetRouteInfo(route_id, route_info);
             
             LOG_INFO("更新路径属性: " << route_id 
-                      << " 控制器: " << info.controller);
+                      << " 控制器: " << info.controller
+                      << " 速度限制: " << info.speed_limit);
           });
   
   connect(topology_route_widget_, &TopologyRouteWidget::SignalHandleOver,
@@ -705,7 +722,7 @@ void SceneManager::createTopologyLine(const QString &from, const QString &to) {
     line->SetPartOfBidirectional(is_part_of_bidirectional);
     
     // 如果这个连接使得反向连接也变成双向，需要更新反向连接的显示
-    updateAllTopologyLinesBidirectionalStatus();
+    updateAllTopologyLinesStatus();
     
     LOG_INFO("创建拓扑连接: " << from.toStdString() << " -> " << to.toStdString() 
              << (is_part_of_bidirectional ? " (双向)" : " (单向)"));
@@ -714,10 +731,6 @@ void SceneManager::createTopologyLine(const QString &from, const QString &to) {
   }
 }
 
-void SceneManager::updateTopologyLinePositions() {
-  // 线段现在会自动跟随关联的点位移动，不需要手动更新
-  // 这个方法保留用于兼容性，但实际上不执行任何操作
-}
 
 void SceneManager::clearTopologyLineSelection() {
   if (selected_topology_line_) {
@@ -754,7 +767,7 @@ void SceneManager::deleteSelectedTopologyLine() {
     selected_topology_line_ = nullptr;
     
     // 删除路径后，需要更新所有连线的双向状态
-    updateAllTopologyLinesBidirectionalStatus();
+    updateAllTopologyLinesStatus();
   }
 }
 
@@ -802,7 +815,7 @@ void SceneManager::loadTopologyRoutes() {
   }
 }
 
-void SceneManager::updateAllTopologyLinesBidirectionalStatus() {
+void SceneManager::updateAllTopologyLinesStatus() {
   // 更新所有拓扑连线的双向状态
   for (auto line : topology_lines_) {
     if (line && line->GetFromItem() && line->GetToItem()) {
@@ -817,6 +830,12 @@ void SceneManager::updateAllTopologyLinesBidirectionalStatus() {
         // 检查并更新是否为双向连接的一部分
         bool is_part_of_bidirectional = topology_map_.IsBidirectional(from_name, to_name);
         line->SetPartOfBidirectional(is_part_of_bidirectional);
+        auto current_name=line->GetDisplayName();
+        auto new_name=generateRouteId(QString::fromStdString(from_name),QString::fromStdString(to_name));
+        if(current_name!=new_name){
+          FactoryDisplay::Instance()->UpdateDisplayName(current_name,new_name);
+          // LOG_INFO("update topology line display name: " << current_name << " to " << new_name<<" get new name:"<<line->GetDisplayName()<<"display address:"<<line);
+        }
       }
     }
   }

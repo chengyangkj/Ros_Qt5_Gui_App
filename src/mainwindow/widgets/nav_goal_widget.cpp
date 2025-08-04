@@ -145,6 +145,8 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   layout_button->setSpacing(4);
   button_send_ = new QPushButton("导航到此点");
   button_remove_ = new QPushButton("删除点位");
+  button_save_ = new QPushButton("重命名");
+  button_save_->setVisible(false);
   button_cancel_ = new QPushButton("关闭");
   
   // 设置按钮对象名以便样式表识别
@@ -156,6 +158,7 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   button_remove_->setToolTip("删除点位 (Delete/Backspace)");
   
   layout_button->addWidget(button_send_);
+  layout_button->addWidget(button_save_);
   layout_button->addWidget(button_remove_);
   layout_button->addWidget(button_cancel_);
   
@@ -175,21 +178,30 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   connect(button_send_, &QPushButton::clicked, [this]() {
     emit SignalHandleOver(HandleResult::kSend,
                           RobotPose(spinBox_x_->value(), spinBox_y_->value(),
-                                    deg2rad(spinBox_theta_->value())));
+                                    deg2rad(spinBox_theta_->value())),
+                          lineEdit_name_->text());
   });
+
+  connect(button_save_, &QPushButton::clicked, [this]() {
+    emit SignalHandleOver(HandleResult::kSave,
+                          RobotPose(spinBox_x_->value(), spinBox_y_->value(),
+                                    deg2rad(spinBox_theta_->value())),
+                          lineEdit_name_->text());
+  });
+
   connect(button_cancel_, &QPushButton::clicked, [this]() {
     emit SignalHandleOver(HandleResult::kCancel,
                           RobotPose(spinBox_x_->value(), spinBox_y_->value(),
-                                    deg2rad(spinBox_theta_->value())));
+                                    deg2rad(spinBox_theta_->value())),
+                          lineEdit_name_->text());
   });
   connect(button_remove_, &QPushButton::clicked, [this]() {
     emit SignalHandleOver(HandleResult::kRemove,
                           RobotPose(spinBox_x_->value(), spinBox_y_->value(),
-                                    deg2rad(spinBox_theta_->value())));
+                                    deg2rad(spinBox_theta_->value())),  
+                          lineEdit_name_->text());
   });
-  connect(lineEdit_name_, &QLineEdit::editingFinished, [this]() {
-    emit SignalPointNameChanged(lineEdit_name_->text());
-  });
+
 }
 void NavGoalWidget::SlotUpdateValue(double value) {
   emit SignalPoseChanged(RobotPose(spinBox_x_->value(), spinBox_y_->value(),
@@ -201,8 +213,14 @@ void NavGoalWidget::SetEditMode(bool flag) {
   spinBox_theta_->setEnabled(flag);
   lineEdit_name_->setEnabled(flag);
   button_remove_->setEnabled(flag);
+  button_save_->setVisible(flag);
+  button_send_->setVisible(!flag);
 }
+
 void NavGoalWidget::SetPose(const PointInfo &info) {
+  if(IsAnyControlBeingEdited()){
+    return;
+  }
   spinBox_x_->blockSignals(true);
   spinBox_y_->blockSignals(true);
   spinBox_theta_->blockSignals(true);
@@ -213,4 +231,12 @@ void NavGoalWidget::SetPose(const PointInfo &info) {
   spinBox_x_->blockSignals(false);
   spinBox_y_->blockSignals(false);
   spinBox_theta_->blockSignals(false);
+}
+
+bool NavGoalWidget::IsAnyControlBeingEdited() const {
+  // 检查是否有任何输入控件正在获得焦点
+  return spinBox_x_->hasFocus() || 
+         spinBox_y_->hasFocus() || 
+         spinBox_theta_->hasFocus() || 
+         lineEdit_name_->hasFocus();
 }

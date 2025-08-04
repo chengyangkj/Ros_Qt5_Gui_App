@@ -162,7 +162,7 @@ bool FactoryDisplay::UpdateDisplayName(const std::string &old_name, const std::s
   total_display_map_[new_name] = display;
   total_display_map_.erase(iter);
   
-  LOG_INFO("Successfully updated display name: " << old_name << " -> " << new_name);
+  LOG_INFO("Successfully updated display name:[" << old_name << "] to [" << new_name<<"] get new name:"<<display->GetDisplayName());
   return true;
 }
 }  // namespace Display

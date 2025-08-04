@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QWidget>
+#include <QDoubleSpinBox>
 #include "map/topology_map.h"
 
 class TopologyRouteWidget : public QWidget {
@@ -19,6 +20,7 @@ class TopologyRouteWidget : public QWidget {
   struct RouteInfo {
     QString route_name;
     std::string controller;
+    double speed_limit = 1.0;  // 默认最大速度1.0
   };
 
  protected:
@@ -27,8 +29,12 @@ class TopologyRouteWidget : public QWidget {
  private:
   QLineEdit *lineEdit_route_name_;
   QComboBox *comboBox_controller_;
+  QDoubleSpinBox *spinBox_speed_limit_;  // 速度限制数字输入框
   QPushButton *button_delete_;
   QPushButton *button_cancel_;
+  
+  // 检查是否有控件正在被编辑
+  bool IsAnyControlBeingEdited() const;
   
  signals:
   void SignalRouteInfoChanged(const RouteInfo &info);

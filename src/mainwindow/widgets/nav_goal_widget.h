@@ -18,7 +18,8 @@ class NavGoalWidget : public QWidget {
  public:
   enum HandleResult { kSend = 0,
                       kRemove = 1,
-                      kCancel = 2 };
+                      kCancel = 2,
+                      kSave = 3 };
   struct PointInfo {
     RobotPose pose;
     QString name;
@@ -35,9 +36,14 @@ class NavGoalWidget : public QWidget {
   QPushButton *button_send_;
   QPushButton *button_remove_;
   QPushButton *button_cancel_;
+  QPushButton *button_save_;
+  
+  // 检查是否有控件正在被编辑
+  bool IsAnyControlBeingEdited() const;
+  
  signals:
   void SignalPoseChanged(const RobotPose &pose);
-  void SignalHandleOver(const HandleResult &flag, const RobotPose &pose);
+  void SignalHandleOver(const HandleResult &flag, const RobotPose &pose,const QString &name);
   void SignalPointNameChanged(const QString &name);
  public slots:
   void SetPose(const PointInfo &pose);
