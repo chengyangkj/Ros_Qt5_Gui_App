@@ -12,6 +12,7 @@ DisplayPath::DisplayPath(const std::string &display_type, const int &z_value,
                          std::string parent_name)
     : VirtualDisplay(display_type, z_value, parent_name) {
   // enable_scale_ = false;
+  SetZValue(9);
 }
 void DisplayPath::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
@@ -49,7 +50,8 @@ void DisplayPath::drawPath(QPainter *painter) {
 
   painter->setRenderHints(QPainter::Antialiasing |
                           QPainter::SmoothPixmapTransform);
-  painter->setPen(QPen(color_, 1));
+  painter->setPen(QPen(color_, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+  painter->setBrush(QBrush(color_));
   // for (int i = 1; i < path_points_.size(); i++) {
   //   painter->drawLine(path_points_[i - 1], path_points_[i]);
   // }
