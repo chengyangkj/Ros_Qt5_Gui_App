@@ -12,7 +12,7 @@ DisplayPath::DisplayPath(const std::string &display_type, const int &z_value,
                          std::string parent_name)
     : VirtualDisplay(display_type, z_value, parent_name) {
   // enable_scale_ = false;
-  SetZValue(9);
+  setZValue(9);
 }
 void DisplayPath::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
