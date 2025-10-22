@@ -11,6 +11,8 @@
 #include <QDebug>
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <QFileInfo>
+#include <QFile>
 #include "AutoHideDockContainer.h"
 #include "DockAreaTabBar.h"
 #include "DockAreaTitleBar.h"
@@ -94,6 +96,8 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
   }
   display_manager_->UpdateTopicData(id, data);
 }
+
+
 void MainWindow::SlotRecvImage(const std::string &location, std::shared_ptr<cv::Mat> data) {
   if (image_frame_map_.count(location)) {
     QImage image(data->data, data->cols, data->rows, data->step[0], QImage::Format_RGB888);
@@ -811,7 +815,23 @@ void MainWindow::setupUi() {
     if (!fileName.isEmpty()) {
       // 用户选择了文件夹，可以在这里进行相应的操作
       LOG_INFO("用户选择的保存地图路径：" << fileName.toStdString());
-      display_manager_->SaveMap(fileName.toStdString());
+      
+      // 保存占用栅格地图
+      auto occ_map = display_manager_->GetOccupancyMap();
+      occ_map.Save(fileName.toStdString());
+      
+      // 保存拓扑地图
+      auto topology_map = display_manager_->GetTopologyMap();
+
+      std::string topology_path = fileName.toStdString();
+      // 替换扩展名为.topology
+      size_t last_dot = topology_path.find_last_of(".");
+      if (last_dot != std::string::npos) {
+        topology_path = topology_path.substr(0, last_dot) + ".topology";
+      } else {
+        topology_path += ".topology";
+      }
+      Config::ConfigManager::Instacnce()->WriteTopologyMap(topology_path, topology_map);
       
       // 显示保存成功对话框
       QMessageBox::information(this, "保存成功", 
@@ -825,7 +845,19 @@ void MainWindow::setupUi() {
 
   connect(save_map_btn, &QToolButton::clicked, [this]() {
     std::string mapPath = display_manager_->GetMapPath();
-    display_manager_->SaveMap(mapPath);
+    
+    // 保存占用栅格地图
+    auto occ_map = display_manager_->GetOccupancyMap();
+    occ_map.Save(mapPath);
+    
+    // 保存拓扑地图
+    auto topology_map = display_manager_->GetTopologyMap();
+
+    //发送到ROS
+    SendChannelMsg(MsgId::kTopologyMapUpdate, topology_map);
+
+    std::string topology_path = mapPath + ".topology";
+    Config::ConfigManager::Instacnce()->WriteTopologyMap(topology_path, topology_map);
     
     // 显示保存成功对话框
     QMessageBox::information(this, "保存成功", 
@@ -845,7 +877,43 @@ void MainWindow::setupUi() {
     if (!fileName.isEmpty()) {
       // 用户选择了文件夹，可以在这里进行相应的操作
       LOG_INFO("用户选择的打开地图路径：" << fileName.toStdString());
-      display_manager_->OpenMap(fileName.toStdString());
+      
+      std::string file_path = fileName.toStdString();
+      std::string extension = QFileInfo(fileName).suffix().toStdString();
+      
+      if (extension == "yaml") {
+        // 打开占用栅格地图
+        OccupancyMap map;
+        if (map.Load(file_path)) {
+          display_manager_->UpdateOCCMap(map);
+          
+          // 尝试打开对应的拓扑地图
+          std::string topology_path = file_path;
+          size_t last_dot = topology_path.find_last_of(".");
+          if (last_dot != std::string::npos) {
+            topology_path = topology_path.substr(0, last_dot) + ".topology";
+          } else {
+            topology_path += ".topology";
+          }
+          
+          if (QFile::exists(QString::fromStdString(topology_path))) {
+            TopologyMap topology_map;
+            if (Config::ConfigManager::Instacnce()->ReadTopologyMap(topology_path, topology_map)) {
+              display_manager_->UpdateTopologyMap(topology_map);
+            }
+          }
+        } else {
+          QMessageBox::warning(this, "打开失败", "无法打开地图文件: " + fileName);
+        }
+      } else if (extension == "topology") {
+        // 打开拓扑地图
+        TopologyMap topology_map;
+        if (Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, topology_map)) {
+          display_manager_->UpdateTopologyMap(topology_map);
+        } else {
+          QMessageBox::warning(this, "打开失败", "无法打开拓扑地图文件: " + fileName);
+        }
+      }
     } else {
       // 用户取消了选择
       LOG_INFO("取消打开地图");

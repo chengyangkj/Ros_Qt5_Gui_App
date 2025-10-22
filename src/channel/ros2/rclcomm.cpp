@@ -23,6 +23,8 @@ rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
   SET_DEFAULT_TOPIC_NAME("RobotFootprint", "/local_costmap/published_footprint")
+  SET_DEFAULT_TOPIC_NAME("TopologyMap", "/map/topology")
+  SET_DEFAULT_TOPIC_NAME("TopologyMapUpdate", "/map/topology/update")
   if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
     Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
@@ -99,6 +101,14 @@ bool rclcomm::Start() {
       GET_TOPIC_NAME("RobotFootprint"), 20,
       std::bind(&rclcomm::robotFootprintCallback, this, std::placeholders::_1),
       sub1_obt);
+  topology_map_subscriber_ = node->create_subscription<topology_msgs::msg::TopologyMap>(
+      GET_TOPIC_NAME("TopologyMap"), 
+      rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
+      std::bind(&rclcomm::topologyMapCallback, this, std::placeholders::_1),
+      sub1_obt);
+  topology_map_update_publisher_ = node->create_publisher<topology_msgs::msg::TopologyMap>(
+      GET_TOPIC_NAME("TopologyMapUpdate"), 
+      rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local());
   for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
     LOG_INFO("image location:" << one_image_display.location << "topic:" << one_image_display.topic);
     image_subscriber_list_.emplace_back(
@@ -185,6 +195,12 @@ void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
       std::cout << "recv reloc pose:" << speed << std::endl;
       PubRobotSpeed(speed);
 
+    } break;
+    case MsgId::kTopologyMapUpdate: {
+      auto topology_map = std::any_cast<TopologyMap>(msg);
+      std::cout << "recv topology map update:" << topology_map.map_name << std::endl;
+      topology_msgs::msg::TopologyMap ros_msg = ConvertToRosMsg(topology_map);
+      topology_map_update_publisher_->publish(ros_msg);
     } break;
     default:
       break;
@@ -502,4 +518,80 @@ void rclcomm::robotFootprintCallback(const geometry_msgs::msg::PolygonStamped::S
   } catch (tf2::TransformException &ex) {
     LOG_ERROR("robotFootprintCallback transform error: " << ex.what());
   }
+}
+
+TopologyMap rclcomm::ConvertFromRosMsg(const topology_msgs::msg::TopologyMap::SharedPtr msg) {
+  TopologyMap topology_map;
+  
+  topology_map.map_name = msg->map_name;
+  
+  for (const auto& controller : msg->map_property.support_controllers) {
+    topology_map.map_property.support_controllers.push_back(controller);
+  }
+  
+  for (const auto& point_msg : msg->points) {
+    TopologyMap::PointInfo point_info;
+    point_info.name = point_msg.name;
+    point_info.x = point_msg.x;
+    point_info.y = point_msg.y;
+    point_info.theta = point_msg.theta;
+    point_info.type = static_cast<PointType>(point_msg.type);
+    topology_map.points.push_back(point_info);
+  }
+  
+  for (const auto& route_msg : msg->routes) {
+    TopologyMap::RouteInfo route_info;
+    route_info.controller = route_msg.route_info.controller;
+    route_info.speed_limit = route_msg.route_info.speed_limit;
+    topology_map.routes[route_msg.from_point][route_msg.to_point] = route_info;
+  }
+  
+  return topology_map;
+}
+
+topology_msgs::msg::TopologyMap rclcomm::ConvertToRosMsg(const TopologyMap& topology_map) {
+  topology_msgs::msg::TopologyMap msg;
+  
+  msg.map_name = topology_map.map_name;
+  
+  for (const auto& controller : topology_map.map_property.support_controllers) {
+    msg.map_property.support_controllers.push_back(controller);
+  }
+  
+  for (const auto& point : topology_map.points) {
+    topology_msgs::msg::TopologyMapPointInfo point_msg;
+    point_msg.name = point.name;
+    point_msg.x = point.x;
+    point_msg.y = point.y;
+    point_msg.theta = point.theta;
+    point_msg.type = static_cast<uint8_t>(point.type);
+    msg.points.push_back(point_msg);
+  }
+  
+  for (const auto& from_routes : topology_map.routes) {
+    for (const auto& route : from_routes.second) {
+      topology_msgs::msg::RouteConnection route_msg;
+      route_msg.from_point = from_routes.first;
+      route_msg.to_point = route.first;
+      route_msg.route_info.controller = route.second.controller;
+      route_msg.route_info.speed_limit = route.second.speed_limit;
+      msg.routes.push_back(route_msg);
+    }
+  }
+  
+  return msg;
+}
+
+void rclcomm::topologyMapCallback(const topology_msgs::msg::TopologyMap::SharedPtr msg) {
+  TopologyMap topology_map = ConvertFromRosMsg(msg);
+  LOG_INFO("recv topology map:" << topology_map.map_name);
+  for (const auto& point : topology_map.points) {
+    LOG_INFO("point:" << point.name << " x:" << point.x << " y:" << point.y << " theta:" << point.theta);
+  }
+  for (const auto& route : topology_map.routes) {
+    for (const auto& route_info : route.second) {
+      LOG_INFO("route:" << route.first << " -> " << route_info.first << " controller:" << route_info.second.controller << " speed_limit:" << route_info.second.speed_limit);
+    }
+  }
+  OnDataCallback(MsgId::kTopologyMap, topology_map);
 }

@@ -5,8 +5,6 @@
 #include "display/manager/display_manager.h"
 #include <Eigen/Eigen>
 #include <QOpenGLWidget>
-#include <boost/filesystem.hpp>
-#include <fstream>
 #include "algorithm.h"
 #include "display/manager/scene_manager.h"
 #include "logger/logger.h"
@@ -126,11 +124,20 @@ bool DisplayManager::UpdateDisplay(const std::string &display_type,
                                    const std::any &data) {
   // std::cout << "update display:" << display_type << std::endl;/
   VirtualDisplay *display = GetDisplay(display_type);
+
+  //display不存在的情况
   if (!display) {
-    // std::cout << "error current display not find on update:" << display_type
-    //           << std::endl;
+     //更新拓扑地图数据
+     if (display_type == DISPLAY_TOPOLOGY_MAP) {
+      TopologyMap topology_map;
+      GetAnyData(TopologyMap, data, topology_map);
+      scene_manager_ptr_->UpdateTopologyMap(topology_map);
+      return true;
+    }
     return false;
   }
+
+  //根据display类型更新对应display的数据
   if (display_type == DISPLAY_MAP) {
     display->UpdateDisplay(data);
     GetAnyData(OccupancyMap, data, map_data_);
@@ -315,51 +322,25 @@ OccupancyMap &DisplayManager::GetMap() { return map_data_; }
 void DisplayManager::UpdateMap(OccupancyMap &) {
   emit signalPubMap(map_data_);
 }
-void DisplayManager::SaveMap(const std::string &save_path) {
-  LOG_INFO("start save topology map")
-  scene_manager_ptr_->SaveTopologyMap(save_path);
-  LOG_INFO("start save occ map")
+OccupancyMap DisplayManager::GetOccupancyMap() {
   auto display_map_ = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
-  auto map = display_map_->GetOccupancyMap();
-  map.Save(save_path);
+  if (display_map_ != nullptr) {
+    return display_map_->GetOccupancyMap();
+  }
+  return map_data_;
 }
-void DisplayManager::OpenMap(const std::string &path) {
-  boost::filesystem::path filepath(path);
-  //文件夹
-  std::string directory = filepath.parent_path().string();
-  LOG_INFO("Directory: " << directory);
 
-  // 获取文件名（不包括后缀）
-  std::string filenameWithoutExtension = filepath.stem().string();
-  LOG_INFO("Filename without extension: " << filenameWithoutExtension);
-  //去掉filepath后缀
-  map_path_ = filepath.parent_path().string() + "/"+filenameWithoutExtension;
-  // 获取后缀名
-  std::string extension = filepath.extension().string();
-  LOG_INFO("Extension: " << extension);
+void DisplayManager::UpdateOCCMap(const OccupancyMap &map) {
+  map_data_ = map;
+  UpdateDisplay(DISPLAY_MAP, map);
+}
 
+TopologyMap DisplayManager::GetTopologyMap() {
+  return scene_manager_ptr_->GetTopologyMap();
+}
 
-  std::string topology_path =
-      directory + "/" + filenameWithoutExtension + ".topology";
-  std::string pgm_path =
-      directory + "/" + filenameWithoutExtension + ".pgm";
-  std::string yaml_path =
-      directory + "/" + filenameWithoutExtension + ".yaml";
-
-  if (boost::filesystem::exists(yaml_path)) {
-    OccupancyMap map;
-    bool ret = map.Load(yaml_path);
-    LOG_INFO("open map ret:" << ret);
-    UpdateDisplay(DISPLAY_MAP, map);
-  } else {
-    LOG_ERROR("pgm or yaml not exit! path:" << directory + "/" + filenameWithoutExtension)
-  }
-
-  if (boost::filesystem::exists(topology_path)) {
-    LOG_INFO("open topology map path:" << topology_path);
-    scene_manager_ptr_->OpenTopologyMap(topology_path);
-  }
-  
+void DisplayManager::UpdateTopologyMap(const TopologyMap &topology_map) {
+  scene_manager_ptr_->UpdateTopologyMap(topology_map);
 }
 void DisplayManager::SetScaleBig() {
   FactoryDisplay::Instance()

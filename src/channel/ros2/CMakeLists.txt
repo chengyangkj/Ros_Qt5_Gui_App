@@ -1,5 +1,8 @@
 set(TARGET_NAME channel_ros2)
 
+# 包含topology_msgs获取脚本
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/GetTopologyMsg.cmake)
+
 file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR} *.cpp *.cc)
 file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  *.h *.hpp)
 find_package(ament_cmake REQUIRED)
@@ -28,7 +31,12 @@ target_link_libraries(${TARGET_NAME}
 PUBLIC
 basic
 common
+topology_msgs__rosidl_generator_cpp #消息类型的ROS库
+topology_msgs__rosidl_typesupport_cpp
+topology_msgs__rosidl_typesupport_fastrtps_cpp
+topology_msgs__rosidl_typesupport_introspection_cpp
 )
+
 set_target_properties(${TARGET_NAME} PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"

@@ -25,7 +25,15 @@
 ![地图编辑工具](./images/edit_map2.png)
 
 #### 拓扑地图
-支持拖拽设置机器人导航目标点：
+支持拖拽设置机器人导航目标点
+
+拓扑地图 ROS2 消息定义：https://github.com/chengyangkj/topology_msgs
+
+- 保存地图: 拓扑地图编辑完成后，点击保存地图按钮，软件会将地图按照打开的路径进行保存,存为*.topology的json格式
+同时发布 /map/topology/update Topic，更新最新的拓扑地图，用户可订阅此话题做保存逻辑。
+
+- 地图加载: 软件订阅 /map/topology 话题，如果话题没有订阅到内容，则会读取相对路径存储的默认地图
+
 
 ![导航点设置](./images/set_nav_goal.gif)
 

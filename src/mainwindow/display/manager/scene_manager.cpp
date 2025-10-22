@@ -52,6 +52,20 @@ void SceneManager::LoadTopologyMap() {
                       .topology_map_config.map_name);
 }
 void SceneManager::OpenTopologyMap(const std::string &file_path) {
+  // 读取新的拓扑地图数据
+  TopologyMap new_topology_map;
+  if (!Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, new_topology_map)) {
+    LOG_ERROR("Failed to read topology map from: " << file_path);
+    return;
+  }
+  
+  // 调用UpdateTopologyMap方法更新显示
+  UpdateTopologyMap(new_topology_map);
+  
+  LOG_INFO("Open Topology Map Success! File: " << file_path);
+}
+
+void SceneManager::UpdateTopologyMap(const TopologyMap &topology_map) {
   // 先保存当前拓扑地图中的点名称列表，用于后续删除
   std::vector<std::string> old_point_names;
   for (const auto &point : topology_map_.points) {
@@ -66,13 +80,6 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
   topology_lines_.clear();
   selected_topology_line_ = nullptr;
   
-  // 读取新的拓扑地图数据
-  TopologyMap new_topology_map;
-  if (!Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, new_topology_map)) {
-    LOG_ERROR("Failed to read topology map from: " << file_path);
-    return;
-  }
-  
   // 删除原有的显示对象
   for (const auto &point_name : old_point_names) {
     auto display = FactoryDisplay::Instance()->GetDisplay(point_name);
@@ -82,8 +89,8 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
     }
   }
   
-  // 清空当前拓扑地图并更新为新数据
-  topology_map_ = new_topology_map;
+  // 更新拓扑地图数据
+  topology_map_ = topology_map;
   topology_route_widget_->SetSupportControllers(topology_map_.map_property.support_controllers);
   
   // 为每个点创建显示对象
@@ -98,8 +105,7 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
     auto map_pose = display_manager_->wordPose2Map(robot_pose);
     goal_point->UpdateDisplay(map_pose);
     
-    
-    LOG_INFO("Load Point: " << point.name << " at world pose(" 
+    LOG_INFO("Update Point: " << point.name << " at world pose(" 
              << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
              << ") -> map pose(" << map_pose.x << ", " << map_pose.y << ", " << map_pose.theta << ")");
   }
@@ -107,7 +113,7 @@ void SceneManager::OpenTopologyMap(const std::string &file_path) {
   // 加载拓扑路径
   loadTopologyRoutes();
   
-  LOG_INFO("Load Topology Map Success! Total points: " << topology_map_.points.size() 
+  LOG_INFO("Update Topology Map Success! Total points: " << topology_map_.points.size() 
            << ", Total routes: " << topology_map_.routes.size());
   emit signalTopologyMapUpdate(topology_map_);
 }
@@ -631,12 +637,6 @@ void SceneManager::drawPoint(const QPointF &pose) {
   auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
   QPointF pose_map = map_ptr->mapFromScene(pose);
   map_ptr->DrawPoint(pose_map);
-}
-void SceneManager::SaveTopologyMap(const std::string &file_path) {
-  Config::ConfigManager::Instacnce()->WriteTopologyMap(
-      file_path + ".topology",
-      topology_map_);
-  saveTopologyMap();
 }
 
 // 拓扑连接相关方法实现

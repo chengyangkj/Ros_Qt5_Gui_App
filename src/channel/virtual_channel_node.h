@@ -12,6 +12,7 @@
 #include <thread>
 #include "msg/msg_info.h"
 #include "occupancy_map.h"
+#include "topology_map.h"
 #include "point_type.h"
 using namespace basic;
 class VirtualChannelNode {

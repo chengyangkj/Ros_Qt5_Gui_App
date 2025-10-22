@@ -72,9 +72,11 @@ void DisplayOccMap::ParseOccupyMap() {
           // 将 map_value 从 0-100 映射到透明度 0-255 范围
           int alpha = static_cast<int>(std::clamp(map_value * 2.55, 0.0, 255.0));
           color = QColor(0, 0, 0, alpha);  // 黑色, 透明度根据占据值动态调整
-        } else if (map_value == 0 || map_value == -1) {
+        } else if (map_value == 0 ) {
           // 自由区域和未知区域都设为白色
           color = Qt::white;
+        } else if (map_value == -1) {
+          color = Qt::gray;
         } else {
           color = Qt::white;  // 默认白色
         }

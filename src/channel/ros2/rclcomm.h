@@ -26,10 +26,12 @@
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "std_msgs/msg/int32.hpp"
 #include "tf2/LinearMath/Quaternion.h"
-#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 #include "virtual_channel_node.h"
+#include "topology_msgs/msg/topology_map.hpp"
+
 class rclcomm : public VirtualChannelNode {
  public:
   rclcomm();
@@ -47,6 +49,7 @@ class rclcomm : public VirtualChannelNode {
   void getRobotPose();
   void local_path_callback(const nav_msgs::msg::Path::SharedPtr msg);
   void robotFootprintCallback(const geometry_msgs::msg::PolygonStamped::SharedPtr msg);
+  void topologyMapCallback(const topology_msgs::msg::TopologyMap::SharedPtr msg);
 
  public:
   bool Start() override;
@@ -58,6 +61,8 @@ class rclcomm : public VirtualChannelNode {
   void PubRobotSpeed(const RobotSpeed &speed);
   basic::RobotPose getTransform(std::string from, std::string to);
   void SendMessage(const MsgId &msg_id, const std::any &msg) override;
+  TopologyMap ConvertFromRosMsg(const topology_msgs::msg::TopologyMap::SharedPtr msg);
+  topology_msgs::msg::TopologyMap ConvertToRosMsg(const TopologyMap& topology_map);
 
  private:
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr speed_publisher_;
@@ -79,6 +84,10 @@ class rclcomm : public VirtualChannelNode {
   rclcpp::Subscription<nav_msgs::msg::Path>::SharedPtr global_path_subscriber_;
   rclcpp::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr
       robot_footprint_subscriber_;
+  rclcpp::Subscription<topology_msgs::msg::TopologyMap>::SharedPtr
+      topology_map_subscriber_;
+  rclcpp::Publisher<topology_msgs::msg::TopologyMap>::SharedPtr
+      topology_map_update_publisher_;
   std::vector<rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr> image_subscriber_list_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> transform_listener_;

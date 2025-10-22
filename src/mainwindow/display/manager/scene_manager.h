@@ -65,7 +65,6 @@ class SceneManager : public QGraphicsScene {
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
  public slots:
   void SetEditMapMode(MapEditMode mode);
-  void SaveTopologyMap(const std::string &file_path);
 
  public:
   SceneManager(QObject *parent = nullptr);
@@ -74,6 +73,8 @@ class SceneManager : public QGraphicsScene {
   void AddOneNavPoint();
   void LoadTopologyMap();
   void OpenTopologyMap(const std::string &file_path);
+  void UpdateTopologyMap(const TopologyMap &topology_map);
+  TopologyMap GetTopologyMap() { return topology_map_; }
 
  private:
   void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) override;

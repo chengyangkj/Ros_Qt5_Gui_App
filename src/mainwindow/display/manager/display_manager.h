@@ -73,8 +73,10 @@ class DisplayManager : public QObject {
   void slotSetRobotPose(const RobotPose &pose);
   void UpdateTopicData(const MsgId &id, const std::any &data);
   void FocusDisplay(const std::string &display_type);
-  void SaveMap(const std::string &save_path);
-  void OpenMap(const std::string &save_path);
+  OccupancyMap GetOccupancyMap();
+  void UpdateOCCMap(const OccupancyMap &map);
+  TopologyMap GetTopologyMap();
+  void UpdateTopologyMap(const TopologyMap &topology_map);
   void SetScaleBig();
   void SetScaleSmall();
 

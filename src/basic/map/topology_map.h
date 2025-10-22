@@ -49,7 +49,7 @@ struct TopologyMap {
 
   //属性
   struct PropertyInfo {
-    std::vector<std::string> support_controllers{"FollowPath","Backward","MPPI"};
+    std::vector<std::string> support_controllers{"FollowPath","BackUp","MPPI"};
   };
   
   std::string map_name;
