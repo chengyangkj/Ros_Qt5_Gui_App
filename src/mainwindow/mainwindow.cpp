@@ -804,6 +804,14 @@ void MainWindow::setupUi() {
           [this](const RobotPose &pose) {
             SendChannelMsg(MsgId::kSetNavGoalPose, pose);
           });
+  connect(display_manager_, &Display::DisplayManager::signalPubMultiPointNav,
+          [this](const std::vector<RobotPose> &poses) {
+            if (poses.size() > 0) {
+              SendChannelMsg(MsgId::kSetMultiPointNav, poses);
+            } else {
+              QMessageBox::warning(this, "警告", "没有找到路径");
+            }
+          });
   // ui相关
   connect(reloc_btn, &QToolButton::clicked,
           [this]() { display_manager_->StartReloc(); });

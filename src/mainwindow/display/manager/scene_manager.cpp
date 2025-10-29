@@ -467,6 +467,47 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
               nav_goal_widget_->hide();
               curr_handle_display_ = nullptr;
               nav_goal_widget_->hide();
+            } else if (flag == NavGoalWidget::HandleResult::kMultiPointNav) {
+              // 获取当前机器人位置
+              RobotPose current_robot_pose = display_manager_->GetRobotPose();
+              std::string target_point = display->GetDisplayName();
+              
+              LOG_INFO("Multi-point navigation: Robot at (" << current_robot_pose.x << ", " 
+                       << current_robot_pose.y << ", " << current_robot_pose.theta 
+                       << "), Target: " << target_point);
+              
+              // 使用FindRoute方法寻找从机器人当前位置到目标点的路径
+              TopologyMap::RoutePath route_path = topology_map_.FindRoute(current_robot_pose, target_point);
+              
+              std::vector<RobotPose> poses;
+              
+              if (route_path.found) {
+                LOG_INFO("Found route path: " << route_path.start_point << " -> " << route_path.end_point);
+                LOG_INFO("Path points: ");
+                for (size_t i = 0; i < route_path.path_points.size(); ++i) {
+                  LOG_INFO("  " << i << ": " << route_path.path_points[i]);
+                }
+                LOG_INFO("Total distance: " << route_path.total_distance);
+                
+                // 将路径上的所有点位转换为RobotPose
+                for (const auto &point_name : route_path.path_points) {
+                  TopologyMap::PointInfo point_info = topology_map_.GetPoint(point_name);
+                  if (!point_info.name.empty()) {  // 确保点存在
+                    poses.push_back(point_info.ToRobotPose());
+                    LOG_INFO("Added pose: " << point_name << " (" << point_info.x << ", " 
+                             << point_info.y << ", " << point_info.theta << ")");
+                  }
+                }
+                
+                emit display_manager_->signalPubMultiPointNav(poses);
+              } else {
+                LOG_WARN("No route found from robot position to target point: " << target_point);
+                // 如果找不到路径，发送空向量
+                emit display_manager_->signalPubMultiPointNav(poses);
+              }
+              
+              nav_goal_widget_->hide();
+              curr_handle_display_ = nullptr;
             } else if (flag == NavGoalWidget::HandleResult::kRemove) {
               LOG_INFO("remove:" << display->GetDisplayName());
               
@@ -532,6 +573,7 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
               nav_goal_widget_->hide();
             }
           });
+          
   connect(nav_goal_widget_, &NavGoalWidget::SignalPoseChanged,
           [this, display](const RobotPose &pose) {
             // 更新显示位置：世界坐标 -> 地图坐标
