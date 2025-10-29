@@ -256,7 +256,7 @@ void TopologyRouteWidget::SetEditMode(bool is_edit) {
   button_delete_->setEnabled(is_edit);
 }
 
-void TopologyRouteWidget::SetSupportControllers(const std::vector<std::string> &controllers) {
+void TopologyRouteWidget::SetSupportControllers(const std::set<std::string> &controllers) {
   comboBox_controller_->clear();
   for (const auto &controller : controllers) {
     comboBox_controller_->addItem(controller.c_str());

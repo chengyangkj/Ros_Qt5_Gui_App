@@ -23,6 +23,7 @@ RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
   SET_DEFAULT_TOPIC_NAME("MoveBaseStatus", "/move_base/status")
   SET_DEFAULT_TOPIC_NAME("RobotFootprint", "/move_base/local_costmap/published_footprint")
+  SET_DEFAULT_TOPIC_NAME("BaseFrameId", "base_link")
   if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
     Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
@@ -311,7 +312,7 @@ void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
 
-      tf_listener_->transformPoint("base_link", point_laser_frame,
+      tf_listener_->transformPoint(GET_TOPIC_NAME("BaseFrameId"), point_laser_frame,
                                    point_base_frame);
       basic::Point p;
       p.x = point_base_frame.point.x;
@@ -411,7 +412,7 @@ void RosNode::PubRobotSpeed(const RobotSpeed &speed) {
   speed_publisher_.publish(twist);
 }
 void RosNode::GetRobotPose() {
-  OnDataCallback(MsgId::kRobotPose, getTransform("base_link", "map"));
+  OnDataCallback(MsgId::kRobotPose, getTransform(GET_TOPIC_NAME("BaseFrameId"), "map"));
 }
 /**
  * @description: 获取坐标变化

@@ -50,6 +50,17 @@
 }
 ```
 
+### 机器人位置配置
+
+```
+ {
+      "display_name": "BaseFrameId",
+      "enable": true,
+      "topic": "/base_link"
+    }
+```
+其中base_link为机器人中心
+
 ### 机器人外形配置
 
 ```json
@@ -98,3 +109,4 @@
   ]
 }
 ``` 
+

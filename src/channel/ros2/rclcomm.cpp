@@ -25,6 +25,7 @@ rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME("RobotFootprint", "/local_costmap/published_footprint")
   SET_DEFAULT_TOPIC_NAME("TopologyMap", "/map/topology")
   SET_DEFAULT_TOPIC_NAME("TopologyMapUpdate", "/map/topology/update")
+  SET_DEFAULT_TOPIC_NAME("BaseFrameId", "base_link")
   if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
     Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
@@ -214,7 +215,7 @@ void rclcomm::BatteryCallback(
   OnDataCallback(MsgId::kBatteryState, map);
 }
 void rclcomm::getRobotPose() {
-  OnDataCallback(MsgId::kRobotPose, getTransform("base_link", "map"));
+  OnDataCallback(MsgId::kRobotPose, getTransform(GET_TOPIC_NAME("BaseFrameId"), "map"));
 }
 /**
  * @description: 获取坐标变化
@@ -349,7 +350,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-      tf_buffer_->transform(point_laser_frame, point_base_frame, "base_link");
+      tf_buffer_->transform(point_laser_frame, point_base_frame, GET_TOPIC_NAME("BaseFrameId"));
       basic::Point p;
       p.x = point_base_frame.point.x;
       p.y = point_base_frame.point.y;
@@ -526,7 +527,7 @@ TopologyMap rclcomm::ConvertFromRosMsg(const topology_msgs::msg::TopologyMap::Sh
   topology_map.map_name = msg->map_name;
   
   for (const auto& controller : msg->map_property.support_controllers) {
-    topology_map.map_property.support_controllers.push_back(controller);
+    topology_map.map_property.support_controllers.insert(controller);
   }
   
   for (const auto& point_msg : msg->points) {
