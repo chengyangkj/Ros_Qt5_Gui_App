@@ -8,7 +8,7 @@
               OneValue(kSetNavGoalPose, ) OneValue(kSetRelocPose, )            \
                   OneValue(kSetRobotSpeed, ) OneValue(kBatteryState, ) OneValue(kImage, ) \
                   OneValue(kRobotFootprint, ) OneValue(kOccMap, ) OneValue(kTopologyMap, ) \
-                  OneValue(kTopologyMapUpdate, )
+                  OneValue(kTopologyMapUpdate, ) OneValue(kSetMultiPointNav, )
 
 DECLARE_ENUM(MsgId, SOME_ENUM)
 DEFINE_ENUM(MsgId, SOME_ENUM)

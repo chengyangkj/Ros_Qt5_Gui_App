@@ -143,7 +143,8 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   
   QVBoxLayout *layout_button = new QVBoxLayout();
   layout_button->setSpacing(4);
-  button_send_ = new QPushButton("导航到此点");
+  button_send_ = new QPushButton("单点导航");
+  button_multi_point_nav_ = new QPushButton("多点导航");
   button_remove_ = new QPushButton("删除点位");
   button_save_ = new QPushButton("重命名");
   button_save_->setVisible(false);
@@ -158,6 +159,7 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   button_remove_->setToolTip("删除点位 (Delete/Backspace)");
   
   layout_button->addWidget(button_send_);
+  layout_button->addWidget(button_multi_point_nav_);
   layout_button->addWidget(button_save_);
   layout_button->addWidget(button_remove_);
   layout_button->addWidget(button_cancel_);
@@ -181,7 +183,12 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
                                     deg2rad(spinBox_theta_->value())),
                           lineEdit_name_->text());
   });
-
+  connect(button_multi_point_nav_, &QPushButton::clicked, [this]() {
+    emit SignalHandleOver(HandleResult::kMultiPointNav,
+                          RobotPose(spinBox_x_->value(), spinBox_y_->value(),
+                                    deg2rad(spinBox_theta_->value())),
+                          lineEdit_name_->text());
+  });
   connect(button_save_, &QPushButton::clicked, [this]() {
     emit SignalHandleOver(HandleResult::kSave,
                           RobotPose(spinBox_x_->value(), spinBox_y_->value(),
