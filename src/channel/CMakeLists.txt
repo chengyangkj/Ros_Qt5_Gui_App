@@ -1,7 +1,6 @@
 include(GTestHelper)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-link_libraries(basic common)
 if( BUILD_WITH_CHANNEL_AUTO STREQUAL "ON")
     message("BUILD_WITH_CHANNEL_AUTO")
     if(DEFINED ENV{ROS_VERSION} AND "$ENV{ROS_VERSION}" STREQUAL "1")
