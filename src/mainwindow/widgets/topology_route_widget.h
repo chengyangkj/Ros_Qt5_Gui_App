@@ -20,6 +20,7 @@ class TopologyRouteWidget : public QWidget {
   struct RouteInfo {
     QString route_name;
     std::string controller;
+    std::string goal_checker;
     double speed_limit = 1.0;  // 默认最大速度1.0
   };
 
@@ -29,6 +30,7 @@ class TopologyRouteWidget : public QWidget {
  private:
   QLineEdit *lineEdit_route_name_;
   QComboBox *comboBox_controller_;
+  QComboBox *comboBox_goal_checker_;
   QDoubleSpinBox *spinBox_speed_limit_;  // 速度限制数字输入框
   QPushButton *button_delete_;
   QPushButton *button_cancel_;
@@ -44,6 +46,7 @@ class TopologyRouteWidget : public QWidget {
   void SetRouteInfo(const RouteInfo &info);
   void SetEditMode(bool is_edit);
   void SetSupportControllers(const std::set<std::string> &controllers);
+  void SetSupportGoalCheckers(const std::set<std::string> &goal_checkers);
   
  private slots:
   void SlotUpdateValue();

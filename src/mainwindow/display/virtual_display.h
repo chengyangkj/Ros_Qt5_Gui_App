@@ -19,6 +19,7 @@
 #include <QVector3D>
 #include <QtCore>
 #include <any>
+#include <algorithm>
 #include <iostream>
 #include "msg/msg_info.h"
 
@@ -124,7 +125,66 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
                     children_.end());
   }
   std::vector<VirtualDisplay *> GetChildren() { return children_; }
-  void UpdateMap(OccupancyMap map) { map_data_ = map; }
+  void UpdateMap(const OccupancyMap &map) { 
+    try {
+      // 安全复制字符串
+      std::string safe_image;
+      try {
+        safe_image = map.map_config.image;
+      } catch (...) {
+        safe_image = "./";
+      }
+      map_data_.map_config.image.swap(safe_image);
+      
+      // 安全复制 vector - 逐个元素复制避免整体赋值
+      try {
+        map_data_.map_config.origin.clear();
+        size_t origin_size = 3;
+        try {
+          origin_size = map.map_config.origin.size();
+        } catch (...) {
+          origin_size = 3;
+        }
+        if (origin_size > 0 && origin_size <= 100) {  // 合理范围检查
+          map_data_.map_config.origin.reserve(origin_size);
+          for (size_t i = 0; i < origin_size; ++i) {
+            try {
+              double val = map.map_config.origin[i];
+              map_data_.map_config.origin.push_back(val);
+            } catch (...) {
+              map_data_.map_config.origin.push_back(0.0);
+            }
+          }
+        } else {
+          map_data_.map_config.origin.resize(3);
+        }
+      } catch (...) {
+        map_data_.map_config.origin.clear();
+        map_data_.map_config.origin.resize(3);
+        map_data_.map_config.origin[0] = 0.0;
+        map_data_.map_config.origin[1] = 0.0;
+        map_data_.map_config.origin[2] = 0.0;
+      }
+      
+      // 复制简单类型
+      map_data_.map_config.resolution = map.map_config.resolution;
+      map_data_.map_config.negate = map.map_config.negate;
+      map_data_.map_config.occupied_thresh = map.map_config.occupied_thresh;
+      map_data_.map_config.free_thresh = map.map_config.free_thresh;
+      map_data_.map_config.mode = map.map_config.mode;
+      map_data_.rows = map.rows;
+      map_data_.cols = map.cols;
+      
+      // 安全复制 Eigen::MatrixXi
+      try {
+        map_data_.map_data = map.map_data;
+      } catch (...) {
+        LOG_ERROR("Failed to copy map_data, map may be corrupted");
+      }
+    } catch (...) {
+      LOG_ERROR("UpdateMap failed, map may be corrupted");
+    }
+  }
 
   double GetRotate() { return rotate_value_; }
   virtual bool UpdateData(const std::any &data) = 0;

@@ -60,6 +60,10 @@ struct MapConfig {
     origin = ori;
     resolution = res;
   }
+  MapConfig(const MapConfig &other) = default;
+  MapConfig &operator=(const MapConfig &other) = default;
+  MapConfig(MapConfig &&other) noexcept = default;
+  MapConfig &operator=(MapConfig &&other) noexcept = default;
   bool Load(const std::string &filename) {
     std::ifstream fin(filename.c_str());
     if (fin.fail()) {
@@ -153,6 +157,8 @@ struct MapConfig {
     }
   }
 };
+
+
 class OccupancyMap {
  public:
   MapConfig map_config;
@@ -166,6 +172,10 @@ class OccupancyMap {
   OccupancyMap(int rows_, int cols_, Eigen::Vector3d origin, double res,
                Eigen::MatrixXi data)
       : map_config({origin[0], origin[1], origin[2]}, res), rows(rows_), cols(cols_), map_data(data) {}
+  OccupancyMap(const OccupancyMap &other) = default;
+  OccupancyMap &operator=(const OccupancyMap &other) = default;
+  OccupancyMap(OccupancyMap &&other) noexcept = default;
+  OccupancyMap &operator=(OccupancyMap &&other) noexcept = default;
   ~OccupancyMap() = default;
   Eigen::MatrixXi GetMapData() { return map_data; }
   Eigen::MatrixXi flip() { return map_data.colwise().reverse(); }

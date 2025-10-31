@@ -164,7 +164,7 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   // 路径名称（只读）
   QHBoxLayout *layout_name = new QHBoxLayout();
   layout_name->setSpacing(6);
-  QLabel *label_name = new QLabel("路径名:");
+  QLabel *label_name = new QLabel("name:");
   label_name->setMinimumSize(50, 20);
   lineEdit_route_name_ = new QLineEdit();
   lineEdit_route_name_->setReadOnly(true); // 路径名不可修改
@@ -175,12 +175,22 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   // 控制器类型
   QHBoxLayout *layout_controller = new QHBoxLayout();
   layout_controller->setSpacing(6);
-  QLabel *label_controller = new QLabel("控制器:");
+  QLabel *label_controller = new QLabel("controller:");
   label_controller->setMinimumSize(50, 20);
   comboBox_controller_ = new QComboBox();
   layout_controller->addWidget(label_controller);
   layout_controller->addWidget(comboBox_controller_);
   layout->addLayout(layout_controller);
+  
+  // 目标检查器类型
+  QHBoxLayout *layout_goal_checker = new QHBoxLayout();
+  layout_goal_checker->setSpacing(6);
+  QLabel *label_goal_checker = new QLabel("goal_checker:");
+  label_goal_checker->setMinimumSize(50, 20);
+  comboBox_goal_checker_ = new QComboBox();
+  layout_goal_checker->addWidget(label_goal_checker);
+  layout_goal_checker->addWidget(comboBox_goal_checker_);
+  layout->addLayout(layout_goal_checker);
   
   // 速度限制
   QHBoxLayout *layout_speed = new QHBoxLayout();
@@ -189,7 +199,7 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   label_speed->setMinimumSize(50, 20);
   spinBox_speed_limit_ = new QDoubleSpinBox();
   spinBox_speed_limit_->setRange(0.1, 10.0);  // 设置范围0.1到10.0
-  spinBox_speed_limit_->setValue(1.0);  // 默认值
+  spinBox_speed_limit_->setValue(2.0);  // 默认值
   spinBox_speed_limit_->setSuffix(" m/s");  // 添加单位后缀
   spinBox_speed_limit_->setDecimals(2);  // 显示两位小数
   spinBox_speed_limit_->setSingleStep(0.1);  // 步进值0.1
@@ -222,6 +232,9 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
   connect(comboBox_controller_, QOverload<int>::of(&QComboBox::currentIndexChanged),
           this, &TopologyRouteWidget::SlotUpdateValue);
   
+  connect(comboBox_goal_checker_, QOverload<int>::of(&QComboBox::currentIndexChanged),
+          this, &TopologyRouteWidget::SlotUpdateValue);
+  
   connect(spinBox_speed_limit_, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
           this, &TopologyRouteWidget::SlotUpdateValue);
   
@@ -229,6 +242,7 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
     RouteInfo info;
     info.route_name = lineEdit_route_name_->text();
     info.controller = comboBox_controller_->currentText().toStdString();
+    info.goal_checker = comboBox_goal_checker_->currentText().toStdString();
     
     // 验证速度限制输入
     double speed_limit = spinBox_speed_limit_->value();
@@ -241,6 +255,7 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
     RouteInfo info;
     info.route_name = lineEdit_route_name_->text();
     info.controller = comboBox_controller_->currentText().toStdString();
+    info.goal_checker = comboBox_goal_checker_->currentText().toStdString();
     
     // 验证速度限制输入
     double speed_limit = spinBox_speed_limit_->value();
@@ -252,6 +267,7 @@ TopologyRouteWidget::TopologyRouteWidget(QWidget *parent) : QWidget(parent) {
 
 void TopologyRouteWidget::SetEditMode(bool is_edit) {
   comboBox_controller_->setEnabled(is_edit);
+  comboBox_goal_checker_->setEnabled(is_edit);
   spinBox_speed_limit_->setEnabled(is_edit);
   button_delete_->setEnabled(is_edit);
 }
@@ -265,10 +281,19 @@ void TopologyRouteWidget::SetSupportControllers(const std::set<std::string> &con
   
 }
 
+void TopologyRouteWidget::SetSupportGoalCheckers(const std::set<std::string> &goal_checkers) {
+  comboBox_goal_checker_->clear();
+  for (const auto &goal_checker : goal_checkers) {
+    comboBox_goal_checker_->addItem(goal_checker.c_str());
+    std::cout << "add goal_checker:" << goal_checker << std::endl;
+  }
+}
+
 void TopologyRouteWidget::SlotUpdateValue() {
   RouteInfo info;
   info.route_name = lineEdit_route_name_->text();
   info.controller = comboBox_controller_->currentText().toStdString();
+  info.goal_checker = comboBox_goal_checker_->currentText().toStdString();
   
   // 验证速度限制输入
   double speed_limit = spinBox_speed_limit_->value();
@@ -289,6 +314,7 @@ void TopologyRouteWidget::SetRouteInfo(const RouteInfo &info) {
   }
   lineEdit_route_name_->blockSignals(true);
   comboBox_controller_->blockSignals(true);
+  comboBox_goal_checker_->blockSignals(true);
   spinBox_speed_limit_->blockSignals(true);
   
   lineEdit_route_name_->setText(info.route_name);
@@ -297,6 +323,16 @@ void TopologyRouteWidget::SetRouteInfo(const RouteInfo &info) {
   int controller_index = comboBox_controller_->findText(info.controller.c_str());
   if (controller_index >= 0) {
     comboBox_controller_->setCurrentIndex(controller_index);
+  }else{
+    comboBox_controller_->setCurrentIndex(0);
+  }
+  
+  // 设置目标检查器
+  int goal_checker_index = comboBox_goal_checker_->findText(info.goal_checker.c_str());
+  if (goal_checker_index >= 0) {
+    comboBox_goal_checker_->setCurrentIndex(goal_checker_index);
+  }else{
+    comboBox_goal_checker_->setCurrentIndex(0);
   }
   
   // 设置速度限制
@@ -304,11 +340,13 @@ void TopologyRouteWidget::SetRouteInfo(const RouteInfo &info) {
   
   lineEdit_route_name_->blockSignals(false);
   comboBox_controller_->blockSignals(false);
+  comboBox_goal_checker_->blockSignals(false);
   spinBox_speed_limit_->blockSignals(false);
 } 
 
 bool TopologyRouteWidget::IsAnyControlBeingEdited() const {
   // 检查是否有任何输入控件正在获得焦点
   return comboBox_controller_->hasFocus() || 
+         comboBox_goal_checker_->hasFocus() ||
          spinBox_speed_limit_->hasFocus();
 } 

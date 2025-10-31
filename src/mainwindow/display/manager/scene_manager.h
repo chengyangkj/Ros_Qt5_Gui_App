@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
+#include <memory>
 #include "map/topology_map.h"
 
 #include "display/point_shape.h"
@@ -33,8 +34,8 @@ class SceneManager : public QGraphicsScene {
   QGraphicsView *view_ptr_;
   Display::VirtualDisplay *curr_handle_display_{nullptr};
   DisplayManager *display_manager_;
-  NavGoalWidget *nav_goal_widget_;
-  TopologyRouteWidget *topology_route_widget_;
+  std::unique_ptr<NavGoalWidget> nav_goal_widget_;
+  std::unique_ptr<TopologyRouteWidget> topology_route_widget_;
 
   TopologyMap topology_map_;
   MapEditMode current_mode_;

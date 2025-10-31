@@ -22,6 +22,7 @@ struct TopologyMap {
   // 路径属性结构体
   struct RouteInfo {
     std::string controller{"FollowPath"};
+    std::string goal_checker{"general_goal_checker"};
     double speed_limit{1.0};  // 默认最大速度1.0
     RouteInfo() = default;
     RouteInfo(std::string ctrl) 
@@ -53,7 +54,8 @@ struct TopologyMap {
 
   //属性
   struct PropertyInfo {
-    std::set<std::string> support_controllers{"FollowPath","BackUp","MPPI"};
+    std::vector<std::string> support_controllers{"FollowPath","BackUp","FollowPathOmni","FollowPathDiffDriver"};
+    std::vector<std::string> support_goal_checkers{"general_goal_checker","precise_goal_checker","backup_goal_checker","diffdriver_goal_checker"};
   };
   
   std::string map_name;
@@ -320,7 +322,7 @@ struct TopologyMap {
 };
 
 // 嵌套结构体的 nlohmann/json 序列化支持
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::PointInfo, x, y, theta, name, type);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::RouteInfo, controller, speed_limit);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap::PropertyInfo, support_controllers);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TopologyMap, map_name, map_property,points, routes);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(TopologyMap::PointInfo, x, y, theta, name, type);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(TopologyMap::RouteInfo, controller, speed_limit, goal_checker);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(TopologyMap::PropertyInfo, support_controllers, support_goal_checkers);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(TopologyMap, map_name, map_property,points, routes);
