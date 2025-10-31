@@ -107,6 +107,8 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   QLabel *label_name = new QLabel("name:");
   label_name->setMinimumSize(40, 20);
   lineEdit_name_ = new QLineEdit();
+  lineEdit_name_->setReadOnly(true);
+  button_edit_name_ = new QPushButton("编辑名称");
   layout_name->addWidget(label_name);
   layout_name->addWidget(lineEdit_name_);
   layout->addLayout(layout_name);
@@ -146,8 +148,6 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   button_send_ = new QPushButton("Go To Point");
   button_multi_point_nav_ = new QPushButton("Go Through Points");
   button_remove_ = new QPushButton("Remove Point");
-  button_save_ = new QPushButton("Rename");
-  button_save_->setVisible(false);
   button_cancel_ = new QPushButton("Close");
   
   // 设置按钮对象名以便样式表识别
@@ -158,9 +158,9 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   button_remove_->setShortcut(QKeySequence::Delete);
   button_remove_->setToolTip("删除点位 (Delete/Backspace)");
   
+  layout_button->addWidget(button_edit_name_);
   layout_button->addWidget(button_send_);
   layout_button->addWidget(button_multi_point_nav_);
-  layout_button->addWidget(button_save_);
   layout_button->addWidget(button_remove_);
   layout_button->addWidget(button_cancel_);
   
@@ -177,6 +177,26 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
           SLOT(SlotUpdateValue(double)));
   connect(spinBox_theta_, SIGNAL(valueChanged(double)), this,
           SLOT(SlotUpdateValue(double)));
+  
+  connect(button_edit_name_, &QPushButton::clicked, [this]() {
+    if (lineEdit_name_->isReadOnly()) {
+      original_name_ = lineEdit_name_->text();
+      lineEdit_name_->setReadOnly(false);
+      lineEdit_name_->setFocus();
+      button_edit_name_->setText("保存名称");
+    } else {
+      QString new_name = lineEdit_name_->text();
+      if (new_name != original_name_) {
+        emit SignalHandleOver(HandleResult::kChangeName,
+                              RobotPose(spinBox_x_->value(), spinBox_y_->value(),
+                                       deg2rad(spinBox_theta_->value())),
+                              new_name);
+      }
+      lineEdit_name_->setReadOnly(true);
+      button_edit_name_->setText("编辑名称");
+    }
+  });
+  
   connect(button_send_, &QPushButton::clicked, [this]() {
     emit SignalHandleOver(HandleResult::kSend,
                           RobotPose(spinBox_x_->value(), spinBox_y_->value(),
@@ -185,12 +205,6 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   });
   connect(button_multi_point_nav_, &QPushButton::clicked, [this]() {
     emit SignalHandleOver(HandleResult::kMultiPointNav,
-                          RobotPose(spinBox_x_->value(), spinBox_y_->value(),
-                                    deg2rad(spinBox_theta_->value())),
-                          lineEdit_name_->text());
-  });
-  connect(button_save_, &QPushButton::clicked, [this]() {
-    emit SignalHandleOver(HandleResult::kSave,
                           RobotPose(spinBox_x_->value(), spinBox_y_->value(),
                                     deg2rad(spinBox_theta_->value())),
                           lineEdit_name_->text());
@@ -220,7 +234,7 @@ void NavGoalWidget::SetEditMode(bool flag) {
   spinBox_theta_->setEnabled(flag);
   lineEdit_name_->setEnabled(flag);
   button_remove_->setEnabled(flag);
-  button_save_->setVisible(flag);
+  button_edit_name_->setVisible(flag);
   button_send_->setVisible(!flag);
 }
 
@@ -231,13 +245,18 @@ void NavGoalWidget::SetPose(const PointInfo &info) {
   spinBox_x_->blockSignals(true);
   spinBox_y_->blockSignals(true);
   spinBox_theta_->blockSignals(true);
+  lineEdit_name_->blockSignals(true);
   spinBox_x_->setValue(info.pose.x);
   spinBox_y_->setValue(info.pose.y);
   spinBox_theta_->setValue(rad2deg(info.pose.theta));
   lineEdit_name_->setText(info.name);
+  original_name_ = info.name;
+  lineEdit_name_->setReadOnly(true);
+  button_edit_name_->setText("编辑名称");
   spinBox_x_->blockSignals(false);
   spinBox_y_->blockSignals(false);
   spinBox_theta_->blockSignals(false);
+  lineEdit_name_->blockSignals(false);
 }
 
 bool NavGoalWidget::IsAnyControlBeingEdited() const {

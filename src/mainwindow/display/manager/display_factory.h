@@ -44,6 +44,7 @@ class FactoryDisplay : public QObject {
 
  private:
   QTimer timer_coordinate_system_;
+  std::mutex display_map_mutex_;
   std::string main_display_;
   std::map<std::string, VirtualDisplay *> total_display_map_;
   SceneManager *scene_manager_ptr_;

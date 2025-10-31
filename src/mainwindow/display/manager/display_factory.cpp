@@ -24,24 +24,35 @@ FactoryDisplay::FactoryDisplay() {}
 FactoryDisplay::~FactoryDisplay() { run_flag_ = false; }
 // 获取图层
 VirtualDisplay *FactoryDisplay::GetDisplay(const std::string &display_name) {
-  if (total_display_map_.count(display_name) != 0) {
-    return total_display_map_[display_name];
+  std::lock_guard<std::mutex> lock(display_map_mutex_);
+  auto it = total_display_map_.find(display_name);
+  if (it != total_display_map_.end()) {
+    return it->second;
   }
   return nullptr;
 }
 void FactoryDisplay::RemoveDisplay(VirtualDisplay *display) {
-  auto find_iter = std::find_if(
-      total_display_map_.begin(), total_display_map_.end(),
-      [display](std::pair<std::string, VirtualDisplay *> pair) -> bool {
-        return pair.second == display;
-      });
-  if (find_iter != total_display_map_.end()) {
-    total_display_map_.erase(find_iter);
+  std::string parent_name;
+  {
+    std::lock_guard<std::mutex> lock(display_map_mutex_);
+    auto find_iter = std::find_if(
+        total_display_map_.begin(), total_display_map_.end(),
+        [display](std::pair<std::string, VirtualDisplay *> pair) -> bool {
+          return pair.second == display;
+        });
+    if (find_iter != total_display_map_.end()) {
+      total_display_map_.erase(find_iter);
+    }
+    if (display) {
+      parent_name = display->GetParentName();
+    }
   }
-  auto parent_ptr_ =
-      FactoryDisplay::Instance()->GetDisplay(display->GetParentName());
-  if (parent_ptr_ != nullptr) {
-    parent_ptr_->RemoveChild(display);
+  
+  if (!parent_name.empty()) {
+    auto parent_ptr_ = GetDisplay(parent_name);
+    if (parent_ptr_ != nullptr) {
+      parent_ptr_->RemoveChild(display);
+    }
   }
 }  // namespace Display
 // 设置图层的scene坐标
@@ -73,18 +84,22 @@ bool FactoryDisplay::SetDisplayScaled(const std::string &display_name,
 }
 void FactoryDisplay::AddDisplay(VirtualDisplay *display,
                                 const std::string &parent_name) {
-  if (total_display_map_.count(display->GetDisplayName()) != 0) {
-    std::cout << "display name:" << display->GetDisplayName()
-              << " already exist" << std::endl;
-    return;
+  std::string display_name;
+  {
+    std::lock_guard<std::mutex> lock(display_map_mutex_);
+    display_name = display->GetDisplayName();
+    if (total_display_map_.count(display_name) != 0) {
+      std::cout << "display name:" << display_name
+                << " already exist" << std::endl;
+      return;
+    }
+    total_display_map_[display_name] = display;
   }
-
-  total_display_map_[display->GetDisplayName()] = display;
 
   if (!parent_name.empty()) {
     auto parent_ptr = GetDisplay(parent_name);
     if (parent_ptr == nullptr) {
-      LOG_ERROR("not find parent display:" << parent_name << " current display:" << display->GetDisplayName())
+      LOG_ERROR("not find parent display:" << parent_name << " current display:" << display_name);
       return;
     }
     parent_ptr->AddChild(display);
@@ -95,33 +110,37 @@ void FactoryDisplay::SetFocusDisplay(const std::string &display_name) {
   focus_display_name_ = display_name;
 }
 void FactoryDisplay::RemoveDisplay(const std::string &name) {
+  std::lock_guard<std::mutex> lock(display_map_mutex_);
   auto iter = total_display_map_.find(name);
   if (iter != total_display_map_.end()) {
     delete iter->second;
     total_display_map_.erase(iter);
   }
-  iter = total_display_map_.find(name);
-  if (iter != total_display_map_.end()) {
-    delete iter->second;
-    total_display_map_.erase(iter);
-  }
 }
-int FactoryDisplay::GetDisplaySize() { return total_display_map_.size(); }
+int FactoryDisplay::GetDisplaySize() { 
+  std::lock_guard<std::mutex> lock(display_map_mutex_);
+  return total_display_map_.size(); 
+}
 std::map<std::string, VirtualDisplay *> FactoryDisplay::GetTotalDisplayMap() {
+  std::lock_guard<std::mutex> lock(display_map_mutex_);
   return total_display_map_;
 }
 // 设置响应鼠标事件的图层
 bool FactoryDisplay::SetMoveEnable(const std::string &display_name,
                                    bool enable) {
-  if (total_display_map_.count(display_name) != 0) {
-    total_display_map_[display_name]->SetMoveEnable(enable);
+  std::lock_guard<std::mutex> lock(display_map_mutex_);
+  auto it = total_display_map_.find(display_name);
+  if (it != total_display_map_.end()) {
+    it->second->SetMoveEnable(enable);
     return true;
   }
   return false;
 }
 bool FactoryDisplay::GetMoveEnable(const std::string &display_name) {
-  if (total_display_map_.count(display_name) != 0) {
-    return total_display_map_[display_name]->GetMoveEnable();
+  std::lock_guard<std::mutex> lock(display_map_mutex_);
+  auto it = total_display_map_.find(display_name);
+  if (it != total_display_map_.end()) {
+    return it->second->GetMoveEnable();
   }
   return false;
 }
@@ -139,12 +158,19 @@ void FactoryDisplay::Process() {
 }
 // 安全地更新显示对象名称
 bool FactoryDisplay::UpdateDisplayName(const std::string &old_name, const std::string &new_name) {
+  std::lock_guard<std::mutex> lock(display_map_mutex_);
+  
   // 检查旧名称是否存在
   auto iter = total_display_map_.find(old_name);
   if (iter == total_display_map_.end()) {
     LOG_ERROR("Display with old name not found: " << old_name);
+    for(auto &item : total_display_map_) {
+      LOG_INFO("Display name: " << item.first);
+    }
     return false;
   }
+
+  LOG_INFO("Update display name: " << old_name << " -> " << new_name);
   
   // 检查新名称是否已经存在
   if (total_display_map_.find(new_name) != total_display_map_.end()) {
@@ -154,7 +180,11 @@ bool FactoryDisplay::UpdateDisplayName(const std::string &old_name, const std::s
   
   // 获取显示对象指针
   VirtualDisplay* display = iter->second;
-  
+  if (!display) {
+    LOG_ERROR("Display pointer is null for name: " << old_name);
+    return false;
+  }
+
   // 更新显示对象的内部名称
   display->SetDisplayName(new_name);
   

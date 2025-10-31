@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include <QTimer>
 #include <iostream>
+#include <algorithm>
 #include "config/config_manager.h"
 #include "display/display_occ_map.h"
 #include "display/manager/display_factory.h"
@@ -87,12 +88,7 @@ void SceneManager::UpdateTopologyMap(const TopologyMap &topology_map) {
   
   // 更新拓扑地图数据
   topology_map_ = topology_map;
-  // 如果 widget 存在，更新支持列表（只有在 widget 已创建时才需要更新）
-  if (topology_route_widget_) {
-    topology_route_widget_->SetSupportControllers(topology_map_.map_property.support_controllers);
-    topology_route_widget_->SetSupportGoalCheckers(topology_map_.map_property.support_goal_checkers);
-  }
-  
+
   // 为每个点创建显示对象
   for (auto &point : topology_map_.points) {
     auto goal_point = new PointShape(PointShape::ePointType::kNavGoal, DISPLAY_GOAL,
@@ -109,6 +105,7 @@ void SceneManager::UpdateTopologyMap(const TopologyMap &topology_map) {
              << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
              << ") -> map pose(" << map_pose.x << ", " << map_pose.y << ", " << map_pose.theta << ")");
   }
+
   
   // 加载拓扑路径
   loadTopologyRoutes();
@@ -457,10 +454,9 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
 
   // 使用原始指针进行连接，避免 lambda 中访问已销毁的智能指针
   NavGoalWidget* widget_ptr = nav_goal_widget_.get();
-  std::string point_name = display->GetDisplayName();  // 保存点位名称，避免 display 被删除后访问无效
   
   connect(widget_ptr, &NavGoalWidget::SignalHandleOver,
-          [this, display, widget_ptr, point_name](const NavGoalWidget::HandleResult &flag,
+          [this, display, widget_ptr](const NavGoalWidget::HandleResult &flag,
                           const RobotPose &pose,const QString &new_name) {
             // 安全检查：确保 widget 仍然有效且是当前活跃的 widget
             if (!nav_goal_widget_ || nav_goal_widget_.get() != widget_ptr) {
@@ -468,10 +464,13 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
               return;
             }
             // 检查 display 是否仍然有效（防止点位被删除后访问）
-            if (!display || display->GetDisplayName() != point_name) {
+            if (!display ) {
               LOG_WARN("Display was deleted or changed, ignoring signal");
               return;
             }
+
+            std::string point_name = display->GetDisplayName();  
+
             
             if (flag == NavGoalWidget::HandleResult::kSend) {
               emit display_manager_->signalPub2DGoal(pose);
@@ -500,11 +499,11 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
                 LOG_INFO("Total distance: " << route_path.total_distance);
                 
                 // 将路径上的所有点位转换为RobotPose
-                for (const auto &point_name : route_path.path_points) {
-                  TopologyMap::PointInfo point_info = topology_map_.GetPoint(point_name);
+                for (const auto &name : route_path.path_points) {
+                  TopologyMap::PointInfo point_info = topology_map_.GetPoint(name);
                   if (!point_info.name.empty()) {  // 确保点存在
                     poses.push_back(point_info.ToRobotPose());
-                    LOG_INFO("Added pose: " << point_name << " (" << point_info.x << ", " 
+                    LOG_INFO("Added pose: " << name << " (" << point_info.x << ", " 
                              << point_info.y << ", " << point_info.theta << ")");
                   }
                 }
@@ -553,7 +552,7 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
               delete display;
               nav_goal_widget_->hide();
 
-            } else if (flag == NavGoalWidget::HandleResult::kSave) {
+            } else if (flag == NavGoalWidget::HandleResult::kChangeName) {
               std::string old_name = point_name;  // 使用保存的点位名称
               auto iter=std::find_if(topology_map_.points.begin(), topology_map_.points.end(), [new_name](const TopologyMap::PointInfo &point) {
                 return point.name == new_name.toStdString();
@@ -567,13 +566,22 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
   
               // 先更新拓扑地图中的点名称
               topology_map_.UpdatePointName(old_name, new_name.toStdString());
+
               // 使用安全的方法更新显示对象名称和映射表
               if (!FactoryDisplay::Instance()->UpdateDisplayName(old_name, new_name.toStdString())) {
                 LOG_ERROR("Failed to update display name from " << old_name << " to " << new_name.toStdString());
                 return;
               }
 
-              updateAllTopologyLinesStatus();
+              //更新拓扑路径
+              for(auto line : topology_lines_) {
+                if(line->GetFromItem() == display || line->GetToItem() == display) {
+                  std::string from_name = static_cast<VirtualDisplay*>(line->GetFromItem())->GetDisplayName();
+                  std::string to_name = static_cast<VirtualDisplay*>(line->GetToItem())->GetDisplayName();
+                  std::string new_route_name = generateRouteId(QString::fromStdString(from_name), QString::fromStdString(to_name));
+                  FactoryDisplay::Instance()->UpdateDisplayName(line->GetDisplayName(), new_route_name);
+                }
+              }
        
               nav_goal_widget_->hide();
               LOG_INFO("Successfully updated point name: " << old_name << " -> " << new_name.toStdString());
@@ -584,17 +592,18 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
           });
           
   connect(widget_ptr, &NavGoalWidget::SignalPoseChanged,
-          [this, display, widget_ptr, point_name](const RobotPose &pose) {
+          [this, display, widget_ptr](const RobotPose &pose) {
             // 安全检查：确保 widget 和 display 仍然有效
             if (!nav_goal_widget_ || nav_goal_widget_.get() != widget_ptr) {
               LOG_WARN("NavGoalWidget was replaced or destroyed, ignoring pose changed signal");
               return;
             }
-            if (!display || display->GetDisplayName() != point_name) {
+            if (!display) {
               LOG_WARN("Display was deleted or changed, ignoring pose changed signal");
               return;
             }
-            
+            std::string point_name = display->GetDisplayName();
+
             // 更新显示位置：世界坐标 -> 地图坐标
             auto map_pose = display_manager_->wordPose2Map(pose);
             display->UpdateDisplay(map_pose);
@@ -713,8 +722,36 @@ void SceneManager::blindTopologyRouteWidget(TopologyLine* line, bool is_edit) {
             if (flag == TopologyRouteWidget::HandleResult::kDelete) {
               LOG_INFO("删除路径: " << saved_route_id);
               
-              // 删除选中的拓扑连线
-              deleteSelectedTopologyLine();
+              auto find_line = std::find_if(topology_lines_.begin(), topology_lines_.end(), [saved_route_id]( TopologyLine *line) {
+                return line->GetDisplayName() == saved_route_id;
+              });
+              
+              if(find_line != topology_lines_.end()) {
+                TopologyLine* line = *find_line;
+                
+                // 如果这个 line 是当前选中的，先清除选中状态
+                if (selected_topology_line_ == line) {
+                  selected_topology_line_ = nullptr;
+                }
+                
+                // 从场景中移除
+                removeItem(line);
+                
+                // 从拓扑地图中删除路径
+                topology_map_.RemoveRoute(saved_route_id);
+                
+                // 从显示列表中删除
+                topology_lines_.erase(find_line);
+                
+                // 从 FactoryDisplay 映射表中删除（不删除对象）
+                FactoryDisplay::Instance()->RemoveDisplay(line);
+                
+                // 手动删除对象
+                delete line;
+                
+                // 更新所有连线的双向状态
+                updateAllTopologyLinesStatus();
+              }
               
               topology_route_widget_->hide();
             } else {
@@ -865,7 +902,10 @@ void SceneManager::createTopologyLine(const QString &from, const QString &to) {
 
 void SceneManager::clearTopologyLineSelection() {
   if (selected_topology_line_) {
-    selected_topology_line_->SetSelected(false);
+    // 检查 line 是否还在 scene 中（防止访问已删除的对象）
+    if (selected_topology_line_->scene()) {
+      selected_topology_line_->SetSelected(false);
+    }
     selected_topology_line_ = nullptr;
   }
 
@@ -949,25 +989,41 @@ void SceneManager::loadTopologyRoutes() {
 void SceneManager::updateAllTopologyLinesStatus() {
   // 更新所有拓扑连线的双向状态
   for (auto line : topology_lines_) {
-    if (line && line->GetFromItem() && line->GetToItem()) {
-      // 获取起点和终点的显示名称
-      VirtualDisplay* from_display = dynamic_cast<VirtualDisplay*>(line->GetFromItem());
-      VirtualDisplay* to_display = dynamic_cast<VirtualDisplay*>(line->GetToItem());
+    if (!line) continue;
+    if (!line->GetFromItem() || !line->GetToItem()) continue;
+    
+    // 获取起点和终点的显示名称
+    VirtualDisplay* from_display = dynamic_cast<VirtualDisplay*>(line->GetFromItem());
+    VirtualDisplay* to_display = dynamic_cast<VirtualDisplay*>(line->GetToItem());
+    
+    if (!from_display || !to_display) continue;
+    
+    try {
+
+      //根据开始与结束点位 更新名字
+      std::string from_name = from_display->GetDisplayName();
+      std::string to_name = to_display->GetDisplayName();
       
-      if (from_display && to_display) {
-        std::string from_name = from_display->GetDisplayName();
-        std::string to_name = to_display->GetDisplayName();
-        
-        // 检查并更新是否为双向连接的一部分
-        bool is_part_of_bidirectional = topology_map_.IsBidirectional(from_name, to_name);
-        line->SetPartOfBidirectional(is_part_of_bidirectional);
-        auto current_name=line->GetDisplayName();
-        auto new_name=generateRouteId(QString::fromStdString(from_name),QString::fromStdString(to_name));
-        if(current_name!=new_name){
-          FactoryDisplay::Instance()->UpdateDisplayName(current_name,new_name);
-          // LOG_INFO("update topology line display name: " << current_name << " to " << new_name<<" get new name:"<<line->GetDisplayName()<<"display address:"<<line);
+      // 检查并更新是否为双向连接的一部分
+      bool is_part_of_bidirectional = topology_map_.IsBidirectional(from_name, to_name);
+      line->SetPartOfBidirectional(is_part_of_bidirectional);
+      
+      std::string current_name = line->GetDisplayName();
+      std::string new_name = generateRouteId(QString::fromStdString(from_name), QString::fromStdString(to_name));
+      
+      LOG_INFO("update topology line status: " << current_name << " -> " << new_name);
+      if (current_name != new_name && !current_name.empty() && !new_name.empty()) {
+        // 检查 line 是否还在 topology_lines_ 中（防止在更新过程中被删除）
+        bool line_exists = std::find(topology_lines_.begin(), topology_lines_.end(), line) != topology_lines_.end();
+        if (line_exists) {
+          FactoryDisplay::Instance()->UpdateDisplayName(current_name, new_name);
         }
       }
+
+
+    } catch (...) {
+      LOG_ERROR("Error updating topology line status for line");
+      continue;
     }
   }
 }

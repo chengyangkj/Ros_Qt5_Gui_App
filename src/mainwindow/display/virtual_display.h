@@ -8,6 +8,8 @@
  * @Description: 图层的虚拟类
  */
 #pragma once
+#ifndef DISPLAY_VIRTUAL_DISPLAY_H_
+#define DISPLAY_VIRTUAL_DISPLAY_H_
 #include <math.h>
 #include <Eigen/Dense>
 #include <QCursor>
@@ -21,6 +23,7 @@
 #include <any>
 #include <algorithm>
 #include <iostream>
+#include <mutex>
 #include "msg/msg_info.h"
 
 #include "display_defines.h"
@@ -83,6 +86,15 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   std::vector<VirtualDisplay *> children_;
   bool is_moving_{false};
   std::string display_name_;
+  std::mutex display_name_mutex_;
+  
+  // 状态相关的互斥锁
+  std::mutex state_mutex_;  // 保护 scale_value_, rotate_value_, move_enable_, is_moving_
+  std::mutex pose_mutex_;   // 保护 curr_scene_pose_, pose_in_parent_
+  std::mutex map_data_mutex_;  // 保护 map_data_
+  std::mutex geometry_mutex_;  // 保护 bounding_rect_
+  std::mutex metadata_mutex_;  // 保护 display_type_, parent_name_, children_
+
   double min_scale_value_{0.1};
   double max_scale_value_{20};
  signals:
@@ -97,16 +109,24 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   virtual ~VirtualDisplay();
   bool UpdateDisplay(const std::any &data) { return UpdateData(data); }
   VirtualDisplay *SetRotateEnable(const bool &enable) {
+    std::lock_guard<std::mutex> lock(state_mutex_);
     enable_rotate_ = enable;
     return this;
   }
-  double GetScaleValue() { return scale_value_; }
+  double GetScaleValue() { 
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    return scale_value_; 
+  }
   VirtualDisplay *SetScaleEnable(const bool &enable) {
+    std::lock_guard<std::mutex> lock(state_mutex_);
     enable_scale_ = enable;
     return this;
   }
   VirtualDisplay *SetMoveEnable(const bool &enable) {
-    move_enable_ = enable;
+    {
+      std::lock_guard<std::mutex> lock(state_mutex_);
+      move_enable_ = enable;
+    }
     if (enable) {
       // 只有响应的图层才响应鼠标事件
       setAcceptHoverEvents(true);
@@ -118,94 +138,76 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
     update();
     return this;
   }
-  bool GetMoveEnable() { return move_enable_; }
-  void AddChild(VirtualDisplay *child) { children_.push_back(child); }
+  bool GetMoveEnable() { 
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    return move_enable_; 
+  }
+
+  void AddChild(VirtualDisplay *child) { 
+    std::lock_guard<std::mutex> lock(metadata_mutex_);
+    children_.push_back(child); 
+  }
+
   void RemoveChild(VirtualDisplay *child) {
+    std::lock_guard<std::mutex> lock(metadata_mutex_);
     children_.erase(std::remove(children_.begin(), children_.end(), child),
                     children_.end());
   }
-  std::vector<VirtualDisplay *> GetChildren() { return children_; }
-  void UpdateMap(const OccupancyMap &map) { 
-    try {
-      // 安全复制字符串
-      std::string safe_image;
-      try {
-        safe_image = map.map_config.image;
-      } catch (...) {
-        safe_image = "./";
-      }
-      map_data_.map_config.image.swap(safe_image);
-      
-      // 安全复制 vector - 逐个元素复制避免整体赋值
-      try {
-        map_data_.map_config.origin.clear();
-        size_t origin_size = 3;
-        try {
-          origin_size = map.map_config.origin.size();
-        } catch (...) {
-          origin_size = 3;
-        }
-        if (origin_size > 0 && origin_size <= 100) {  // 合理范围检查
-          map_data_.map_config.origin.reserve(origin_size);
-          for (size_t i = 0; i < origin_size; ++i) {
-            try {
-              double val = map.map_config.origin[i];
-              map_data_.map_config.origin.push_back(val);
-            } catch (...) {
-              map_data_.map_config.origin.push_back(0.0);
-            }
-          }
-        } else {
-          map_data_.map_config.origin.resize(3);
-        }
-      } catch (...) {
-        map_data_.map_config.origin.clear();
-        map_data_.map_config.origin.resize(3);
-        map_data_.map_config.origin[0] = 0.0;
-        map_data_.map_config.origin[1] = 0.0;
-        map_data_.map_config.origin[2] = 0.0;
-      }
-      
-      // 复制简单类型
-      map_data_.map_config.resolution = map.map_config.resolution;
-      map_data_.map_config.negate = map.map_config.negate;
-      map_data_.map_config.occupied_thresh = map.map_config.occupied_thresh;
-      map_data_.map_config.free_thresh = map.map_config.free_thresh;
-      map_data_.map_config.mode = map.map_config.mode;
-      map_data_.rows = map.rows;
-      map_data_.cols = map.cols;
-      
-      // 安全复制 Eigen::MatrixXi
-      try {
-        map_data_.map_data = map.map_data;
-      } catch (...) {
-        LOG_ERROR("Failed to copy map_data, map may be corrupted");
-      }
-    } catch (...) {
-      LOG_ERROR("UpdateMap failed, map may be corrupted");
-    }
+
+  std::vector<VirtualDisplay *> GetChildren() { 
+    std::lock_guard<std::mutex> lock(metadata_mutex_);
+    return children_; 
   }
 
-  double GetRotate() { return rotate_value_; }
+  void UpdateMap(const OccupancyMap &map) { 
+    std::lock_guard<std::mutex> lock(map_data_mutex_);
+    map_data_ = map;
+  }
+
+  double GetRotate() { 
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    return rotate_value_; 
+  }
+  
   virtual bool UpdateData(const std::any &data) = 0;
   virtual bool SetDisplayConfig(const std::string &config_name,
                                 const std::any &config_data);
   bool SetScaled(const double &value);
   bool SetRotate(const double &value);
-  void SetBoundingRect(QRectF rect) { bounding_rect_ = rect; }
-  QPointF GetOriginPose() { return bounding_rect_.topLeft(); }
+  void SetBoundingRect(QRectF rect) { 
+    std::lock_guard<std::mutex> lock(geometry_mutex_);
+    bounding_rect_ = rect; 
+  }
+  QPointF GetOriginPose() { 
+    std::lock_guard<std::mutex> lock(geometry_mutex_);
+    return bounding_rect_.topLeft(); 
+  }
   QPointF GetOriginPoseScene() { return mapToScene(GetOriginPose()); }
   QPointF PoseToScene(QPointF pose) {  //将坐标转换为scene(以中心为原点)
     return mapToScene((pose + GetOriginPose()));
   }
   void CenterOnScene(QPointF pose);
-  bool IsMoving() { return is_moving_; }
+  bool IsMoving() { 
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    return is_moving_; 
+  }
   void UpdatePose(const RobotPose &pose) { SetPoseInParent(pose); }
   void SetPoseInParent(const RobotPose &pose);
-  RobotPose GetCurrentScenePose() { return curr_scene_pose_; }
-  RobotPose GetPoseInParent() { return pose_in_parent_; }
-  std::string GetParentName() { return parent_name_; }
-  std::string GetDisplayName() { return display_name_; }
+  RobotPose GetCurrentScenePose() { 
+    std::lock_guard<std::mutex> lock(pose_mutex_);
+    return curr_scene_pose_; 
+  }
+  RobotPose GetPoseInParent() { 
+    std::lock_guard<std::mutex> lock(pose_mutex_);
+    return pose_in_parent_; 
+  }
+  std::string GetParentName() { 
+    std::lock_guard<std::mutex> lock(metadata_mutex_);
+    return parent_name_; 
+  }
+  std::string GetDisplayName() { 
+    std::lock_guard<std::mutex> lock(display_name_mutex_);
+    return display_name_; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {
     setPos(pose - GetOriginPose());
@@ -217,7 +219,10 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   void Update();
 
  private:
-  void SetDisplayName(const std::string &name) { display_name_ = name; }
+  void SetDisplayName(const std::string &name) { 
+    std::lock_guard<std::mutex> lock(display_name_mutex_);
+    display_name_ = name; 
+  }
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
   void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -229,3 +234,4 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   void parentItemChange(GraphicsItemChange change, const QVariant &value);
 };
 }  // namespace Display
+#endif  // DISPLAY_VIRTUAL_DISPLAY_H_

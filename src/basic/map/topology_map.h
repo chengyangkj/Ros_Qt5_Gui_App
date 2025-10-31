@@ -65,6 +65,28 @@ struct TopologyMap {
   //from->to
   std::map<std::string, std::map<std::string, RouteInfo>> routes;
 
+  TopologyMap() = default;
+  TopologyMap(const TopologyMap &other) = default;
+  TopologyMap &operator=(const TopologyMap &other) {
+    if (this != &other) {
+      map_name = other.map_name;
+      map_property = other.map_property;
+      points = other.points;
+      routes = other.routes;
+    }
+    return *this;
+  }
+  TopologyMap(TopologyMap &&other) noexcept = default;
+  TopologyMap &operator=(TopologyMap &&other) noexcept {
+    if (this != &other) {
+      map_name = std::move(other.map_name);
+      map_property = std::move(other.map_property);
+      points = std::move(other.points);
+      routes = std::move(other.routes);
+    }
+    return *this;
+  }
+
   
   void AddPoint(const PointInfo &point) { points.push_back(point); }
   void RemovePoint(const std::string &name) {

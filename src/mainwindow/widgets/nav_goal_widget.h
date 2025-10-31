@@ -19,7 +19,7 @@ class NavGoalWidget : public QWidget {
   enum HandleResult { kSend = 0,
                       kRemove = 1,
                       kCancel = 2,
-                      kSave = 3,
+                      kChangeName = 3,
                       kMultiPointNav = 4 };
   struct PointInfo {
     RobotPose pose;
@@ -34,11 +34,12 @@ class NavGoalWidget : public QWidget {
   QDoubleSpinBox *spinBox_y_;
   QDoubleSpinBox *spinBox_theta_;
   QLineEdit *lineEdit_name_;
+  QPushButton *button_edit_name_;
   QPushButton *button_send_;
   QPushButton *button_multi_point_nav_;
   QPushButton *button_remove_;
   QPushButton *button_cancel_;
-  QPushButton *button_save_;
+  QString original_name_;
   
   // 检查是否有控件正在被编辑
   bool IsAnyControlBeingEdited() const;
