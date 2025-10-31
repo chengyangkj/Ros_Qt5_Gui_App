@@ -272,7 +272,7 @@ void TopologyRouteWidget::SetEditMode(bool is_edit) {
   button_delete_->setEnabled(is_edit);
 }
 
-void TopologyRouteWidget::SetSupportControllers(const std::set<std::string> &controllers) {
+void TopologyRouteWidget::SetSupportControllers(const std::vector<std::string> &controllers) {
   comboBox_controller_->clear();
   for (const auto &controller : controllers) {
     comboBox_controller_->addItem(controller.c_str());
@@ -281,7 +281,7 @@ void TopologyRouteWidget::SetSupportControllers(const std::set<std::string> &con
   
 }
 
-void TopologyRouteWidget::SetSupportGoalCheckers(const std::set<std::string> &goal_checkers) {
+void TopologyRouteWidget::SetSupportGoalCheckers(const std::vector<std::string> &goal_checkers) {
   comboBox_goal_checker_->clear();
   for (const auto &goal_checker : goal_checkers) {
     comboBox_goal_checker_->addItem(goal_checker.c_str());

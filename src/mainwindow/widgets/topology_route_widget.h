@@ -45,8 +45,8 @@ class TopologyRouteWidget : public QWidget {
  public slots:
   void SetRouteInfo(const RouteInfo &info);
   void SetEditMode(bool is_edit);
-  void SetSupportControllers(const std::set<std::string> &controllers);
-  void SetSupportGoalCheckers(const std::set<std::string> &goal_checkers);
+  void SetSupportControllers(const std::vector<std::string> &controllers);
+  void SetSupportGoalCheckers(const std::vector<std::string> &goal_checkers);
   
  private slots:
   void SlotUpdateValue();
