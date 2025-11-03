@@ -72,6 +72,7 @@ class SceneManager : public QGraphicsScene {
   virtual ~SceneManager();
   void Init(QGraphicsView *view_ptr, DisplayManager *manager);
   void AddOneNavPoint();
+  void AddPointAtRobotPosition();
   void LoadTopologyMap();
   void OpenTopologyMap(const std::string &file_path);
   void UpdateTopologyMap(const TopologyMap &topology_map);

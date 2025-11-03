@@ -318,6 +318,7 @@ void DisplayManager::StartReloc() {
 }
 void DisplayManager::SetEditMapMode(MapEditMode mode) { scene_manager_ptr_->SetEditMapMode(mode); }
 void DisplayManager::AddOneNavPoint() { scene_manager_ptr_->AddOneNavPoint(); }
+void DisplayManager::AddPointAtRobotPosition() { scene_manager_ptr_->AddPointAtRobotPosition(); }
 OccupancyMap &DisplayManager::GetMap() { return map_data_; }
 void DisplayManager::UpdateMap(OccupancyMap &) {
   emit signalPubMap(map_data_);

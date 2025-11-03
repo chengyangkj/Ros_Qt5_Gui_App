@@ -70,6 +70,7 @@ class DisplayManager : public QObject {
   void StartReloc();
   void SetEditMapMode(MapEditMode mode);
   void AddOneNavPoint();
+  void AddPointAtRobotPosition();
   void slotRobotScenePoseChanged(const RobotPose &pose);
   void slotSetRobotPose(const RobotPose &pose);
   void UpdateTopicData(const MsgId &id, const std::any &data);

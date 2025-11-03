@@ -207,6 +207,34 @@ void SceneManager::saveTopologyMap() {
 }
 void SceneManager::AddOneNavPoint() {
 }
+
+void SceneManager::AddPointAtRobotPosition() {
+  // 获取机器人当前位置（世界坐标）
+  RobotPose robot_pose = display_manager_->GetRobotPose();
+  
+  // 生成点位名称
+  std::string name = generatePointName("NAV_POINT");
+  
+  // 创建点位显示对象
+  auto goal_point = new PointShape(PointShape::ePointType::kNavGoal,
+                                  DISPLAY_GOAL, name, 8, DISPLAY_MAP);
+  goal_point->SetRotateEnable(true)->SetMoveEnable(true)->setVisible(true);
+  
+  // 世界坐标 -> 地图坐标
+  auto map_pose = display_manager_->wordPose2Map(robot_pose);
+  goal_point->UpdateDisplay(map_pose);
+  
+  // 添加到拓扑地图
+  topology_map_.AddPoint(TopologyMap::PointInfo(robot_pose, name));
+  
+  LOG_INFO("Add nav point at robot position: " << name << " at world pose(" 
+           << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
+           << ") -> map pose(" << map_pose.x << ", " << map_pose.y << ", " << map_pose.theta << ")");
+  LOG_INFO("Total points: " << topology_map_.points.size());
+  
+  curr_handle_display_ = goal_point;
+}
+
 void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   if (mouseEvent->button() == Qt::LeftButton) {
     left_pressed_ = true;

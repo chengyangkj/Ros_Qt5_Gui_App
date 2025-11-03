@@ -236,6 +236,7 @@ void NavGoalWidget::SetEditMode(bool flag) {
   button_remove_->setEnabled(flag);
   button_edit_name_->setVisible(flag);
   button_send_->setVisible(!flag);
+  button_multi_point_nav_->setVisible(!flag);
 }
 
 void NavGoalWidget::SetPose(const PointInfo &info) {

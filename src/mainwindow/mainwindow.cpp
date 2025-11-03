@@ -27,6 +27,7 @@
 #include <QMessageBox>
 
 #include "widgets/speed_ctrl.h"
+#include "display/manager/view_manager.h"
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -77,7 +78,9 @@ void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
     case MsgId::kRobotPose: {
       nav_goal_table_view_->UpdateRobotPose(std::any_cast<RobotPose>(data));
       auto robot_pose = std::any_cast<RobotPose>(data);
-      label_pos_robot_->setText("(" +  QString::number(robot_pose.x).mid(0, 4)  + "," + QString::number(robot_pose.y).mid(0, 4) + "," + QString::number(robot_pose.theta).mid(0, 4) + ")");
+      label_pos_robot_->setText("Robot: (" + QString::number(robot_pose.x, 'f', 2) + ", " + 
+                                QString::number(robot_pose.y, 'f', 2) + ", " + 
+                                QString::number(robot_pose.theta, 'f', 2) + ")");
     } break;
     case MsgId::kBatteryState: {
       std::map<std::string, std::string> map =
@@ -497,90 +500,65 @@ void MainWindow::setupUi() {
   display_manager_ = new Display::DisplayManager();
   center_h_layout->addWidget(display_manager_->GetViewPtr());
 
-  //////////////////////////////////////////////////////////////////////////坐标显示 - 现代化设计
+  //////////////////////////////////////////////////////////////////////////坐标显示 - 现代化设计（无标签版本）
   QHBoxLayout *horizontalLayout_12 = new QHBoxLayout();
   horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
-  horizontalLayout_12->setSpacing(16);
+  horizontalLayout_12->setSpacing(10);
+  horizontalLayout_12->setContentsMargins(8, 8, 8, 8);
   
-  QLabel *label = new QLabel();
-  label->setText("map:");
-  label->setObjectName(QString::fromUtf8("label"));
-  label->setStyleSheet(R"(
-    QLabel {
-      color: #666666;
+  // 统一的样式字符串
+  const QString common_style = R"(
+    QLineEdit {
+      color: #2d3748;
       font-weight: 500;
-      font-size: 12px;
+      font-size: 13px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ffffff, stop:1 #f8fafc);
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px 14px;
+      selection-background-color: #6366f1;
+      selection-color: white;
     }
-  )");
-  horizontalLayout_12->addWidget(label);
+    QLineEdit:focus {
+      border: 1.5px solid #6366f1;
+      background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ffffff, stop:1 #f1f5f9);
+    }
+  )";
 
-  label_pos_map_ = new QLabel();
+  // Map坐标显示
+  label_pos_map_ = new QLineEdit();
+  label_pos_map_->setReadOnly(true);
   label_pos_map_->setObjectName(QString::fromUtf8("label_pos_map_"));
-  label_pos_map_->setStyleSheet(R"(
-    QLabel {
-      color: #333333;
-      font-weight: 500;
-      font-size: 12px;
-      background-color: #f5f5f5;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      padding: 4px 8px;
-    }
-  )");
+  label_pos_map_->setMinimumWidth(160);
+  label_pos_map_->setMaximumWidth(220);
+  label_pos_map_->setPlaceholderText("Map: (x, y)");
+  label_pos_map_->setStyleSheet(common_style);
+  label_pos_map_->setText("Map: (0.00, 0.00)");
   horizontalLayout_12->addWidget(label_pos_map_);
 
-  QLabel *label_5 = new QLabel();
-  label_5->setText("scene:");
-  label_5->setObjectName(QString::fromUtf8("label_5"));
-  label_5->setStyleSheet(R"(
-    QLabel {
-      color: #666666;
-      font-weight: 500;
-      font-size: 12px;
-    }
-  )");
-  horizontalLayout_12->addWidget(label_5);
-
-  label_pos_scene_ = new QLabel();
+  // Scene坐标显示
+  label_pos_scene_ = new QLineEdit();
+  label_pos_scene_->setReadOnly(true);
   label_pos_scene_->setObjectName(QString::fromUtf8("label_pos_scene_"));
-  label_pos_scene_->setStyleSheet(R"(
-    QLabel {
-      color: #333333;
-      font-weight: 500;
-      font-size: 12px;
-      background-color: #f5f5f5;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      padding: 4px 8px;
-    }
-  )");
+  label_pos_scene_->setMinimumWidth(160);
+  label_pos_scene_->setMaximumWidth(220);
+  label_pos_scene_->setPlaceholderText("Scene: (x, y)");
+  label_pos_scene_->setStyleSheet(common_style);
+  label_pos_scene_->setText("Scene: (0.00, 0.00)");
   horizontalLayout_12->addWidget(label_pos_scene_);
 
-  QLabel *label_pos_robot_text = new QLabel();
-  label_pos_robot_text->setText("Robot Pose");
-  label_pos_robot_text->setObjectName(QString::fromUtf8("label_pos_robot_text"));
-  label_pos_robot_text->setStyleSheet(R"(
-    QLabel {
-      color: #333333;
-      font-weight: 500;
-      font-size: 12px;
-    }
-  )");
-  horizontalLayout_12->addWidget(label_pos_robot_text);
-
-  label_pos_robot_ = new QLabel();
+  // Robot Pose坐标显示
+  label_pos_robot_ = new QLineEdit();
+  label_pos_robot_->setReadOnly(true);
   label_pos_robot_->setObjectName(QString::fromUtf8("label_pos_robot_"));
-  label_pos_robot_->setStyleSheet(R"(
-    QLabel {
-      color: #333333;
-      font-weight: 500;
-      font-size: 12px;
-      background-color: #f5f5f5;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      padding: 4px 8px;
-    }
-  )");
+  label_pos_robot_->setMinimumWidth(180);
+  label_pos_robot_->setMaximumWidth(240);
+  label_pos_robot_->setPlaceholderText("Robot: (x, y, θ)");
+  label_pos_robot_->setStyleSheet(common_style);
+  label_pos_robot_->setText("Robot: (0.00, 0.00, 0.00)");
   horizontalLayout_12->addWidget(label_pos_robot_);
 
   horizontalLayout_12->addItem(
@@ -936,17 +914,62 @@ void MainWindow::setupUi() {
       display_manager_->SetEditMapMode(Display::MapEditMode::kStopEdit);
       edit_map_btn->setText("编辑地图");
       tools_edit_map_widget->hide();
+      // 隐藏添加机器人位置按钮
+      Display::ViewManager* view_manager = dynamic_cast<Display::ViewManager*>(display_manager_->GetViewPtr());
+      if (view_manager) {
+        view_manager->ShowAddRobotPosButton(false);
+      }
     }
   });
   connect(add_point_btn, &QToolButton::clicked, [this]() {
     display_manager_->SetEditMapMode(Display::MapEditMode::kAddPoint);
+    // 显示添加机器人位置按钮
+    Display::ViewManager* view_manager = dynamic_cast<Display::ViewManager*>(display_manager_->GetViewPtr());
+    if (view_manager) {
+      view_manager->ShowAddRobotPosButton(true);
+      // 连接按钮点击事件（只在进入模式时连接一次）
+      QToolButton* add_robot_pos_btn = view_manager->GetAddRobotPosButton();
+      if (add_robot_pos_btn) {
+        // 先断开之前的连接（如果有）
+        add_robot_pos_btn->disconnect();
+        connect(add_robot_pos_btn, &QToolButton::clicked, [this]() {
+          display_manager_->AddPointAtRobotPosition();
+        });
+      }
+    }
   });
-  connect(normal_cursor_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kMoveCursor); });
-  connect(erase_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kErase); });
-  connect(draw_line_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kDrawLine); });
-  connect(add_region_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kRegion); });
-  connect(draw_pen_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kDrawWithPen); });
-  connect(add_topology_path_btn, &QToolButton::clicked, [this]() { display_manager_->SetEditMapMode(Display::MapEditMode::kLinkTopology); });
+  // 当退出 kAddPoint 模式时，隐藏添加机器人位置按钮
+  auto hideAddRobotPosButton = [this]() {
+    Display::ViewManager* view_manager = dynamic_cast<Display::ViewManager*>(display_manager_->GetViewPtr());
+    if (view_manager) {
+      view_manager->ShowAddRobotPosButton(false);
+    }
+  };
+  
+  connect(normal_cursor_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
+    display_manager_->SetEditMapMode(Display::MapEditMode::kMoveCursor);
+    hideAddRobotPosButton();
+  });
+  connect(erase_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
+    display_manager_->SetEditMapMode(Display::MapEditMode::kErase);
+    hideAddRobotPosButton();
+  });
+  connect(draw_line_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
+    display_manager_->SetEditMapMode(Display::MapEditMode::kDrawLine);
+    hideAddRobotPosButton();
+  });
+  connect(add_region_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
+    display_manager_->SetEditMapMode(Display::MapEditMode::kRegion);
+    hideAddRobotPosButton();
+  });
+  connect(draw_pen_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
+    display_manager_->SetEditMapMode(Display::MapEditMode::kDrawWithPen);
+    hideAddRobotPosButton();
+  });
+  connect(add_topology_path_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
+    display_manager_->SetEditMapMode(Display::MapEditMode::kLinkTopology);
+    hideAddRobotPosButton();
+  });
   connect(display_manager_->GetDisplay(DISPLAY_MAP),
           SIGNAL(signalCursorPose(QPointF)), this,
           SLOT(signalCursorPose(QPointF)));
@@ -955,10 +978,10 @@ void MainWindow::setupUi() {
 void MainWindow::signalCursorPose(QPointF pos) {
   basic::Point mapPos =
       display_manager_->mapPose2Word(basic::Point(pos.x(), pos.y()));
-  label_pos_map_->setText("(" + QString::number(mapPos.x).mid(0, 4) +
-                          ", " + QString::number(mapPos.y).mid(0, 4) + ") ");
-  label_pos_scene_->setText("(" + QString::number(pos.x()).mid(0, 4) +
-                            ", " + QString::number(pos.y()).mid(0, 4) + ")");
+      label_pos_map_->setText("Map: (" + QString::number(mapPos.x, 'f', 2) +
+                          ", " + QString::number(mapPos.y, 'f', 2) + ")");
+      label_pos_scene_->setText("Scene: (" + QString::number(pos.x(), 'f', 2) +
+                            ", " + QString::number(pos.y(), 'f', 2) + ")");
 }
 
 //============================================================================

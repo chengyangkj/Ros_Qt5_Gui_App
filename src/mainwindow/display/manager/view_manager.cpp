@@ -24,6 +24,23 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
   main_layout->addLayout(bottom_bar_layout);
 
   // 创建工具按钮并添加到布局中
+  // 添加机器人位置按钮（在放大缩小按钮左侧，初始隐藏）
+  add_robot_pos_btn_ = new QToolButton();
+  add_robot_pos_btn_->setIcon(QIcon(":/images/crosshair.svg"));
+  add_robot_pos_btn_->setIconSize(QSize(25, 25));
+  add_robot_pos_btn_->setToolTip("添加机器人当前位置为目标点");
+  add_robot_pos_btn_->setCursor(Qt::PointingHandCursor);
+  add_robot_pos_btn_->setStyleSheet(
+      "QToolButton {"
+      "   border: none;"
+      "   background-color: transparent;"
+      "}"
+      "QToolButton:hover {"
+      "   background-color: rgba(0, 0, 0, 0.1);"
+      "   border-radius: 4px;"
+      "}");
+  add_robot_pos_btn_->hide();  // 初始隐藏
+  bottom_bar_layout->addWidget(add_robot_pos_btn_);
 
   QToolButton *set_big_btn_ = new QToolButton();
   set_big_btn_->setIcon(QIcon(":/images/big.svg"));
@@ -133,6 +150,12 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
 }
 void ViewManager::SetDisplayManagerPtr(DisplayManager *display_manager) {
   display_manager_ptr_ = display_manager;
+}
+
+void ViewManager::ShowAddRobotPosButton(bool show) {
+  if (add_robot_pos_btn_) {
+    add_robot_pos_btn_->setVisible(show);
+  }
 }
 void ViewManager::mouseMoveEvent(QMouseEvent *event) {
   // 根据需要设置不同的鼠标指针样式

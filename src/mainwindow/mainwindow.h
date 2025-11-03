@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QInputDialog>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPlainTextEdit>
@@ -68,9 +69,9 @@ class MainWindow : public QMainWindow {
   ads::CDockWidget *TimelineDockWidget;
   Display::DisplayManager *display_manager_;
 
-  QLabel *label_pos_map_;
-  QLabel *label_pos_scene_;
-  QLabel *label_pos_robot_;
+  QLineEdit *label_pos_map_;
+  QLineEdit *label_pos_scene_;
+  QLineEdit *label_pos_robot_;
   QThread message_thread_;
   SpeedCtrlWidget *speed_ctrl_widget_;
   NavGoalTableView *nav_goal_table_view_;
