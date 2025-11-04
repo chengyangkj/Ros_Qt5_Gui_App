@@ -27,6 +27,7 @@
 #include <QMessageBox>
 
 #include "widgets/speed_ctrl.h"
+#include "widgets/display_config_widget.h"
 #include "display/manager/view_manager.h"
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
@@ -601,6 +602,20 @@ void MainWindow::setupUi() {
       dock_manager_->addDockWidget(ads::DockWidgetArea::BottomDockWidgetArea,
                                    SpeedCtrlDockWidget, dashboard_area);
   ui->menuView->addAction(SpeedCtrlDockWidget->toggleViewAction());
+
+  ////////////////////////////////////////////////////////图层配置管理
+  DisplayConfigWidget *display_config_widget_ = new DisplayConfigWidget();
+  display_config_widget_->SetDisplayManager(display_manager_);
+  ads::CDockWidget *DisplayConfigDockWidget = new ads::CDockWidget("DisplayConfig");
+  DisplayConfigDockWidget->setWidget(display_config_widget_);
+  DisplayConfigDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+  DisplayConfigDockWidget->setMinimumSize(250, 200);
+  DisplayConfigDockWidget->setMaximumSize(400, 9999);
+  auto display_config_area =
+      dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
+                                   DisplayConfigDockWidget, center_docker_area_);
+  DisplayConfigDockWidget->toggleView(false);
+  ui->menuView->addAction(DisplayConfigDockWidget->toggleViewAction());
 
   /////////////////////////////////////////////////////////导航任务列表
   QWidget *task_list_widget = new QWidget();

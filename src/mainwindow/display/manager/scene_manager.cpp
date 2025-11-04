@@ -133,11 +133,7 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
   switch (mode) {
     case kStopEdit: {
       SetPointMoveEnable(false);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(true);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT)->setVisible(true);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT_FOOTPRINT)->setVisible(true);
       saveTopologyMap();
       view_ptr_->setCursor(Qt::ArrowCursor);
     } break;
@@ -148,10 +144,6 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
       view_ptr_->setCursor(Qt::OpenHandCursor);
       SetPointMoveEnable(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_COST_MAP)->setVisible(false);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(false);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT)->setVisible(false);
-      FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT_FOOTPRINT)->setVisible(false);
     } break;
     case kErase: {
       SetPointMoveEnable(false);
