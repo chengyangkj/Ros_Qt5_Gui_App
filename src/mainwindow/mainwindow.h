@@ -87,7 +87,6 @@ class MainWindow : public QMainWindow {
   
  private:
   void setupUi();
-  void SubscribeToMessageBus();
   bool openChannel();
   bool openChannel(const std::string &channel_name);
   void closeChannel();

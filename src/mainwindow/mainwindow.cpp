@@ -66,27 +66,27 @@ bool MainWindow::openChannel(const std::string &channel_name) {
   return false;
 }
 void MainWindow::registerChannel() {
-  SubscribeToMessageBus();
-}
-
-void MainWindow::SubscribeToMessageBus() {
   SUBSCRIBE(MSG_ID_ODOM_POSE, [this](const RobotState& data) {
     updateOdomInfo(data);
   });
+
   SUBSCRIBE(MSG_ID_ROBOT_POSE, [this](const RobotPose& robot_pose) {
       nav_goal_table_view_->UpdateRobotPose(robot_pose);
       label_pos_robot_->setText("Robot: (" + QString::number(robot_pose.x, 'f', 2) + ", " + 
                                 QString::number(robot_pose.y, 'f', 2) + ", " + 
                                 QString::number(robot_pose.theta, 'f', 2) + ")");
   });
+
   SUBSCRIBE(MSG_ID_BATTERY_STATE, [this](const std::map<std::string, std::string>& map) {
     this->SlotSetBatteryStatus(std::stod(map.at("percent")),
                                std::stod(map.at("voltage")));
   });
+
   SUBSCRIBE(MSG_ID_IMAGE, [this](const std::pair<std::string, std::shared_ptr<cv::Mat>>& location_to_mat) {
       this->SlotRecvImage(location_to_mat.first, location_to_mat.second);
   });
 }
+
 
 void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
   // 保留此方法以兼容现有代码，但不再使用
@@ -575,7 +575,7 @@ void MainWindow::setupUi() {
   DashBoardDockWidget->setWidget(speed_dashboard_widget);
   speed_dash_board_ = new DashBoard(speed_dashboard_widget);
   auto dashboard_area =
-      dock_manager_->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea,
+      dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
                                    DashBoardDockWidget, center_docker_area_);
   ui->menuView->addAction(DashBoardDockWidget->toggleViewAction());
 
@@ -601,9 +601,9 @@ void MainWindow::setupUi() {
   DisplayConfigDockWidget->setMinimumSize(250, 200);
   DisplayConfigDockWidget->setMaximumSize(400, 9999);
   auto display_config_area =
-      dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
+      dock_manager_->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea,
                                    DisplayConfigDockWidget, center_docker_area_);
-  DisplayConfigDockWidget->toggleView(false);
+  DisplayConfigDockWidget->toggleView(true);
   ui->menuView->addAction(DisplayConfigDockWidget->toggleViewAction());
 
   /////////////////////////////////////////////////////////导航任务列表
@@ -767,10 +767,7 @@ void MainWindow::setupUi() {
     ads::CDockWidget *dock_widget = new ads::CDockWidget(std::string("image/" + one_image.location).c_str());
     dock_widget->setWidget(image_frame_map_[one_image.location]);
 
-    dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea,
-                                 dock_widget,
-                                 center_docker_area_);
-    dock_widget->toggleView(true);
+    dock_widget->toggleView(false);
     ui->menuView->addAction(dock_widget->toggleViewAction());
   }
 

@@ -8,9 +8,8 @@ set(topology_msgs_DOWNLOAD_URL
 
 FetchContent_Declare(
   topology_msgs
-  URL ${topology_msgs_DOWNLOAD_URL}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-  OVERRIDE_FIND_PACKAGE)
+  URL "${topology_msgs_DOWNLOAD_URL}")
 
 FetchContent_GetProperties(topology_msgs)
 if(NOT topology_msgs_POPULATED)
