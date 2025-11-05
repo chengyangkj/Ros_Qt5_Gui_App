@@ -30,5 +30,5 @@ target_include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
  ${CMAKE_CURRENT_BINARY_DIR}
 )
-target_link_libraries(${TARGET_NAME} Qt5::Widgets Qt5::Core Qt5::Concurrent Qt5::Svg dockwidget::dockwidget nlohmann_json common basic channel plugin ${OpenCV_LIBS})
+target_link_libraries(${TARGET_NAME} Qt5::Widgets Qt5::Core Qt5::Concurrent Qt5::Svg dockwidget::dockwidget nlohmann_json common basic framework channel plugin ${OpenCV_LIBS})
 

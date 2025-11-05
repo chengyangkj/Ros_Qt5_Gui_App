@@ -7,10 +7,13 @@
  * @Description:
  */
 #include "display/laser_points.h"
+#include "core/framework/framework.h"
+#include "msg/msg_info.h"
 namespace Display {
 LaserPoints::LaserPoints(const std::string &display_type, const int &z_value,
                          std::string parent_name)
-    : VirtualDisplay(display_type, z_value, parent_name) {}
+    : VirtualDisplay(display_type, z_value, parent_name) {
+}
 void LaserPoints::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
                         QWidget *widget) {
@@ -21,15 +24,6 @@ void LaserPoints::paint(QPainter *painter,
 
 LaserPoints::~LaserPoints() {}
 
-bool LaserPoints::UpdateData(const std::any &data) {
-  if (data.type() == typeid(LaserScan)) {
-    auto laser_scan = std::any_cast<LaserScan>(data);
-    laser_data_scene_[laser_scan.id] = laser_scan.data;
-    computeBoundRect(laser_data_scene_);
-  }
-  update();
-  return true;
-}
 void LaserPoints::computeBoundRect(
     const std::map<int, std::vector<Point>> &laser_scan) {
   float xmax, xmin, ymax, ymin;
@@ -53,6 +47,12 @@ void LaserPoints::computeBoundRect(
 bool LaserPoints::SetDisplayConfig(const std::string &config_name,
                                    const std::any &config_data) {
   return true;
+}
+
+void LaserPoints::UpdateLaserData(int id, const std::vector<Point>& data) {
+  laser_data_scene_[id] = data;
+  computeBoundRect(laser_data_scene_);
+  update();
 }
 void LaserPoints::drawLaser(QPainter *painter, int id,
                             std::vector<Point> data) {

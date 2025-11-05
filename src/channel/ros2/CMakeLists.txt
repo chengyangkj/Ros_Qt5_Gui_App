@@ -34,6 +34,7 @@ target_link_libraries(${TARGET_NAME}
 PUBLIC
 basic
 common
+framework
 topology_msgs__rosidl_generator_cpp #消息类型的ROS库
 topology_msgs__rosidl_typesupport_cpp
 topology_msgs__rosidl_typesupport_fastrtps_cpp

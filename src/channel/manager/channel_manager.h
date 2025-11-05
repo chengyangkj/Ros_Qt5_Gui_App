@@ -32,13 +32,5 @@ class ChannelManager {
   /// @return channel list
   std::vector<std::string> DiscoveryAllChannel();
   VirtualChannelNode *GetChannel();
-  void RegisterOnDataCallback(
-      std::function<void(const MsgId &id, const std::any &data)> &&func) {
-    if (channel_ptr_ != nullptr) {
-      channel_ptr_->RegisterOnDataCallback(std::move(func));
-    }
-  }
   void CloseChannel();
-
-  void SendMessage(const MsgId &msg_id, const std::any &msg);
 };

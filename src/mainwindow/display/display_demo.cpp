@@ -18,14 +18,5 @@ void DisplayDemo::paint(QPainter *painter,
 }
 
 DisplayDemo::~DisplayDemo() {}
-bool DisplayDemo::UpdateData(const std::any &data) {
-  try {
-
-    update();
-  } catch (const std::bad_any_cast &e) {
-    LOG_ERROR("DisplayDemo UpdateData error: " << e.what());
-  }
-  return true;
-}
 void DisplayDemo::drawFrame(QPainter *painter) {}
 } // namespace Display

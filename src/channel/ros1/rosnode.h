@@ -15,9 +15,8 @@
 
 #include <tf/transform_listener.h>
 #include "virtual_channel_node.h"
+#include "core/framework/framework.h"
 class RosNode : public VirtualChannelNode {
- private:
-  /* data */
  public:
   RosNode(/* args */);
   ~RosNode() override;
@@ -26,7 +25,6 @@ class RosNode : public VirtualChannelNode {
   bool Start() override;
   bool Stop() override;
   std::string Name() { return "ROS1"; };
-  void SendMessage(const MsgId &msg_id, const std::any &msg) override;
 
  private:
   void init();

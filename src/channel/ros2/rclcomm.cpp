@@ -13,6 +13,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "config/config_manager.h"
 #include "logger/logger.h"
+#include "core/framework/framework.h"
 rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME("NavGoal", "/goal_pose")
   SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
@@ -166,65 +167,56 @@ bool rclcomm::Start() {
                   return;
                 }
               }
-              OnDataCallback(MsgId::kImage, std::pair<std::string, cv::Mat>(one_image_display.location, conversion_mat_));
+              PUBLISH(MSG_ID_IMAGE, (std::pair<std::string, cv::Mat>(one_image_display.location, conversion_mat_)));
             }));
   }
 
   tf_buffer_ = std::make_unique<tf2_ros::Buffer>(node->get_clock(), std::chrono::seconds(10));
   transform_listener_ =
       std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
+  
+  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const RobotPose& pose) {
+    std::cout << "recv nav goal pose:" << pose << std::endl;
+    PubNavGoal(pose);
+  });
+  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const RobotPose& pose) {
+    std::cout << "recv reloc pose:" << pose << std::endl;
+    PubRelocPose(pose);
+  });
+  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const RobotSpeed& speed) {
+    std::cout << "recv robot speed:" << speed << std::endl;
+    PubRobotSpeed(speed);
+  });
+  SUBSCRIBE(MSG_ID_TOPOLOGY_MAP_UPDATE, [this](const TopologyMap& topology_map) {
+    std::cout << "recv topology map update:" << topology_map.map_name << std::endl;
+    topology_msgs::msg::TopologyMap ros_msg = ConvertToRosMsg(topology_map);
+    topology_map_update_publisher_->publish(ros_msg);
+  });
+  SUBSCRIBE(MSG_ID_SET_MULTI_POINT_NAV, [this](const std::vector<RobotPose>& poses) {
+    std::cout << "recv multi point nav:" << poses.size() << std::endl;
+    PubMultiPointNav(poses);
+  });
+  
   init_flag_ = true;
   return true;
 }
+
 bool rclcomm::Stop() {
   rclcpp::shutdown();
   return true;
 }
-void rclcomm::SendMessage(const MsgId &msg_id, const std::any &msg) {
-  switch (msg_id) {
-    case MsgId::kSetNavGoalPose: {
-      auto pose = std::any_cast<basic::RobotPose>(msg);
-      std::cout << "recv nav goal pose:" << pose << std::endl;
 
-      PubNavGoal(pose);
-
-    } break;
-    case MsgId::kSetRelocPose: {
-      auto pose = std::any_cast<basic::RobotPose>(msg);
-      std::cout << "recv reloc pose:" << pose << std::endl;
-      PubRelocPose(pose);
-
-    } break;
-    case MsgId::kSetRobotSpeed: {
-      auto speed = std::any_cast<basic::RobotSpeed>(msg);
-      std::cout << "recv reloc pose:" << speed << std::endl;
-      PubRobotSpeed(speed);
-
-    } break;
-    case MsgId::kTopologyMapUpdate: {
-      auto topology_map = std::any_cast<TopologyMap>(msg);
-      std::cout << "recv topology map update:" << topology_map.map_name << std::endl;
-      topology_msgs::msg::TopologyMap ros_msg = ConvertToRosMsg(topology_map);
-      topology_map_update_publisher_->publish(ros_msg);
-    } break;
-    case MsgId::kSetMultiPointNav: {
-      auto poses = std::any_cast<std::vector<RobotPose>>(msg);
-      std::cout << "recv multi point nav:" << poses.size() << std::endl;
-      PubMultiPointNav(poses);
-    } break;
-    default:
-      break;
-  }
-}
 void rclcomm::BatteryCallback(
     const sensor_msgs::msg::BatteryState::SharedPtr msg) {
   std::map<std::string, std::string> map;
   map["percent"] = std::to_string(msg->percentage);
   map["voltage"] = std::to_string(msg->voltage);
-  OnDataCallback(MsgId::kBatteryState, map);
+  PUBLISH(MSG_ID_BATTERY_STATE, map);
 }
+
 void rclcomm::getRobotPose() {
-  OnDataCallback(MsgId::kRobotPose, getTransform(GET_TOPIC_NAME("BaseFrameId"), "map"));
+  auto pose = getTransform(GET_TOPIC_NAME("BaseFrameId"), "map");
+  PUBLISH(MSG_ID_ROBOT_POSE, pose);
 }
 /**
  * @description: 获取坐标变化
@@ -277,7 +269,7 @@ void rclcomm::odom_callback(const nav_msgs::msg::Odometry::SharedPtr msg) {
   double roll, pitch, yaw;
   mat.getRPY(roll, pitch, yaw);
   state.theta = yaw;
-  OnDataCallback(MsgId::kOdomPose, state);
+  PUBLISH(MSG_ID_ODOM_POSE, state);
 }
 void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   try {
@@ -300,7 +292,7 @@ void rclcomm::local_path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
       point.y = point_map_frame.point.y;
       path.push_back(point);
     }
-    OnDataCallback(MsgId::kLocalPath, path);
+    PUBLISH(MSG_ID_LOCAL_PATH, path);
   } catch (tf2::TransformException &ex) {
   }
 }
@@ -335,7 +327,7 @@ void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
       point.y = point_map_frame.point.y;
       path.push_back(point);
     }
-    OnDataCallback(MsgId::kGlobalPath, path);
+    PUBLISH(MSG_ID_GLOBAL_PATH, path);
   } catch (tf2::TransformException &ex) {
   }
 }
@@ -369,7 +361,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       laser_points.push_back(p);
     }
     laser_points.id = 0;
-    OnDataCallback(MsgId::kLaserScan, laser_points);
+    PUBLISH(MSG_ID_LASER_SCAN, laser_points);
   } catch (tf2::TransformException &ex) {
     // tf_buffer_->lookupTransform("map", "base_scan", tf2::TimePointZero);
   }
@@ -390,7 +382,7 @@ void rclcomm::globalCostMapCallback(
     cost_map(x, y) = msg->data[i];
   }
   cost_map.SetFlip();
-  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
+  PUBLISH(MSG_ID_GLOBAL_COST_MAP, cost_map);
 }
 void rclcomm::localCostMapCallback(
     const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
@@ -451,7 +443,7 @@ void rclcomm::localCostMapCallback(
         sized_cost_map(x, y) = 0;
       }
     }
-  OnDataCallback(MsgId::kLocalCostMap, sized_cost_map);
+  PUBLISH(MSG_ID_LOCAL_COST_MAP, sized_cost_map);
 }
 void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   double origin_x = msg->info.origin.position.x;
@@ -470,7 +462,7 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   new_map.SetFlip();
   
   occ_map_ = new_map;
-  OnDataCallback(MsgId::kOccupancyMap, new_map);
+  PUBLISH(MSG_ID_OCCUPANCY_MAP, new_map);
 }
 
 void rclcomm::PubRelocPose(const RobotPose &pose) {
@@ -528,7 +520,7 @@ void rclcomm::robotFootprintCallback(const geometry_msgs::msg::PolygonStamped::S
       footprint.push_back(p);
     }
     
-    OnDataCallback(MsgId::kRobotFootprint, footprint);
+    PUBLISH(MSG_ID_ROBOT_FOOTPRINT, footprint);
   } catch (tf2::TransformException &ex) {
     LOG_ERROR("robotFootprintCallback transform error: " << ex.what());
   }
@@ -627,7 +619,7 @@ void rclcomm::topologyMapCallback(const topology_msgs::msg::TopologyMap::SharedP
       LOG_INFO("route:" << route.first << " -> " << route_info.first << " controller:" << route_info.second.controller << " speed_limit:" << route_info.second.speed_limit);
     }
   }
-  OnDataCallback(MsgId::kTopologyMap, topology_map);
+  PUBLISH(MSG_ID_TOPOLOGY_MAP, topology_map);
 }
 
 void rclcomm::PubMultiPointNav(const std::vector<RobotPose> &poses) {

@@ -33,6 +33,7 @@
 #include "tf2_ros/transform_listener.h"
 #include "virtual_channel_node.h"
 #include "topology_msgs/msg/topology_map.hpp"
+#include "core/framework/framework.h"
 
 class rclcomm : public VirtualChannelNode {
  public:
@@ -63,7 +64,6 @@ class rclcomm : public VirtualChannelNode {
   void PubMultiPointNav(const std::vector<RobotPose> &poses);
   void PubRobotSpeed(const RobotSpeed &speed);
   basic::RobotPose getTransform(std::string from, std::string to);
-  void SendMessage(const MsgId &msg_id, const std::any &msg) override;
   TopologyMap ConvertFromRosMsg(const topology_msgs::msg::TopologyMap::SharedPtr msg);
   topology_msgs::msg::TopologyMap ConvertToRosMsg(const TopologyMap& topology_map);
 

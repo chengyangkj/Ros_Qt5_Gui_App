@@ -1,0 +1,48 @@
+set(TARGET_NAME framework)
+include(GTestHelper)
+
+file(GLOB_RECURSE SOURCE_FILE CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.cc)
+list(FILTER SOURCE_FILE EXCLUDE REGEX ".*_test\\.cpp$|.*_test\\.cc$")
+file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR} *.h *.hpp)
+
+add_library(${TARGET_NAME} SHARED
+    ${SOURCE_FILE}
+    ${INCLUDE_FILE}
+)
+
+target_include_directories(${TARGET_NAME} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+)
+
+find_package(Qt5 COMPONENTS Core QUIET)
+if(Qt5Core_FOUND)
+  target_link_libraries(${TARGET_NAME} PUBLIC common Qt5::Core)
+  target_compile_definitions(${TARGET_NAME} PUBLIC QT_CORE_LIB)
+else()
+  target_link_libraries(${TARGET_NAME} PUBLIC common)
+endif()
+
+set_target_properties(${TARGET_NAME} PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+    CXX_VISIBILITY_PRESET default
+    VISIBILITY_INLINES_HIDDEN OFF
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
+install(TARGETS ${TARGET_NAME}
+    RUNTIME DESTINATION bin/lib
+    LIBRARY DESTINATION bin/lib
+    ARCHIVE DESTINATION bin/lib
+)
+
+set(TEST_LINK_LIBRARIES ${TARGET_NAME})
+AddTest()
+
+if(BUILD_WITH_TEST AND TARGET ${TARGET_NAME}_test)
+  set_target_properties(${TARGET_NAME}_test PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+  )
+endif()
+

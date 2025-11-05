@@ -11,6 +11,8 @@
 #include "display/point_shape.h"
 #include "QDebug"
 #include "algorithm.h"
+#include "core/framework/framework.h"
+#include "msg/msg_info.h"
 #include <cmath>
 using namespace basic;
 #define circle_radius 20
@@ -43,7 +45,6 @@ PointShape::PointShape(const ePointType &type, const std::string &display_type,
                              robot_svg_renderer_.defaultSize().height()));
     } break;
   }
- 
 }
 QVariant PointShape::itemChange(GraphicsItemChange change,
                                 const QVariant &value) {
@@ -66,10 +67,10 @@ QVariant PointShape::itemChange(GraphicsItemChange change,
   };
   return QGraphicsItem::itemChange(change, value);
 }
-bool PointShape::UpdateData(const std::any &data) {
-  GetAnyData(RobotPose, data, robot_pose_);
+bool PointShape::UpdateData(const RobotPose &pose) {
+  robot_pose_ = pose;
   rotate_value_ = 0;
-  SetPoseInParent(robot_pose_);
+  SetPoseInParent(pose);
   update();
   return true;
 }

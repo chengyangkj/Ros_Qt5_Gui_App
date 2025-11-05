@@ -9,6 +9,7 @@
 #include "display/robot_shape.h"
 #include "algorithm.h"
 #include "msg/msg_info.h"
+#include "core/framework/framework.h"
 namespace Display {
 RobotShape::RobotShape(const std::string &display_type, const int &z_value,
                        std::string parent_name)
@@ -21,6 +22,22 @@ RobotShape::RobotShape(const std::string &display_type, const int &z_value,
   path_ = QPainterPath();
   SetBoundingRect(QRectF(0, 0, 0, 0));
   setZValue(10);
+  
+  SUBSCRIBE(MSG_ID_OCCUPANCY_MAP, [this](const OccupancyMap& data) {
+    map_data_ = data;
+    if (!robot_footprint_.empty()) {
+      updateFootprintPath();
+      update();
+    }
+  });
+  
+  SUBSCRIBE(MSG_ID_ROBOT_FOOTPRINT, [this](const RobotPath& data) {
+    robot_footprint_ = data;
+    updateFootprintPath();
+    rotate_value_ = 0;
+    SetPoseInParent(robot_pose_);
+    update();
+  });
 }
 
 void RobotShape::paint(QPainter *painter,
@@ -31,20 +48,6 @@ void RobotShape::paint(QPainter *painter,
 
 RobotShape::~RobotShape() {}
 
-bool RobotShape::UpdateData(const std::any &data) {
-  try {
-    // 检查是否是RobotFootprint数据
-    GetAnyData(RobotPath, data, robot_footprint_);
-    updateFootprintPath();
-  
-    rotate_value_ = 0;
-    SetPoseInParent(robot_pose_);
-    update();
-  } catch (const std::bad_any_cast &e) {
-    LOG_ERROR("RobotShape UpdateData error: " << e.what());
-  }
-  return true;
-}
 
 void RobotShape::updateFootprintPath() {
   path_ = QPainterPath(); // 创建新的空路径来替代 clear()

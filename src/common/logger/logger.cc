@@ -7,22 +7,22 @@ Logger* Logger::Instance() {
   return &logger;
 }
 Logger::Logger() {
-  int argc=0;
-  char** argv=nullptr;
+  int argc = 0;
+  char** argv = nullptr;
   START_EASYLOGGINGPP(argc, argv);
   el::Configurations defaultConf;
   defaultConf.setToDefault();
-  //设置最大文件大小
+  // 设置最大文件大小
   defaultConf.setGlobally(el::ConfigurationType::MaxLogFileSize, "100000000");
-  //是否写入文件
+  // 是否写入文件
   defaultConf.setGlobally(el::ConfigurationType::ToFile, "true");
-  //是否输出控制台
+  // 是否输出控制台
   defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
   // filename
   defaultConf.setGlobally(el::ConfigurationType::Filename,
                           "ros_qt_gui_app.log");
   defaultConf.setGlobally(el::ConfigurationType::Format, "[%datetime][%level] %msg");
-  //设置配置文件
+  // 设置配置文件
   el::Loggers::reconfigureLogger("default", defaultConf);
 
   /// 防止Fatal级别日志中断程序

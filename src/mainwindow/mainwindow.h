@@ -34,6 +34,9 @@
 #include "widgets/set_pose_widget.h"
 #include "widgets/speed_ctrl.h"
 #include "widgets/ratio_layouted_frame.h"
+#include "core/framework/framework.h"
+#include <memory>
+#include <vector>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -48,7 +51,6 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
  public slots:
   void signalCursorPose(QPointF pos);
-  void SendChannelMsg(const MsgId &id, const std::any &data);
   void RecvChannelMsg(const MsgId &id, const std::any &data);
   void updateOdomInfo(RobotState state);
   void RestoreState();
@@ -79,11 +81,13 @@ class MainWindow : public QMainWindow {
   QLabel *label_power_;
   ads::CDockAreaWidget *center_docker_area_;
   std::map<std::string, RatioLayoutedFrame *> image_frame_map_;
+  
  signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);
   
  private:
   void setupUi();
+  void SubscribeToMessageBus();
   bool openChannel();
   bool openChannel(const std::string &channel_name);
   void closeChannel();

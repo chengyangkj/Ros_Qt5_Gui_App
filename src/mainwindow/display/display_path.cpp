@@ -7,12 +7,30 @@
  * @Description:
  */
 #include "display/display_path.h"
+#include "core/framework/framework.h"
+#include "msg/msg_info.h"
 namespace Display {
 DisplayPath::DisplayPath(const std::string &display_type, const int &z_value,
                          std::string parent_name)
     : VirtualDisplay(display_type, z_value, parent_name) {
-  // enable_scale_ = false;
   setZValue(9);
+  
+  SUBSCRIBE(MSG_ID_OCCUPANCY_MAP, [this](const OccupancyMap& data) {
+    map_data_ = data;
+    if (!path_points_.empty()) {
+      update();
+    }
+  });
+  
+  if (display_type == DISPLAY_GLOBAL_PATH) {
+    SUBSCRIBE(MSG_ID_GLOBAL_PATH, [this](const RobotPath& data) {
+      updatePathPoints(data);
+    });
+  } else if (display_type == DISPLAY_LOCAL_PATH) {
+    SUBSCRIBE(MSG_ID_LOCAL_PATH, [this](const RobotPath& data) {
+      updatePathPoints(data);
+    });
+  }
 }
 void DisplayPath::paint(QPainter *painter,
                         const QStyleOptionGraphicsItem *option,
@@ -32,20 +50,6 @@ bool DisplayPath::SetDisplayConfig(const std::string &config_name,
   }
   return true;
 }
-bool DisplayPath::UpdateData(const std::any &data) {
-  try {
-    auto path_data = std::any_cast<RobotPath>(data);
-    computeBoundRect(path_data);
-    path_points_.clear();
-    for (auto one_path : path_data) {
-      path_points_.push_back(QPointF(one_path.x, one_path.y));
-    }
-    update();
-  } catch (const std::bad_any_cast &e) {
-    LOG_ERROR("DisplayPath UpdateData error: " << e.what());
-  }
-  return true;
-}
 void DisplayPath::drawPath(QPainter *painter) {
 
   painter->setRenderHints(QPainter::Antialiasing |
@@ -57,6 +61,27 @@ void DisplayPath::drawPath(QPainter *painter) {
   // }
   painter->drawPoints(path_points_);
 }
+void DisplayPath::updatePathPoints(const RobotPath& path) {
+  path_points_.clear();
+  
+  if (path.empty() || map_data_.Cols() == 0 || map_data_.Rows() == 0) {
+    SetBoundingRect(QRectF(0, 0, 0, 0));
+    update();
+    return;
+  }
+  
+  RobotPath path_data_trans;
+  for (auto one_point : path) {
+    double x, y;
+    map_data_.xy2ScenePose(one_point.x, one_point.y, x, y);
+    path_points_.push_back(QPointF(x, y));
+    path_data_trans.push_back(Point(x, y));
+  }
+  
+  computeBoundRect(path_data_trans);
+  update();
+}
+
 void DisplayPath::computeBoundRect(const RobotPath &path) {
   if (path.empty())
     return;
@@ -70,8 +95,6 @@ void DisplayPath::computeBoundRect(const RobotPath &path) {
     ymax = ymax > p.y ? ymax : p.y;
     ymin = ymin < p.y ? ymin : p.y;
   }
-  // std::cout << "xmax:" << xmax << "xmin:" << xmin << "ymax:" << ymax
-  //           << "ymin:" << ymin << std::endl;
-  SetBoundingRect(QRectF(xmin, ymin, xmax, ymax));
+  SetBoundingRect(QRectF(xmin, ymin, xmax - xmin, ymax - ymin));
 }
 } // namespace Display

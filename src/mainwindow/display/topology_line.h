@@ -60,8 +60,6 @@ class TopologyLine : public VirtualDisplay {
                const std::string &display_name = "");
   ~TopologyLine();
   
-  // 实现VirtualDisplay的纯虚函数
-  bool UpdateData(const std::any &data) override;
   void updateBoundingRect();
   
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,

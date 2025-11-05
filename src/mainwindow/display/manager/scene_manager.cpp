@@ -99,7 +99,8 @@ void SceneManager::UpdateTopologyMap(const TopologyMap &topology_map) {
     // 使用统一的坐标转换：世界坐标 -> 地图坐标
     auto robot_pose = point.ToRobotPose();
     auto map_pose = display_manager_->wordPose2Map(robot_pose);
-    goal_point->UpdateDisplay(map_pose);
+    goal_point->SetPoseInParent(map_pose);
+    goal_point->update();
     
     LOG_INFO("Update Point: " << point.name << " at world pose(" 
              << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
@@ -214,7 +215,7 @@ void SceneManager::AddPointAtRobotPosition() {
   
   // 世界坐标 -> 地图坐标
   auto map_pose = display_manager_->wordPose2Map(robot_pose);
-  goal_point->UpdateDisplay(map_pose);
+  goal_point->UpdateData(map_pose);
   
   // 添加到拓扑地图
   topology_map_.AddPoint(TopologyMap::PointInfo(robot_pose, name));
@@ -269,7 +270,7 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       auto world_pose = display_manager_->scenePoseToWord(scene_pose);
       auto map_pose = display_manager_->wordPose2Map(world_pose);
       
-      goal_point->UpdateDisplay(map_pose);
+      goal_point->UpdateData(map_pose);
       topology_map_.AddPoint(TopologyMap::PointInfo(world_pose, name));
 
       
@@ -626,7 +627,8 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
 
             // 更新显示位置：世界坐标 -> 地图坐标
             auto map_pose = display_manager_->wordPose2Map(pose);
-            display->UpdateDisplay(map_pose);
+            display->SetPoseInParent(map_pose);
+            display->update();
             
             // 同步更新拓扑地图中的点坐标
             topology_map_.UpdatePoint(point_name, TopologyMap::PointInfo(pose, point_name));

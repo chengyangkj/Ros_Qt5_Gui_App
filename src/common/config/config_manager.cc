@@ -53,7 +53,7 @@ bool ConfigManager::ReadRootConfig() {
     nlohmann::json j;
     file >> j;
     config_root_ = j.get<Config::ConfigRoot>();
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     fprintf(stderr, "Error parsing config.json error: %s\n", e.what());
     std::exit(1);
   }
@@ -117,7 +117,7 @@ bool ConfigManager::ReadTopologyMap(const std::string &map_path,
     nlohmann::json j;
     file >> j;
     map = j.get<TopologyMap>();
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     fprintf(stderr, "Error parsing struct %s\n", e.what());
     file.close();
     return false;

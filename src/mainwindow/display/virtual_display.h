@@ -23,12 +23,14 @@
 #include <any>
 #include <algorithm>
 #include <iostream>
-#include <mutex>
 #include "msg/msg_info.h"
 
 #include "display_defines.h"
 #include "occupancy_map.h"
 #include "point_type.h"
+#include "core/framework/framework.h"
+#include <vector>
+#include <memory>
 using namespace basic;
 #define GetAnyData(type, data, res_data)    \
   {                                         \
@@ -40,20 +42,6 @@ using namespace basic;
   }
 
 namespace Display {
-#define DISPLAY_ROBOT ToString(MsgId::kRobotPose)
-#define DISPLAY_MAP ToString(MsgId::kOccupancyMap)
-#define DISPLAY_LOCAL_COST_MAP ToString(MsgId::kLocalCostMap)
-#define DISPLAY_GLOBAL_COST_MAP ToString(MsgId::kGlobalCostMap)
-#define DISPLAY_GLOBAL_PATH ToString(MsgId::kGlobalPath)
-#define DISPLAY_LOCAL_PATH ToString(MsgId::kLocalPath)
-#define DISPLAY_LASER ToString(MsgId::kLaserScan)
-#define DISPLAY_PARTICLE "Particle"
-#define DISPLAY_REGION "Region"
-#define DISPLAY_TAG "Tag"
-#define DISPLAY_GOAL "GoalPose"
-#define DISPLAY_TOPOLINE "TopologyLine"
-#define DISPLAY_ROBOT_FOOTPRINT ToString(MsgId::kRobotFootprint)
-#define DISPLAY_TOPOLOGY_MAP ToString(MsgId::kTopologyMap)
 
 
 
@@ -76,7 +64,6 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   QRectF bounding_rect_;
   QTransform transform_;
   double rotate_value_{0};
-  OccupancyMap map_data_;
   QPointF rotate_center_;
   bool enable_rotate_{false};
   std::string parent_name_;
@@ -86,14 +73,6 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   std::vector<VirtualDisplay *> children_;
   bool is_moving_{false};
   std::string display_name_;
-  std::mutex display_name_mutex_;
-  
-  // 状态相关的互斥锁
-  std::mutex state_mutex_;  // 保护 scale_value_, rotate_value_, move_enable_, is_moving_
-  std::mutex pose_mutex_;   // 保护 curr_scene_pose_, pose_in_parent_
-  std::mutex map_data_mutex_;  // 保护 map_data_
-  std::mutex geometry_mutex_;  // 保护 bounding_rect_
-  std::mutex metadata_mutex_;  // 保护 display_type_, parent_name_, children_
 
   double min_scale_value_{0.1};
   double max_scale_value_{20};
@@ -107,26 +86,19 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   VirtualDisplay(const std::string &display_type, const int &z_value,
                  const std::string &parent_name, std::string display_name = "");
   virtual ~VirtualDisplay();
-  bool UpdateDisplay(const std::any &data) { return UpdateData(data); }
   VirtualDisplay *SetRotateEnable(const bool &enable) {
-    std::lock_guard<std::mutex> lock(state_mutex_);
     enable_rotate_ = enable;
     return this;
   }
   double GetScaleValue() { 
-    std::lock_guard<std::mutex> lock(state_mutex_);
     return scale_value_; 
   }
   VirtualDisplay *SetScaleEnable(const bool &enable) {
-    std::lock_guard<std::mutex> lock(state_mutex_);
     enable_scale_ = enable;
     return this;
   }
   VirtualDisplay *SetMoveEnable(const bool &enable) {
-    {
-      std::lock_guard<std::mutex> lock(state_mutex_);
-      move_enable_ = enable;
-    }
+    move_enable_ = enable;
     if (enable) {
       // 只有响应的图层才响应鼠标事件
       setAcceptHoverEvents(true);
@@ -139,47 +111,33 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
     return this;
   }
   bool GetMoveEnable() { 
-    std::lock_guard<std::mutex> lock(state_mutex_);
     return move_enable_; 
   }
 
   void AddChild(VirtualDisplay *child) { 
-    std::lock_guard<std::mutex> lock(metadata_mutex_);
     children_.push_back(child); 
   }
 
   void RemoveChild(VirtualDisplay *child) {
-    std::lock_guard<std::mutex> lock(metadata_mutex_);
     children_.erase(std::remove(children_.begin(), children_.end(), child),
                     children_.end());
   }
 
   std::vector<VirtualDisplay *> GetChildren() { 
-    std::lock_guard<std::mutex> lock(metadata_mutex_);
     return children_; 
   }
 
-  void UpdateMap(const OccupancyMap &map) { 
-    std::lock_guard<std::mutex> lock(map_data_mutex_);
-    map_data_ = map;
-  }
-
   double GetRotate() { 
-    std::lock_guard<std::mutex> lock(state_mutex_);
     return rotate_value_; 
   }
-  
-  virtual bool UpdateData(const std::any &data) = 0;
   virtual bool SetDisplayConfig(const std::string &config_name,
                                 const std::any &config_data);
   bool SetScaled(const double &value);
   bool SetRotate(const double &value);
   void SetBoundingRect(QRectF rect) { 
-    std::lock_guard<std::mutex> lock(geometry_mutex_);
     bounding_rect_ = rect; 
   }
   QPointF GetOriginPose() { 
-    std::lock_guard<std::mutex> lock(geometry_mutex_);
     return bounding_rect_.topLeft(); 
   }
   QPointF GetOriginPoseScene() { return mapToScene(GetOriginPose()); }
@@ -188,25 +146,20 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
   }
   void CenterOnScene(QPointF pose);
   bool IsMoving() { 
-    std::lock_guard<std::mutex> lock(state_mutex_);
     return is_moving_; 
   }
   void UpdatePose(const RobotPose &pose) { SetPoseInParent(pose); }
   void SetPoseInParent(const RobotPose &pose);
   RobotPose GetCurrentScenePose() { 
-    std::lock_guard<std::mutex> lock(pose_mutex_);
     return curr_scene_pose_; 
   }
   RobotPose GetPoseInParent() { 
-    std::lock_guard<std::mutex> lock(pose_mutex_);
     return pose_in_parent_; 
   }
   std::string GetParentName() { 
-    std::lock_guard<std::mutex> lock(metadata_mutex_);
     return parent_name_; 
   }
   std::string GetDisplayName() { 
-    std::lock_guard<std::mutex> lock(display_name_mutex_);
     return display_name_; }
   //设置原点在全局的坐标
   void SetOriginPoseInScene(const QPointF &pose) {
@@ -220,7 +173,6 @@ class VirtualDisplay : public QObject, public QGraphicsItem {
 
  private:
   void SetDisplayName(const std::string &name) { 
-    std::lock_guard<std::mutex> lock(display_name_mutex_);
     display_name_ = name; 
   }
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;

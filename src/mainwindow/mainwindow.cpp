@@ -66,39 +66,31 @@ bool MainWindow::openChannel(const std::string &channel_name) {
   return false;
 }
 void MainWindow::registerChannel() {
-  channel_manager_.RegisterOnDataCallback(
-      std::move([this](const MsgId &id, const std::any &data) {
-        emit OnRecvChannelData(id, data);
-      }));
+  SubscribeToMessageBus();
 }
-void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
-  switch (id) {
-    case MsgId::kOdomPose:
-      updateOdomInfo(std::any_cast<RobotState>(data));
-      break;
-    case MsgId::kRobotPose: {
-      nav_goal_table_view_->UpdateRobotPose(std::any_cast<RobotPose>(data));
-      auto robot_pose = std::any_cast<RobotPose>(data);
+
+void MainWindow::SubscribeToMessageBus() {
+  SUBSCRIBE(MSG_ID_ODOM_POSE, [this](const RobotState& data) {
+    updateOdomInfo(data);
+  });
+  SUBSCRIBE(MSG_ID_ROBOT_POSE, [this](const RobotPose& robot_pose) {
+      nav_goal_table_view_->UpdateRobotPose(robot_pose);
       label_pos_robot_->setText("Robot: (" + QString::number(robot_pose.x, 'f', 2) + ", " + 
                                 QString::number(robot_pose.y, 'f', 2) + ", " + 
                                 QString::number(robot_pose.theta, 'f', 2) + ")");
-    } break;
-    case MsgId::kBatteryState: {
-      std::map<std::string, std::string> map =
-          std::any_cast<std::map<std::string, std::string>>(data);
-      this->SlotSetBatteryStatus(std::stod(map["percent"]),
-                                 std::stod(map["voltage"]));
-
-    } break;
-    case MsgId::kImage: {
-      auto location_to_mat = std::any_cast<std::pair<std::string, std::shared_ptr<cv::Mat>>>(data);
-
+  });
+  SUBSCRIBE(MSG_ID_BATTERY_STATE, [this](const std::map<std::string, std::string>& map) {
+    this->SlotSetBatteryStatus(std::stod(map.at("percent")),
+                               std::stod(map.at("voltage")));
+  });
+  SUBSCRIBE(MSG_ID_IMAGE, [this](const std::pair<std::string, std::shared_ptr<cv::Mat>>& location_to_mat) {
       this->SlotRecvImage(location_to_mat.first, location_to_mat.second);
-    } break;
-    default:
-      break;
-  }
-  display_manager_->UpdateTopicData(id, data);
+  });
+}
+
+void MainWindow::RecvChannelMsg(const MsgId &id, const std::any &data) {
+  // 保留此方法以兼容现有代码，但不再使用
+  // 数据现在通过 message_bus 订阅接收
 }
 
 
@@ -107,9 +99,6 @@ void MainWindow::SlotRecvImage(const std::string &location, std::shared_ptr<cv::
     QImage image(data->data, data->cols, data->rows, data->step[0], QImage::Format_RGB888);
     image_frame_map_[location]->setImage(image);
   }
-}
-void MainWindow::SendChannelMsg(const MsgId &id, const std::any &data) {
-  channel_manager_.SendMessage(id, data);
 }
 void MainWindow::closeChannel() { channel_manager_.CloseChannel(); }
 MainWindow::~MainWindow() { delete ui; }
@@ -594,7 +583,7 @@ void MainWindow::setupUi() {
   speed_ctrl_widget_ = new SpeedCtrlWidget();
   connect(speed_ctrl_widget_, &SpeedCtrlWidget::signalControlSpeed,
           [this](const RobotSpeed &speed) {
-            SendChannelMsg(MsgId::kSetRobotSpeed, speed);
+            PUBLISH(MSG_ID_SET_ROBOT_SPEED, speed);
           });
   ads::CDockWidget *SpeedCtrlDockWidget = new ads::CDockWidget("SpeedCtrl");
   SpeedCtrlDockWidget->setWidget(speed_ctrl_widget_);
@@ -708,7 +697,7 @@ void MainWindow::setupUi() {
   nav_goal_list_dock_widget->toggleView(false);
   connect(nav_goal_table_view_, &NavGoalTableView::signalSendNavGoal,
           [this](const RobotPose &pose) {
-            SendChannelMsg(MsgId::kSetNavGoalPose, pose);
+            PUBLISH(MSG_ID_SET_NAV_GOAL_POSE, pose);
           });
   connect(btn_load_task_chain, &QPushButton::clicked, [this]() {
     QString fileName = QFileDialog::getOpenFileName(nullptr, "Open JSON file",
@@ -791,16 +780,16 @@ void MainWindow::setupUi() {
           this, SLOT(RecvChannelMsg(const MsgId &, const std::any &)), Qt::BlockingQueuedConnection);
   connect(display_manager_, &Display::DisplayManager::signalPub2DPose,
           [this](const RobotPose &pose) {
-            SendChannelMsg(MsgId::kSetRelocPose, pose);
+            PUBLISH(MSG_ID_SET_RELOC_POSE, pose);
           });
   connect(display_manager_, &Display::DisplayManager::signalPub2DGoal,
           [this](const RobotPose &pose) {
-            SendChannelMsg(MsgId::kSetNavGoalPose, pose);
+            PUBLISH(MSG_ID_SET_NAV_GOAL_POSE, pose);
           });
   connect(display_manager_, &Display::DisplayManager::signalPubMultiPointNav,
           [this](const std::vector<RobotPose> &poses) {
             if (poses.size() > 0) {
-              SendChannelMsg(MsgId::kSetMultiPointNav, poses);
+              PUBLISH(MSG_ID_SET_MULTI_POINT_NAV, poses);
             } else {
               QMessageBox::warning(this, "警告", "没有找到路径");
             }
@@ -855,7 +844,7 @@ void MainWindow::setupUi() {
     auto topology_map = display_manager_->GetTopologyMap();
 
     //发送到ROS
-    SendChannelMsg(MsgId::kTopologyMapUpdate, topology_map);
+    PUBLISH(MSG_ID_TOPOLOGY_MAP_UPDATE, topology_map);
 
     std::string topology_path = mapPath + ".topology";
     Config::ConfigManager::Instacnce()->WriteTopologyMap(topology_path, topology_map);

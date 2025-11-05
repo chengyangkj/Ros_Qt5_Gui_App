@@ -3,11 +3,14 @@
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
 #include "display/manager/display_manager.h"
+#include "display/point_shape.h"
+#include "display/laser_points.h"
 #include <Eigen/Eigen>
 #include <QOpenGLWidget>
 #include "algorithm.h"
 #include "display/manager/scene_manager.h"
 #include "logger/logger.h"
+#include "core/framework/framework.h"
 namespace Display {
 
 DisplayManager::DisplayManager() {
@@ -51,10 +54,35 @@ DisplayManager::DisplayManager() {
   // 设置默认地图图层响应鼠标事件
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_MAP);
   InitUi();
+  
+  SUBSCRIBE(MSG_ID_TOPOLOGY_MAP, [this](const TopologyMap& data) {
+    scene_manager_ptr_->UpdateTopologyMap(data);
+  });
+  
+  SUBSCRIBE(MSG_ID_OCCUPANCY_MAP, [this](const OccupancyMap& data) {
+    map_data_ = data;
+    if (!init_flag_) {
+      scene_manager_ptr_->LoadTopologyMap();
+      init_flag_ = true;
+    }
+  });
+
+  SUBSCRIBE(MSG_ID_ROBOT_POSE, [this](const RobotPose& data) {
+    // LOG_INFO("robot pose update:" << data.x << " " << data.y << " " << data.theta);
+    if (!is_reloc_mode_) {
+      UpdateRobotPose(data);
+    }
+  });
+
+  SUBSCRIBE(MSG_ID_LASER_SCAN, [this](const LaserScan& data) {
+    auto* laser_display = dynamic_cast<LaserPoints*>(GetDisplay(DISPLAY_LASER));
+    if (laser_display) {
+      std::vector<Point> transformed_points = transLaserPoint(data.data);
+      laser_display->UpdateLaserData(data.id, transformed_points);
+    }
+  });
 }
-void DisplayManager::UpdateTopicData(const MsgId &id, const std::any &data) {
-  UpdateDisplay(ToString(id), data);
-}
+
 void DisplayManager::slotSetRobotPose(const RobotPose &pose) {
   FactoryDisplay::Instance()->SetMoveEnable(DISPLAY_ROBOT, false);
   UpdateRobotPose(pose);
@@ -120,72 +148,6 @@ bool DisplayManager::SetDisplayConfig(const std::string &config_name,
   }
   return display->SetDisplayConfig(config_list[1].toStdString(), data);
 }
-bool DisplayManager::UpdateDisplay(const std::string &display_type,
-                                   const std::any &data) {
-  // std::cout << "update display:" << display_type << std::endl;/
-  VirtualDisplay *display = GetDisplay(display_type);
-
-  //display不存在的情况
-  if (!display) {
-     //更新拓扑地图数据
-     if (display_type == DISPLAY_TOPOLOGY_MAP) {
-      TopologyMap topology_map;
-      GetAnyData(TopologyMap, data, topology_map);
-      scene_manager_ptr_->UpdateTopologyMap(topology_map);
-      return true;
-    }
-    return false;
-  }
-
-  //根据display类型更新对应display的数据
-  if (display_type == DISPLAY_MAP) {
-    display->UpdateDisplay(data);
-    GetAnyData(OccupancyMap, data, map_data_);
-    // 所有图层更新地图数据
-    for (auto [name, display] :
-         FactoryDisplay::Instance()->GetTotalDisplayMap()) {
-      display->UpdateMap(map_data_);
-    }
-    if (!init_flag_) {
-      scene_manager_ptr_->LoadTopologyMap();
-      init_flag_ = true;
-    }
-
-  } else if (display_type == DISPLAY_ROBOT) {
-    //重定位时屏蔽位置更新
-    if (!is_reloc_mode_) {
-      GetAnyData(RobotPose, data, robot_pose_);
-      UpdateRobotPose(robot_pose_);
-    }
-  } else if (display_type == DISPLAY_LASER) {
-    LaserScan laser_scan;
-    GetAnyData(LaserScan, data, laser_scan)
-    // 点坐标转换为图元坐标系下
-
-    laser_scan.data = transLaserPoint(laser_scan.data);
-
-    display->UpdateDisplay(laser_scan);
-  } else if (display_type == DISPLAY_GLOBAL_PATH ||
-             display_type == DISPLAY_LOCAL_PATH) {
-    // 激光坐标转换为地图的图元坐标
-    RobotPath path_data;
-    RobotPath path_data_trans;
-    GetAnyData(RobotPath, data, path_data);
-    for (auto one_points : path_data) {
-      // std::cout << "location:" << one_laser.first << std::endl;
-      // 转换为图元坐标系
-      double x, y;
-      map_data_.xy2ScenePose(one_points.x, one_points.y, x, y);
-      path_data_trans.push_back(Point(x, y));
-    }
-    display->UpdateDisplay(path_data_trans);
-  } else {
-    display->UpdateDisplay(data);
-  }
-  return true;
-}
-
-
 /**
  * @description:坐标系转换为图元坐标系
  * @return {*}
@@ -214,7 +176,11 @@ DisplayManager::transLaserPoint(const std::vector<Point> &point) {
  */
 void DisplayManager::UpdateRobotPose(const RobotPose &pose) {
   robot_pose_ = pose;
-  GetDisplay(DISPLAY_ROBOT)->UpdateDisplay(wordPose2Map(pose));
+  auto* robot_display = dynamic_cast<PointShape*>(GetDisplay(DISPLAY_ROBOT));
+  if (robot_display) {
+    robot_display->UpdateData(wordPose2Map(pose));
+    robot_display->update();
+  }
 }
 
 void DisplayManager::updateScaled(double value) {
@@ -320,9 +286,6 @@ void DisplayManager::SetEditMapMode(MapEditMode mode) { scene_manager_ptr_->SetE
 void DisplayManager::AddOneNavPoint() { scene_manager_ptr_->AddOneNavPoint(); }
 void DisplayManager::AddPointAtRobotPosition() { scene_manager_ptr_->AddPointAtRobotPosition(); }
 OccupancyMap &DisplayManager::GetMap() { return map_data_; }
-void DisplayManager::UpdateMap(OccupancyMap &) {
-  emit signalPubMap(map_data_);
-}
 OccupancyMap DisplayManager::GetOccupancyMap() {
   auto display_map_ = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
   if (display_map_ != nullptr) {
@@ -332,8 +295,7 @@ OccupancyMap DisplayManager::GetOccupancyMap() {
 }
 
 void DisplayManager::UpdateOCCMap(const OccupancyMap &map) {
-  map_data_ = map;
-  UpdateDisplay(DISPLAY_MAP, map);
+  PUBLISH(MSG_ID_OCCUPANCY_MAP, map);
 }
 
 TopologyMap DisplayManager::GetTopologyMap() {
@@ -341,7 +303,7 @@ TopologyMap DisplayManager::GetTopologyMap() {
 }
 
 void DisplayManager::UpdateTopologyMap(const TopologyMap &topology_map) {
-  scene_manager_ptr_->UpdateTopologyMap(topology_map);
+  PUBLISH(MSG_ID_TOPOLOGY_MAP, topology_map);
 }
 void DisplayManager::SetScaleBig() {
   FactoryDisplay::Instance()

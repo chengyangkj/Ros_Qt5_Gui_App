@@ -73,14 +73,14 @@ class DisplayManager : public QObject {
   void AddPointAtRobotPosition();
   void slotRobotScenePoseChanged(const RobotPose &pose);
   void slotSetRobotPose(const RobotPose &pose);
-  void UpdateTopicData(const MsgId &id, const std::any &data);
   void FocusDisplay(const std::string &display_type);
+  void SetScaleBig();
+  void SetScaleSmall();
+
   OccupancyMap GetOccupancyMap();
   void UpdateOCCMap(const OccupancyMap &map);
   TopologyMap GetTopologyMap();
   void UpdateTopologyMap(const TopologyMap &topology_map);
-  void SetScaleBig();
-  void SetScaleSmall();
 
  private:
   void InitUi();
@@ -99,13 +99,11 @@ class DisplayManager : public QObject {
   RobotPose mapPose2Word(const RobotPose &pose);
   RobotPose scenePoseToWord(const RobotPose &pose);
   RobotPose scenePoseToMap(const RobotPose &pose);
-  bool UpdateDisplay(const std::string &display_type, const std::any &data);
   void UpdateRobotPose(const RobotPose &pose);
   bool SetDisplayConfig(const std::string &config_name, const std::any &data);
   void SetRelocMode(bool is_move);
   void SetNavGoalMode(bool is_start);
   OccupancyMap &GetMap();
-  void UpdateMap(OccupancyMap &);
   RobotPose GetRobotPose() { return robot_pose_; }
   void SetFocusOn(const std::string &display_type) {
     focus_display_ = display_type;

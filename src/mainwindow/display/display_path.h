@@ -21,11 +21,13 @@ class DisplayPath : public VirtualDisplay {
  private:
   QColor color_;
   QPolygonF path_points_;
+  OccupancyMap map_data_;
 
  private:
   void drawPath(QPainter *painter);
 
   void computeBoundRect(const RobotPath &path);
+  void updatePathPoints(const RobotPath& path);
 
  public:
   DisplayPath(const std::string &display_type, const int &z_value,
@@ -35,6 +37,5 @@ class DisplayPath : public VirtualDisplay {
                         const std::any &config_data) override;
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
-  bool UpdateData(const std::any &data) override;
 };
 }  // namespace Display

@@ -16,6 +16,7 @@
 #include <limits>
 #include "config/config_manager.h"
 #include "virtual_display.h"
+#include "occupancy_map.h"
 namespace Display {
 
 class RobotShape : public VirtualDisplay {
@@ -23,6 +24,7 @@ class RobotShape : public VirtualDisplay {
   QPainterPath path_;
   RobotPose robot_pose_{0, 0, 0};
   RobotPath robot_footprint_;  // 存储RobotFootprint数据
+  OccupancyMap map_data_;  // 地图数据，用于坐标转换
   QColor color_{0x1E90FF};
   float opacity_{0.5};
 
@@ -36,7 +38,6 @@ class RobotShape : public VirtualDisplay {
   ~RobotShape();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
-  bool UpdateData(const std::any &data) override;
 };
 
 }  // namespace Display

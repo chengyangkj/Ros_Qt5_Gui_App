@@ -30,7 +30,7 @@ class PointShape : public VirtualDisplay {
              std::string parent_name = "");
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
-  bool UpdateData(const std::any &data) override;
+  bool UpdateData(const RobotPose &pose);
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data) override;
   // void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;

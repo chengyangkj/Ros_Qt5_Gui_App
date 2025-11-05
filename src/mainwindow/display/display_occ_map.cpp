@@ -10,28 +10,20 @@
 #include <QtConcurrent>
 #include <algorithm>
 #include <iostream>
+#include "core/framework/framework.h"
+#include "msg/msg_info.h"
+#include "display/manager/display_factory.h"
 namespace Display {
 DisplayOccMap::DisplayOccMap(const std::string &display_type,
                              const int &z_value, std::string parent_name)
     : VirtualDisplay(display_type, z_value, parent_name) {
   SetMoveEnable(true);
-}
-bool DisplayOccMap::UpdateData(const std::any &data) {
-  try {
-    if (data.type() == typeid(OccupancyMap)) {
-      map_data_ = std::any_cast<OccupancyMap>(data);
-    }
-
-  } catch (const std::bad_any_cast &e) {
-    LOG_ERROR("DisplayOccMap UpdateData error: " << e.what());
-    return false;
-  }
-
-  ParseOccupyMap();
-
-  // std::cout << "map update calling:" << map_image_.width() << " "
-  //           << map_image_.height() << std::endl;
-  return true;
+  SUBSCRIBE(MSG_ID_OCCUPANCY_MAP, [this](const OccupancyMap& data) {
+    map_data_ = data;
+    ParseOccupyMap();
+    LOG_INFO("map update calling:" << map_image_.width() << " "
+            << map_image_.height() << std::endl);
+  });
 }
 bool DisplayOccMap::SetDisplayConfig(const std::string &config_name,
                                      const std::any &config_data) {

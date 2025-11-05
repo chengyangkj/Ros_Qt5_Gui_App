@@ -10,24 +10,27 @@
 #include <iostream>
 
 #include "display/display_cost_map.h"
+#include "core/framework/framework.h"
+#include "msg/msg_info.h"
 namespace Display {
 DisplayCostMap::DisplayCostMap(const std::string &display_type,
                                const int &z_value, std::string parent_name)
     : VirtualDisplay(display_type, z_value, parent_name) {
-}
-bool DisplayCostMap::UpdateData(const std::any &data) {
-  try {
-    if (data.type() == typeid(OccupancyMap))
-      cost_map_data_ = std::any_cast<OccupancyMap>(data);
-  } catch (const std::bad_any_cast &e) {
-    LOG_ERROR("DisplayCostMap UpdateData error: " << e.what());
-    return false;
+  if (display_type == DISPLAY_GLOBAL_COST_MAP) {
+    SUBSCRIBE(MSG_ID_GLOBAL_COST_MAP, [this](const OccupancyMap& data) {
+      cost_map_data_ = data;
+      ParseCostMap();
+      SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
+      update();
+    });
+  } else if (display_type == DISPLAY_LOCAL_COST_MAP) {
+    SUBSCRIBE(MSG_ID_LOCAL_COST_MAP, [this](const OccupancyMap& data) {
+      cost_map_data_ = data;
+      ParseCostMap();
+      SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
+      update();
+    });
   }
-  ParseCostMap();
-  //绘制原点在地图中心
-  SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
-  update();
-  return true;
 }
 bool DisplayCostMap::SetDisplayConfig(const std::string &config_name,
                                       const std::any &config_data) {

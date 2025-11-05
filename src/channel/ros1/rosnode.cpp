@@ -67,6 +67,20 @@ bool RosNode::Start() {
   }
   ros::start();
   init();
+  
+  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const RobotPose& pose) {
+    std::cout << "recv nav goal pose:" << pose << std::endl;
+    PubNavGoal(pose);
+  });
+  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const RobotPose& pose) {
+    std::cout << "recv reloc pose:" << pose << std::endl;
+    PubRelocPose(pose);
+  });
+  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const RobotSpeed& speed) {
+    std::cout << "recv robot speed:" << speed << std::endl;
+    PubRobotSpeed(speed);
+  });
+  
   return true;
 }
 void RosNode::init() {
@@ -154,7 +168,7 @@ void RosNode::init() {
                 }
               }
 
-              OnDataCallback(MsgId::kImage, std::pair<std::string, std::shared_ptr<cv::Mat>>(one_image_display.location, std::make_shared<cv::Mat>(conversion_mat_)));
+              PUBLISH(MSG_ID_IMAGE, std::pair<std::string, std::shared_ptr<cv::Mat>>(one_image_display.location, std::make_shared<cv::Mat>(conversion_mat_)));
             })));
   }
 
@@ -166,37 +180,11 @@ bool RosNode::Stop() {
   ros::shutdown();
   return true;
 }
-void RosNode::SendMessage(const MsgId &msg_id, const std::any &msg) {
-  switch (msg_id) {
-    case MsgId::kSetNavGoalPose: {
-      auto pose = std::any_cast<basic::RobotPose>(msg);
-      std::cout << "recv nav goal pose:" << pose << std::endl;
-
-      PubNavGoal(pose);
-
-    } break;
-    case MsgId::kSetRelocPose: {
-      auto pose = std::any_cast<basic::RobotPose>(msg);
-      std::cout << "recv reloc pose:" << pose << std::endl;
-      PubRelocPose(pose);
-
-    } break;
-    case MsgId::kSetRobotSpeed: {
-      auto speed = std::any_cast<basic::RobotSpeed>(msg);
-      std::cout << "recv speed pose:" << speed << std::endl;
-      PubRobotSpeed(speed);
-
-    } break;
-    default:
-      break;
-  }
-}
-
 void RosNode::BatteryCallback(sensor_msgs::BatteryState::ConstPtr battery) {
   std::map<std::string, std::string> map;
   map["percent"] = std::to_string(battery->percentage);
   map["voltage"] = std::to_string(battery->voltage);
-  OnDataCallback(MsgId::kBatteryState, map);
+  PUBLISH(MSG_ID_BATTERY_STATE, map);
 }
 // void RosNode::MbStatusCallback(actionlib_msgs::GoalStatusArray::ConstPtr msg) {
 
@@ -207,7 +195,7 @@ void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
   state.vx = (double)msg->twist.twist.linear.x;
   state.vy = (double)msg->twist.twist.linear.y;
   state.w = (double)msg->twist.twist.angular.z;
-  OnDataCallback(MsgId::kOdomPose, state);
+  PUBLISH(MSG_ID_ODOM_POSE, state);
 }
 void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   double origin_x = msg->info.origin.position.x;
@@ -224,7 +212,7 @@ void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     occ_map_(x, y) = msg->data[i];
   }
   occ_map_.SetFlip();
-  OnDataCallback(MsgId::kOccupancyMap, occ_map_);
+  PUBLISH(MSG_ID_OCCUPANCY_MAP, occ_map_);
 }
 void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   if (occ_map_.cols == 0 || occ_map_.rows == 0)
@@ -273,7 +261,7 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
         sized_cost_map(x, y) = 0;
       }
     }
-  OnDataCallback(MsgId::kLocalCostMap, sized_cost_map);
+  PUBLISH(MSG_ID_LOCAL_COST_MAP, sized_cost_map);
 }
 void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   int width = msg->info.width;
@@ -289,7 +277,7 @@ void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     cost_map(x, y) = msg->data[i];
   }
   cost_map.SetFlip();
-  OnDataCallback(MsgId::kGlobalCostMap, cost_map);
+  PUBLISH(MSG_ID_GLOBAL_COST_MAP, cost_map);
 }
 // 激光雷达点云话题回调
 void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
@@ -324,7 +312,7 @@ void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
     // "base_link"); std::cout << "get transform" << pose.x << " " << pose.y
     // << " " << pose.theta
     //           << std::endl;
-    OnDataCallback(MsgId::kLaserScan, laser_points);
+    PUBLISH(MSG_ID_LASER_SCAN, laser_points);
   } catch (tf2::TransformException &ex) {
   }
 }
@@ -347,7 +335,7 @@ void RosNode::GlobalPathCallback(nav_msgs::Path::ConstPtr msg) {
       point.y = point_map_frame.point.y;
       path.push_back(point);
     }
-    OnDataCallback(MsgId::kGlobalPath, path);
+    PUBLISH(MSG_ID_GLOBAL_PATH, path);
   } catch (tf2::TransformException &ex) {
   }
 }
@@ -370,7 +358,7 @@ void RosNode::LocalPathCallback(nav_msgs::Path::ConstPtr msg) {
       point.y = point_map_frame.point.y;
       path.push_back(point);
     }
-    OnDataCallback(MsgId::kLocalPath, path);
+    PUBLISH(MSG_ID_LOCAL_PATH, path);
   } catch (tf2::TransformException &ex) {
   }
 }
@@ -412,7 +400,7 @@ void RosNode::PubRobotSpeed(const RobotSpeed &speed) {
   speed_publisher_.publish(twist);
 }
 void RosNode::GetRobotPose() {
-  OnDataCallback(MsgId::kRobotPose, getTransform(GET_TOPIC_NAME("BaseFrameId"), "map"));
+  PUBLISH(MSG_ID_ROBOT_POSE, getTransform(GET_TOPIC_NAME("BaseFrameId"), "map"));
 }
 /**
  * @description: 获取坐标变化
@@ -463,7 +451,7 @@ void RosNode::RobotFootprintCallback(geometry_msgs::PolygonStamped::ConstPtr msg
       footprint.push_back(p);
     }
     
-    OnDataCallback(MsgId::kRobotFootprint, footprint);
+    PUBLISH(MSG_ID_ROBOT_FOOTPRINT, footprint);
   } catch (tf2::TransformException &ex) {
     LOG_ERROR("RobotFootprintCallback transform error: " << ex.what());
   }

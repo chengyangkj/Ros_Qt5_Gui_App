@@ -17,9 +17,9 @@ class LaserPoints : public VirtualDisplay {
   ~LaserPoints();
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
              QWidget *widget = nullptr) override;
-  bool UpdateData(const std::any &data) override;
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data) override;
+  void UpdateLaserData(int id, const std::vector<Point>& data);
 
  private:
   void Id2Color(int id, int &R, int &G, int &B);

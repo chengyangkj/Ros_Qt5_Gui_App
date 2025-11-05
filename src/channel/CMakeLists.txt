@@ -33,7 +33,7 @@ ${QT_MOC_HPP}
 ${SOURCE_FILE}
 )
 
-target_link_libraries(channel PUBLIC Boost::filesystem pthread dl common)
+target_link_libraries(channel PUBLIC Boost::filesystem pthread dl common framework)
 
 target_include_directories(channel PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}

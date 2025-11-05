@@ -14,6 +14,7 @@
 #include "occupancy_map.h"
 #include "topology_map.h"
 #include "point_type.h"
+#include "core/framework/framework.h"
 using namespace basic;
 class VirtualChannelNode {
  private:
@@ -21,10 +22,7 @@ class VirtualChannelNode {
 
  public:
   VirtualChannelNode(/* args */) {}
-  void RegisterOnDataCallback(
-      std::function<void(const MsgId &id, const std::any &data)> &&func) {
-    OnDataCallback = func;
-  }
+  
   bool Init() {
     if (Start()) {
       std::cout << "start channel success" << std::endl;
@@ -50,10 +48,8 @@ class VirtualChannelNode {
   virtual bool Start() = 0;
   virtual bool Stop() = 0;
   virtual std::string Name() = 0;
-  virtual void SendMessage(const MsgId &msg_id, const std::any &msg) = 0;
 
  public:
-  std::function<void(const MsgId &id, const std::any &data)> OnDataCallback;
   int loop_rate_{30};
   std::atomic<bool> run_flag_{false};
 };

@@ -81,11 +81,6 @@ void ChannelManager::CloseChannel() {
   delete channel_ptr_;
   channel_ptr_ = nullptr;
 }
-void ChannelManager::SendMessage(const MsgId &msg_id, const std::any &msg) {
-  if (channel_ptr_ != nullptr) {
-    channel_ptr_->SendMessage(msg_id, msg);
-  }
-}
 VirtualChannelNode *ChannelManager::GetChannel() {
   [[unlikely]] if (channel_ptr_ == nullptr) {
     std::cout << "error channel is nullptr exit!" << std::endl;

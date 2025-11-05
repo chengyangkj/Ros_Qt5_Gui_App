@@ -18,7 +18,6 @@ class DisplayOccMap : public VirtualDisplay {
   DisplayOccMap(const std::string &display_type, const int &z_value,
                 std::string parent_name = "");
   ~DisplayOccMap() = default;
-  bool UpdateData(const std::any &data) override;
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data);
   void EraseMapRange(const QPointF &pose, double range);

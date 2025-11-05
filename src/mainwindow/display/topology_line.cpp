@@ -560,10 +560,5 @@ void TopologyLine::updateBoundingRect() {
   update();
 }
 
-bool TopologyLine::UpdateData(const std::any &data) {
-  // TopologyLine不需要从外部数据更新，只需要跟随关联的item位置
-  updateBoundingRect();
-  return true;
-}
 
 }  // namespace Display 
