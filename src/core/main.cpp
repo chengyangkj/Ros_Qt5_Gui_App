@@ -15,15 +15,23 @@
 #include <iostream>
 #include "logger/logger.h"
 #include "runtime/application_manager.h"
+
+static QApplication* g_app = nullptr;
+
 void signalHandler(int signal) {
-  if (signal == SIGINT) {
-    QCoreApplication::quit();
+  if (signal == SIGINT || signal == SIGTERM) {
+    if (g_app) {
+      g_app->exit(0);
+    }
   }
 }
+
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
-  // 注册信号处理函数
+  g_app = &a;
+  
   std::signal(SIGINT, signalHandler);
+  std::signal(SIGTERM, signalHandler);
 
   ApplicationManager manager_;
   LOG_INFO("ros_qt5_gui_app init!")

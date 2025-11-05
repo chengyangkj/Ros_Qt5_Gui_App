@@ -14,22 +14,23 @@
 #include "config/config_manager.h"
 #include "logger/logger.h"
 #include "core/framework/framework.h"
+#include "msg/msg_info.h"
 rclcomm::rclcomm() {
-  SET_DEFAULT_TOPIC_NAME("NavGoal", "/goal_pose")
-  SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
-  SET_DEFAULT_TOPIC_NAME("Map", "/map")
-  SET_DEFAULT_TOPIC_NAME("LocalCostMap", "/local_costmap/costmap")
-  SET_DEFAULT_TOPIC_NAME("GlobalCostMap", "/global_costmap/costmap")
-  SET_DEFAULT_TOPIC_NAME("LaserScan", "/scan")
-  SET_DEFAULT_TOPIC_NAME("GlobalPlan", "/plan")
-  SET_DEFAULT_TOPIC_NAME("LocalPlan", "/local_plan")
-  SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
-  SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
-  SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
-  SET_DEFAULT_TOPIC_NAME("RobotFootprint", "/local_costmap/published_footprint")
-  SET_DEFAULT_TOPIC_NAME("TopologyMap", "/map/topology")
-  SET_DEFAULT_TOPIC_NAME("TopologyMapUpdate", "/map/topology/update")
-  SET_DEFAULT_TOPIC_NAME("BaseFrameId", "base_link")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_GOAL, "/goal_pose")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_SET_RELOC_POSE, "/initialpose")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_MAP, "/map")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_LOCAL_COST_MAP, "/local_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_GLOBAL_COST_MAP, "/global_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_LASER, "/scan")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_GLOBAL_PATH, "/plan")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_LOCAL_PATH, "/local_plan")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT, "/odom")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_SET_ROBOT_SPEED, "/cmd_vel")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_BATTERY_STATE, "/battery")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT, "/local_costmap/published_footprint")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP, "/map/topology")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_TOPOLOGY_MAP_UPDATE, "/map/topology/update")
+  SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
   if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
     Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
@@ -55,27 +56,27 @@ bool rclcomm::Start() {
   sub_laser_obt.callback_group = callback_group_laser;
 
   nav_goal_publisher_ = node->create_publisher<geometry_msgs::msg::PoseStamped>(
-      GET_TOPIC_NAME("NavGoal"), 10);
+      GET_TOPIC_NAME(DISPLAY_GOAL), 10);
   nav_through_poses_client_ = rclcpp_action::create_client<nav2_msgs::action::NavigateThroughPoses>(node, "navigate_through_poses");
   reloc_pose_publisher_ =
       node->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
-          GET_TOPIC_NAME("Reloc"), 10);
+          GET_TOPIC_NAME(MSG_ID_SET_RELOC_POSE), 10);
   speed_publisher_ = node->create_publisher<geometry_msgs::msg::Twist>(
-      GET_TOPIC_NAME("Speed"), 10);
+      GET_TOPIC_NAME(MSG_ID_SET_ROBOT_SPEED), 10);
   map_subscriber_ = node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-      GET_TOPIC_NAME("Map"),
+      GET_TOPIC_NAME(DISPLAY_MAP),
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
       std::bind(&rclcomm::map_callback, this, std::placeholders::_1), sub1_obt);
   local_cost_map_subscriber_ =
       node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-          GET_TOPIC_NAME("LocalCostMap"),
+          GET_TOPIC_NAME(DISPLAY_LOCAL_COST_MAP),
           rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
           std::bind(&rclcomm::localCostMapCallback, this,
                     std::placeholders::_1),
           sub1_obt);
   global_cost_map_subscriber_ =
       node->create_subscription<nav_msgs::msg::OccupancyGrid>(
-          GET_TOPIC_NAME("GlobalCostMap"),
+          GET_TOPIC_NAME(DISPLAY_GLOBAL_COST_MAP),
           rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
           std::bind(&rclcomm::globalCostMapCallback, this,
                     std::placeholders::_1),
@@ -83,37 +84,37 @@ bool rclcomm::Start() {
 
   laser_scan_subscriber_ =
       node->create_subscription<sensor_msgs::msg::LaserScan>(
-          GET_TOPIC_NAME("LaserScan"), 20,
+          GET_TOPIC_NAME(DISPLAY_LASER), 20,
           std::bind(&rclcomm::laser_callback, this, std::placeholders::_1),
           sub_laser_obt);
   battery_state_subscriber_ =
       node->create_subscription<sensor_msgs::msg::BatteryState>(
-          GET_TOPIC_NAME("Battery"), 1,
+          GET_TOPIC_NAME(MSG_ID_BATTERY_STATE), 1,
           std::bind(&rclcomm::BatteryCallback, this, std::placeholders::_1),
           sub1_obt);
   global_path_subscriber_ = node->create_subscription<nav_msgs::msg::Path>(
-      GET_TOPIC_NAME("GlobalPlan"), 20,
+      GET_TOPIC_NAME(DISPLAY_GLOBAL_PATH), 20,
       std::bind(&rclcomm::path_callback, this, std::placeholders::_1),
       sub1_obt);
   local_path_subscriber_ = node->create_subscription<nav_msgs::msg::Path>(
-      GET_TOPIC_NAME("LocalPlan"), 20,
+      GET_TOPIC_NAME(DISPLAY_LOCAL_PATH), 20,
       std::bind(&rclcomm::local_path_callback, this, std::placeholders::_1),
       sub1_obt);
   odometry_subscriber_ = node->create_subscription<nav_msgs::msg::Odometry>(
-      GET_TOPIC_NAME("Odometry"), 20,
+      GET_TOPIC_NAME(DISPLAY_ROBOT), 20,
       std::bind(&rclcomm::odom_callback, this, std::placeholders::_1),
       sub1_obt);
   robot_footprint_subscriber_ = node->create_subscription<geometry_msgs::msg::PolygonStamped>(
-      GET_TOPIC_NAME("RobotFootprint"), 20,
+      GET_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT), 20,
       std::bind(&rclcomm::robotFootprintCallback, this, std::placeholders::_1),
       sub1_obt);
   topology_map_subscriber_ = node->create_subscription<topology_msgs::msg::TopologyMap>(
-      GET_TOPIC_NAME("TopologyMap"), 
+      GET_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP), 
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local(),
       std::bind(&rclcomm::topologyMapCallback, this, std::placeholders::_1),
       sub1_obt);
   topology_map_update_publisher_ = node->create_publisher<topology_msgs::msg::TopologyMap>(
-      GET_TOPIC_NAME("TopologyMapUpdate"), 
+      GET_TOPIC_NAME(MSG_ID_TOPOLOGY_MAP_UPDATE), 
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local());
   for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
     LOG_INFO("image location:" << one_image_display.location << "topic:" << one_image_display.topic);
@@ -215,7 +216,8 @@ void rclcomm::BatteryCallback(
 }
 
 void rclcomm::getRobotPose() {
-  auto pose = getTransform(GET_TOPIC_NAME("BaseFrameId"), "map");
+  std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+  auto pose = getTransform(base_frame, "map");
   PUBLISH(MSG_ID_ROBOT_POSE, pose);
 }
 /**
@@ -354,7 +356,8 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-      tf_buffer_->transform(point_laser_frame, point_base_frame, GET_TOPIC_NAME("BaseFrameId"));
+      std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+      tf_buffer_->transform(point_laser_frame, point_base_frame, base_frame);
       basic::Point p;
       p.x = point_base_frame.point.x;
       p.y = point_base_frame.point.y;

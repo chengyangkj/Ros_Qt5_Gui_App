@@ -28,7 +28,9 @@ ConfigManager *ConfigManager::Instacnce() {
   return &config;
 }
 // #define CHECK_DEFALUT
-ConfigManager::ConfigManager(/* args */) { Init(config_path_); }
+ConfigManager::ConfigManager(/* args */) {
+  Init(config_path_);
+}
 void ConfigManager::Init(const std::string &config_path) {
   config_path_ = config_path;
   // 配置不存在 写入默认配置
@@ -58,10 +60,15 @@ bool ConfigManager::ReadRootConfig() {
     std::exit(1);
   }
   file.close();
+  
   return true;
 }
 bool ConfigManager::StoreConfig() {
   std::lock_guard<std::mutex> lock(mutex_);
+  return StoreConfigUnlocked();
+}
+
+bool ConfigManager::StoreConfigUnlocked() {
   nlohmann::json j = config_root_;
   std::string pretty_json = j.dump(2);
   writeStringToFile(config_path_, pretty_json);
@@ -81,6 +88,7 @@ std::string ConfigManager::GetTopicName(const std::string &frame_name) {
 
 void ConfigManager::SetDefaultTopicName(const std::string &frame_name,
                                         const std::string &topic_name) {
+  std::lock_guard<std::mutex> lock(mutex_);
   auto iter = std::find_if(config_root_.display_config.begin(),
                            config_root_.display_config.end(),
                            [&frame_name](const auto &item) {
@@ -89,10 +97,33 @@ void ConfigManager::SetDefaultTopicName(const std::string &frame_name,
   if (iter == config_root_.display_config.end()) {
     config_root_.display_config.push_back(
         DisplayConfig(frame_name, topic_name, true));
-  } else if (iter->topic == "") {
+  } else if (iter->topic.empty()) {
     iter->topic = topic_name;
   }
-  StoreConfig();
+  StoreConfigUnlocked();
+}
+
+std::string ConfigManager::GetConfigValue(const std::string &key, const std::string &default_value) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  auto it = config_root_.key_value.find(key);
+  if (it != config_root_.key_value.end()) {
+    return it->second;
+  }
+  return default_value;
+}
+
+void ConfigManager::SetConfigValue(const std::string &key, const std::string &value) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  config_root_.key_value[key] = value;
+  StoreConfigUnlocked();
+}
+
+void ConfigManager::SetDefaultKeyValue(const std::string &key, const std::string &value) {
+  std::lock_guard<std::mutex> lock(mutex_);
+  if (config_root_.key_value.find(key) == config_root_.key_value.end()) {
+    config_root_.key_value[key] = value;
+    StoreConfigUnlocked();
+  }
 }
 
 bool ConfigManager::ReadTopologyMap(const std::string &map_path,

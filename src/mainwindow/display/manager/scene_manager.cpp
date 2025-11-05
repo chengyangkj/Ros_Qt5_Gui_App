@@ -44,9 +44,8 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   timer->start(16); // 约60FPS更新
 }
 void SceneManager::LoadTopologyMap() {
-  OpenTopologyMap(Config::ConfigManager::Instacnce()
-                      ->GetRootConfig()
-                      .topology_map_config.map_name);
+  std::string map_name = GET_CONFIG_VALUE("topology_map_name", "./default_topology_map.json");
+  OpenTopologyMap(map_name);
 }
 void SceneManager::OpenTopologyMap(const std::string &file_path) {
   // 读取新的拓扑地图数据
@@ -187,13 +186,8 @@ void SceneManager::SetPointMoveEnable(bool is_enable) {
   }
 }
 void SceneManager::saveTopologyMap() {
-
-  
-  Config::ConfigManager::Instacnce()->WriteTopologyMap(
-      Config::ConfigManager::Instacnce()
-          ->GetRootConfig()
-          .topology_map_config.map_name,
-      topology_map_);
+  std::string map_name = GET_CONFIG_VALUE("topology_map_name", "./default_topology_map.json");
+  Config::ConfigManager::Instacnce()->WriteTopologyMap(map_name, topology_map_);
   LOG_INFO("Save topology map with " << topology_map_.points.size() << " points, " 
            << topology_map_.routes.size() << " routes");
   emit signalTopologyMapUpdate(topology_map_);

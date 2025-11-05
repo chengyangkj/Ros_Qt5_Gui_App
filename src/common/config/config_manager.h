@@ -13,6 +13,21 @@
                                                             topic_name);
 #endif
 
+#ifndef SET_DEFAULT_KEY_VALUE
+  #define SET_DEFAULT_KEY_VALUE(key, value)                             \
+    Config::ConfigManager::Instacnce()->SetDefaultKeyValue(key, value);
+#endif
+
+#ifndef SET_KEY_VALUE
+  #define SET_KEY_VALUE(key, value)                                     \
+    Config::ConfigManager::Instacnce()->SetConfigValue(key, value);
+#endif
+
+#ifndef GET_CONFIG_VALUE
+  #define GET_CONFIG_VALUE(key, default_value)                          \
+    Config::ConfigManager::Instacnce()->GetConfigValue(key, default_value)
+#endif
+
 namespace Config {
 
 class ConfigManager {
@@ -25,6 +40,7 @@ class ConfigManager {
   ConfigManager(const ConfigManager &) = delete;
   ConfigManager &operator=(const ConfigManager &) = delete;
   bool ReadRootConfig();
+  bool StoreConfigUnlocked();  // 内部版本，不获取锁（假设调用者已持有锁）
 
  public:
   ~ConfigManager();
@@ -37,6 +53,9 @@ class ConfigManager {
   void SetDefaultConfig(const std::string &name, const std::string &value);
   void SetDefaultTopicName(const std::string &frame_name,
                            const std::string &topic_name);
+  std::string GetConfigValue(const std::string &key, const std::string &default_value = "");
+  void SetConfigValue(const std::string &key, const std::string &value);
+  void SetDefaultKeyValue(const std::string &key, const std::string &value);
   ConfigRoot &GetRootConfig() { return config_root_; }
   bool ReadTopologyMap(const std::string &map_path, TopologyMap &map);
   bool WriteTopologyMap(const std::string &map_path,

@@ -9,21 +9,22 @@
 #include "rosnode.h"
 #include <opencv2/opencv.hpp>
 #include "config/config_manager.h"
+#include "msg/msg_info.h"
 RosNode::RosNode(/* args */) {
-  SET_DEFAULT_TOPIC_NAME("NavGoal", "/move_base_simple/goal")
-  SET_DEFAULT_TOPIC_NAME("Reloc", "/initialpose")
-  SET_DEFAULT_TOPIC_NAME("Map", "/map")
-  SET_DEFAULT_TOPIC_NAME("LocalCostMap", "/move_base/local_costmap/costmap")
-  SET_DEFAULT_TOPIC_NAME("GlobalCostMap", "/move_base/global_costmap/costmap")
-  SET_DEFAULT_TOPIC_NAME("LaserScan", "/scan")
-  SET_DEFAULT_TOPIC_NAME("GlobalPlan", "/move_base/DWAPlannerROS/global_plan")
-  SET_DEFAULT_TOPIC_NAME("LocalPlan", "/move_base/DWAPlannerROS/local_plan")
-  SET_DEFAULT_TOPIC_NAME("Odometry", "/odom")
-  SET_DEFAULT_TOPIC_NAME("Speed", "/cmd_vel")
-  SET_DEFAULT_TOPIC_NAME("Battery", "/battery")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_GOAL, "/move_base_simple/goal")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_SET_RELOC_POSE, "/initialpose")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_MAP, "/map")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_LOCAL_COST_MAP, "/move_base/local_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_GLOBAL_COST_MAP, "/move_base/global_costmap/costmap")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_LASER, "/scan")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_GLOBAL_PATH, "/move_base/DWAPlannerROS/global_plan")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_LOCAL_PATH, "/move_base/DWAPlannerROS/local_plan")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT, "/odom")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_SET_ROBOT_SPEED, "/cmd_vel")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_BATTERY_STATE, "/battery")
   SET_DEFAULT_TOPIC_NAME("MoveBaseStatus", "/move_base/status")
-  SET_DEFAULT_TOPIC_NAME("RobotFootprint", "/move_base/local_costmap/published_footprint")
-  SET_DEFAULT_TOPIC_NAME("BaseFrameId", "base_link")
+  SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT, "/move_base/local_costmap/published_footprint")
+  SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
   if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
     Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
@@ -87,31 +88,31 @@ void RosNode::init() {
   // 设置默认的topic名称
   ros::NodeHandle nh;
   nav_goal_publisher_ =
-      nh.advertise<geometry_msgs::PoseStamped>(GET_TOPIC_NAME("NavGoal"), 10);
+      nh.advertise<geometry_msgs::PoseStamped>(GET_TOPIC_NAME(DISPLAY_GOAL), 10);
   reloc_pose_publisher_ =
       nh.advertise<geometry_msgs::PoseWithCovarianceStamped>(
-          GET_TOPIC_NAME("Reloc"), 10);
+          GET_TOPIC_NAME(MSG_ID_SET_RELOC_POSE), 10);
   speed_publisher_ =
-      nh.advertise<geometry_msgs::Twist>(GET_TOPIC_NAME("Speed"), 10);
+      nh.advertise<geometry_msgs::Twist>(GET_TOPIC_NAME(MSG_ID_SET_ROBOT_SPEED), 10);
 
   map_subscriber_ =
-      nh.subscribe(GET_TOPIC_NAME("Map"), 1, &RosNode::MapCallback, this);
+      nh.subscribe(GET_TOPIC_NAME(DISPLAY_MAP), 1, &RosNode::MapCallback, this);
   local_cost_map_subscriber_ = nh.subscribe(
-      GET_TOPIC_NAME("LocalCostMap"), 1, &RosNode::LocalCostMapCallback, this);
+      GET_TOPIC_NAME(DISPLAY_LOCAL_COST_MAP), 1, &RosNode::LocalCostMapCallback, this);
   global_cost_map_subscriber_ =
-      nh.subscribe(GET_TOPIC_NAME("GlobalCostMap"), 1,
+      nh.subscribe(GET_TOPIC_NAME(DISPLAY_GLOBAL_COST_MAP), 1,
                    &RosNode::GlobalCostMapCallback, this);
-  laser_scan_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LaserScan"), 1,
+  laser_scan_subscriber_ = nh.subscribe(GET_TOPIC_NAME(DISPLAY_LASER), 1,
                                         &RosNode::LaserScanCallback, this);
-  global_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("GlobalPlan"), 1,
+  global_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME(DISPLAY_GLOBAL_PATH), 1,
                                          &RosNode::GlobalPathCallback, this);
-  local_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME("LocalPlan"), 1,
+  local_path_subscriber_ = nh.subscribe(GET_TOPIC_NAME(DISPLAY_LOCAL_PATH), 1,
                                         &RosNode::LocalPathCallback, this);
-  odometry_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Odometry"), 1,
+  odometry_subscriber_ = nh.subscribe(GET_TOPIC_NAME(DISPLAY_ROBOT), 1,
                                       &RosNode::OdometryCallback, this);
-  battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME("Battery"), 1,
+  battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME(MSG_ID_BATTERY_STATE), 1,
                                      &RosNode::BatteryCallback, this);
-  robot_footprint_subscriber_ = nh.subscribe(GET_TOPIC_NAME("RobotFootprint"), 1,
+  robot_footprint_subscriber_ = nh.subscribe(GET_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT), 1,
                                              &RosNode::RobotFootprintCallback, this);
 
   for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
@@ -300,7 +301,8 @@ void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
 
-      tf_listener_->transformPoint(GET_TOPIC_NAME("BaseFrameId"), point_laser_frame,
+      std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+      tf_listener_->transformPoint(base_frame, point_laser_frame,
                                    point_base_frame);
       basic::Point p;
       p.x = point_base_frame.point.x;
@@ -400,7 +402,8 @@ void RosNode::PubRobotSpeed(const RobotSpeed &speed) {
   speed_publisher_.publish(twist);
 }
 void RosNode::GetRobotPose() {
-  PUBLISH(MSG_ID_ROBOT_POSE, getTransform(GET_TOPIC_NAME("BaseFrameId"), "map"));
+  std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+  PUBLISH(MSG_ID_ROBOT_POSE, getTransform(base_frame, "map"));
 }
 /**
  * @description: 获取坐标变化
