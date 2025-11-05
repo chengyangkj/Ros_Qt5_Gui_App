@@ -29,10 +29,12 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include <cmath>
 #include "logger/logger.h"
 #include "yaml-cpp/yaml.h"
 #include <SDL/SDL_image.h>
-#define OCC_GRID_UNKNOWN 0     //未知領域
+#define OCC_GRID_UNKNOWN -1    //未知領域
 #define OCC_GRID_FREE 0        //free
 #define OCC_GRID_OCCUPIED 100  //占有領域
 // We use SDL_image to load the image from disk
@@ -379,93 +381,108 @@ free_thresh: 0.196
     map_config.Save(mapmetadatafile);
   }
   bool Load(const std::string &yaml_path) {
-    //解析yaml
-    if (!map_config.Load(yaml_path)) return false;
-
-    SDL_Surface* img;
-    unsigned char* pixels;
-    unsigned char* p;
-    unsigned char value;
-    int rowstride, n_channels, avg_channels;
-    unsigned int i,j;
-    int k;
-    double occ;
-    int alpha;
-    int color_sum;
-    double color_avg;
-    // Load the image using SDL.  If we get NULL back, the image load failed.
-    if(!(img = IMG_Load(map_config.image.c_str())))
-    {
-      LOG_ERROR(std::string("failed to open image file \"") +
-                           std::string(map_config.image) + std::string("\": ") + IMG_GetError());
+    if (!map_config.Load(yaml_path)) {
       return false;
     }
+
+    SDL_Surface* img = IMG_Load(map_config.image.c_str());
+    if (!img) {
+      LOG_ERROR("failed to open image file \"" << map_config.image << "\": " << IMG_GetError());
+      return false;
+    }
+
     int height = img->h;
     int width = img->w;
     rows = height;
     cols = width;
-    LOG_INFO("reade from pgm width:" << width << " height:" << height);
+    LOG_INFO("read from image width:" << width << " height:" << height);
+    
     map_data = Eigen::MatrixXi(height, width);
-    rowstride = img->pitch;
-    n_channels = img->format->BytesPerPixel;
-    // NOTE: Trinary mode still overrides here to preserve existing behavior.
-    // Alpha will be averaged in with color channels when using trinary mode.
-    if (map_config.mode==MapConfig::MapMode::TRINARY || !img->format->Amask)
-      avg_channels = n_channels;
-    else
-      avg_channels = n_channels - 1;
-
-    // Copy pixel data into the map structure
-    pixels = (unsigned char*)(img->pixels);
-    for(j = 0; j < height; j++)
-    {
-      for (i = 0; i < width; i++)
-      {
-        // Compute mean of RGB for this pixel
-        p = pixels + j*rowstride + i*n_channels;
-        color_sum = 0;
-        for(k=0;k<avg_channels;k++)
-          color_sum += *(p + (k));
-        color_avg = color_sum / (double)avg_channels;
-
-        if (n_channels == 1)
-          alpha = 1;
-        else
-          alpha = *(p+n_channels-1);
-
-        if(map_config.negate)
-          color_avg = 255 - color_avg;
-
-        if(map_config.mode==MapConfig::MapMode::RAW){
-          value = color_avg;
-          map_data(j,i) = value;
-          continue;
+    
+    int rowstride = img->pitch;
+    int n_channels = img->format->BytesPerPixel;
+    bool has_alpha = (img->format->Amask != 0);
+    
+    unsigned char* pixels = static_cast<unsigned char*>(img->pixels);
+    
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        unsigned char* p = pixels + y * rowstride + x * n_channels;
+        
+        std::vector<unsigned char> channels;
+        for (int k = 0; k < n_channels; k++) {
+          channels.push_back(p[k]);
         }
-
-
-        // If negate is true, we consider blacker pixels free, and whiter
-        // pixels occupied.  Otherwise, it's vice versa.
-        occ = (255 - color_avg) / 255.0;
-
-        // Apply thresholds to RGB means to determine occupancy values for
-        // map.  Note that we invert the graphics-ordering of the pixels to
-        // produce a map with cell (0,0) in the lower-left corner.
-        if(occ > map_config.occupied_thresh)
-          value = +100;
-        else if(occ < map_config.free_thresh)
-          value = 0;
-        else if(map_config.mode==MapConfig::MapMode::TRINARY || alpha < 1.0)
-          value = -1;
-        else {
-          double ratio = (occ - map_config.free_thresh) / (map_config.occupied_thresh - map_config.free_thresh);
-          value = 1 + 98 * ratio;
+        
+        bool alpha_channel_exists = (n_channels > 1 && has_alpha);
+        unsigned char alpha_value = alpha_channel_exists ? p[n_channels - 1] : 255;
+        bool is_transparent = alpha_channel_exists && (alpha_value < 255);
+        
+        if (map_config.mode == MapConfig::MapMode::TRINARY && alpha_channel_exists) {
+          channels.push_back(255 - alpha_value);
         }
-
-        map_data(j,i) = value;
+        
+        double sum = 0.0;
+        for (auto c : channels) {
+          sum += c;
+        }
+        double shade = sum / channels.size() / 255.0;
+        
+        double occ = (map_config.negate ? shade : 1.0 - shade);
+        
+        int map_cell;
+        
+        switch (map_config.mode) {
+          case MapConfig::MapMode::TRINARY: {
+            if (occ > map_config.occupied_thresh) {
+              map_cell = OCC_GRID_OCCUPIED;
+            } else if (occ < map_config.free_thresh) {
+              map_cell = OCC_GRID_FREE;
+            } else {
+              map_cell = OCC_GRID_UNKNOWN;
+            }
+            break;
+          }
+          
+          case MapConfig::MapMode::SCALE: {
+            if (is_transparent) {
+              map_cell = OCC_GRID_UNKNOWN;
+            } else if (occ > map_config.occupied_thresh) {
+              map_cell = OCC_GRID_OCCUPIED;
+            } else if (occ < map_config.free_thresh) {
+              map_cell = OCC_GRID_FREE;
+            } else {
+              double ratio = (occ - map_config.free_thresh) / 
+                            (map_config.occupied_thresh - map_config.free_thresh);
+              map_cell = static_cast<int>(std::rint(ratio * 98.0 + 1.0));
+            }
+            break;
+          }
+          
+          case MapConfig::MapMode::RAW: {
+            double occ_percent = std::round(shade * 255.0);
+            if (OCC_GRID_FREE <= occ_percent && occ_percent <= OCC_GRID_OCCUPIED) {
+              map_cell = static_cast<int>(occ_percent);
+            } else {
+              map_cell = OCC_GRID_UNKNOWN;
+            }
+            break;
+          }
+          
+          default: {
+            LOG_ERROR("Invalid map mode");
+            SDL_FreeSurface(img);
+            return false;
+          }
+        }
+        
+        map_data(height - y - 1, x) = map_cell;
       }
     }
 
     SDL_FreeSurface(img);
+    LOG_INFO("Map loaded successfully: " << width << " X " << height 
+             << " @ " << map_config.resolution << " m/cell");
     return true;
   }
 };
