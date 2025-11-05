@@ -333,6 +333,7 @@ void rclcomm::path_callback(const nav_msgs::msg::Path::SharedPtr msg) {
   } catch (tf2::TransformException &ex) {
   }
 }
+
 void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
   // qDebug()<<"订阅到激光话题";
   // std::cout<<"recv laser"<<std::endl;

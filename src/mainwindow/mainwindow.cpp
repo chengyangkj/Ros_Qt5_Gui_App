@@ -525,7 +525,7 @@ void MainWindow::setupUi() {
   label_pos_map_->setMinimumWidth(160);
   label_pos_map_->setMaximumWidth(220);
   label_pos_map_->setPlaceholderText("Map: (x, y)");
-  label_pos_map_->setStyleSheet(common_style);
+  label_pos_map_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
   label_pos_map_->setText("Map: (0.00, 0.00)");
   horizontalLayout_12->addWidget(label_pos_map_);
 
@@ -536,7 +536,7 @@ void MainWindow::setupUi() {
   label_pos_scene_->setMinimumWidth(160);
   label_pos_scene_->setMaximumWidth(220);
   label_pos_scene_->setPlaceholderText("Scene: (x, y)");
-  label_pos_scene_->setStyleSheet(common_style);
+  label_pos_scene_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
   label_pos_scene_->setText("Scene: (0.00, 0.00)");
   horizontalLayout_12->addWidget(label_pos_scene_);
 
@@ -547,7 +547,7 @@ void MainWindow::setupUi() {
   label_pos_robot_->setMinimumWidth(180);
   label_pos_robot_->setMaximumWidth(240);
   label_pos_robot_->setPlaceholderText("Robot: (x, y, θ)");
-  label_pos_robot_->setStyleSheet(common_style);
+  label_pos_robot_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
   label_pos_robot_->setText("Robot: (0.00, 0.00, 0.00)");
   horizontalLayout_12->addWidget(label_pos_robot_);
 
@@ -555,6 +555,10 @@ void MainWindow::setupUi() {
       new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
   center_layout->addLayout(horizontalLayout_12);
+  
+  // 减小下方边距
+  center_layout->setContentsMargins(0, 0, 0, 5);
+  center_layout->setSpacing(5);
 
   /////////////////////////////////////////////////中心主窗体
   QWidget *center_widget = new QWidget();
