@@ -146,7 +146,6 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   QVBoxLayout *layout_button = new QVBoxLayout();
   layout_button->setSpacing(4);
   button_send_ = new QPushButton("Go To Point");
-  button_multi_point_nav_ = new QPushButton("Go Through Points");
   button_remove_ = new QPushButton("Remove Point");
   button_cancel_ = new QPushButton("Close");
   
@@ -160,7 +159,6 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
   
   layout_button->addWidget(button_edit_name_);
   layout_button->addWidget(button_send_);
-  layout_button->addWidget(button_multi_point_nav_);
   layout_button->addWidget(button_remove_);
   layout_button->addWidget(button_cancel_);
   
@@ -203,12 +201,6 @@ NavGoalWidget::NavGoalWidget(QWidget *parent) : QWidget(parent) {
                                     deg2rad(spinBox_theta_->value())),
                           lineEdit_name_->text());
   });
-  connect(button_multi_point_nav_, &QPushButton::clicked, [this]() {
-    emit SignalHandleOver(HandleResult::kMultiPointNav,
-                          RobotPose(spinBox_x_->value(), spinBox_y_->value(),
-                                    deg2rad(spinBox_theta_->value())),
-                          lineEdit_name_->text());
-  });
 
   connect(button_cancel_, &QPushButton::clicked, [this]() {
     emit SignalHandleOver(HandleResult::kCancel,
@@ -236,7 +228,6 @@ void NavGoalWidget::SetEditMode(bool flag) {
   button_remove_->setEnabled(flag);
   button_edit_name_->setVisible(flag);
   button_send_->setVisible(!flag);
-  button_multi_point_nav_->setVisible(!flag);
 }
 
 void NavGoalWidget::SetPose(const PointInfo &info) {

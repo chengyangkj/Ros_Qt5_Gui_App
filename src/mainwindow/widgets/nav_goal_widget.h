@@ -19,8 +19,7 @@ class NavGoalWidget : public QWidget {
   enum HandleResult { kSend = 0,
                       kRemove = 1,
                       kCancel = 2,
-                      kChangeName = 3,
-                      kMultiPointNav = 4 };
+                      kChangeName = 3 };
   struct PointInfo {
     RobotPose pose;
     QString name;
@@ -36,7 +35,6 @@ class NavGoalWidget : public QWidget {
   QLineEdit *lineEdit_name_;
   QPushButton *button_edit_name_;
   QPushButton *button_send_;
-  QPushButton *button_multi_point_nav_;
   QPushButton *button_remove_;
   QPushButton *button_cancel_;
   QString original_name_;

@@ -14,7 +14,6 @@
 #include <cv_bridge/cv_bridge.h>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
-#include "nav2_msgs/action/navigate_through_poses.hpp"
 #include "algorithm.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
@@ -61,7 +60,6 @@ class rclcomm : public VirtualChannelNode {
   std::string Name() override { return "ROS2"; };
   void PubRelocPose(const RobotPose &pose);
   void PubNavGoal(const RobotPose &pose);
-  void PubMultiPointNav(const std::vector<RobotPose> &poses);
   void PubRobotSpeed(const RobotSpeed &speed);
   basic::RobotPose getTransform(std::string from, std::string to);
   TopologyMap ConvertFromRosMsg(const topology_msgs::msg::TopologyMap::SharedPtr msg);
@@ -73,8 +71,6 @@ class rclcomm : public VirtualChannelNode {
       reloc_pose_publisher_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr
       nav_goal_publisher_;
-  rclcpp_action::Client<nav2_msgs::action::NavigateThroughPoses>::SharedPtr
-      nav_through_poses_client_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_subscriber_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
       local_cost_map_subscriber_;

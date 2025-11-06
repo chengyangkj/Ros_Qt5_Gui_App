@@ -57,7 +57,6 @@ bool rclcomm::Start() {
 
   nav_goal_publisher_ = node->create_publisher<geometry_msgs::msg::PoseStamped>(
       GET_TOPIC_NAME(DISPLAY_GOAL), 10);
-  nav_through_poses_client_ = rclcpp_action::create_client<nav2_msgs::action::NavigateThroughPoses>(node, "navigate_through_poses");
   reloc_pose_publisher_ =
       node->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
           GET_TOPIC_NAME(MSG_ID_SET_RELOC_POSE), 10);
@@ -192,10 +191,6 @@ bool rclcomm::Start() {
     std::cout << "recv topology map update:" << topology_map.map_name << std::endl;
     topology_msgs::msg::TopologyMap ros_msg = ConvertToRosMsg(topology_map);
     topology_map_update_publisher_->publish(ros_msg);
-  });
-  SUBSCRIBE(MSG_ID_SET_MULTI_POINT_NAV, [this](const std::vector<RobotPose>& poses) {
-    std::cout << "recv multi point nav:" << poses.size() << std::endl;
-    PubMultiPointNav(poses);
   });
   
   init_flag_ = true;
@@ -624,84 +619,4 @@ void rclcomm::topologyMapCallback(const topology_msgs::msg::TopologyMap::SharedP
     }
   }
   PUBLISH(MSG_ID_TOPOLOGY_MAP, topology_map);
-}
-
-void rclcomm::PubMultiPointNav(const std::vector<RobotPose> &poses) {
-  if (poses.empty()) {
-    std::cout << "Multi-point navigation: poses vector is empty" << std::endl;
-    return;
-  }
-
-  std::cout << "Multi-point navigation: sending " << poses.size() << " poses" << std::endl;
-
-  // 等待action服务器可用
-  if (!nav_through_poses_client_->wait_for_action_server(std::chrono::seconds(5))) {
-    std::cout << "NavigateThroughPoses Action服务器不可用" << std::endl;
-    return;
-  }
-
-  // 创建导航目标
-  nav2_msgs::action::NavigateThroughPoses::Goal goal;
-  
-  for (const auto& pose : poses) {
-    geometry_msgs::msg::PoseStamped pose_stamped;
-    pose_stamped.pose.position.x = pose.x;
-    pose_stamped.pose.position.y = pose.y;
-    pose_stamped.pose.position.z = 0.0;
-    
-    tf2::Quaternion q;
-    q.setRPY(0, 0, pose.theta);
-    pose_stamped.pose.orientation = tf2::toMsg(q);
-    
-    pose_stamped.header.stamp = node->get_clock()->now();
-    pose_stamped.header.frame_id = "map";
-    goal.poses.push_back(pose_stamped);
-    
-    std::cout << "Added pose: (" << pose.x << ", " << pose.y << ", " << pose.theta << ")" << std::endl;
-  }
-
-  // 设置发送选项
-  auto send_goal_options = rclcpp_action::Client<nav2_msgs::action::NavigateThroughPoses>::SendGoalOptions();
-  
-  // 设置回调函数
-  send_goal_options.goal_response_callback = 
-    [](const rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateThroughPoses>::SharedPtr & goal_handle) {
-      if (!goal_handle) {
-        std::cout << "Multi-point navigation goal was rejected by server" << std::endl;
-      } else {
-        std::cout << "Multi-point navigation goal accepted by server, waiting for result" << std::endl;
-      }
-    };
-
-  send_goal_options.result_callback = 
-    [](const rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateThroughPoses>::WrappedResult & result) {
-      switch (result.code) {
-        case rclcpp_action::ResultCode::SUCCEEDED:
-          std::cout << "Multi-point navigation succeeded!" << std::endl;
-          break;
-        case rclcpp_action::ResultCode::ABORTED:
-          std::cout << "Multi-point navigation was aborted" << std::endl;
-          break;
-        case rclcpp_action::ResultCode::CANCELED:
-          std::cout << "Multi-point navigation was canceled" << std::endl;
-          break;
-        default:
-          std::cout << "Multi-point navigation failed with unknown result code" << std::endl;
-          break;
-      }
-    };
-
-  send_goal_options.feedback_callback = 
-    [](rclcpp_action::ClientGoalHandle<nav2_msgs::action::NavigateThroughPoses>::SharedPtr,
-       const std::shared_ptr<const nav2_msgs::action::NavigateThroughPoses::Feedback> feedback) {
-      std::cout << "Multi-point navigation feedback: current pose (" 
-                << feedback->current_pose.pose.position.x << ", "
-                << feedback->current_pose.pose.position.y << ")" << std::endl;
-    };
-
-  // 发送目标
-  std::cout << "Sending NavigateThroughPoses goal with " << poses.size() << " poses" << std::endl;
-  auto future = nav_through_poses_client_->async_send_goal(goal, send_goal_options);
-  
-  std::cout << "Multi-point navigation goal sent successfully" << std::endl;
 }

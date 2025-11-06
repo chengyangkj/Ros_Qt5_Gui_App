@@ -35,7 +35,6 @@ jobs:
           libgtest-dev \
           libsdl-image1.2-dev \
           libsdl1.2-dev \
-          ros-galactic-nav2-msgs \
           wget
 
       - name: Update gtest
