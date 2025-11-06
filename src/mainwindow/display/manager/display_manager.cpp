@@ -304,6 +304,9 @@ TopologyMap DisplayManager::GetTopologyMap() {
 
 void DisplayManager::UpdateTopologyMap(const TopologyMap &topology_map) {
   PUBLISH(MSG_ID_TOPOLOGY_MAP, topology_map);
+  QTimer::singleShot(100, [this]() {
+    SetScaleBig();
+  });
 }
 void DisplayManager::SetScaleBig() {
   FactoryDisplay::Instance()

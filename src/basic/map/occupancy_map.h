@@ -483,6 +483,7 @@ free_thresh: 0.196
     SDL_FreeSurface(img);
     LOG_INFO("Map loaded successfully: " << width << " X " << height 
              << " @ " << map_config.resolution << " m/cell");
+    SetFlip();
     return true;
   }
 };

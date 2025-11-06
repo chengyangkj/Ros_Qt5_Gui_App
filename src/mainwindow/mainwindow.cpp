@@ -835,11 +835,10 @@ void MainWindow::setupUi() {
   });
 
   connect(save_map_btn, &QToolButton::clicked, [this]() {
-    std::string mapPath = display_manager_->GetMapPath();
     
     // 保存占用栅格地图
     auto occ_map = display_manager_->GetOccupancyMap();
-    occ_map.Save(mapPath);
+    occ_map.Save(map_path_);
     
     // 保存拓扑地图
     auto topology_map = display_manager_->GetTopologyMap();
@@ -847,12 +846,12 @@ void MainWindow::setupUi() {
     //发送到ROS
     PUBLISH(MSG_ID_TOPOLOGY_MAP_UPDATE, topology_map);
 
-    std::string topology_path = mapPath + ".topology";
+    std::string topology_path = map_path_ + ".topology";
     Config::ConfigManager::Instacnce()->WriteTopologyMap(topology_path, topology_map);
     
     // 显示保存成功对话框
     QMessageBox::information(this, "保存成功", 
-                            "地图文件已成功保存到:\n" + QString::fromStdString(mapPath),
+                            "地图文件已成功保存到:\n" + QString::fromStdString(map_path_),
                             QMessageBox::Ok);
   });
 
@@ -873,6 +872,11 @@ void MainWindow::setupUi() {
       std::string extension = QFileInfo(fileName).suffix().toStdString();
       
       if (extension == "yaml") {
+        map_path_ = file_path;
+        size_t last_dot = map_path_.find_last_of(".");
+        if (last_dot != std::string::npos) {
+          map_path_ = map_path_.substr(0, last_dot);
+        }
         // 打开占用栅格地图
         OccupancyMap map;
         if (map.Load(file_path)) {

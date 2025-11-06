@@ -622,7 +622,7 @@ void DisplayConfigWidget::InitRobotShapeTab() {
 void DisplayConfigWidget::SetDisplayManager(Display::DisplayManager *manager) {
   display_manager_ = manager;
   if (display_manager_) {
-    LoadConfig();
+  LoadConfig();
   }
 }
 

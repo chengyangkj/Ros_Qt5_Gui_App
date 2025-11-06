@@ -81,6 +81,7 @@ class MainWindow : public QMainWindow {
   QLabel *label_power_;
   ads::CDockAreaWidget *center_docker_area_;
   std::map<std::string, RatioLayoutedFrame *> image_frame_map_;
+  std::string map_path_{"./map"};
   
  signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);
