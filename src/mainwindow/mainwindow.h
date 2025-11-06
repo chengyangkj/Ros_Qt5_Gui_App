@@ -71,9 +71,6 @@ class MainWindow : public QMainWindow {
   ads::CDockWidget *TimelineDockWidget;
   Display::DisplayManager *display_manager_;
 
-  QLineEdit *label_pos_map_;
-  QLineEdit *label_pos_scene_;
-  QLineEdit *label_pos_robot_;
   QThread message_thread_;
   SpeedCtrlWidget *speed_ctrl_widget_;
   NavGoalTableView *nav_goal_table_view_;

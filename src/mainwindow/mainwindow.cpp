@@ -72,9 +72,12 @@ void MainWindow::registerChannel() {
 
   SUBSCRIBE(MSG_ID_ROBOT_POSE, [this](const RobotPose& robot_pose) {
       nav_goal_table_view_->UpdateRobotPose(robot_pose);
-      label_pos_robot_->setText("Robot: (" + QString::number(robot_pose.x, 'f', 2) + ", " + 
-                                QString::number(robot_pose.y, 'f', 2) + ", " + 
-                                QString::number(robot_pose.theta, 'f', 2) + ")");
+      Display::ViewManager* view_manager = dynamic_cast<Display::ViewManager*>(display_manager_->GetViewPtr());
+      if (view_manager) {
+        view_manager->UpdateRobotPos("Robot: (" + QString::number(robot_pose.x, 'f', 2) + ", " + 
+                                     QString::number(robot_pose.y, 'f', 2) + ", " + 
+                                     QString::number(robot_pose.theta, 'f', 2) + ")");
+      }
   });
 
   SUBSCRIBE(MSG_ID_BATTERY_STATE, [this](const std::map<std::string, std::string>& map) {
@@ -205,6 +208,22 @@ void MainWindow::setupUi() {
       border-color: #1976d2;
     }
   )";
+
+  // 添加 "view" 菜单按钮
+  QToolButton *view_menu_btn = new QToolButton();
+  QIcon view_icon;
+  view_icon.addFile(QString::fromUtf8(":/images/list_view.svg"),
+                    QSize(32, 32), QIcon::Normal, QIcon::Off);
+  view_menu_btn->setIcon(view_icon);
+  view_menu_btn->setIconSize(QSize(20, 20));
+  view_menu_btn->setPopupMode(QToolButton::InstantPopup);
+  view_menu_btn->setMenu(ui->menuView);
+  view_menu_btn->setStyleSheet(modernToolButtonStyle);
+  view_menu_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+  horizontalLayout_tools->addWidget(view_menu_btn);
+
+  // 隐藏默认菜单栏
+  menuBar()->setVisible(false);
 
   QToolButton *reloc_btn = new QToolButton();
   reloc_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -490,71 +509,6 @@ void MainWindow::setupUi() {
   display_manager_ = new Display::DisplayManager();
   center_h_layout->addWidget(display_manager_->GetViewPtr());
 
-  //////////////////////////////////////////////////////////////////////////坐标显示 - 现代化设计（无标签版本）
-  QHBoxLayout *horizontalLayout_12 = new QHBoxLayout();
-  horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
-  horizontalLayout_12->setSpacing(10);
-  horizontalLayout_12->setContentsMargins(8, 8, 8, 8);
-  
-  // 统一的样式字符串
-  const QString common_style = R"(
-    QLineEdit {
-      color: #2d3748;
-      font-weight: 500;
-      font-size: 13px;
-      font-family: 'Consolas', 'Monaco', monospace;
-      background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #ffffff, stop:1 #f8fafc);
-      border: 1.5px solid #d1d5db;
-      border-radius: 6px;
-      padding: 8px 14px;
-      selection-background-color: #6366f1;
-      selection-color: white;
-    }
-    QLineEdit:focus {
-      border: 1.5px solid #6366f1;
-      background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #ffffff, stop:1 #f1f5f9);
-    }
-  )";
-
-  // Map坐标显示
-  label_pos_map_ = new QLineEdit();
-  label_pos_map_->setReadOnly(true);
-  label_pos_map_->setObjectName(QString::fromUtf8("label_pos_map_"));
-  label_pos_map_->setMinimumWidth(160);
-  label_pos_map_->setMaximumWidth(220);
-  label_pos_map_->setPlaceholderText("Map: (x, y)");
-  label_pos_map_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
-  label_pos_map_->setText("Map: (0.00, 0.00)");
-  horizontalLayout_12->addWidget(label_pos_map_);
-
-  // Scene坐标显示
-  label_pos_scene_ = new QLineEdit();
-  label_pos_scene_->setReadOnly(true);
-  label_pos_scene_->setObjectName(QString::fromUtf8("label_pos_scene_"));
-  label_pos_scene_->setMinimumWidth(160);
-  label_pos_scene_->setMaximumWidth(220);
-  label_pos_scene_->setPlaceholderText("Scene: (x, y)");
-  label_pos_scene_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
-  label_pos_scene_->setText("Scene: (0.00, 0.00)");
-  horizontalLayout_12->addWidget(label_pos_scene_);
-
-  // Robot Pose坐标显示
-  label_pos_robot_ = new QLineEdit();
-  label_pos_robot_->setReadOnly(true);
-  label_pos_robot_->setObjectName(QString::fromUtf8("label_pos_robot_"));
-  label_pos_robot_->setMinimumWidth(180);
-  label_pos_robot_->setMaximumWidth(240);
-  label_pos_robot_->setPlaceholderText("Robot: (x, y, θ)");
-  label_pos_robot_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
-  label_pos_robot_->setText("Robot: (0.00, 0.00, 0.00)");
-  horizontalLayout_12->addWidget(label_pos_robot_);
-
-  horizontalLayout_12->addItem(
-      new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-  center_layout->addLayout(horizontalLayout_12);
   
   // 减小下方边距
   center_layout->setContentsMargins(0, 0, 0, 5);
@@ -979,10 +933,13 @@ void MainWindow::setupUi() {
 void MainWindow::signalCursorPose(QPointF pos) {
   basic::Point mapPos =
       display_manager_->mapPose2Word(basic::Point(pos.x(), pos.y()));
-      label_pos_map_->setText("Map: (" + QString::number(mapPos.x, 'f', 2) +
-                          ", " + QString::number(mapPos.y, 'f', 2) + ")");
-      label_pos_scene_->setText("Scene: (" + QString::number(pos.x(), 'f', 2) +
-                            ", " + QString::number(pos.y(), 'f', 2) + ")");
+  Display::ViewManager* view_manager = dynamic_cast<Display::ViewManager*>(display_manager_->GetViewPtr());
+  if (view_manager) {
+    view_manager->UpdateMapPos("Map: (" + QString::number(mapPos.x, 'f', 2) +
+                               ", " + QString::number(mapPos.y, 'f', 2) + ")");
+    view_manager->UpdateScenePos("Scene: (" + QString::number(pos.x(), 'f', 2) +
+                                 ", " + QString::number(pos.y(), 'f', 2) + ")");
+  }
 }
 
 //============================================================================

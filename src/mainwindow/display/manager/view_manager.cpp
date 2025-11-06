@@ -23,13 +23,48 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
   main_layout->addItem(
       new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-  // 创建一个水平布局，放在右下角
-  QHBoxLayout *bottom_bar_layout = new QHBoxLayout;
-  bottom_bar_layout->setContentsMargins(0, 0, 0, 0);
-  bottom_bar_layout->setSpacing(0);
-  bottom_bar_layout->addItem(
+  // 创建一个水平布局，放在底部，包含左侧坐标显示和右侧工具按钮
+  QHBoxLayout *bottom_layout = new QHBoxLayout;
+  bottom_layout->setContentsMargins(5, 0, 5, 5);
+  bottom_layout->setSpacing(5);
+  
+  // 左侧坐标显示
+  label_pos_map_ = new QLineEdit();
+  label_pos_map_->setReadOnly(true);
+  label_pos_map_->setObjectName(QString::fromUtf8("label_pos_map_"));
+  label_pos_map_->setMinimumWidth(160);
+  label_pos_map_->setMaximumWidth(220);
+  label_pos_map_->setFixedHeight(20);
+  label_pos_map_->setPlaceholderText("Map: (x, y)");
+  label_pos_map_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
+  label_pos_map_->setText("Map: (0.00, 0.00)");
+  bottom_layout->addWidget(label_pos_map_);
+
+  label_pos_scene_ = new QLineEdit();
+  label_pos_scene_->setReadOnly(true);
+  label_pos_scene_->setObjectName(QString::fromUtf8("label_pos_scene_"));
+  label_pos_scene_->setMinimumWidth(160);
+  label_pos_scene_->setMaximumWidth(220);
+  label_pos_scene_->setFixedHeight(20);
+  label_pos_scene_->setPlaceholderText("Scene: (x, y)");
+  label_pos_scene_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
+  label_pos_scene_->setText("Scene: (0.00, 0.00)");
+  bottom_layout->addWidget(label_pos_scene_);
+
+  label_pos_robot_ = new QLineEdit();
+  label_pos_robot_->setReadOnly(true);
+  label_pos_robot_->setObjectName(QString::fromUtf8("label_pos_robot_"));
+  label_pos_robot_->setMinimumWidth(180);
+  label_pos_robot_->setMaximumWidth(240);
+  label_pos_robot_->setFixedHeight(20);
+  label_pos_robot_->setPlaceholderText("Robot: (x, y, θ)");
+  label_pos_robot_->setStyleSheet("QLineEdit { border: none; background-color: transparent; font-size: 10px; }");
+  label_pos_robot_->setText("Robot: (0.00, 0.00, 0.00)");
+  bottom_layout->addWidget(label_pos_robot_);
+  
+  // 中间spacer，将右侧按钮推到右边
+  bottom_layout->addItem(
       new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-  main_layout->addLayout(bottom_bar_layout);
 
   // 创建工具按钮并添加到布局中
   // 添加机器人位置按钮（在放大缩小按钮左侧，初始隐藏）
@@ -48,7 +83,7 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   border-radius: 4px;"
       "}");
   add_robot_pos_btn_->hide();  // 初始隐藏
-  bottom_bar_layout->addWidget(add_robot_pos_btn_);
+  bottom_layout->addWidget(add_robot_pos_btn_);
 
   QToolButton *set_big_btn_ = new QToolButton();
   set_big_btn_->setIcon(QIcon(":/images/big.svg"));
@@ -60,7 +95,7 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   border: none;"
       "   background-color: transparent;"
       "}");
-  bottom_bar_layout->addWidget(set_big_btn_);
+  bottom_layout->addWidget(set_big_btn_);
   QToolButton *set_small_btn_ = new QToolButton();
   set_small_btn_->setIcon(QIcon(":/images/scale.svg"));
   set_small_btn_->setIconSize(QSize(25, 25));
@@ -71,7 +106,7 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   border: none;"
       "   background-color: transparent;"
       "}");
-  bottom_bar_layout->addWidget(set_small_btn_);
+  bottom_layout->addWidget(set_small_btn_);
   focus_robot_btn_ = new QToolButton();
   focus_robot_btn_->setIcon(QIcon(":/images/unfocus.svg"));
   focus_robot_btn_->setToolTip("聚焦机器人");
@@ -82,9 +117,11 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
       "   background-color: transparent;"
       "}");
   focus_robot_btn_->setIconSize(QSize(25, 25));
-  bottom_bar_layout->addWidget(focus_robot_btn_);
+  bottom_layout->addWidget(focus_robot_btn_);
   
-  setViewportMargins(0, 5, 0, 5);
+  main_layout->addLayout(bottom_layout);
+  
+  setViewportMargins(0, 5, 0, 0);
 
   //左侧工具
   QHBoxLayout *display_config_layout = new QHBoxLayout;
@@ -132,6 +169,24 @@ void ViewManager::SetDisplayManagerPtr(DisplayManager *display_manager) {
 void ViewManager::ShowAddRobotPosButton(bool show) {
   if (add_robot_pos_btn_) {
     add_robot_pos_btn_->setVisible(show);
+  }
+}
+
+void ViewManager::UpdateMapPos(const QString &text) {
+  if (label_pos_map_) {
+    label_pos_map_->setText(text);
+  }
+}
+
+void ViewManager::UpdateScenePos(const QString &text) {
+  if (label_pos_scene_) {
+    label_pos_scene_->setText(text);
+  }
+}
+
+void ViewManager::UpdateRobotPos(const QString &text) {
+  if (label_pos_robot_) {
+    label_pos_robot_->setText(text);
   }
 }
 void ViewManager::mouseMoveEvent(QMouseEvent *event) {

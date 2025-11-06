@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>images/list_view.svg</file>
         <file>images/robot.png</file>
         <file>images/line.png</file>
         <file>images/offline.png</file>
