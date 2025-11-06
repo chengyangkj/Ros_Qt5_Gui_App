@@ -225,7 +225,7 @@ void NavGoalWidget::SetEditMode(bool flag) {
   spinBox_y_->setEnabled(flag);
   spinBox_theta_->setEnabled(flag);
   lineEdit_name_->setEnabled(flag);
-  button_remove_->setEnabled(flag);
+  button_remove_->setVisible(flag);
   button_edit_name_->setVisible(flag);
   button_send_->setVisible(!flag);
 }
