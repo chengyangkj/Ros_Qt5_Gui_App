@@ -98,8 +98,7 @@ void SceneManager::UpdateTopologyMap(const TopologyMap &topology_map) {
     // 使用统一的坐标转换：世界坐标 -> 地图坐标
     auto robot_pose = point.ToRobotPose();
     auto map_pose = display_manager_->wordPose2Map(robot_pose);
-    goal_point->SetPoseInParent(map_pose);
-    goal_point->update();
+    goal_point->UpdateData(map_pose);
     
     LOG_INFO("Update Point: " << point.name << " at world pose(" 
              << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
@@ -621,8 +620,10 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
 
             // 更新显示位置：世界坐标 -> 地图坐标
             auto map_pose = display_manager_->wordPose2Map(pose);
-            display->SetPoseInParent(map_pose);
-            display->update();
+            auto* point_shape = dynamic_cast<PointShape*>(display);
+            if (point_shape) {
+              point_shape->UpdateData(map_pose);
+            }
             
             // 同步更新拓扑地图中的点坐标
             topology_map_.UpdatePoint(point_name, TopologyMap::PointInfo(pose, point_name));
