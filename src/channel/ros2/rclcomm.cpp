@@ -10,7 +10,6 @@
 #include <fstream>
 #include <chrono>
 #include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include "config/config_manager.h"
 #include "logger/logger.h"
 #include "core/framework/framework.h"
