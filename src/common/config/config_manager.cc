@@ -60,7 +60,7 @@ bool ConfigManager::ReadRootConfig() {
     std::exit(1);
   }
   file.close();
-  
+
   return true;
 }
 bool ConfigManager::StoreConfig() {

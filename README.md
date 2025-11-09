@@ -37,8 +37,9 @@
 
 | 功能 | 状态 | 备注 |
 |------|------|------|
-| ROS1支持 | ❓| 缺乏测试，bug请反馈[Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues) |
-| ROS2支持 | ✅ | 稳定及长期支持维护 |
+| ROS1通信支持 |  ✅| 缺乏测试，bug请反馈[Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues) |
+| ROS2通信支持 | ✅ | 稳定及长期支持维护 |
+| rosbridge 通信支持 | ✅ | [dev]开发中，部分功能已支持.. |
 | 全局/局部地图显示 | ✅ | |
 | 机器人实时位置显示 | ✅ | |
 | 机器人速度仪表盘 | ✅ | |
@@ -73,7 +74,7 @@
 
 ```bash
 sudo apt-get update
-sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev -y
+sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev libbson-dev libwebsocketpp-dev  -y
 ```
 
 ### CMake 升级

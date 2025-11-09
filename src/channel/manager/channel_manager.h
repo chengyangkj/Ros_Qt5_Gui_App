@@ -17,6 +17,7 @@ class ChannelManager {
  private:
   VirtualChannelNode *channel_ptr_{nullptr};
   boost::dll::shared_library *library_channel_;
+  std::string GetChannelPath(const std::string &channel_type);
 
  public:
   explicit ChannelManager();
@@ -25,7 +26,7 @@ class ChannelManager {
   /// @param name
   /// @return
   bool OpenChannel(const std::string &name);
-  /// @brief 自动查找当前可执行程序陆军下的lib目录中的channel并打开
+  /// @brief 根据配置自动选择channel类型并打开，默认auto
   /// @return
   bool OpenChannelAuto();
   /// @brief 查找lib路径下所有channel

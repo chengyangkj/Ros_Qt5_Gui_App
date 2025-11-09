@@ -1,5 +1,27 @@
 # 功能使用指南
 
+## 通信channel配置
+
+默认情况下，系统会根据当前所使用的ROS1或ROS2自行打开channel，这里介绍下如何打开rosbridge channel
+
+- 机器人运行 rosbridge
+For ROS2 (Recommended):
+
+ros2 run rosbridge_server rosbridge_websocket
+# or
+ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+For ROS1:
+
+roslaunch rosbridge_server rosbridge_websocket.launch 
+
+- 配置界面切换rosbridge
+
+![切换channel](./images/switch_channel.png)
+
+切换完成后重启生效，需要注意添正确机器人rosbridge的ip与端口
+目前大地图通过rosbridge传输不过来，需要手动使用软件的[打开地图]功能，手动打开地图，后期这个问题看看寻找解决方案解决下
+
+
 ## 地图显示与编辑
 
 ### 地图显示

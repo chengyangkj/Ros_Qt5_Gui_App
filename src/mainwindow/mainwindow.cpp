@@ -29,6 +29,7 @@
 #include "widgets/speed_ctrl.h"
 #include "widgets/display_config_widget.h"
 #include "display/manager/view_manager.h"
+#include <QTimer>
 using namespace ads;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -54,6 +55,30 @@ MainWindow::MainWindow(QWidget *parent)
 bool MainWindow::openChannel() {
   if (channel_manager_.OpenChannelAuto()) {
     registerChannel();
+    
+    // 延迟检查连接状态（连接超时是5秒）
+    auto* channel = channel_manager_.GetChannel();
+    if (channel) {
+      QTimer::singleShot(6000, this, [this, channel]() {
+        if (channel->IsConnectionFailed()) {
+          std::string error_msg = channel->GetConnectionError();
+          std::string channel_name = channel->Name();
+          if (!error_msg.empty()) {
+            QMessageBox::critical(this, QString::fromStdString(channel_name) + " 连接失败", 
+                                  QString::fromStdString(error_msg),
+                                  QMessageBox::Ok);
+          } else {
+            QMessageBox::critical(this, QString::fromStdString(channel_name) + " 连接失败", 
+                                  "无法连接到 " + QString::fromStdString(channel_name) + " 服务器。\n\n请检查：\n"
+                                  "1. 服务器是否正在运行\n"
+                                  "2. 配置是否正确\n"
+                                  "3. 网络连接是否正常",
+                                  QMessageBox::Ok);
+          }
+        }
+      });
+    }
+    
     return true;
   }
   return false;

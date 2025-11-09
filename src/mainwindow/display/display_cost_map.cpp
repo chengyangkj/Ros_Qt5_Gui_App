@@ -26,9 +26,9 @@ DisplayCostMap::DisplayCostMap(const std::string &display_type,
   } else if (display_type == DISPLAY_LOCAL_COST_MAP) {
     SUBSCRIBE(MSG_ID_LOCAL_COST_MAP, [this](const OccupancyMap& data) {
       cost_map_data_ = data;
-      ParseCostMap();
-      SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
-      update();
+  ParseCostMap();
+  SetBoundingRect(QRectF(0, 0, map_image_.width(), map_image_.height()));
+  update();
     });
   }
 }

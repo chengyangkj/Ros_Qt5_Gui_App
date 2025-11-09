@@ -16,6 +16,7 @@
 #include <QFileDialog>
 #include <QTableWidget>
 #include <QHeaderView>
+#include <QComboBox>
 #include <map>
 #include <string>
 #include <vector>
@@ -55,6 +56,7 @@ class DisplayConfigWidget : public QWidget {
   void InitKeyValueTab();
   void InitImageConfigTab();
   void InitRobotShapeTab();
+  void InitChannelConfigTab();
   void RefreshKeyValueTab();
   void UpdateDisplayVisibility(const std::string &display_name, bool visible);
   void AutoSaveConfig();
@@ -84,5 +86,12 @@ class DisplayConfigWidget : public QWidget {
   QSlider *robot_opacity_slider_{nullptr};
   QLabel *robot_opacity_label_{nullptr};
   QColor robot_color_;
+  
+  QWidget *channel_config_tab_{nullptr};
+  QComboBox *channel_type_combo_{nullptr};
+  QLineEdit *rosbridge_ip_edit_{nullptr};
+  QLineEdit *rosbridge_port_edit_{nullptr};
+  QPushButton *reconnect_channel_btn_{nullptr};
+  bool is_loading_config_{false};
 };
 

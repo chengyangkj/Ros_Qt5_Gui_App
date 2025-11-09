@@ -1,20 +1,56 @@
 #include "channel_manager.h"
 #include <boost/dll.hpp>
-
 #include <iostream>
+#include "config/config_manager.h"
 namespace fs = boost::filesystem;
 ChannelManager::ChannelManager() {}
 ChannelManager::~ChannelManager() {}
+
+std::string ChannelManager::GetChannelPath(const std::string &channel_type) {
+  std::string libDir = boost::dll::program_location().parent_path().string() + "/lib/";
+  std::string libPrefix = "libchannel_";
+  std::string libSuffix;
+
+#ifdef __WIN32
+  libSuffix = ".dll";
+#elif __APPLE__
+  libSuffix = ".dylib";
+#elif __linux__
+  libSuffix = ".so";
+#endif
+
+  return libDir + libPrefix + channel_type + libSuffix;
+}
+
 bool ChannelManager::OpenChannelAuto() {
-  auto channel_list = DiscoveryAllChannel();
-  if (channel_list.size() == 0)
-    return false;
-  // 如果已经打开了channel，则关闭
   if (channel_ptr_) {
     CloseChannel();
   }
 
-  return OpenChannel(channel_list[0]);
+  // 从配置读取通道类型
+  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  std::string channel_type = config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
+
+  if (channel_type == "auto") {
+    auto channel_list = DiscoveryAllChannel();
+    if (channel_list.size() == 0) {
+      std::cout << "No channel found in lib directory" << std::endl;
+      return false;
+    }
+    std::cout << "Auto select channel: " << channel_list[0] << std::endl;
+    return OpenChannel(channel_list[0]);
+  } else if (channel_type == "ros2" || channel_type == "ros1" || channel_type == "rosbridge") {
+    std::string channel_path = GetChannelPath(channel_type);
+    std::cout << "Open channel from config: " << channel_path << std::endl;
+    return OpenChannel(channel_path);
+  } else {
+    std::cout << "Unknown channel type: " << channel_type << ", fallback to auto" << std::endl;
+    auto channel_list = DiscoveryAllChannel();
+    if (channel_list.size() == 0) {
+      return false;
+    }
+    return OpenChannel(channel_list[0]);
+  }
 }
 std::vector<std::string> ChannelManager::DiscoveryAllChannel() {
   std::vector<std::string> res;

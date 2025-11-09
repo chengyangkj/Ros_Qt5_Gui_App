@@ -32,12 +32,26 @@ struct RobotShapedConfig {
 };
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(RobotShapedConfig, shaped_points, is_ellipse, color, opacity);
 
+
+struct RosbridgeConfig {
+  std::string ip{"127.0.0.1"};
+  std::string port{"9090"};
+};
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(RosbridgeConfig, ip, port);
+
+struct ChannelConfig {
+  std::string channel_type{"auto"};
+  RosbridgeConfig rosbridge_config;
+};
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ChannelConfig, channel_type, rosbridge_config);
+
 struct ConfigRoot {
   std::vector<DisplayConfig> display_config;
   std::vector<ImageDisplayConfig> images;
   RobotShapedConfig robot_shape_config;
   std::map<std::string, std::string> key_value;
+  ChannelConfig channel_config; 
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigRoot, display_config, images, robot_shape_config, key_value);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigRoot, display_config, images, robot_shape_config, key_value, channel_config);
 
 }  // namespace Config

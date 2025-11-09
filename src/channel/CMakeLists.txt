@@ -10,7 +10,8 @@ if( BUILD_WITH_CHANNEL_AUTO STREQUAL "ON")
         message("Auto USE ROS2 channel")
         add_subdirectory(ros2)
     else()
-        message("build map editor only!")
+        message("Auto USE ROSbridge channel")
+        add_subdirectory(rosbridge)
     endif()
 elseif(BUILD_WITH_CHANNEL_ROS2 STREQUAL "ON")
     message("Manual USE ROS2 channel")
@@ -18,9 +19,11 @@ elseif(BUILD_WITH_CHANNEL_ROS2 STREQUAL "ON")
 elseif(BUILD_WITH_CHANNEL_ROS1 STREQUAL "ON")
     message("Manual USE ROS1 channel")
     add_subdirectory(ros1)
-
-  
 endif()
+
+message("build ROSBridge channel")
+add_subdirectory(rosbridge)
+
 #manager
 find_package(Boost REQUIRED COMPONENTS filesystem)
 file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*.h manager/*.hpp)

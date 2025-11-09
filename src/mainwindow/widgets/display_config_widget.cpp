@@ -63,6 +63,7 @@ void DisplayConfigWidget::InitUI() {
   )");
   
   InitDisplayConfigTab();
+  InitChannelConfigTab();
   InitKeyValueTab();
   InitImageConfigTab();
   InitRobotShapeTab();
@@ -619,6 +620,253 @@ void DisplayConfigWidget::InitRobotShapeTab() {
   tab_widget_->addTab(robot_shape_tab_, "机器人外形");
 }
 
+void DisplayConfigWidget::InitChannelConfigTab() {
+  channel_config_tab_ = new QWidget();
+  QVBoxLayout *tab_layout = new QVBoxLayout(channel_config_tab_);
+  tab_layout->setContentsMargins(10, 10, 10, 10);
+  tab_layout->setSpacing(10);
+  
+  QLabel *section_label = new QLabel("通信配置", channel_config_tab_);
+  section_label->setStyleSheet(R"(
+    QLabel {
+      font-size: 14px;
+      font-weight: bold;
+      color: #333333;
+      padding: 5px;
+    }
+  )");
+  tab_layout->addWidget(section_label);
+  
+  QGroupBox *channel_type_group = new QGroupBox("通道类型", channel_config_tab_);
+  channel_type_group->setStyleSheet(R"(
+    QGroupBox {
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      margin-top: 10px;
+      padding-top: 10px;
+      background-color: #f9f9f9;
+    }
+    QGroupBox::title {
+      subcontrol-origin: margin;
+      left: 10px;
+      padding: 0 5px;
+    }
+  )");
+  
+  QVBoxLayout *channel_type_layout = new QVBoxLayout(channel_type_group);
+  channel_type_layout->setContentsMargins(10, 15, 10, 10);
+  channel_type_layout->setSpacing(8);
+  
+  QHBoxLayout *type_layout = new QHBoxLayout();
+  QLabel *type_label = new QLabel("类型:", channel_type_group);
+  type_label->setFixedWidth(80);
+  channel_type_combo_ = new QComboBox(channel_type_group);
+  channel_type_combo_->addItem("auto", "auto");
+  channel_type_combo_->addItem("ROS2", "ros2");
+  channel_type_combo_->addItem("ROS1", "ros1");
+  channel_type_combo_->addItem("ROSBridge", "rosbridge");
+  channel_type_combo_->setStyleSheet(R"(
+    QComboBox {
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      padding: 4px;
+      background-color: #ffffff;
+      min-width: 150px;
+    }
+    QComboBox:hover {
+      border-color: #1976d2;
+    }
+    QComboBox::drop-down {
+      border: none;
+      width: 20px;
+    }
+    QComboBox::down-arrow {
+      image: none;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 6px solid #333333;
+      margin-right: 5px;
+    }
+  )");
+  connect(channel_type_combo_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+    // 如果正在加载配置，不显示提示
+    if (is_loading_config_) {
+      return;
+    }
+    
+    auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+    QString channel_type = channel_type_combo_->itemData(index).toString();
+    QString old_channel_type = QString::fromStdString(config.channel_config.channel_type);
+    
+    // 更新通道配置
+    config.channel_config.channel_type = channel_type.toStdString();
+    AutoSaveConfig();
+    
+    // 根据选择的类型显示/隐藏 ROSBridge 配置
+    bool show_rosbridge = (channel_type == "rosbridge");
+    rosbridge_ip_edit_->setEnabled(show_rosbridge);
+    rosbridge_port_edit_->setEnabled(show_rosbridge);
+    
+    // 如果通道类型发生变化，提示用户需要重启
+    if (channel_type != old_channel_type) {
+      QMessageBox::information(this, "通道配置已更改", 
+                                "通道类型已更改为: " + channel_type + "\n\n"
+                                "请重启应用程序以使配置生效。",
+                                QMessageBox::Ok);
+    }
+  });
+  type_layout->addWidget(type_label);
+  type_layout->addWidget(channel_type_combo_);
+  type_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
+  channel_type_layout->addLayout(type_layout);
+  
+  tab_layout->addWidget(channel_type_group);
+  
+  QGroupBox *rosbridge_group = new QGroupBox("ROSBridge 配置", channel_config_tab_);
+  rosbridge_group->setStyleSheet(R"(
+    QGroupBox {
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      margin-top: 10px;
+      padding-top: 10px;
+      background-color: #f9f9f9;
+    }
+    QGroupBox::title {
+      subcontrol-origin: margin;
+      left: 10px;
+      padding: 0 5px;
+    }
+  )");
+  
+  QVBoxLayout *rosbridge_layout = new QVBoxLayout(rosbridge_group);
+  rosbridge_layout->setContentsMargins(10, 15, 10, 10);
+  rosbridge_layout->setSpacing(8);
+  
+  QHBoxLayout *ip_layout = new QHBoxLayout();
+  QLabel *ip_label = new QLabel("IP地址:", rosbridge_group);
+  ip_label->setFixedWidth(80);
+  rosbridge_ip_edit_ = new QLineEdit(rosbridge_group);
+  rosbridge_ip_edit_->setPlaceholderText("127.0.0.1");
+  rosbridge_ip_edit_->setStyleSheet(R"(
+    QLineEdit {
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      padding: 4px;
+      background-color: #ffffff;
+    }
+    QLineEdit:focus {
+      border-color: #1976d2;
+    }
+    QLineEdit:disabled {
+      background-color: #f5f5f5;
+      color: #999999;
+    }
+  )");
+  connect(rosbridge_ip_edit_, &QLineEdit::editingFinished, [this]() {
+    // 如果正在加载配置，不显示提示
+    if (is_loading_config_) {
+      return;
+    }
+    
+    auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+    QString new_ip = rosbridge_ip_edit_->text();
+    QString old_ip = QString::fromStdString(config.channel_config.rosbridge_config.ip);
+    
+    // 更新 ROSBridge IP 配置
+    config.channel_config.rosbridge_config.ip = new_ip.toStdString();
+    AutoSaveConfig();
+    
+    // 如果 IP 地址发生变化，提示用户需要重启
+    if (new_ip != old_ip && !new_ip.isEmpty()) {
+      QMessageBox::information(this, "ROSBridge 配置已更改", 
+                                "ROSBridge IP 地址已更改为: " + new_ip + "\n\n"
+                                "请重启应用程序以使配置生效。",
+                                QMessageBox::Ok);
+    }
+  });
+  ip_layout->addWidget(ip_label);
+  ip_layout->addWidget(rosbridge_ip_edit_);
+  rosbridge_layout->addLayout(ip_layout);
+  
+  QHBoxLayout *port_layout = new QHBoxLayout();
+  QLabel *port_label = new QLabel("端口:", rosbridge_group);
+  port_label->setFixedWidth(80);
+  rosbridge_port_edit_ = new QLineEdit(rosbridge_group);
+  rosbridge_port_edit_->setPlaceholderText("9090");
+  rosbridge_port_edit_->setStyleSheet(R"(
+    QLineEdit {
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      padding: 4px;
+      background-color: #ffffff;
+    }
+    QLineEdit:focus {
+      border-color: #1976d2;
+    }
+    QLineEdit:disabled {
+      background-color: #f5f5f5;
+      color: #999999;
+    }
+  )");
+  connect(rosbridge_port_edit_, &QLineEdit::editingFinished, [this]() {
+    // 如果正在加载配置，不显示提示
+    if (is_loading_config_) {
+      return;
+    }
+    
+    auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+    QString new_port = rosbridge_port_edit_->text();
+    QString old_port = QString::fromStdString(config.channel_config.rosbridge_config.port);
+    
+    // 更新 ROSBridge 端口配置
+    config.channel_config.rosbridge_config.port = new_port.toStdString();
+    AutoSaveConfig();
+    
+    // 如果端口发生变化，提示用户需要重启
+    if (new_port != old_port && !new_port.isEmpty()) {
+      QMessageBox::information(this, "ROSBridge 配置已更改", 
+                                "ROSBridge 端口已更改为: " + new_port + "\n\n"
+                                "请重启应用程序以使配置生效。",
+                                QMessageBox::Ok);
+    }
+  });
+  port_layout->addWidget(port_label);
+  port_layout->addWidget(rosbridge_port_edit_);
+  rosbridge_layout->addLayout(port_layout);
+  
+  tab_layout->addWidget(rosbridge_group);
+  
+  reconnect_channel_btn_ = new QPushButton("保存", channel_config_tab_);
+  reconnect_channel_btn_->setFixedWidth(150);
+  reconnect_channel_btn_->setStyleSheet(R"(
+    QPushButton {
+      border: 1px solid #1976d2;
+      border-radius: 4px;
+      padding: 6px;
+      background-color: #1976d2;
+      color: #ffffff;
+      font-weight: bold;
+    }
+    QPushButton:hover {
+      background-color: #1565c0;
+    }
+    QPushButton:pressed {
+      background-color: #0d47a1;
+    }
+  )");
+  connect(reconnect_channel_btn_, &QPushButton::clicked, [this]() {
+    QMessageBox::information(this, "提示", 
+                              "请重启应用程序以使通道配置生效。\n"
+                              "当前配置已保存。",
+                              QMessageBox::Ok);
+  });
+  tab_layout->addWidget(reconnect_channel_btn_, 0, Qt::AlignLeft);
+  
+  tab_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
+  
+  tab_widget_->addTab(channel_config_tab_, "通信配置");
+}
+
 void DisplayConfigWidget::SetDisplayManager(Display::DisplayManager *manager) {
   display_manager_ = manager;
   if (display_manager_) {
@@ -975,6 +1223,39 @@ void DisplayConfigWidget::LoadConfig() {
   robot_opacity_slider_->setValue(static_cast<int>(config.robot_shape_config.opacity * 100));
   robot_opacity_label_->setText(QString::number(robot_opacity_slider_->value()) + "%");
   robot_opacity_slider_->blockSignals(false);
+  
+  // Load channel config
+  is_loading_config_ = true;
+  
+  // 加载通道类型
+  std::string channel_type = config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
+  channel_type_combo_->blockSignals(true);
+  int index = channel_type_combo_->findData(QString::fromStdString(channel_type));
+  if (index >= 0) {
+    channel_type_combo_->setCurrentIndex(index);
+  } else {
+    channel_type_combo_->setCurrentIndex(0); // default to "auto"
+  }
+  channel_type_combo_->blockSignals(false);
+  
+  // 加载 ROSBridge IP
+  std::string rosbridge_ip = config.channel_config.rosbridge_config.ip.empty() ? "127.0.0.1" : config.channel_config.rosbridge_config.ip;
+  rosbridge_ip_edit_->blockSignals(true);
+  rosbridge_ip_edit_->setText(QString::fromStdString(rosbridge_ip));
+  rosbridge_ip_edit_->blockSignals(false);
+  
+  // 加载 ROSBridge 端口
+  std::string rosbridge_port = config.channel_config.rosbridge_config.port.empty() ? "9090" : config.channel_config.rosbridge_config.port;
+  rosbridge_port_edit_->blockSignals(true);
+  rosbridge_port_edit_->setText(QString::fromStdString(rosbridge_port));
+  rosbridge_port_edit_->blockSignals(false);
+  
+  // Enable/disable ROSBridge config based on channel type
+  bool show_rosbridge = (channel_type == "rosbridge");
+  rosbridge_ip_edit_->setEnabled(show_rosbridge);
+  rosbridge_port_edit_->setEnabled(show_rosbridge);
+  
+  is_loading_config_ = false;
 }
 
 void DisplayConfigWidget::SaveConfig() {
