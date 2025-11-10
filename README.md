@@ -2,8 +2,8 @@
  * @Author: chengyangkj chengyangkj@qq.com
  * @Date: 2023-09-02 07:23:43
  * @LastEditors: chengyangkj chengyangkj@qq.com
- * @LastEditTime: 2023-10-06 14:03:03
- * @FilePath: /ROS2_Qt5_Gui_App/README.md
+ * @LastEditTime: 2024-01-15
+ * @FilePath: /Ros_Qt5_Gui_App/README.md
 -->
 <div align="center">
 
@@ -37,23 +37,24 @@
 
 | 功能 | 状态 | 备注 |
 |------|------|------|
-| ROS1通信支持 |  ✅| 缺乏测试，bug请反馈[Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues) |
-| ROS2通信支持 | ✅ | 稳定及长期支持维护 |
-| rosbridge 通信支持 | ✅ | [dev]开发中，部分功能已支持.. |
-| 全局/局部地图显示 | ✅ | |
-| 机器人实时位置显示 | ✅ | |
-| 机器人速度仪表盘 | ✅ | |
-| 机器人手动控制 | ✅ | |
-| 机器人重定位 | ✅ | |
-| 机器人单点/多点导航 | ✅ | |
-| 机器人全局/局部规划轨迹显示 | ✅ | |
-| 拓扑点位编辑功能 | ✅ | |
-| 电池电量显示 | ✅ | |
-| 地图障碍物编辑功能 | ✅ | |
-| 拓扑路径编辑功能 | ✅ ||
-| 地图加载/保存 | ✅ | |
-| 相机图像显示 | ✅ | 移植自 rqt_image_view |
-| 机器人车身轮廓显示 | ✅ | 订阅ros footprint话题 |
+| ROS1 通信支持 | ✅ | 基础功能已实现，持续优化中 |
+| ROS2 通信支持 | ✅ | 稳定及长期支持维护 |
+| ROSBridge 通信支持 | ✅ | 支持 WebSocket 连接，支持断线重连 |
+| 全局/局部地图显示 | ✅ | 支持 OccupancyGrid 地图 |
+| 机器人实时位置显示 | ✅ | 基于 TF 变换 |
+| 机器人速度仪表盘 | ✅ | 实时显示线速度和角速度 |
+| 机器人手动控制 | ✅ | 支持速度控制 |
+| 机器人重定位 | ✅ | 支持 2D Pose Estimate |
+| 机器人单点/多点导航 | ✅ | 支持导航目标点设置 |
+| 机器人全局/局部规划轨迹显示 | ✅ | 实时显示规划路径 |
+| 拓扑点位编辑功能 | ✅ | 可视化编辑拓扑点 |
+| 电池电量显示 | ✅ | 订阅 BatteryState 话题 |
+| 地图障碍物编辑功能 | ✅ | 支持地图编辑 |
+| 拓扑路径编辑功能 | ✅ | 可视化编辑拓扑路径 |
+| 地图加载/保存 | ✅ | 支持地图文件管理 |
+| 相机图像显示 | ✅ | 支持多路图像显示 |
+| 机器人车身轮廓显示 | ✅ | 订阅 footprint 话题 |
+| 激光雷达显示 | ✅ | 支持 LaserScan 可视化 |
 
 ### 🖼️ 界面预览
 
@@ -65,21 +66,36 @@
 
 ### 环境要求
 
-- Ubuntu 18.04+
-- ROS1/ROS2 环境
-- Qt5 基础环境
-- CMake 3.16+ 
+- **操作系统**: Ubuntu 18.04+ / Windows 10+
+- **ROS 环境**: ROS1 (Melodic/Noetic) 或 ROS2 (Foxy/Galactic/Humble)
+- **Qt5**: Qt5.12+ (Qt5 Core, Widgets, SVG)
+- **CMake**: 3.16+
+- **编译器**: GCC 7+ / MSVC 2019+
 
 ### 安装依赖
 
+#### Ubuntu/Debian
+
 ```bash
 sudo apt-get update
-sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev -y
+sudo apt-get install -y \
+  qtbase5-dev \
+  qtbase5-private-dev \
+  libqt5svg5-dev \
+  qtbase5-dev-tools \
+  libeigen3-dev \
+  libgtest-dev \
+  libsdl-image1.2-dev \
+  libsdl1.2-dev
 ```
+
+#### Windows
+
+Windows 平台需要手动安装 Qt5 和配置环境变量，或使用 vcpkg 等包管理器。
 
 ### CMake 升级
 
-ubuntu 18.04 默认安装的是 3.10.2 版本，需要升级到 3.16+ 版本, Ubuntu20.04及以上可跳过此步骤
+Ubuntu 20.04及以下的系统自带的CMake版本过低，需要升级到 3.16+ 版本。Ubuntu 22.04 及以上可跳过此步骤。
 
 ```bash
 wget https://cmake.org/files/v3.16/cmake-3.16.4-Linux-x86_64.sh -O cmake-install.sh
@@ -90,35 +106,108 @@ sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 ### 编译构建
 
 ```bash
-mkdir -p ~/qt_ws
-cd ~/qt_ws
-git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App
+# 克隆仓库
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
 cd Ros_Qt5_Gui_App
+
+# 创建构建目录
 mkdir build && cd build
+
+# 配置和编译
 cmake ..
-make
+make -j$(nproc)  # Linux
+# 或
+cmake --build . --config Release  # Windows
 ```
 
 ### 运行
 
+#### 方法 1: 使用启动脚本（推荐）
+
+构建完成后，启动脚本会自动复制到 `build` 目录，直接运行即可：
+
 ```bash
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
+cd build
+./start.sh  # Linux
+# 或
+start.bat   # Windows
+```
+
+启动脚本会自动：
+- 设置库文件路径
+- 启动程序
+
+#### 方法 2: 手动运行
+
+```bash
+cd build
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib  # Linux
 ./ros_qt5_gui_app
 ```
 
+#### 方法 3: 安装后运行
+
+```bash
+cd build
+make install  # Linux
+# 或
+cmake --install . --config Release  # Windows
+
+cd ../install/bin
+./start.sh  # Linux
+# 或
+start.bat   # Windows
+```
+
+### 配置说明
+
+首次运行前，请确保：
+
+1. **ROS 环境已配置**: 确保已 source ROS 的 setup.bash/setup.bat
+2. **话题配置**: 检查 `config.json` 中的话题名称是否与你的 ROS 系统匹配
+3. **通道选择**: 在配置界面中选择正确的通信通道（ROS1/ROS2/ROSBridge）
+
+详细配置说明请参考 [配置文档](./doc/configuration.md)
+
 ## 📚 文档
 
-- [配置说明](./doc/configuration.md)
-- [使用指南](./doc/usage.md)
-- [开发指南](./doc/development.md)
-- [常见问题](./doc/faq.md)
+- [配置说明](./doc/configuration.md) - 详细的配置选项说明
+- [使用指南](./doc/usage.md) - 功能使用教程
+- [开发指南](./doc/development.md) - 开发环境搭建和代码结构
+- [常见问题](./doc/faq.md) - FAQ 和故障排除
 
+## 🏗️ 项目结构
+
+```
+Ros_Qt5_Gui_App/
+├── src/                    # 源代码目录
+│   ├── core/              # 核心模块（主程序入口）
+│   ├── mainwindow/        # 主窗口和界面
+│   ├── common/            # 公共库
+│   ├── basic/             # 基础数据结构
+│   ├── channel/           # 通信通道（ROS1/ROS2/ROSBridge）
+│   └── plugin/            # 插件系统
+├── install/               # 安装脚本
+│   ├── linux/bin/        # Linux 启动脚本
+│   └── windows/bin/       # Windows 启动脚本
+├── doc/                   # 文档目录
+├── cmake/                 # CMake 模块
+└── CMakeLists.txt        # 主 CMake 配置文件
+```
 
 ## 🤝 贡献
 
-欢迎提交 [Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues) 和 [Pull Requests](https://github.com/chengyangkj/Ros_Qt5_Gui_App/pulls)。
+欢迎提交 [Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues) 和 [Pull Requests](https://github.com/chengyangkj/Ros_Qt5_Gui_App/pulls)！
 
-如果有什么想法或者建议，欢迎提交 [🌟心愿/需求单](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29) 说不定哪天就实现了呢
+如果有什么想法或者建议，欢迎提交 [🌟心愿/需求单](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues/29)，说不定哪天就实现了呢！
+
+### 贡献指南
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
 
 ## 📊 Star 历史
 
@@ -142,19 +231,24 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 
 | 分支 | 支持平台 | 功能说明 |
 |------|---------|---------|
-| [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master) | Win10 Ubuntu | ROS + QWidget + QGraphicsview 自定义可视化界面显示 |
+| [master](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/master) | Win10 Ubuntu | ROS + QWidget + QGraphicsView 自定义可视化界面显示 |
 | [qml_hmi](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/qml_hmi) | Win10 Ubuntu | ROS + QML + C++ 混合编程，QML 自绘制地图、激光雷达等可视化 demo |
 | [simple](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/simple) | Win10 Ubuntu | ROS + QWidget + Librviz 可视化显示，CSDN 博客《ROS 人机交互软件开发》课程实现版本 |
 | [rviz_tree](https://github.com/chengyangkj/Ros_Qt5_Gui_App/tree/rviz_tree) | Win10 Ubuntu | ROS + QWidget + Librviz 原生图层 API 管理图层，无需手动创建图层 |
-| [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo) | Win10 Ubuntu | 使用 cakin_create_qt_pkg 创建的原始包，cmakelist.txt 配置到 qt5，可直接编译运行 |
-| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo) | ROS2 | 运行在 ROS2 平台的 Qt demo 包，cmakelist.txt 配置到 qt5，可使用 colcon build 编译使用 |
+| [ros_qt_demo](https://github.com/chengyangkj/ros_qt_demo) | Win10 Ubuntu | 使用 catkin_create_qt_pkg 创建的原始包，CMakeLists.txt 配置到 Qt5，可直接编译运行 |
+| [ros2_qt_demo](https://github.com/chengyangkj/ros2_qt_demo) | ROS2 | 运行在 ROS2 平台的 Qt demo 包，CMakeLists.txt 配置到 Qt5，可使用 colcon build 编译使用 |
 | [ROS2_Qt5_Gui_App](https://github.com/chengyangkj/ROS2_Qt5_Gui_App) | ROS2 | 与本仓库相同/不再维护 |
 | [Flutter App](https://github.com/chengyangkj/ROS_Flutter_Gui_App) | 多平台 (Flutter) | 已实现 |
 
 ## 💬 交流群
 
-QQ 群: 797497206
+- **QQ 群**: 797497206
+- **Issues**: [GitHub Issues](https://github.com/chengyangkj/Ros_Qt5_Gui_App/issues)
 
 ## 📄 开源协议
 
 本项目采用 [MIT](LICENSE) 开源协议。
+
+## 🙏 致谢
+
+感谢所有贡献者和使用者的支持！
