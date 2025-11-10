@@ -29,7 +29,7 @@ class TopologyLine : public VirtualDisplay {
   
   bool is_part_of_bidirectional_{false};              // 是否是双向连接的一部分
   bool is_selected_{false};
-  int line_width_{4};                               // 稍微加粗
+  int line_width_{5};                               // 线段宽度
   int arrow_size_{20};                              // 加大箭头
   bool is_highlighted_{false};
   

@@ -37,3 +37,4 @@ enable_testing()
 
 # modules
 add_subdirectory(src)
+add_subdirectory(install)

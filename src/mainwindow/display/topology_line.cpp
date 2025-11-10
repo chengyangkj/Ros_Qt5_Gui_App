@@ -166,14 +166,12 @@ void TopologyLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
   if (is_selected_ && !is_preview_mode_) {
     drawFlowingLight(painter, start_pos, end_pos, main_color);
   }
+ 
+  drawMovingArrows(painter, start_pos, end_pos, main_color);
   
-  // 绘制动态箭头
   if (is_preview_mode_) {
     // 预览模式：固定箭头在终点
     drawStaticArrow(painter, start_pos, end_pos, main_color);
-  } else {
-    // 正常模式：动态滚动箭头
-    drawMovingArrows(painter, start_pos, end_pos, main_color);
   }
 }
 
@@ -224,35 +222,56 @@ void TopologyLine::drawStaticArrow(QPainter *painter, const QPointF &start, cons
 void TopologyLine::drawMovingArrows(QPainter *painter, const QPointF &start, const QPointF &end, const QColor &color) {
   QPointF direction = end - start;
   qreal length = qSqrt(direction.x() * direction.x() + direction.y() * direction.y());
-  if (length < arrow_size_) return;
+  if (length == 0) return;
   
   direction /= length;
   
-  // 计算箭头间距和数量
-  qreal arrow_spacing = 60.0; // 箭头间距
-  qreal arrow_size = arrow_size_ * 0.8; // 稍小的箭头
-  int num_arrows = static_cast<int>(length / arrow_spacing) + 1;
-  
-  // 计算动画偏移
-  qreal anim_offset = fmod(animation_offset_ * 6, arrow_spacing); // 控制移动速度（减慢箭头滚动）
+  // 箭头参数（参考 Dart 代码，调整大小以适应 Qt 场景）
+  qreal arrow_spacing = 40.0; // 箭头间距（稍微增大间距）
+  qreal triangle_size = 5.0; // 三角形大小（调整为可见大小）
   
   painter->save();
   
-  // 绘制箭头
-  for (int i = 0; i < num_arrows; ++i) {
-    qreal t = (i * arrow_spacing + anim_offset) / length;
-    if (t > 1.0) t = fmod(t, 1.0); // 循环
+  // 绘制静态三角形箭头（无动画偏移）
+  qreal current_distance = 0.0;
+  
+  while (current_distance < length) {
+    // 只在路径中间部分绘制箭头（不在起点和终点附近）
+    if (current_distance > triangle_size && current_distance < length - triangle_size) {
+      QPointF triangle_center = start + direction * current_distance;
+      
+      // 计算三角形透明度（从起点到终点，透明度从 0.8 到 0.5）
+      qreal distance_ratio = current_distance / length;
+      qreal opacity = 0.8 - distance_ratio * 0.3;
+      opacity = qMax(0.0, qMin(1.0, opacity));
+      
+      // 计算垂直向量
+      QPointF perpendicular(-direction.y(), direction.x());
+      
+      // 计算三角形的三个点
+      QPointF front_point = triangle_center + direction * triangle_size; // 前端点
+      QPointF back_left = triangle_center - direction * triangle_size * 0.5 + perpendicular * triangle_size * 0.5; // 左后点
+      QPointF back_right = triangle_center - direction * triangle_size * 0.5 - perpendicular * triangle_size * 0.5; // 右后点
+      
+      // 创建三角形路径
+      QPolygonF triangle;
+      triangle << front_point << back_left << back_right;
+      
+      // 设置颜色和透明度（确保箭头可见）
+      QColor triangle_color = color;
+      // 如果颜色透明度太低，使用不透明颜色
+      if (color.alphaF() < 0.5) {
+        triangle_color = QColor(color.red(), color.green(), color.blue(), 255);
+      }
+      triangle_color.setAlphaF(opacity * triangle_color.alphaF());
+      
+      // 绘制实心三角形
+      painter->setBrush(QBrush(triangle_color));
+      painter->setPen(QPen(triangle_color.darker(150), 1));
+      painter->drawPolygon(triangle);
+    }
     
-    QPointF arrow_pos = start + direction * (t * length);
-    
-    // 计算箭头透明度（渐变效果）
-    qreal alpha = 0.3 + 0.7 * qSin(t * M_PI * 2 + animation_offset_);
-    alpha = qMax(0.2, qMin(1.0, alpha));
-    
-    QColor arrow_color = color;
-    arrow_color.setAlphaF(alpha);
-    
-    drawSingleMovingArrow(painter, arrow_pos, direction, arrow_color, arrow_size);
+    current_distance += arrow_spacing;
   }
   
   painter->restore();
