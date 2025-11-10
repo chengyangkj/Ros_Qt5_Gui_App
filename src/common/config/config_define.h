@@ -45,13 +45,20 @@ struct ChannelConfig {
 };
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ChannelConfig, channel_type, rosbridge_config);
 
+
+struct MapConfig {
+  std::string path;
+};
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(MapConfig, path);
+
 struct ConfigRoot {
   std::vector<DisplayConfig> display_config;
   std::vector<ImageDisplayConfig> images;
   RobotShapedConfig robot_shape_config;
   std::map<std::string, std::string> key_value;
   ChannelConfig channel_config; 
+  MapConfig map_config;
 };
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigRoot, display_config, images, robot_shape_config, key_value, channel_config);
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ConfigRoot, display_config, images, robot_shape_config, key_value, channel_config, map_config);
 
 }  // namespace Config

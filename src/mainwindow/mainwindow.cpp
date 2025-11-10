@@ -50,7 +50,19 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<TopologyMap::PointInfo>("TopologyMap::PointInfo");
   setupUi();
   openChannel();
-  QTimer::singleShot(50, [=]() { RestoreState(); });
+  QTimer::singleShot(50, [=]() { 
+    RestoreState();
+    std::string map_path = Config::ConfigManager::Instacnce()->GetRootConfig().map_config.path;
+    if (!map_path.empty()) {
+      std::string yaml_path = map_path;
+      if (yaml_path.find(".yaml") == std::string::npos && yaml_path.find(".yml") == std::string::npos) {
+        yaml_path += ".yaml";
+      }
+      if (QFile::exists(QString::fromStdString(yaml_path))) {
+        LoadMap(yaml_path);
+      }
+    }
+  });
 }
 bool MainWindow::openChannel() {
   if (channel_manager_.OpenChannelAuto()) {
@@ -814,12 +826,13 @@ void MainWindow::setupUi() {
     // 保存拓扑地图
     auto topology_map = display_manager_->GetTopologyMap();
 
-    //发送到ROS
-    PUBLISH(MSG_ID_TOPOLOGY_MAP_UPDATE, topology_map);
 
     std::string topology_path = map_path_ + ".topology";
     Config::ConfigManager::Instacnce()->WriteTopologyMap(topology_path, topology_map);
     
+    //发送到ROS
+    PUBLISH(MSG_ID_TOPOLOGY_MAP_UPDATE, topology_map);
+
     // 显示保存成功对话框
     QMessageBox::information(this, "保存成功", 
                             "地图文件已成功保存到:\n" + QString::fromStdString(map_path_),
@@ -836,55 +849,14 @@ void MainWindow::setupUi() {
                                                     "", filters.join(";;"),
                                                     nullptr, QFileDialog::DontUseNativeDialog);
     if (!fileName.isEmpty()) {
-      // 用户选择了文件夹，可以在这里进行相应的操作
       LOG_INFO("用户选择的打开地图路径：" << fileName.toStdString());
-      
-      std::string file_path = fileName.toStdString();
-      std::string extension = QFileInfo(fileName).suffix().toStdString();
-      
-      if (extension == "yaml") {
-        map_path_ = file_path;
-        size_t last_dot = map_path_.find_last_of(".");
-        if (last_dot != std::string::npos) {
-          map_path_ = map_path_.substr(0, last_dot);
-        }
-        // 打开占用栅格地图
-        OccupancyMap map;
-        if (map.Load(file_path)) {
-          display_manager_->UpdateOCCMap(map);
-          
-          // 尝试打开对应的拓扑地图
-          std::string topology_path = file_path;
-          size_t last_dot = topology_path.find_last_of(".");
-          if (last_dot != std::string::npos) {
-            topology_path = topology_path.substr(0, last_dot) + ".topology";
-          } else {
-            topology_path += ".topology";
-          }
-          
-          if (QFile::exists(QString::fromStdString(topology_path))) {
-            TopologyMap topology_map;
-            if (Config::ConfigManager::Instacnce()->ReadTopologyMap(topology_path, topology_map)) {
-              display_manager_->UpdateTopologyMap(topology_map);
-            }
-          }
-        } else {
-          QMessageBox::warning(this, "打开失败", "无法打开地图文件: " + fileName);
-        }
-      } else if (extension == "topology") {
-        // 打开拓扑地图
-        TopologyMap topology_map;
-        if (Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, topology_map)) {
-          display_manager_->UpdateTopologyMap(topology_map);
-        } else {
-          QMessageBox::warning(this, "打开失败", "无法打开拓扑地图文件: " + fileName);
-        }
-      }
+      LoadMap(fileName.toStdString());
     } else {
-      // 用户取消了选择
       LOG_INFO("取消打开地图");
     }
   });
+
+  
   connect(edit_map_btn, &QToolButton::clicked, [this, tools_edit_map_widget, edit_map_btn]() {
     if (edit_map_btn->text() == "编辑地图") {
       display_manager_->SetEditMapMode(Display::MapEditMode::kMoveCursor);
@@ -1032,4 +1004,58 @@ void MainWindow::updateOdomInfo(RobotState state) {
 void MainWindow::SlotSetBatteryStatus(double percent, double voltage) {
   battery_bar_->setValue(percent);
   label_power_->setText(QString::number(voltage, 'f', 2) + "V");
+}
+
+bool MainWindow::LoadMap(const std::string& file_path) {
+  if (file_path.empty()) {
+    return false;
+  }
+
+  std::string extension = QFileInfo(QString::fromStdString(file_path)).suffix().toStdString();
+  
+  if (extension == "yaml") {
+    map_path_ = file_path;
+    size_t last_dot = map_path_.find_last_of(".");
+    if (last_dot != std::string::npos) {
+      map_path_ = map_path_.substr(0, last_dot);
+    }
+
+    Config::ConfigManager::Instacnce()->GetRootConfig().map_config.path = map_path_;
+    Config::ConfigManager::Instacnce()->StoreConfig();
+
+    OccupancyMap map;
+    if (map.Load(file_path)) {
+      display_manager_->UpdateOCCMap(map);
+      
+      std::string topology_path = file_path;
+      size_t last_dot = topology_path.find_last_of(".");
+      if (last_dot != std::string::npos) {
+        topology_path = topology_path.substr(0, last_dot) + ".topology";
+      } else {
+        topology_path += ".topology";
+      }
+      
+      if (QFile::exists(QString::fromStdString(topology_path))) {
+        TopologyMap topology_map;
+        if (Config::ConfigManager::Instacnce()->ReadTopologyMap(topology_path, topology_map)) {
+          display_manager_->UpdateTopologyMap(topology_map);
+        }
+      }
+      return true;
+    } else {
+      QMessageBox::warning(this, "打开失败", "无法打开地图文件: " + QString::fromStdString(file_path));
+      return false;
+    }
+  } else if (extension == "topology") {
+    TopologyMap topology_map;
+    if (Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, topology_map)) {
+      display_manager_->UpdateTopologyMap(topology_map);
+      return true;
+    } else {
+      QMessageBox::warning(this, "打开失败", "无法打开拓扑地图文件: " + QString::fromStdString(file_path));
+      return false;
+    }
+  }
+  
+  return false;
 }

@@ -19,7 +19,7 @@ ros2 launch rosbridge_server rosbridge_websocket_launch.xml
 
 **ROS1：**
 ```bash
-roslaunch rosbridge_server rosbridge_websocket.launch
+roslaunch rosbridge_server rosbridge_websocket.launch 
 ```
 
 ### 配置界面切换
@@ -35,6 +35,10 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 
 
 ## 地图显示与编辑
+
+### 打开地图
+
+点击顶部工具栏[打开地图]按钮，选中地图的yaml文件，即可自动加载。打开一次后即记录地图路径，下次开启软件会自动打开。
 
 ### 地图显示
 软件支持显示全局地图和局部地图，地图数据来自 ROS 话题。

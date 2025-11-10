@@ -90,5 +90,6 @@ class MainWindow : public QMainWindow {
   void closeChannel();
   void registerChannel();
   void SaveState();
+  bool LoadMap(const std::string& file_path);
 };
 #endif  // MAINWINDOW_H
