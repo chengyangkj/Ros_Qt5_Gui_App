@@ -103,7 +103,7 @@ chmod +x cmake-install.sh
 sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 ```
 
-### 编译构建
+### 源码编译构建
 
 ```bash
 # 克隆仓库
@@ -119,6 +119,11 @@ make -j$(nproc)  # Linux
 # 或
 cmake --build . --config Release  # Windows
 ```
+
+### Release 二进制发行版使用
+
+下载[release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases)界面中对应系统版本的二进制压缩包，参考[方法 3: 安装后运行](#方法-3-安装后运行)运行程序
+
 
 ### 运行
 
@@ -145,7 +150,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib  # Linux
 ./ros_qt5_gui_app
 ```
 
-#### 方法 3: 安装后运行
+#### 方法 3: 安装后运行 {#方法-3-安装后运行}
 
 ```bash
 cd build
