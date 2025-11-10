@@ -102,6 +102,7 @@ make
 ### 运行
 
 ```bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 ./ros_qt5_gui_app
 ```
 
