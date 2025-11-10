@@ -56,10 +56,10 @@ void DisplayPath::drawPath(QPainter *painter) {
                           QPainter::SmoothPixmapTransform);
   painter->setPen(QPen(color_, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
   painter->setBrush(QBrush(color_));
-  // for (int i = 1; i < path_points_.size(); i++) {
-  //   painter->drawLine(path_points_[i - 1], path_points_[i]);
-  // }
-  painter->drawPoints(path_points_);
+  for (int i = 1; i < path_points_.size(); i++) {
+    painter->drawLine(path_points_[i - 1], path_points_[i]);
+  }
+  // painter->drawPoints(path_points_);
 }
 void DisplayPath::updatePathPoints(const RobotPath& path) {
   path_points_.clear();

@@ -134,6 +134,8 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT)->setVisible(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT_FOOTPRINT)->setVisible(true);
+      FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_PATH)->setVisible(true);
+      FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_PATH)->setVisible(true);
       view_ptr_->setCursor(Qt::ArrowCursor);
     } break;
     case kAddPoint: {
@@ -147,6 +149,8 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_COST_MAP)->setVisible(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT)->setVisible(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT_FOOTPRINT)->setVisible(false);
+      FactoryDisplay::Instance()->GetDisplay(DISPLAY_GLOBAL_PATH)->setVisible(false);
+      FactoryDisplay::Instance()->GetDisplay(DISPLAY_LOCAL_PATH)->setVisible(false);
     } break;
     case kErase: {
       SetPointMoveEnable(false);
