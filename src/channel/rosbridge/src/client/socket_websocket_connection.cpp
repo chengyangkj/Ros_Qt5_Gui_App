@@ -118,21 +118,19 @@ namespace rosbridge2cpp{
   }
 
   void SocketWebSocketConnection::Disconnect(){
-    if (!is_connected_) {
-      return;
-    }
-    
-    try {
-      websocketpp::lib::error_code ec;
-      c_.close(hdl_, websocketpp::close::status::normal, "", ec);
-      if (ec) {
-        std::cout << "[WebSocketConnection] Error on close: " << ec.message() << std::endl;
+    if (is_connected_) {
+      try {
+        websocketpp::lib::error_code ec;
+        c_.close(hdl_, websocketpp::close::status::normal, "", ec);
+        if (ec) {
+          std::cout << "[WebSocketConnection] Error on close: " << ec.message() << std::endl;
+        }
+      } catch (websocketpp::exception const & e) {
+        std::cout << "[WebSocketConnection] Exception on close: " << e.what() << std::endl;
       }
-    } catch (websocketpp::exception const & e) {
-      std::cout << "[WebSocketConnection] Exception on close: " << e.what() << std::endl;
+      is_connected_ = false;
     }
     
-    is_connected_ = false;
     terminate_receiver_thread_ = true;
     
     if (asio_thread_ && asio_thread_->joinable()) {

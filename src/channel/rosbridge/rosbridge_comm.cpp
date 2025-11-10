@@ -11,6 +11,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/imgproc/types_c.h>
 #include <algorithm>
+#include <thread>
+#include <chrono>
 
 /**
  * @brief 构造函数，初始化默认配置
@@ -94,6 +96,18 @@ void RosbridgeComm::ConnectAsync() {
     }
     connection_failed_ = true;
     connecting_ = false;
+    
+    if (reconnect_enabled_ && init_flag_ && !reconnecting_) {
+      std::lock_guard<std::mutex> reconnect_lock(reconnect_mutex_);
+      if (!reconnecting_) {
+        reconnecting_ = true;
+        if (reconnect_thread_.joinable()) {
+          reconnect_thread_.join();
+        }
+        reconnect_thread_ = std::thread(&RosbridgeComm::ReconnectLoop, this);
+        LOG_INFO("Starting reconnection loop...");
+      }
+    }
   });
   
   // 创建ROSBridge实例
@@ -116,6 +130,12 @@ void RosbridgeComm::ConnectAsync() {
   
   LOG_INFO("Successfully connected to ROSBridge server!");
   connecting_ = false;
+  connection_failed_ = false;
+  
+  {
+    std::lock_guard<std::mutex> reconnect_lock(reconnect_mutex_);
+    reconnecting_ = false;
+  }
   
   // ========== 订阅ROS话题 ==========
   
@@ -256,6 +276,16 @@ void RosbridgeComm::ConnectAsync() {
 bool RosbridgeComm::Stop() {
   init_flag_ = false;
   connecting_ = false;
+  reconnect_enabled_ = false;
+  
+  {
+    std::lock_guard<std::mutex> reconnect_lock(reconnect_mutex_);
+    reconnecting_ = false;
+  }
+  
+  if (reconnect_thread_.joinable()) {
+    reconnect_thread_.join();
+  }
   
   if (connection_thread_.joinable()) {
     connection_thread_.join();
@@ -265,8 +295,83 @@ bool RosbridgeComm::Stop() {
   publishers_.clear();
   callback_handles_.clear();
   ros_bridge_.reset();
+  
+  if (websocket_connection_) {
+    websocket_connection_->Disconnect();
+  }
   websocket_connection_.reset();
   return true;
+}
+
+/**
+ * @brief 重连循环，在连接断开时自动尝试重连
+ */
+void RosbridgeComm::ReconnectLoop() {
+  const int reconnect_interval_seconds = 3;
+  
+  while (reconnect_enabled_ && init_flag_) {
+    {
+      std::lock_guard<std::mutex> lock(reconnect_mutex_);
+      if (!reconnecting_) {
+        break;
+      }
+    }
+    
+    std::this_thread::sleep_for(std::chrono::seconds(reconnect_interval_seconds));
+    
+    if (!reconnect_enabled_ || !init_flag_) {
+      break;
+    }
+    
+    {
+      std::lock_guard<std::mutex> lock(reconnect_mutex_);
+      if (!reconnecting_) {
+        break;
+      }
+    }
+    
+    LOG_INFO("Attempting to reconnect to ROSBridge server at " << rosbridge_ip_ << ":" << rosbridge_port_);
+    
+    if (connection_thread_.joinable()) {
+      connection_thread_.join();
+    }
+    
+    subscribers_.clear();
+    publishers_.clear();
+    callback_handles_.clear();
+    ros_bridge_.reset();
+    
+    if (websocket_connection_) {
+      websocket_connection_->Disconnect();
+    }
+    websocket_connection_.reset();
+    
+    connecting_ = true;
+    connection_failed_ = false;
+    {
+      std::lock_guard<std::mutex> lock(error_msg_mutex_);
+      connection_error_msg_.clear();
+    }
+    
+    connection_thread_ = std::thread(&RosbridgeComm::ConnectAsync, this);
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    
+    {
+      std::lock_guard<std::mutex> lock(reconnect_mutex_);
+      if (!connection_failed_ && !reconnecting_) {
+        LOG_INFO("Reconnection successful!");
+        break;
+      }
+    }
+  }
+  
+  {
+    std::lock_guard<std::mutex> lock(reconnect_mutex_);
+    reconnecting_ = false;
+  }
+  
+  LOG_INFO("Reconnection loop stopped");
 }
 
 /**

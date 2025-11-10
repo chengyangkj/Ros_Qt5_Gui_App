@@ -87,6 +87,12 @@ class RosbridgeComm : public VirtualChannelNode {
   int rosbridge_port_;
   
   void ConnectAsync();
+  void ReconnectLoop();
+  
+  std::atomic_bool reconnect_enabled_{true};
+  std::atomic_bool reconnecting_{false};
+  std::thread reconnect_thread_;
+  std::mutex reconnect_mutex_;
 };
 
 #endif  // ROSBRIDGE_COMM_H
