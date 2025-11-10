@@ -1,6 +1,7 @@
 #include "channel_manager.h"
 #include <boost/dll.hpp>
 #include <iostream>
+#include <algorithm>
 #include "config/config_manager.h"
 namespace fs = boost::filesystem;
 ChannelManager::ChannelManager() {}
@@ -37,6 +38,24 @@ bool ChannelManager::OpenChannelAuto() {
       std::cout << "No channel found in lib directory" << std::endl;
       return false;
     }
+    
+    // 如果有多个 channel，过滤掉 ROSBridge
+    std::vector<std::string> filtered_list;
+    if (channel_list.size() > 1) {
+      for (const auto& channel_path : channel_list) {
+        // 检查路径中是否包含 "rosbridge"（不区分大小写）
+        std::string lower_path = channel_path;
+        std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
+        if (lower_path.find("rosbridge") == std::string::npos) {
+          filtered_list.push_back(channel_path);
+        }
+      }
+      // 如果过滤后还有 channel，使用过滤后的列表
+      if (filtered_list.size() > 0) {
+        channel_list = filtered_list;
+      }
+    }
+    
     std::cout << "Auto select channel: " << channel_list[0] << std::endl;
     return OpenChannel(channel_list[0]);
   } else if (channel_type == "ros2" || channel_type == "ros1" || channel_type == "rosbridge") {
