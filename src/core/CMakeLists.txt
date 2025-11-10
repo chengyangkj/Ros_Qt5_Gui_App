@@ -9,8 +9,8 @@ target_link_libraries(${PROJECT_NAME}  common mainwindow framework runtime Qt5::
 set_target_properties(${PROJECT_NAME} PROPERTIES
 RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
 LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-BUILD_RPATH "./lib"
-INSTALL_RPATH "./lib"
+BUILD_RPATH "$ORIGIN:$ORIGIN/lib"
+INSTALL_RPATH "$ORIGIN:$ORIGIN/lib"
 )
 
 install(TARGETS ${PROJECT_NAME}
