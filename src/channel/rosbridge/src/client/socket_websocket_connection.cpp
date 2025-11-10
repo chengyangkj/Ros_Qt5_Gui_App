@@ -84,34 +84,9 @@ namespace rosbridge2cpp{
     }
   }
 
-  bool SocketWebSocketConnection::SendMessage(const uint8_t *data, unsigned int length){
-    if (!is_connected_) {
-      std::cout << "[WebSocketConnection] Not connected, cannot send message" << std::endl;
-      return false;
-    }
-    
-    try {
-      websocketpp::lib::error_code ec;
-      c_.send(hdl_, data, length, websocketpp::frame::opcode::binary, ec);
-      if (ec) {
-        std::cout << "[WebSocketConnection] Send failed: " << ec.message() << std::endl;
-        return false;
-      }
-      std::cout << "[WebSocketConnection] Data sent (" << length << " Bytes): " << std::endl;
-      for (unsigned int i = 0; i < length; i++) {
-        std::cout << ":" << std::setw(2) << std::setfill('0') << std::hex << (int)(data[i]);
-      }
-      std::cout << "[WebSocketConnection] Data end" << std::endl;
-      return true;
-    } catch (websocketpp::exception const & e) {
-      std::cout << "[WebSocketConnection] Send exception: " << e.what() << std::endl;
-      return false;
-    }
-  }
 
   int SocketWebSocketConnection::ReceiverThreadFunction(){
     std::cout << "[WebSocketConnection] Receiver thread started" << std::endl;
-    std::cout << "[WebSocketConnection] bson_only_mode is: " << bson_only_mode_ << std::endl;
     
     // The WebSocket client handles message reception in the on_message callback
     // This thread just waits for termination
@@ -128,11 +103,6 @@ namespace rosbridge2cpp{
     callback_function_defined_ = true;
   }
 
-  void SocketWebSocketConnection::RegisterIncomingMessageCallback(std::function<void(bson_t&)> fun){
-    incoming_message_callback_bson_ = fun;
-    callback_function_defined_ = true;
-  }
-
   void SocketWebSocketConnection::RegisterErrorCallback(std::function<void(TransportError)> fun){
     error_callback_ = fun;
   }
@@ -144,16 +114,7 @@ namespace rosbridge2cpp{
   }
 
   void SocketWebSocketConnection::SetTransportMode(ITransportLayer::TransportMode mode){
-    switch(mode){
-      case ITransportLayer::JSON:
-        bson_only_mode_ = false;
-        break;
-      case ITransportLayer::BSON:
-        bson_only_mode_ = true;
-        break;
-      default:
-        std::cerr << "Given TransportMode Not implemented" << std::endl;
-    }
+    // Only JSON mode is supported
   }
 
   void SocketWebSocketConnection::Disconnect(){
@@ -205,39 +166,19 @@ namespace rosbridge2cpp{
   }
 
   void SocketWebSocketConnection::on_message(connection_hdl hdl, message_ptr msg) {
+    // Handle JSON messages
+    const std::string& payload = msg->get_payload();
     
-    if (bson_only_mode_) {
-      // Handle BSON messages
-      const std::string& payload = msg->get_payload();
-      const uint8_t* data = reinterpret_cast<const uint8_t*>(payload.c_str());
-      size_t length = payload.size();
-      
-      bson_t b;
-      if (!bson_init_static(&b, data, length)) {
-        std::cout << "[WebSocketConnection] Error on BSON parse - Ignoring message" << std::endl;
-        return;
-      }
-      
-      if (incoming_message_callback_bson_) {
-        incoming_message_callback_bson_(b);
-      }
-      
-      bson_destroy(&b);
-    } else {
-      // Handle JSON messages
-      const std::string& payload = msg->get_payload();
-      
-      json j;
-      j.Parse(payload.c_str());
-      
-      if (j.HasParseError()) {
-        std::cout << "[WebSocketConnection] JSON parse error - Ignoring message" << std::endl;
-        return;
-      }
-      
-      if (incoming_message_callback_) {
-        incoming_message_callback_(j);
-      }
+    json j;
+    j.Parse(payload.c_str());
+    
+    if (j.HasParseError()) {
+      std::cout << "[WebSocketConnection] JSON parse error - Ignoring message" << std::endl;
+      return;
+    }
+    
+    if (incoming_message_callback_) {
+      incoming_message_callback_(j);
     }
   }
 }

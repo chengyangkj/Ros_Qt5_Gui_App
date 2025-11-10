@@ -155,26 +155,6 @@ namespace rosbridge2cpp {
 		return ros_.SendMessage(cmd);
 	}
 
-	bool ROSTopic::Publish(bson_t *message)
-	{
-		if (!is_advertised_) {
-			if (!Advertise()) {
-				return false;
-			}
-		}
-
-		assert(message);
-
-		std::string publish_id = GeneratePublishID();
-
-		ROSBridgePublishMsg cmd(true);
-		cmd.id_ = publish_id;
-		cmd.topic_ = topic_name_;
-		cmd.msg_bson_ = message;
-		cmd.latch_ = latch_;
-
-		return ros_.QueueMessage(topic_name_, queue_size_, cmd);
-	}
 
 	std::string ROSTopic::GeneratePublishID()
 	{

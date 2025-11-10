@@ -30,13 +30,10 @@ jobs:
           libqt5svg5-dev \
           qtbase5-dev-tools \
           qtbase5-private-dev \
-          qt5* \
           libeigen3-dev \
           libgtest-dev \
           libsdl-image1.2-dev \
           libsdl1.2-dev \
-          libbson-dev \ 
-          libwebsocketpp-dev \
           wget
 
       - name: Update gtest

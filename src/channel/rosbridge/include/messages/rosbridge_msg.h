@@ -5,8 +5,6 @@
 #include "rapidjson/stringbuffer.h"
 #include <unordered_map>
 
-#include <bson.h>
-
 #include "helper.h"
 
 
@@ -75,7 +73,7 @@ public:
 	ROSBridgeMsg() = default;
 
 	// This method can be used to parse incoming ROSBridge messages in order
-	// to fill the class variables from the wire representation (for example, JSON or BSON)
+	// to fill the class variables from the wire representation (JSON)
 	//
 	// Returns true if a 'op' field could be found in the given data package
 	//
@@ -105,35 +103,6 @@ public:
 		return true;
 	}
 
-	bool FromBSON(bson_t &bson)
-	{
-		if (!bson_has_field(&bson, "op")) {
-			std::cerr << "[ROSBridgeMsg] Received message without 'op' field" << std::endl;
-			return false;
-		}
-
-		bool key_found = false;
-		std::string op_code = rosbridge2cpp::Helper::get_utf8_by_key("op", bson, key_found);
-		assert(key_found); // should always be true, otherwise this is contradictory to the !bson_has_field check
-		key_found = false;
-
-		auto mapping_iterator = op_code_mapping.find(op_code);
-		if (mapping_iterator == op_code_mapping.end()) {
-			std::cerr << "[ROSBridgeMsg] Received message with invalid 'op' field: " << op_code << std::endl;
-			return false;
-		}
-
-		op_ = mapping_iterator->second;
-
-		if (!bson_has_field(&bson, "id"))
-			return true; // return true, because id is only optional
-
-		id_ = rosbridge2cpp::Helper::get_utf8_by_key("id", bson, key_found);
-		assert(key_found);
-
-		return true;
-	}
-
 	std::string getOpCodeString()
 	{
 		if (op_ == OPCODE_UNDEFINED) return "opcode_undefined";
@@ -157,7 +126,6 @@ public:
 	virtual ~ROSBridgeMsg() = default;
 
 	virtual rapidjson::Document ToJSON(rapidjson::Document::AllocatorType& alloc) = 0;
-	virtual void ToBSON(bson_t& bson) = 0;
 
 	OpCode op_ = OPCODE_UNDEFINED;
 	std::string id_ = "";
@@ -175,19 +143,6 @@ protected:
 	{
 		if (value != -1)
 			d.AddMember(rapidjson::StringRef(key), value, alloc);
-	}
-
-	void add_if_value_changed(bson_t &bson, const char* key, const std::string& value)
-	{
-		if (!value.empty())
-			BSON_APPEND_UTF8(&bson, key, value.c_str());
-	}
-
-	// key must be valid as long as 'd' lives!
-	void add_if_value_changed(bson_t &bson, const char* key, int value)
-	{
-		if (value != -1)
-			BSON_APPEND_INT32(&bson, key, value);
 	}
 
 private:

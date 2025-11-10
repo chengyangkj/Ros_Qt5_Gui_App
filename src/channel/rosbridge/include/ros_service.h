@@ -42,7 +42,6 @@ namespace rosbridge2cpp {
 		// The whole content of the "request" parameter will be send as the "args"
 		// argument of the Service Request
 		bool CallService(rapidjson::Value &request, FunVrROSServiceResponseMsg callback);
-		bool CallService(bson_t *request, FunVrROSServiceResponseMsg callback);
 
 		std::string GenerateServiceCallID();
 

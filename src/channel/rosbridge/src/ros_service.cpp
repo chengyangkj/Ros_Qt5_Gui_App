@@ -28,24 +28,6 @@ namespace rosbridge2cpp{
 		return ros_.SendMessage(cmd);
 	}
 
-	bool ROSService::CallService(bson_t *request, FunVrROSServiceResponseMsg callback) {
-		if (is_advertised_)	// You can't use an advertised ROSService instance to call services.
-			return false;	// Use a separate instance
-
-		assert(request);
-
-		std::string service_call_id = GenerateServiceCallID();
-
-		// Register the callback with the given call id in the ROSBridge
-		ros_.RegisterServiceCallback(service_call_id, callback);
-
-		ROSBridgeCallServiceMsg cmd(true);
-		cmd.id_ = service_call_id;
-		cmd.service_ = service_name_;
-		cmd.args_bson_ = request;
-
-		return ros_.SendMessage(cmd);
-	}
 
 	bool ROSService::Advertise(FunVrROSCallServiceMsgrROSServiceResponseMsgrAllocator callback) {
 		if (is_advertised_)

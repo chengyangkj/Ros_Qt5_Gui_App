@@ -13,7 +13,7 @@
 namespace rosbridge2cpp {
 	class ITransportLayer {
 	public:
-		enum TransportMode { JSON, BSON };
+		enum TransportMode { JSON };
 		virtual ~ITransportLayer() = default;
 
 		// Initialize the TransportLayer by connecting to the given IP and port
@@ -25,14 +25,8 @@ namespace rosbridge2cpp {
 		// Send a string over the underlying transport mechanism to the rosbridge server
 		virtual bool SendMessage(std::string data) = 0;
 
-		// Send a string over the underlying transport mechanism to the rosbridge server
-		virtual bool SendMessage(const uint8_t *data, unsigned int length) = 0;
-
 		// Register a std::function that will be called whenever a new data packet has been received by this TransportLayer.
 		virtual void RegisterIncomingMessageCallback(std::function<void(json&)>) = 0;
-
-		// Register a std::function that will be called whenever a new data packet has been received by this TransportLayer.
-		virtual void RegisterIncomingMessageCallback(std::function<void(bson_t&)>) = 0;
 
 		// Register a std::function that will be called when errors occur.
 		virtual void RegisterErrorCallback(std::function<void(TransportError)>) = 0;

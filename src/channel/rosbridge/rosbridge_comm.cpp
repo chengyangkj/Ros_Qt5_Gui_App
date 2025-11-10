@@ -97,7 +97,7 @@ void RosbridgeComm::ConnectAsync() {
   });
   
   // 创建ROSBridge实例
-  ros_bridge_ = std::make_unique<ROSBridge>(*websocket_connection_,false);
+  ros_bridge_ = std::make_unique<ROSBridge>(*websocket_connection_);
   
   // 连接到ROSBridge服务器
   LOG_INFO("Attempting to connect to ROSBridge server at " << rosbridge_ip_ << ":" << rosbridge_port_);

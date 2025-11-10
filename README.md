@@ -74,7 +74,7 @@
 
 ```bash
 sudo apt-get update
-sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev libbson-dev libwebsocketpp-dev  -y
+sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev -y
 ```
 
 ### CMake 升级

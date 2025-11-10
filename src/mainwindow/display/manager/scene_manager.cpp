@@ -43,10 +43,7 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
   connect(timer, &QTimer::timeout, this, &SceneManager::advance);
   timer->start(16); // 约60FPS更新
 }
-void SceneManager::LoadTopologyMap() {
-  std::string map_name = GET_CONFIG_VALUE("topology_map_name", "./default_topology_map.json");
-  OpenTopologyMap(map_name);
-}
+
 void SceneManager::OpenTopologyMap(const std::string &file_path) {
   // 读取新的拓扑地图数据
   TopologyMap new_topology_map;
@@ -137,7 +134,6 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT)->setVisible(true);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_ROBOT_FOOTPRINT)->setVisible(true);
-      saveTopologyMap();
       view_ptr_->setCursor(Qt::ArrowCursor);
     } break;
     case kAddPoint: {
@@ -192,13 +188,7 @@ void SceneManager::SetPointMoveEnable(bool is_enable) {
     }
   }
 }
-void SceneManager::saveTopologyMap() {
-  std::string map_name = GET_CONFIG_VALUE("topology_map_name", "./default_topology_map.json");
-  Config::ConfigManager::Instacnce()->WriteTopologyMap(map_name, topology_map_);
-  LOG_INFO("Save topology map with " << topology_map_.points.size() << " points, " 
-           << topology_map_.routes.size() << " routes");
-  emit signalTopologyMapUpdate(topology_map_);
-}
+
 void SceneManager::AddOneNavPoint() {
 }
 

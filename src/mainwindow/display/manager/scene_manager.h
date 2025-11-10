@@ -73,7 +73,6 @@ class SceneManager : public QGraphicsScene {
   void Init(QGraphicsView *view_ptr, DisplayManager *manager);
   void AddOneNavPoint();
   void AddPointAtRobotPosition();
-  void LoadTopologyMap();
   void OpenTopologyMap(const std::string &file_path);
   void UpdateTopologyMap(const TopologyMap &topology_map);
   TopologyMap GetTopologyMap() { return topology_map_; }
@@ -84,7 +83,6 @@ class SceneManager : public QGraphicsScene {
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) override;
   void wheelEvent(QGraphicsSceneWheelEvent *event) override;
   void keyPressEvent(QKeyEvent *event) override;
-  void saveTopologyMap();
   void blindNavGoalWidget(Display::VirtualDisplay *, bool is_edit = false);
   void updateNavGoalWidgetPose( Display::VirtualDisplay *, bool is_move = true);
   void blindTopologyRouteWidget(TopologyLine* line, bool is_edit = false);

@@ -61,10 +61,6 @@ DisplayManager::DisplayManager() {
   
   SUBSCRIBE(MSG_ID_OCCUPANCY_MAP, [this](const OccupancyMap& data) {
     map_data_ = data;
-    if (!init_flag_) {
-      scene_manager_ptr_->LoadTopologyMap();
-      init_flag_ = true;
-    }
   });
 
   SUBSCRIBE(MSG_ID_ROBOT_POSE, [this](const RobotPose& data) {
