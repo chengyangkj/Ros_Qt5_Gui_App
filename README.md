@@ -164,14 +164,13 @@ start.bat   # Windows
 首次运行前，请确保：
 
 1. **ROS 环境已配置**: 确保已 source ROS 的 setup.bash/setup.bat
-2. **话题配置**: 检查 `config.json` 中的话题名称是否与你的 ROS 系统匹配
+2. **话题配置**: 检查配置界面中的话题名称是否与你的 ROS 系统匹配
 3. **通道选择**: 在配置界面中选择正确的通信通道（ROS1/ROS2/ROSBridge）
 
-详细配置说明请参考 [配置文档](./doc/configuration.md)
+详细配置说明请参考 [功能使用指南](./doc/usage.md)
 
 ## 📚 文档
 
-- [配置说明](./doc/configuration.md) - 详细的配置选项说明
 - [使用指南](./doc/usage.md) - 功能使用教程
 - [开发指南](./doc/development.md) - 开发环境搭建和代码结构
 - [常见问题](./doc/faq.md) - FAQ 和故障排除
