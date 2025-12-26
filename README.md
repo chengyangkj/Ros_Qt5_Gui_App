@@ -110,6 +110,10 @@ sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
 cd Ros_Qt5_Gui_App
 
+```
+
+#### 方法一、手动cmake编译
+```bash
 # 创建构建目录
 mkdir build && cd build
 
@@ -118,6 +122,20 @@ cmake ..
 make -j$(nproc)  # Linux
 # 或
 cmake --build . --config Release  # Windows
+```
+
+#### 方法二、执行 build.sh 编译
+
+```bash
+./build.sh
+```
+
+#### 方法三、执行 build_cn.sh 中国加速编译
+
+将拉取的三方库位置替换为gitee，加速编译
+
+```bash
+./buils_cn.sh
 ```
 
 ### Release 二进制发行版使用

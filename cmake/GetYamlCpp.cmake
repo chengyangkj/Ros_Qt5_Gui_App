@@ -1,16 +1,15 @@
 include(FetchContent)
-message("Fetching yaml-cpp...")
+message(STATUS "get yaml-cpp ...")
 
-# 设置yaml-cpp版本和下载URL
-set(YAML_CPP_VERSION "0.8.0" CACHE STRING "yaml-cpp version")
-set(yaml-cpp_DOWNLOAD_URL
-    "https://github.com/jbeder/yaml-cpp/archive/${YAML_CPP_VERSION}.tar.gz"
-    CACHE STRING "")
+set(yaml-cpp_GIT_REPOSITORY
+    "https://github.com/jbeder/yaml-cpp.git"
+    CACHE STRING "yaml-cpp git repository")
 
 FetchContent_Declare(
     yaml-cpp
-    URL ${yaml-cpp_DOWNLOAD_URL}
-)
+    GIT_REPOSITORY ${yaml-cpp_GIT_REPOSITORY}
+    GIT_TAG "0.8.0"
+    GIT_SHALLOW TRUE)
 
 FetchContent_GetProperties(yaml-cpp)
 if(NOT yaml-cpp_POPULATED)

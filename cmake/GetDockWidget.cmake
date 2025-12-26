@@ -1,14 +1,15 @@
 include(FetchContent)
-message("Fetching dockwidget...")
+message(STATUS "get dockwidget ...")
 
-set(dockwidget_DOWNLOAD_URL
-    "https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/refs/tags/4.4.0.zip"
-    CACHE STRING "")
+set(dockwidget_GIT_REPOSITORY
+    "https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System.git"
+    CACHE STRING "dockwidget git repository")
 
 FetchContent_Declare(
     dockwidget
-    URL ${dockwidget_DOWNLOAD_URL}
-)
+    GIT_REPOSITORY ${dockwidget_GIT_REPOSITORY}
+    GIT_TAG "4.4.0"
+    GIT_SHALLOW TRUE)
 
 FetchContent_GetProperties(dockwidget)
 if(NOT dockwidget_POPULATED)
