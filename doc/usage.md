@@ -63,6 +63,8 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 ![地图编辑](./images/edit_map.png)
 ![地图编辑工具](./images/edit_map2.png)
 
+其中，在地图编辑时，支持 ctrl+z 撤销上一步的操作
+
 #### 拓扑地图
 
 支持通过拖拽方式设置机器人导航目标点。

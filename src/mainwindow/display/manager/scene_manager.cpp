@@ -1,9 +1,12 @@
 #include "display/manager/scene_manager.h"
+#include "display/manager/map_edit_command.h"
+#include "display/manager/view_manager.h"
 #include <QDebug>
 #include <QKeyEvent>
 #include <QTimer>
 #include <iostream>
 #include <algorithm>
+#include <map>
 #include "config/config_manager.h"
 #include "display/display_occ_map.h"
 #include "display/manager/display_factory.h"
@@ -14,6 +17,7 @@
 #include <QMessageBox>
 
 namespace Display {
+
 SceneManager::SceneManager(QObject *parent) : QGraphicsScene(parent), current_mode_(MapEditMode::kStopEdit) {}
 void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
 
@@ -110,6 +114,17 @@ void SceneManager::UpdateTopologyMap(const TopologyMap &topology_map) {
            << ", Total routes: " << topology_map_.routes.size());
   emit signalTopologyMapUpdate(topology_map_);
 }
+void SceneManager::SetToolRange(double range) {
+  double clamped_range = qMax(0.1, qMin(50.0, range));  // 限制范围在 0.1 到 50 米
+  pen_range_ = clamped_range;
+  pen_range_ = clamped_range;
+  if (current_mode_ == MapEditMode::kErase) {
+    setEraseCursor();
+  } else if (current_mode_ == MapEditMode::kDrawWithPen) {
+    setPenCursor();
+  }
+}
+
 void SceneManager::SetEditMapMode(MapEditMode mode) {
   current_mode_ = mode;
   
@@ -160,7 +175,7 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
     case kDrawWithPen: {
       SetPointMoveEnable(false);
       FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP)->SetMoveEnable(false);
-      view_ptr_->setCursor(pen_cursor_);
+      setPenCursor();
     } break;
     case kDrawLine: {
       SetPointMoveEnable(false);
@@ -177,6 +192,7 @@ void SceneManager::SetEditMapMode(MapEditMode mode) {
     default:
       break;
   }
+  emit signalEditMapModeChanged(mode);
   LOG_INFO("set edit mode:" << mode)
 }
 void SceneManager::SetPointMoveEnable(bool is_enable) {
@@ -203,6 +219,10 @@ void SceneManager::AddPointAtRobotPosition() {
   // 生成点位名称
   std::string name = generatePointName("NAV_POINT");
   
+  TopologyMap::PointInfo point_info(robot_pose, name);
+  auto command = std::make_unique<AddPointCommand>(name, point_info);
+  PushCommand(std::move(command));
+  
   // 创建点位显示对象
   auto goal_point = new PointShape(PointShape::ePointType::kNavGoal,
                                   DISPLAY_GOAL, name, 8, DISPLAY_MAP);
@@ -213,7 +233,7 @@ void SceneManager::AddPointAtRobotPosition() {
   goal_point->UpdateData(map_pose);
   
   // 添加到拓扑地图
-  topology_map_.AddPoint(TopologyMap::PointInfo(robot_pose, name));
+  topology_map_.AddPoint(point_info);
   
   LOG_INFO("Add nav point at robot position: " << name << " at world pose(" 
            << robot_pose.x << ", " << robot_pose.y << ", " << robot_pose.theta 
@@ -243,7 +263,13 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     if(nav_goal_widget_ && nav_goal_widget_->isVisible()) {
       nav_goal_widget_->hide();
     }
-  
+    
+    // 如果是点位且处于移动模式，保存初始位置用于撤销
+    if (current_mode_ == MapEditMode::kMoveCursor && display->GetDisplayType() == DISPLAY_GOAL) {
+      std::string point_name = display->GetDisplayName();
+      auto point_info = topology_map_.GetPoint(point_name);
+      point_move_start_positions_[point_name] = point_info;
+    }
   }
 
   switch (current_mode_) {
@@ -252,21 +278,31 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     } break;
     case MapEditMode::kDrawLine: {
       auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+      // 开始绘制线段操作，保存整个地图的初始状态
+      is_draw_line_operation_active_ = true;
+      current_map_ptr_ = map_ptr;
       map_ptr->StartDrawLine(map_ptr->mapFromScene(position));
+      line_start_pose_ = map_ptr->mapFromScene(position);
+      // 保存整个地图的初始状态（在操作前保存），以便后续可以提取任意区域
+      draw_line_operation_saved_image_ = map_ptr->GetMapImage();
     } break;
     case MapEditMode::kAddPoint: {
       std::string name = generatePointName("NAV_POINT");
-      auto goal_point = new PointShape(PointShape::ePointType::kNavGoal,
-                                      DISPLAY_GOAL, name, 8, DISPLAY_MAP);
-      goal_point->SetRotateEnable(true)->SetMoveEnable(true)->setVisible(true);
       
       // 统一的坐标转换：场景坐标 -> 世界坐标 -> 地图坐标
       auto scene_pose = basic::RobotPose(position.x(), position.y(), 0);
       auto world_pose = display_manager_->scenePoseToWord(scene_pose);
       auto map_pose = display_manager_->wordPose2Map(world_pose);
       
+      TopologyMap::PointInfo point_info(world_pose, name);
+      auto command = std::make_unique<AddPointCommand>(name, point_info);
+      PushCommand(std::move(command));
+      
+      auto goal_point = new PointShape(PointShape::ePointType::kNavGoal,
+                                      DISPLAY_GOAL, name, 8, DISPLAY_MAP);
+      goal_point->SetRotateEnable(true)->SetMoveEnable(true)->setVisible(true);
       goal_point->UpdateData(map_pose);
-      topology_map_.AddPoint(TopologyMap::PointInfo(world_pose, name));
+      topology_map_.AddPoint(point_info);
 
       
       LOG_INFO("Add nav point: " << name << " at scene pose(" 
@@ -277,10 +313,42 @@ void SceneManager::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent) {
       curr_handle_display_ = goal_point;
     } break;
     case MapEditMode::kErase: {
-      eraseScenePointRange(position, 3);
+      auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+      QPointF pose_map = map_ptr->mapFromScene(position);
+      // 开始擦除操作，记录初始区域并保存整个地图的初始状态
+      is_erase_operation_active_ = true;
+      current_map_ptr_ = map_ptr;
+      double range = pen_range_;
+      float x = pose_map.x();
+      float y = pose_map.y();
+      int left = qMax(0, static_cast<int>(x - range));
+      int top = qMax(0, static_cast<int>(y - range));
+      int right = qMin(map_ptr->GetMapImage().width() - 1, static_cast<int>(x + range));
+      int bottom = qMin(map_ptr->GetMapImage().height() - 1, static_cast<int>(y + range));
+      erase_operation_region_ = QRectF(left, top, right - left + 1, bottom - top + 1);
+      // 保存整个地图的初始状态（在操作前保存），以便后续可以提取任意区域
+      erase_operation_saved_image_ = map_ptr->GetMapImage();
+      // 执行第一次擦除
+      eraseScenePointRange(position, range);
     } break;
     case MapEditMode::kDrawWithPen: {
-      drawPoint(position);
+      auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+      QPointF pose_map = map_ptr->mapFromScene(position);
+      // 开始绘制点操作，记录初始区域并保存整个地图的初始状态
+      is_draw_point_operation_active_ = true;
+      current_map_ptr_ = map_ptr;
+      double range = pen_range_;
+      float x = pose_map.x();
+      float y = pose_map.y();
+      int left = qMax(0, static_cast<int>(x - range));
+      int top = qMax(0, static_cast<int>(y - range));
+      int right = qMin(map_ptr->GetMapImage().width() - 1, static_cast<int>(x + range));
+      int bottom = qMin(map_ptr->GetMapImage().height() - 1, static_cast<int>(y + range));
+      draw_point_operation_region_ = QRectF(left, top, right - left + 1, bottom - top + 1);
+      // 保存整个地图的初始状态（在操作前保存），以便后续可以提取任意区域
+      draw_point_operation_saved_image_ = map_ptr->GetMapImage();
+      // 执行第一次绘制
+      drawScenePointRange(position, range);
     } break;
     case MapEditMode::kLinkTopology: {
       // 拓扑连接模式特殊处理
@@ -350,11 +418,90 @@ void SceneManager::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent) {
   QGraphicsScene::mouseReleaseEvent(mouseEvent);
   left_pressed_ = false;
   right_pressed_ = false;
+  
+  // 处理擦除操作结束
+  if (is_erase_operation_active_ && current_map_ptr_) {
+    // 确保区域有效
+    if (!erase_operation_region_.isEmpty() && !erase_operation_saved_image_.isNull()) {
+      // 从保存的整个地图初始状态中提取操作区域的初始状态
+      QImage region_image = erase_operation_saved_image_.copy(erase_operation_region_.toRect());
+      // 创建擦除命令，使用整个操作区域和提取的初始状态
+      auto command = std::make_unique<EraseCommand>(current_map_ptr_, erase_operation_region_, region_image);
+      PushCommand(std::move(command));
+    }
+    is_erase_operation_active_ = false;
+    current_map_ptr_ = nullptr;
+  }
+  
+  // 处理绘制点操作结束
+  if (is_draw_point_operation_active_ && current_map_ptr_) {
+    // 确保区域有效
+    if (!draw_point_operation_region_.isEmpty() && !draw_point_operation_saved_image_.isNull()) {
+      // 从保存的整个地图初始状态中提取操作区域的初始状态
+      QImage region_image = draw_point_operation_saved_image_.copy(draw_point_operation_region_.toRect());
+      // 创建绘制点命令，使用整个操作区域和提取的初始状态
+      auto command = std::make_unique<DrawPointCommand>(current_map_ptr_, draw_point_operation_region_, region_image);
+      PushCommand(std::move(command));
+    }
+    is_draw_point_operation_active_ = false;
+    current_map_ptr_ = nullptr;
+  }
+  
+  // 检查点位移动，创建撤销命令
+  if (current_mode_ == MapEditMode::kMoveCursor && curr_handle_display_ != nullptr) {
+    std::string display_type = curr_handle_display_->GetDisplayType();
+    if (display_type == DISPLAY_GOAL) {
+      std::string point_name = curr_handle_display_->GetDisplayName();
+      if (point_move_start_positions_.find(point_name) != point_move_start_positions_.end()) {
+        auto old_info = point_move_start_positions_[point_name];
+        auto new_info = topology_map_.GetPoint(point_name);
+        // 检查位置是否真的改变了
+        auto old_pose = old_info.ToRobotPose();
+        auto new_pose = new_info.ToRobotPose();
+        if (old_pose.x != new_pose.x || old_pose.y != new_pose.y || old_pose.theta != new_pose.theta) {
+          auto command = std::make_unique<UpdatePointCommand>(point_name, old_info, new_info);
+          PushCommand(std::move(command));
+        }
+        point_move_start_positions_.erase(point_name);
+      }
+    }
+  }
+  
+  // 处理绘制线段操作结束
+  if (is_draw_line_operation_active_ && current_map_ptr_) {
+    auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+    QPointF end_pose = map_ptr->mapFromScene(position);
+    // 计算操作区域（根据起点和终点）
+    QRectF line_rect = QRectF(line_start_pose_, end_pose).normalized();
+    int padding = 2;
+    QRectF operation_region = QRectF(line_rect.x() - padding, line_rect.y() - padding,
+                                     line_rect.width() + 2 * padding, line_rect.height() + 2 * padding);
+    // 确保区域有效
+    if (!operation_region.isEmpty() && !draw_line_operation_saved_image_.isNull()) {
+      // 从保存的整个地图初始状态中提取操作区域的初始状态
+      QRect rect = operation_region.toRect();
+      rect = rect.intersected(QRect(0, 0, draw_line_operation_saved_image_.width(), draw_line_operation_saved_image_.height()));
+      if (!rect.isEmpty()) {
+        QImage region_image = draw_line_operation_saved_image_.copy(rect);
+        QRectF region_rect(rect);
+        // 创建绘制线段命令，使用操作区域和提取的初始状态
+        auto command = std::make_unique<DrawLineCommand>(map_ptr, line_start_pose_, end_pose, region_rect, region_image);
+        PushCommand(std::move(command));
+        // 完成绘制操作（此时图像已经是最终状态，因为 EndDrawLine 在 mouseMoveEvent 中已经执行）
+        map_ptr->EndDrawLine(end_pose, true);
+      } else {
+        // 如果区域无效，直接完成绘制
+        map_ptr->EndDrawLine(end_pose, true);
+      }
+    } else {
+      // 如果区域无效，直接完成绘制
+      map_ptr->EndDrawLine(end_pose, true);
+    }
+    is_draw_line_operation_active_ = false;
+    current_map_ptr_ = nullptr;
+  }
+  
   switch (current_mode_) {
-    case MapEditMode::kDrawLine: {
-      auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
-      map_ptr->EndDrawLine(map_ptr->mapFromScene(position), true);
-    } break;
     default:
       break;
   }
@@ -383,13 +530,37 @@ void SceneManager::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent) {
     case MapEditMode::kAddPoint: {
     } break;
     case MapEditMode::kErase: {
-      if (left_pressed_) {
-        eraseScenePointRange(position, 3);
+      if (left_pressed_ && is_erase_operation_active_ && current_map_ptr_) {
+        auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+        QPointF pose_map = map_ptr->mapFromScene(position);
+        double range = pen_range_;
+        float x = pose_map.x();
+        float y = pose_map.y();
+        int left = qMax(0, static_cast<int>(x - range));
+        int top = qMax(0, static_cast<int>(y - range));
+        int right = qMin(map_ptr->GetMapImage().width() - 1, static_cast<int>(x + range));
+        int bottom = qMin(map_ptr->GetMapImage().height() - 1, static_cast<int>(y + range));
+        QRectF new_region(left, top, right - left + 1, bottom - top + 1);
+        // 扩展操作区域（不重新保存图像，因为图像已经被修改了）
+        erase_operation_region_ = erase_operation_region_.united(new_region);
+        eraseScenePointRange(position, range);
       }
     } break;
     case MapEditMode::kDrawWithPen: {
-      if (left_pressed_) {
-        drawPoint(position);
+      if (left_pressed_ && is_draw_point_operation_active_ && current_map_ptr_) {
+        auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+        QPointF pose_map = map_ptr->mapFromScene(position);
+        double range = pen_range_;
+        float x = pose_map.x();
+        float y = pose_map.y();
+        int left = qMax(0, static_cast<int>(x - range));
+        int top = qMax(0, static_cast<int>(y - range));
+        int right = qMin(map_ptr->GetMapImage().width() - 1, static_cast<int>(x + range));
+        int bottom = qMin(map_ptr->GetMapImage().height() - 1, static_cast<int>(y + range));
+        QRectF new_region(left, top, right - left + 1, bottom - top + 1);
+        // 扩展操作区域（不重新保存图像，因为图像已经被修改了）
+        draw_point_operation_region_ = draw_point_operation_region_.united(new_region);
+        drawScenePointRange(position, range);
       }
     } break;
     case MapEditMode::kLinkTopology: {
@@ -409,6 +580,9 @@ void SceneManager::wheelEvent(QGraphicsSceneWheelEvent *event) {
     case kErase: {
       setEraseCursor();
     } break;
+    case kDrawWithPen: {
+      setPenCursor();
+    } break;
   }
   QGraphicsScene::wheelEvent(event);
 }
@@ -417,7 +591,13 @@ void SceneManager::keyPressEvent(QKeyEvent *event) {
   if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) {
     if (current_mode_ == kLinkTopology && selected_topology_line_ != nullptr) {
       deleteSelectedTopologyLine();
+    } else if (selected_topology_line_ != nullptr) {
+      deleteSelectedTopologyLine();
     }
+  } else if (event->key() == Qt::Key_Z && event->modifiers() & Qt::ControlModifier) {
+    Undo();
+    event->accept();
+    return;
   }
   QGraphicsScene::keyPressEvent(event);
 }
@@ -425,8 +605,8 @@ void SceneManager::keyPressEvent(QKeyEvent *event) {
 void SceneManager::setEraseCursor() {
   auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
   double scale_value = map_ptr->GetScaleValue();
-  QPixmap pixmap(eraser_range_ * 2 * scale_value, eraser_range_ * 2 * scale_value);
-  // 使用 QPainter 绘制一个红色圆形
+  QPixmap pixmap(pen_range_ * 2 * scale_value, pen_range_ * 2 * scale_value);
+  // 使用 QPainter 绘制一个红色正方形
   pixmap.fill(Qt::transparent);
   QPainter painter(&pixmap);
   painter.setPen(Qt::NoPen);
@@ -436,6 +616,22 @@ void SceneManager::setEraseCursor() {
   // 将 QPixmap 设置为鼠标样式
   eraser_cursor_ = QCursor(pixmap, pixmap.width() / 2, pixmap.height() / 2);
   view_ptr_->setCursor(eraser_cursor_);
+}
+
+void SceneManager::setPenCursor() {
+  auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+  double scale_value = map_ptr->GetScaleValue();
+  QPixmap pixmap(pen_range_ * 2 * scale_value, pen_range_ * 2 * scale_value);
+  // 使用 QPainter 绘制一个蓝色正方形
+  pixmap.fill(Qt::transparent);
+  QPainter painter(&pixmap);
+  painter.setPen(Qt::NoPen);
+  painter.setBrush(QColor(0, 0, 255, 50));
+  painter.drawRect(0, 0, pixmap.width(), pixmap.height());
+
+  // 将 QPixmap 设置为鼠标样式
+  pen_cursor_ = QCursor(pixmap, pixmap.width() / 2, pixmap.height() / 2);
+  view_ptr_->setCursor(pen_cursor_);
 }
 
 void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_edit) {
@@ -458,6 +654,11 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
   
   // 创建新的 widget 实例（每次都是全新的，确保没有历史数据残留）
   nav_goal_widget_ = std::make_unique<NavGoalWidget>(view_ptr_);
+  
+  // 保存初始位置用于撤销（如果处于编辑模式）
+  if (is_edit) {
+    point_move_start_positions_[name] = point_info;
+  }
   
   // 设置新的点位数据
   nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
@@ -489,17 +690,31 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
 
             
             if (flag == NavGoalWidget::HandleResult::kSend) {
+              // 检查点位坐标是否被修改，如果是则创建撤销命令
+              std::string point_name = display->GetDisplayName();
+              if (point_move_start_positions_.find(point_name) != point_move_start_positions_.end()) {
+                auto old_info = point_move_start_positions_[point_name];
+                auto new_info = topology_map_.GetPoint(point_name);
+                auto old_pose = old_info.ToRobotPose();
+                auto new_pose = new_info.ToRobotPose();
+                if (old_pose.x != new_pose.x || old_pose.y != new_pose.y || old_pose.theta != new_pose.theta) {
+                  auto command = std::make_unique<UpdatePointCommand>(point_name, old_info, new_info);
+                  PushCommand(std::move(command));
+                }
+                point_move_start_positions_.erase(point_name);
+              }
+              
               emit display_manager_->signalPub2DGoal(pose);
               nav_goal_widget_->hide();
               curr_handle_display_ = nullptr;
             } else if (flag == NavGoalWidget::HandleResult::kRemove) {
               LOG_INFO("remove:" << point_name);
               
-              // 删除相关的拓扑连线（使用保存的点位名称）
+              // 收集相关的拓扑连线
+              std::vector<std::string> related_routes;
               auto it = topology_lines_.begin();
               while (it != topology_lines_.end()) {
                 TopologyLine* line = *it;
-                // 获取起点和终点的显示名称
                 VirtualDisplay* from_display = dynamic_cast<VirtualDisplay*>(line->GetFromItem());
                 VirtualDisplay* to_display = dynamic_cast<VirtualDisplay*>(line->GetToItem());
                 
@@ -512,6 +727,7 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
                 }
                 
                 if (should_remove) {
+                  related_routes.push_back(line->GetDisplayName());
                   removeItem(line);
                   delete line;
                   it = topology_lines_.erase(it);
@@ -520,7 +736,12 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
                 }
               }
               
-              topology_map_.RemovePoint(point_name);  // 使用保存的点位名称
+              // 创建删除命令
+              auto point_info = topology_map_.GetPoint(point_name);
+              auto command = std::make_unique<RemovePointCommand>(point_name, point_info, related_routes);
+              PushCommand(std::move(command));
+              
+              topology_map_.RemovePoint(point_name);
               curr_handle_display_ = nullptr;
               FactoryDisplay::Instance()->RemoveDisplay(display);
               nav_goal_widget_->disconnect();
@@ -560,6 +781,23 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
        
               nav_goal_widget_->hide();
               LOG_INFO("Successfully updated point name: " << old_name << " -> " << new_name.toStdString());
+            } else if (flag == NavGoalWidget::HandleResult::kCancel) {
+              // 取消时，如果点位被修改过，恢复原位置
+              std::string point_name = display->GetDisplayName();
+              if (point_move_start_positions_.find(point_name) != point_move_start_positions_.end()) {
+                auto old_info = point_move_start_positions_[point_name];
+                auto old_pose = old_info.ToRobotPose();
+                auto map_pose = display_manager_->wordPose2Map(old_pose);
+                auto* point_shape = dynamic_cast<PointShape*>(display);
+                if (point_shape) {
+                  point_shape->UpdateData(map_pose);
+                }
+                topology_map_.UpdatePoint(point_name, old_info);
+                point_move_start_positions_.erase(point_name);
+              }
+              
+              curr_handle_display_ = nullptr;
+              nav_goal_widget_->hide();
             } else {
               curr_handle_display_ = nullptr;
               nav_goal_widget_->hide();
@@ -578,6 +816,12 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
               return;
             }
             std::string point_name = display->GetDisplayName();
+            
+            // 如果是第一次修改，保存旧位置用于撤销
+            if (point_move_start_positions_.find(point_name) == point_move_start_positions_.end()) {
+              auto old_info = topology_map_.GetPoint(point_name);
+              point_move_start_positions_[point_name] = old_info;
+            }
 
             // 更新显示位置：世界坐标 -> 地图坐标
             auto map_pose = display_manager_->wordPose2Map(pose);
@@ -707,6 +951,16 @@ void SceneManager::blindTopologyRouteWidget(TopologyLine* line, bool is_edit) {
               if(find_line != topology_lines_.end()) {
                 TopologyLine* line = *find_line;
                 
+                // 获取起点和终点名称
+                VirtualDisplay* from_display = dynamic_cast<VirtualDisplay*>(line->GetFromItem());
+                VirtualDisplay* to_display = dynamic_cast<VirtualDisplay*>(line->GetToItem());
+                QString from = from_display ? QString::fromStdString(from_display->GetDisplayName()) : QString();
+                QString to = to_display ? QString::fromStdString(to_display->GetDisplayName()) : QString();
+                
+                // 创建删除命令
+                auto command = std::make_unique<RemoveTopologyLineCommand>(from, to);
+                PushCommand(std::move(command));
+                
                 // 如果这个 line 是当前选中的，先清除选中状态
                 if (selected_topology_line_ == line) {
                   selected_topology_line_ = nullptr;
@@ -785,6 +1039,12 @@ void SceneManager::drawPoint(const QPointF &pose) {
   map_ptr->DrawPoint(pose_map);
 }
 
+void SceneManager::drawScenePointRange(const QPointF &pose, double range) {
+  auto map_ptr = static_cast<DisplayOccMap *>(FactoryDisplay::Instance()->GetDisplay(DISPLAY_MAP));
+  QPointF pose_map = map_ptr->mapFromScene(pose);
+  map_ptr->DrawMapRange(pose_map, range);
+}
+
 // 拓扑连接相关方法实现
 void SceneManager::handleTopologyLinking(const QString &point_name) {
   if (first_selected_point_.isEmpty()) {
@@ -828,6 +1088,8 @@ void SceneManager::handleTopologyLinking(const QString &point_name) {
       LOG_WARN("连接已存在: " << first_selected_point_.toStdString() << " -> " << second_point.toStdString());
     } else {
       // 直接创建单向连接
+      auto command = std::make_unique<AddTopologyLineCommand>(first_selected_point_, second_point);
+      PushCommand(std::move(command));
       createTopologyLine(first_selected_point_, second_point);
       LOG_INFO("创建单向连接: " << first_selected_point_.toStdString() << " -> " << second_point.toStdString());
     }
@@ -900,6 +1162,17 @@ void SceneManager::deleteSelectedTopologyLine() {
   if (selected_topology_line_) {
     std::string route_id = selected_topology_line_->GetDisplayName();
     LOG_INFO("delete route_id: " << route_id);
+    
+    // 获取起点和终点名称
+    VirtualDisplay* from_display = dynamic_cast<VirtualDisplay*>(selected_topology_line_->GetFromItem());
+    VirtualDisplay* to_display = dynamic_cast<VirtualDisplay*>(selected_topology_line_->GetToItem());
+    QString from = from_display ? QString::fromStdString(from_display->GetDisplayName()) : QString();
+    QString to = to_display ? QString::fromStdString(to_display->GetDisplayName()) : QString();
+    
+    // 创建删除命令
+    auto command = std::make_unique<RemoveTopologyLineCommand>(from, to);
+    PushCommand(std::move(command));
+    
     // 从拓扑地图中删除路径
     topology_map_.RemoveRoute(route_id);
     
@@ -1023,5 +1296,49 @@ SceneManager::~SceneManager() {
   if (topology_route_widget_) {
     topology_route_widget_->hide();
   }
+  // 清理命令历史
+  ClearCommandHistory();
+}
+
+void SceneManager::PushCommand(std::unique_ptr<MapEditCommand> command) {
+  if (!command) {
+    return;
+  }
+  
+  // 删除当前位置之后的所有命令（当有新操作时，丢弃重做历史）
+  if (command_history_index_ < command_history_.size()) {
+    command_history_.erase(command_history_.begin() + command_history_index_, command_history_.end());
+  }
+  
+  // 添加新命令
+  command_history_.push_back(std::move(command));
+  command_history_index_ = command_history_.size();
+  
+  // 限制历史记录大小
+  if (command_history_.size() > kMaxHistorySize) {
+    command_history_.erase(command_history_.begin());
+    command_history_index_--;
+  }
+}
+
+void SceneManager::Undo() {
+  if (command_history_index_ > 0) {
+    command_history_index_--;
+    command_history_[command_history_index_]->Undo(this);
+    LOG_INFO("Undo command, remaining: " << command_history_index_);
+  }
+}
+
+void SceneManager::Redo() {
+  if (command_history_index_ < command_history_.size()) {
+    command_history_[command_history_index_]->Redo(this);
+    command_history_index_++;
+    LOG_INFO("Redo command, index: " << command_history_index_);
+  }
+}
+
+void SceneManager::ClearCommandHistory() {
+  command_history_.clear();
+  command_history_index_ = 0;
 }
 }  // namespace Display

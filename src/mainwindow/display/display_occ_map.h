@@ -21,10 +21,15 @@ class DisplayOccMap : public VirtualDisplay {
   bool SetDisplayConfig(const std::string &config_name,
                         const std::any &config_data);
   void EraseMapRange(const QPointF &pose, double range);
+  void DrawMapRange(const QPointF &pose, double range);
   OccupancyMap GetOccupancyMap();
   void StartDrawLine(const QPointF &pose);
   void EndDrawLine(const QPointF &pose, bool is_draw);
   void DrawPoint(const QPointF &start);
+  QImage GetMapImageRegion(const QRectF &region);
+  void RestoreMapImageRegion(const QRectF &region, const QImage &image);
+  QImage GetMapImage() const { return map_image_; }
+  void SetMapImage(const QImage &image);
  private:
   OccupancyMap map_data_;
 

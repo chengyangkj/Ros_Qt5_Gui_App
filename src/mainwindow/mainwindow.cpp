@@ -498,7 +498,7 @@ void MainWindow::setupUi() {
   QToolButton *draw_pen_btn = new QToolButton();
   draw_pen_btn->setCheckable(true);
   draw_pen_btn->setStyleSheet(modernEditButtonStyle);
-  draw_pen_btn->setToolTip("线条");
+  draw_pen_btn->setToolTip("障碍物绘制");
   draw_pen_btn->setCursor(Qt::PointingHandCursor);
   draw_pen_btn->setIconSize(QSize(24, 24));
 
@@ -512,7 +512,7 @@ void MainWindow::setupUi() {
   QToolButton *draw_line_btn = new QToolButton();
   draw_line_btn->setCheckable(true);
   draw_line_btn->setStyleSheet(modernEditButtonStyle);
-  draw_line_btn->setToolTip("线条");
+  draw_line_btn->setToolTip("线段绘制");
   draw_line_btn->setCursor(Qt::PointingHandCursor);
   draw_line_btn->setIconSize(QSize(24, 24));
 
@@ -905,6 +905,11 @@ void MainWindow::setupUi() {
   connect(erase_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
     display_manager_->SetEditMapMode(Display::MapEditMode::kErase);
     hideAddRobotPosButton();
+    // 更新滑动条显示为红色
+    Display::ViewManager* view_manager = dynamic_cast<Display::ViewManager*>(display_manager_->GetViewPtr());
+    if (view_manager) {
+      view_manager->UpdateToolSizeSlider(display_manager_->GetEraserRange());
+    }
   });
   connect(draw_line_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
     display_manager_->SetEditMapMode(Display::MapEditMode::kDrawLine);
@@ -917,11 +922,17 @@ void MainWindow::setupUi() {
   connect(draw_pen_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
     display_manager_->SetEditMapMode(Display::MapEditMode::kDrawWithPen);
     hideAddRobotPosButton();
+    // 更新滑动条显示为蓝色
+    Display::ViewManager* view_manager = dynamic_cast<Display::ViewManager*>(display_manager_->GetViewPtr());
+    if (view_manager) {
+      view_manager->UpdateToolSizeSlider(display_manager_->GetPenRange());
+    }
   });
   connect(add_topology_path_btn, &QToolButton::clicked, [this, hideAddRobotPosButton]() { 
     display_manager_->SetEditMapMode(Display::MapEditMode::kLinkTopology);
     hideAddRobotPosButton();
   });
+  
   connect(display_manager_->GetDisplay(DISPLAY_MAP),
           SIGNAL(signalCursorPose(QPointF)), this,
           SLOT(signalCursorPose(QPointF)));

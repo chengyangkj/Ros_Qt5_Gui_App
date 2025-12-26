@@ -112,6 +112,28 @@ void DisplayOccMap::EraseMapRange(const QPointF &pose, double range) {
   update();
 }
 
+void DisplayOccMap::DrawMapRange(const QPointF &pose, double range) {
+  float x = pose.x();
+  float y = pose.y();
+  // 确保传入的坐标在图像范围内
+  if (x < 0 || x >= map_image_.width() || y < 0 || y >= map_image_.height()) {
+    return;
+  }
+  // 计算绘制范围的矩形区域
+  int left = qMax(0, static_cast<int>(x - range));
+  int top = qMax(0, static_cast<int>(y - range));
+  int right = qMin(map_image_.width() - 1, static_cast<int>(x + range));
+  int bottom = qMin(map_image_.height() - 1, static_cast<int>(y + range));
+
+  // 循环遍历范围内的像素点，将其颜色设置为黑色
+  for (int i = left; i <= right; ++i) {
+    for (int j = top; j <= bottom; ++j) {
+      map_image_.setPixelColor(i, j, Qt::black);
+    }
+  }
+  update();
+}
+
 OccupancyMap DisplayOccMap::GetOccupancyMap() {
   OccupancyMap map = map_data_;
 
@@ -168,6 +190,31 @@ void DisplayOccMap::DrawPoint(const QPointF &point) {
   QPainter painter(&map_image_);
   painter.setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
   painter.drawPoint(point);
+  update();
+}
+
+QImage DisplayOccMap::GetMapImageRegion(const QRectF &region) {
+  QRect rect = region.toRect();
+  rect = rect.intersected(QRect(0, 0, map_image_.width(), map_image_.height()));
+  if (rect.isEmpty()) {
+    return QImage();
+  }
+  return map_image_.copy(rect);
+}
+
+void DisplayOccMap::RestoreMapImageRegion(const QRectF &region, const QImage &image) {
+  QRect rect = region.toRect();
+  rect = rect.intersected(QRect(0, 0, map_image_.width(), map_image_.height()));
+  if (rect.isEmpty() || image.isNull()) {
+    return;
+  }
+  QPainter painter(&map_image_);
+  painter.drawImage(rect.topLeft(), image);
+  update();
+}
+
+void DisplayOccMap::SetMapImage(const QImage &image) {
+  map_image_ = image;
   update();
 }
 }  // namespace Display

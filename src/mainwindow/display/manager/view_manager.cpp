@@ -1,4 +1,5 @@
 #include "display/manager/view_manager.h"
+#include "display/manager/scene_manager.h"
 #include <QDebug>
 #include <iostream>
 #include "display/manager/display_factory.h"
@@ -14,6 +15,50 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
 
   QHBoxLayout *center_layout = new QHBoxLayout;
   QVBoxLayout *left_bar_layout = new QVBoxLayout;
+  left_bar_layout->setContentsMargins(5, 5, 5, 5);
+  left_bar_layout->setAlignment(Qt::AlignTop);
+  
+  // 左上角工具大小滑动条
+  tool_size_slider_ = new QSlider(Qt::Horizontal);
+  tool_size_slider_->setMinimum(1);  // 0.1米
+  tool_size_slider_->setMaximum(500);  // 50.0米
+  tool_size_slider_->setValue(1);  // 默认0.1米
+  tool_size_slider_->setMaximumWidth(150);
+  tool_size_slider_->setCursor(Qt::ArrowCursor);
+  tool_size_slider_->setStyleSheet(R"(
+    QSlider {
+      background: transparent;
+    }
+    QSlider::groove:horizontal {
+      background: #e0e0e0;
+      height: 4px;
+      border-radius: 2px;
+    }
+    QSlider::handle:horizontal {
+      background: #1976d2;
+      border: 2px solid #ffffff;
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      margin: -4px 0;
+    }
+    QSlider::handle:horizontal:hover {
+      background: #1565c0;
+    }
+  )");
+  tool_size_slider_->hide();  // 默认隐藏
+
+  left_bar_layout->addWidget(tool_size_slider_);
+  
+  tool_size_value_label_ = new QLabel("0.1");
+  tool_size_value_label_->setStyleSheet("QLabel { color: #1976d2; font-size: 10px; font-weight: 500; min-width: 30px; }");
+  tool_size_value_label_->setAlignment(Qt::AlignCenter);
+  tool_size_value_label_->hide();  // 默认隐藏
+  left_bar_layout->addWidget(tool_size_value_label_);
+  
+  left_bar_layout->addItem(
+      new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
+  
   center_layout->addLayout(left_bar_layout);
   center_layout->addItem(
       new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -161,9 +206,29 @@ ViewManager::ViewManager(QWidget *parent) : QGraphicsView(parent) {
   connect(set_small_btn_, &QToolButton::clicked, [this]() {
     display_manager_ptr_->SetScaleSmall();
   });
+  
+  // 连接工具大小滑动条信号
+  connect(tool_size_slider_, &QSlider::valueChanged, [this](int value) {
+    double range = value / 10.0;  // 转换为米（1-500 对应 0.1-50.0米）
+    if (display_manager_ptr_) {
+      display_manager_ptr_->SetToolRange(range);
+    }
+    tool_size_value_label_->setText(QString::number(range, 'f', 1));
+  });
 }
 void ViewManager::SetDisplayManagerPtr(DisplayManager *display_manager) {
   display_manager_ptr_ = display_manager;
+  // 初始化滑动条值（默认0.1米）
+  if (tool_size_slider_ && display_manager_ptr_) {
+    tool_size_slider_->setValue(1);  // 0.1米
+    display_manager_ptr_->SetToolRange(0.1);
+  }
+  
+  // 连接编辑模式变化信号
+  if (display_manager_ptr_) {
+    connect(display_manager_ptr_, &DisplayManager::signalEditMapModeChanged,
+            this, &ViewManager::OnEditMapModeChanged);
+  }
 }
 
 void ViewManager::ShowAddRobotPosButton(bool show) {
@@ -189,6 +254,28 @@ void ViewManager::UpdateRobotPos(const QString &text) {
     label_pos_robot_->setText(text);
   }
 }
+
+void ViewManager::UpdateToolSizeSlider(double range) {
+  if (tool_size_slider_ && tool_size_value_label_) {
+    tool_size_slider_->setValue(static_cast<int>(range * 10));
+    tool_size_value_label_->setText(QString::number(range, 'f', 1));
+  }
+}
+
+void ViewManager::ShowToolSizeSlider(bool show) {
+  if (tool_size_slider_) {
+    tool_size_slider_->setVisible(show);
+  }
+  if (tool_size_value_label_) {
+    tool_size_value_label_->setVisible(show);
+  }
+}
+
+void ViewManager::OnEditMapModeChanged(MapEditMode mode) {
+  bool show = (mode == MapEditMode::kErase || mode == MapEditMode::kDrawWithPen);
+  ShowToolSizeSlider(show);
+}
+
 void ViewManager::mouseMoveEvent(QMouseEvent *event) {
   // 根据需要设置不同的鼠标指针样式
   // if (someCondition)

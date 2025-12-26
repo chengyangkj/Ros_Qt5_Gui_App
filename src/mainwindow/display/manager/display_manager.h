@@ -63,10 +63,14 @@ class DisplayManager : public QObject {
   void signalTopologyMapUpdate(const TopologyMap &map);
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
   void signalPubMap(const OccupancyMap &map);
+  void signalEditMapModeChanged(MapEditMode mode);
  public slots:
   void updateScaled(double value);
   void StartReloc();
   void SetEditMapMode(MapEditMode mode);
+  void SetToolRange(double range);
+  double GetEraserRange() const;
+  double GetPenRange() const;
   void AddOneNavPoint();
   void AddPointAtRobotPosition();
   void slotRobotScenePoseChanged(const RobotPose &pose);

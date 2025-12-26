@@ -5,6 +5,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsView>
 #include <memory>
+#include <vector>
 #include "map/topology_map.h"
 
 #include "display/point_shape.h"
@@ -12,6 +13,8 @@
 #include "widgets/nav_goal_widget.h"
 #include "widgets/set_pose_widget.h"
 #include "widgets/topology_route_widget.h"
+#include "display/manager/map_edit_command.h"
+
 namespace Display {
 
 enum MapEditMode {
@@ -26,6 +29,7 @@ enum MapEditMode {
 };
 
 class DisplayManager;
+class DisplayOccMap;
 class SceneManager : public QGraphicsScene {
   Q_OBJECT
 
@@ -41,7 +45,7 @@ class SceneManager : public QGraphicsScene {
   MapEditMode current_mode_;
   bool right_pressed_{false};
   bool left_pressed_{false};
-  double eraser_range_{3};
+  double pen_range_{0.5};
   QCursor eraser_cursor_;
   QCursor move_cursor_;
   QCursor line_cursor_;
@@ -60,12 +64,36 @@ class SceneManager : public QGraphicsScene {
   TopologyLine* preview_line_{nullptr};
   QPointF first_point_pos_;
   bool is_drawing_line_{false};
+  QPointF line_start_pose_;
   
- signals:
+  // 点位移动跟踪（用于撤销）
+  std::map<std::string, TopologyMap::PointInfo> point_move_start_positions_;
+  
+  // 擦除/绘制操作跟踪（用于撤销）
+  bool is_erase_operation_active_{false};
+  bool is_draw_point_operation_active_{false};
+  bool is_draw_line_operation_active_{false};
+  QRectF erase_operation_region_;
+  QImage erase_operation_saved_image_;
+  QRectF draw_point_operation_region_;
+  QImage draw_point_operation_saved_image_;
+  QImage draw_line_operation_saved_image_;
+  DisplayOccMap* current_map_ptr_{nullptr};
+  
+  // 撤销/重做系统
+  std::vector<std::unique_ptr<MapEditCommand>> command_history_;
+  size_t command_history_index_{0};
+  static constexpr size_t kMaxHistorySize = 50;
+  
+  signals:
   void signalTopologyMapUpdate(const TopologyMap &map);
   void signalCurrentSelectPointChanged(const TopologyMap::PointInfo &);
+  void signalEditMapModeChanged(MapEditMode mode);
  public slots:
   void SetEditMapMode(MapEditMode mode);
+  void SetToolRange(double range);
+  double GetEraserRange() const { return pen_range_; }
+  double GetPenRange() const { return pen_range_; }
 
  public:
   SceneManager(QObject *parent = nullptr);
@@ -88,7 +116,9 @@ class SceneManager : public QGraphicsScene {
   void blindTopologyRouteWidget(TopologyLine* line, bool is_edit = false);
   std::string generatePointName(const std::string &prefix);
   void eraseScenePointRange(const QPointF &, double);
+  void drawScenePointRange(const QPointF &, double);
   void setEraseCursor();
+  void setPenCursor();
   void drawPoint(const QPointF &);
   void SetPointMoveEnable(bool is_enable);
   void cleanupTopologyDisplays(const std::vector<std::string> &point_names);
@@ -103,5 +133,22 @@ class SceneManager : public QGraphicsScene {
   TopologyLine* findTopologyLine(const QString &route_id);
   void loadTopologyRoutes();
   void updateAllTopologyLinesStatus();
+  
+  // 撤销/重做相关
+  void PushCommand(std::unique_ptr<MapEditCommand> command);
+  void Undo();
+  void Redo();
+  void ClearCommandHistory();
+  
+  // 供命令类访问的友元声明
+  friend class EraseCommand;
+  friend class DrawPointCommand;
+  friend class DrawLineCommand;
+  friend class AddPointCommand;
+  friend class RemovePointCommand;
+  friend class AddTopologyLineCommand;
+  friend class RemoveTopologyLineCommand;
+  friend class UpdatePointCommand;
+  friend class UpdatePointNameCommand;
 };
 }  // namespace Display

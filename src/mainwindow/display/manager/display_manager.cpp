@@ -28,6 +28,9 @@ DisplayManager::DisplayManager() {
       SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)),
       this,
       SIGNAL(signalCurrentSelectPointChanged(const TopologyMap::PointInfo &)));
+  connect(scene_manager_ptr_,
+          SIGNAL(signalEditMapModeChanged(MapEditMode)), this,
+          SIGNAL(signalEditMapModeChanged(MapEditMode)));
   //------------------------------------start display instace (register
   // display)-----------------------------
   (new DisplayOccMap(DISPLAY_MAP, 1));
@@ -279,6 +282,9 @@ void DisplayManager::StartReloc() {
   }
 }
 void DisplayManager::SetEditMapMode(MapEditMode mode) { scene_manager_ptr_->SetEditMapMode(mode); }
+void DisplayManager::SetToolRange(double range) { scene_manager_ptr_->SetToolRange(range); }
+double DisplayManager::GetEraserRange() const { return scene_manager_ptr_->GetEraserRange(); }
+double DisplayManager::GetPenRange() const { return scene_manager_ptr_->GetPenRange(); }
 void DisplayManager::AddOneNavPoint() { scene_manager_ptr_->AddOneNavPoint(); }
 void DisplayManager::AddPointAtRobotPosition() { scene_manager_ptr_->AddPointAtRobotPosition(); }
 OccupancyMap &DisplayManager::GetMap() { return map_data_; }
@@ -300,7 +306,7 @@ TopologyMap DisplayManager::GetTopologyMap() {
 
 void DisplayManager::UpdateTopologyMap(const TopologyMap &topology_map) {
   PUBLISH(MSG_ID_TOPOLOGY_MAP, topology_map);
-  QTimer::singleShot(100, [this]() {
+  QTimer::singleShot(500, [this]() {
     SetScaleBig();
   });
 }

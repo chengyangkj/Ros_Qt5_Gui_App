@@ -6,8 +6,12 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QLineEdit>
+#include <QSlider>
+#include <QLabel>
+#include "display/manager/scene_manager.h"
 namespace Display {
 class DisplayManager;
+
 class ViewManager : public QGraphicsView {
   Q_OBJECT
  private:
@@ -17,6 +21,8 @@ class ViewManager : public QGraphicsView {
   QLineEdit *label_pos_map_;
   QLineEdit *label_pos_scene_;
   QLineEdit *label_pos_robot_;
+  QSlider *tool_size_slider_;
+  QLabel *tool_size_value_label_;
 
  public:
   ViewManager(QWidget *parent = nullptr);
@@ -26,6 +32,11 @@ class ViewManager : public QGraphicsView {
   void UpdateMapPos(const QString &text);
   void UpdateScenePos(const QString &text);
   void UpdateRobotPos(const QString &text);
+  void UpdateToolSizeSlider(double range);
+  void ShowToolSizeSlider(bool show);
+
+ private slots:
+  void OnEditMapModeChanged(MapEditMode mode);
 
  protected:
   void mouseMoveEvent(QMouseEvent *event) override;
