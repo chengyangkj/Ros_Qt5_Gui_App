@@ -2,10 +2,7 @@
 
 #include "logger/easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
-Logger* Logger::Instance() {
-  static Logger logger;
-  return &logger;
-}
+
 Logger::Logger() {
   int argc = 0;
   char** argv = nullptr;

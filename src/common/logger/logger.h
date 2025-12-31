@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <sstream>
+#include "macros.h"
 enum class LogLevel { INFO,
                       ERROR,
                       WARN };
@@ -27,8 +28,9 @@ enum class LogLevel { INFO,
 
 class Logger {
  public:
-  static Logger* Instance();
-  Logger();
+
   ~Logger();
   void Log(LogLevel level, const std::stringstream& message, const char* file = nullptr, int line = 0);
+
+  DEFINE_SINGLETON(Logger)
 };
