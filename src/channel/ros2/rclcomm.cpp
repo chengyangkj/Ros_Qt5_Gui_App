@@ -30,13 +30,13 @@ rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP, "/map/topology")
   SET_DEFAULT_TOPIC_NAME(MSG_ID_TOPOLOGY_MAP_UPDATE, "/map/topology/update")
   SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
-  if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
-    Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
+  if (Config::ConfigManager::Instance()->GetRootConfig().images.empty()) {
+    Config::ConfigManager::Instance()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
                                    .topic = "/camera/front/image_raw",
                                    .enable = true});
   }
-  Config::ConfigManager::Instacnce()->StoreConfig();
+  Config::ConfigManager::Instance()->StoreConfig();
 }
 bool rclcomm::Start() {
   rclcpp::init(0, nullptr);
@@ -114,7 +114,7 @@ bool rclcomm::Start() {
   topology_map_update_publisher_ = node->create_publisher<topology_msgs::msg::TopologyMap>(
       GET_TOPIC_NAME(MSG_ID_TOPOLOGY_MAP_UPDATE), 
       rclcpp::QoS(rclcpp::KeepLast(1)).reliable().transient_local());
-  for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
+  for (auto one_image_display : Config::ConfigManager::Instance()->GetRootConfig().images) {
     LOG_INFO("image location:" << one_image_display.location << "topic:" << one_image_display.topic);
     image_subscriber_list_.emplace_back(
         node->create_subscription<sensor_msgs::msg::Image>(
@@ -210,7 +210,7 @@ void rclcomm::BatteryCallback(
 }
 
 void rclcomm::getRobotPose() {
-  std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+  std::string base_frame = Config::ConfigManager::Instance()->GetConfigValue("BaseFrameId", "base_link");
   auto pose = getTransform(base_frame, "map");
   PUBLISH(MSG_ID_ROBOT_POSE, pose);
 }
@@ -351,7 +351,7 @@ void rclcomm::laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
       point_laser_frame.point.x = x;
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
-      std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+      std::string base_frame = Config::ConfigManager::Instance()->GetConfigValue("BaseFrameId", "base_link");
       tf_buffer_->transform(point_laser_frame, point_base_frame, base_frame);
       basic::Point p;
       p.x = point_base_frame.point.x;

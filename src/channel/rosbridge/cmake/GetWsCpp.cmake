@@ -6,9 +6,13 @@ set(websocketpp_GIT_TAG
     "0.8.2"
     CACHE STRING "websocketpp git tag")
 
+set(websocketpp_GIT_REPOSITORY 
+   "https://github.com/zaphoyd/websocketpp.git"
+   CACHE STRING "websocketpp git repository")
+
 FetchContent_Declare(
   websocketpp
-  GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+  GIT_REPOSITORY ${websocketpp_GIT_REPOSITORY}
   GIT_TAG ${websocketpp_GIT_TAG}
   GIT_SHALLOW TRUE)
 

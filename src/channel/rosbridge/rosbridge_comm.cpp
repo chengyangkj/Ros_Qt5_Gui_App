@@ -38,7 +38,7 @@ RosbridgeComm::RosbridgeComm() {
   SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
   
   // 设置默认通道配置
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   if (config.channel_config.channel_type.empty()) {
     config.channel_config.channel_type = "auto";
   }
@@ -50,13 +50,13 @@ RosbridgeComm::RosbridgeComm() {
   }
   
   // 设置默认图像配置
-  if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
-    Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
+  if (Config::ConfigManager::Instance()->GetRootConfig().images.empty()) {
+    Config::ConfigManager::Instance()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
                                    .topic = "/camera/front/image_raw",
                                    .enable = true});
   }
-  Config::ConfigManager::Instacnce()->StoreConfig();
+  Config::ConfigManager::Instance()->StoreConfig();
 }
 
 /**
@@ -65,7 +65,7 @@ RosbridgeComm::RosbridgeComm() {
  */
 bool RosbridgeComm::Start() {
   // 从配置读取ROSBridge服务器地址和端口
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   rosbridge_ip_ = config.channel_config.rosbridge_config.ip.empty() ? "127.0.0.1" : config.channel_config.rosbridge_config.ip;
   rosbridge_port_ = std::stoi(config.channel_config.rosbridge_config.port.empty() ? "9090" : config.channel_config.rosbridge_config.port);
   
@@ -200,7 +200,7 @@ void RosbridgeComm::ConnectAsync() {
   subscribers_[GET_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP)] = std::move(topology_map_topic);
   
   // 图像话题订阅（动态配置）
-  for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
+  for (auto one_image_display : Config::ConfigManager::Instance()->GetRootConfig().images) {
     if (!one_image_display.enable) continue;
     LOG_INFO("image location:" << one_image_display.location << " topic:" << one_image_display.topic);
     auto image_topic = std::make_unique<ROSTopic>(*ros_bridge_, one_image_display.topic, "sensor_msgs/Image", 1);

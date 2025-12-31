@@ -23,10 +23,7 @@ bool ConfigManager::writeStringToFile(const std::string &filePath,
     return false;
   }
 }
-ConfigManager *ConfigManager::Instacnce() {
-  static ConfigManager config;
-  return &config;
-}
+
 // #define CHECK_DEFALUT
 ConfigManager::ConfigManager(/* args */) {
   Init(config_path_);

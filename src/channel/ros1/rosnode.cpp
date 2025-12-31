@@ -25,14 +25,14 @@ RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME("MoveBaseStatus", "/move_base/status")
   SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT, "/move_base/local_costmap/published_footprint")
   SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
-  if (Config::ConfigManager::Instacnce()->GetRootConfig().images.empty()) {
-    Config::ConfigManager::Instacnce()->GetRootConfig().images.push_back(
+  if (Config::ConfigManager::Instance()->GetRootConfig().images.empty()) {
+    Config::ConfigManager::Instance()->GetRootConfig().images.push_back(
         Config::ImageDisplayConfig{.location = "front",
                                    .topic = "/camera/rgb/image_raw",
                                    .enable = true});
 
   }
-  Config::ConfigManager::Instacnce()->StoreConfig();
+  Config::ConfigManager::Instance()->StoreConfig();
   std::cout << "ros node start" << std::endl;
 }
 basic::RobotPose Convert(const geometry_msgs::Pose &pose) {
@@ -115,7 +115,7 @@ void RosNode::init() {
   robot_footprint_subscriber_ = nh.subscribe(GET_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT), 1,
                                              &RosNode::RobotFootprintCallback, this);
 
-  for (auto one_image_display : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
+  for (auto one_image_display : Config::ConfigManager::Instance()->GetRootConfig().images) {
     LOG_INFO("image location:" << one_image_display.location << " topic:" << one_image_display.topic);
     image_subscriber_list_.emplace_back(nh.subscribe(
         one_image_display.topic, 1,
@@ -301,7 +301,7 @@ void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
       point_laser_frame.point.y = y;
       point_laser_frame.header.frame_id = msg->header.frame_id;
 
-      std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+      std::string base_frame = Config::ConfigManager::Instance()->GetConfigValue("BaseFrameId", "base_link");
       tf_listener_->transformPoint(base_frame, point_laser_frame,
                                    point_base_frame);
       basic::Point p;
@@ -402,7 +402,7 @@ void RosNode::PubRobotSpeed(const RobotSpeed &speed) {
   speed_publisher_.publish(twist);
 }
 void RosNode::GetRobotPose() {
-  std::string base_frame = Config::ConfigManager::Instacnce()->GetConfigValue("BaseFrameId", "base_link");
+  std::string base_frame = Config::ConfigManager::Instance()->GetConfigValue("BaseFrameId", "base_link");
   PUBLISH(MSG_ID_ROBOT_POSE, getTransform(base_frame, "map"));
 }
 /**

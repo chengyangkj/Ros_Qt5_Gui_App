@@ -51,7 +51,7 @@ void SceneManager::Init(QGraphicsView *view_ptr, DisplayManager *manager) {
 void SceneManager::OpenTopologyMap(const std::string &file_path) {
   // 读取新的拓扑地图数据
   TopologyMap new_topology_map;
-  if (!Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, new_topology_map)) {
+  if (!Config::ConfigManager::Instance()->ReadTopologyMap(file_path, new_topology_map)) {
     LOG_ERROR("Failed to read topology map from: " << file_path);
     return;
   }

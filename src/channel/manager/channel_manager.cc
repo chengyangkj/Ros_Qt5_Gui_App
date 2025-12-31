@@ -29,7 +29,7 @@ bool ChannelManager::OpenChannelAuto() {
   }
 
   // 从配置读取通道类型
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   std::string channel_type = config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
 
   if (channel_type == "auto") {

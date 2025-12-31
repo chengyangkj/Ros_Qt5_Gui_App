@@ -6,11 +6,11 @@ TEST(TopologyMapTest, ReadAndWriteMap) {
   map.map_name = "test";
   map.points.push_back(TopologyMap::PointInfo(1.11, 2.22, 3.33, "test1"));
   map.points.push_back(TopologyMap::PointInfo(2.11, .22, 4.33, "test2"));
-  EXPECT_TRUE(Config::ConfigManager::Instacnce()->WriteTopologyMap(
+  EXPECT_TRUE(Config::ConfigManager::Instance()->WriteTopologyMap(
       "./test_map.json", map));
 
   TopologyMap map_read;
-  EXPECT_TRUE(Config::ConfigManager::Instacnce()->ReadTopologyMap(
+  EXPECT_TRUE(Config::ConfigManager::Instance()->ReadTopologyMap(
       "./test_map.json", map_read));
   EXPECT_EQ(map_read.points.size(), map.points.size());
   for (int i = 0; i < map_read.points.size(); i++) {

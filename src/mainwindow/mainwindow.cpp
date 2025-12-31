@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
   openChannel();
   QTimer::singleShot(50, [=]() { 
     RestoreState();
-    std::string map_path = Config::ConfigManager::Instacnce()->GetRootConfig().map_config.path;
+    std::string map_path = Config::ConfigManager::Instance()->GetRootConfig().map_config.path;
     if (!map_path.empty()) {
       std::string yaml_path = map_path;
       if (yaml_path.find(".yaml") == std::string::npos && yaml_path.find(".yml") == std::string::npos) {
@@ -756,7 +756,7 @@ void MainWindow::setupUi() {
 
   //////////////////////////////////////////////////////图片
 
-  for (auto one_image : Config::ConfigManager::Instacnce()->GetRootConfig().images) {
+  for (auto one_image : Config::ConfigManager::Instance()->GetRootConfig().images) {
     LOG_INFO("init image window location:" << one_image.location << " topic:" << one_image.topic);
     image_frame_map_[one_image.location] = new RatioLayoutedFrame();
     ads::CDockWidget *dock_widget = new ads::CDockWidget(std::string("image/" + one_image.location).c_str());
@@ -805,7 +805,7 @@ void MainWindow::setupUi() {
       } else {
         topology_path += ".topology";
       }
-      Config::ConfigManager::Instacnce()->WriteTopologyMap(topology_path, topology_map);
+      Config::ConfigManager::Instance()->WriteTopologyMap(topology_path, topology_map);
       
       // 显示保存成功对话框
       QMessageBox::information(this, "保存成功", 
@@ -828,7 +828,7 @@ void MainWindow::setupUi() {
 
 
     std::string topology_path = map_path_ + ".topology";
-    Config::ConfigManager::Instacnce()->WriteTopologyMap(topology_path, topology_map);
+    Config::ConfigManager::Instance()->WriteTopologyMap(topology_path, topology_map);
     
     //发送到ROS
     PUBLISH(MSG_ID_TOPOLOGY_MAP_UPDATE, topology_map);
@@ -1031,8 +1031,8 @@ bool MainWindow::LoadMap(const std::string& file_path) {
       map_path_ = map_path_.substr(0, last_dot);
     }
 
-    Config::ConfigManager::Instacnce()->GetRootConfig().map_config.path = map_path_;
-    Config::ConfigManager::Instacnce()->StoreConfig();
+    Config::ConfigManager::Instance()->GetRootConfig().map_config.path = map_path_;
+    Config::ConfigManager::Instance()->StoreConfig();
 
     OccupancyMap map;
     if (map.Load(file_path)) {
@@ -1048,7 +1048,7 @@ bool MainWindow::LoadMap(const std::string& file_path) {
       
       if (QFile::exists(QString::fromStdString(topology_path))) {
         TopologyMap topology_map;
-        if (Config::ConfigManager::Instacnce()->ReadTopologyMap(topology_path, topology_map)) {
+        if (Config::ConfigManager::Instance()->ReadTopologyMap(topology_path, topology_map)) {
           display_manager_->UpdateTopologyMap(topology_map);
         }
       }
@@ -1059,7 +1059,7 @@ bool MainWindow::LoadMap(const std::string& file_path) {
     }
   } else if (extension == "topology") {
     TopologyMap topology_map;
-    if (Config::ConfigManager::Instacnce()->ReadTopologyMap(file_path, topology_map)) {
+    if (Config::ConfigManager::Instance()->ReadTopologyMap(file_path, topology_map)) {
       display_manager_->UpdateTopologyMap(topology_map);
       return true;
     } else {

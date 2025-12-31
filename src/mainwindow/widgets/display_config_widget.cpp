@@ -264,7 +264,7 @@ void DisplayConfigWidget::RefreshKeyValueTab() {
   }
   key_value_edits_.clear();
   
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   
   for (const auto &[key, value] : config.key_value) {
     QWidget *item_widget = new QWidget(key_value_scroll_content_);
@@ -694,7 +694,7 @@ void DisplayConfigWidget::InitChannelConfigTab() {
       return;
     }
     
-    auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+    auto &config = Config::ConfigManager::Instance()->GetRootConfig();
     QString channel_type = channel_type_combo_->itemData(index).toString();
     QString old_channel_type = QString::fromStdString(config.channel_config.channel_type);
     
@@ -768,7 +768,7 @@ void DisplayConfigWidget::InitChannelConfigTab() {
       return;
     }
     
-    auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+    auto &config = Config::ConfigManager::Instance()->GetRootConfig();
     QString new_ip = rosbridge_ip_edit_->text();
     QString old_ip = QString::fromStdString(config.channel_config.rosbridge_config.ip);
     
@@ -814,7 +814,7 @@ void DisplayConfigWidget::InitChannelConfigTab() {
       return;
     }
     
-    auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+    auto &config = Config::ConfigManager::Instance()->GetRootConfig();
     QString new_port = rosbridge_port_edit_->text();
     QString old_port = QString::fromStdString(config.channel_config.rosbridge_config.port);
     
@@ -880,7 +880,7 @@ void DisplayConfigWidget::OnToggleDisplay(const std::string &display_name, bool 
 }
 
 void DisplayConfigWidget::OnDisplayTopicChanged(const std::string &display_name, const QString &topic) {
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   auto it = std::find_if(config.display_config.begin(), config.display_config.end(),
                         [&display_name](const auto &item) {
                           return item.display_name == display_name;
@@ -910,7 +910,7 @@ void DisplayConfigWidget::OnAddKeyValue() {
 }
 
 void DisplayConfigWidget::OnRemoveKeyValue(const std::string &key) {
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   config.key_value.erase(key);
   AutoSaveConfig();
   RefreshKeyValueTab();
@@ -977,7 +977,7 @@ void DisplayConfigWidget::OnAddImageConfig() {
 void DisplayConfigWidget::OnRemoveImageConfig(int row) {
   image_table_->removeRow(row);
   
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   if (row < static_cast<int>(config.images.size())) {
     config.images.erase(config.images.begin() + row);
     AutoSaveConfig();
@@ -1007,7 +1007,7 @@ void DisplayConfigWidget::OnImageConfigChanged(int row) {
     return;
   }
   
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   
   QTableWidgetItem *location_item = image_table_->item(row, 0);
   QTableWidgetItem *topic_item = image_table_->item(row, 1);
@@ -1032,7 +1032,7 @@ void DisplayConfigWidget::OnImageConfigChanged(int row) {
 }
 
 void DisplayConfigWidget::OnRobotShapePointChanged() {
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   config.robot_shape_config.shaped_points.clear();
   
   for (int row = 0; row < robot_points_table_->rowCount(); row++) {
@@ -1054,7 +1054,7 @@ void DisplayConfigWidget::OnRobotShapePointChanged() {
 }
 
 void DisplayConfigWidget::OnRobotShapeIsEllipseChanged(bool checked) {
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   config.robot_shape_config.is_ellipse = checked;
   AutoSaveConfig();
 }
@@ -1076,7 +1076,7 @@ void DisplayConfigWidget::OnRobotShapeColorChanged() {
       }
     )" + color_style);
     
-    auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+    auto &config = Config::ConfigManager::Instance()->GetRootConfig();
     QString color_str = QString("0x%1").arg(color.rgb(), 8, 16, QChar('0')).toUpper();
     config.robot_shape_config.color = color_str.toStdString();
     AutoSaveConfig();
@@ -1084,7 +1084,7 @@ void DisplayConfigWidget::OnRobotShapeColorChanged() {
 }
 
 void DisplayConfigWidget::OnRobotShapeOpacityChanged(int value) {
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   config.robot_shape_config.opacity = value / 100.0f;
   AutoSaveConfig();
 }
@@ -1098,11 +1098,11 @@ void DisplayConfigWidget::UpdateDisplayVisibility(const std::string &display_nam
 }
 
 void DisplayConfigWidget::AutoSaveConfig() {
-  Config::ConfigManager::Instacnce()->StoreConfig();
+  Config::ConfigManager::Instance()->StoreConfig();
 }
 
 void DisplayConfigWidget::LoadConfig() {
-  auto &config = Config::ConfigManager::Instacnce()->GetRootConfig();
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   
   for (auto &display_config : config.display_config) {
     auto toggle_it = display_toggle_buttons_.find(display_config.display_name);
