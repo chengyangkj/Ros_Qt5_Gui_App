@@ -21,16 +21,20 @@ endif()
 message("build ROSBridge channel")
 add_subdirectory(rosbridge)
 
-#manager
 find_package(Boost REQUIRED COMPONENTS filesystem)
-file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*.h manager/*.hpp)
-file(GLOB_RECURSE SOURCE_FILE CONFIGURE_DEPENDS  ${CMAKE_SOURCE_DIR}  manager/*.cpp manager/*.cc)
-file(GLOB_RECURSE test_files ${CMAKE_SOURCE_DIR} *_test.cc *_test.cpp)
-list(REMOVE_ITEM SOURCE_FILE ${test_files})
+
+set(CHANNEL_MANAGER_SOURCES
+  manager/channel_manager.cc
+)
+
+set(CHANNEL_MANAGER_HEADERS
+  manager/channel_manager.h
+)
 
 add_library(channel STATIC
-${QT_MOC_HPP}
-${SOURCE_FILE}
+  ${CHANNEL_MANAGER_SOURCES}
+  ${CHANNEL_MANAGER_HEADERS}
+  virtual_channel_node.h
 )
 
 target_link_libraries(channel PUBLIC Boost::filesystem pthread dl common framework)

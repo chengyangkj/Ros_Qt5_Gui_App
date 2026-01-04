@@ -8,30 +8,31 @@
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 #pragma once
-#include <any>
-#include <boost/dll/import.hpp>
-#include <boost/filesystem.hpp>
-#include "msg/msg_info.h"
+#include <memory>
+#include <string>
+#include <vector>
+#include <boost/dll/shared_library.hpp>
 #include "virtual_channel_node.h"
-class ChannelManager {
- private:
-  VirtualChannelNode *channel_ptr_{nullptr};
-  boost::dll::shared_library *library_channel_;
-  std::string GetChannelPath(const std::string &channel_type);
 
+class ChannelManager {
  public:
   explicit ChannelManager();
   ~ChannelManager();
-  /// @brief 传入channel so路径，打开对应的通信channel
-  /// @param name
-  /// @return
-  bool OpenChannel(const std::string &name);
-  /// @brief 根据配置自动选择channel类型并打开，默认auto
-  /// @return
+  
+  ChannelManager(const ChannelManager&) = delete;
+  ChannelManager& operator=(const ChannelManager&) = delete;
+  
+  bool OpenChannel(const std::string& path);
   bool OpenChannelAuto();
-  /// @brief 查找lib路径下所有channel
-  /// @return channel list
   std::vector<std::string> DiscoveryAllChannel();
-  VirtualChannelNode *GetChannel();
+  VirtualChannelNode* GetChannel();
   void CloseChannel();
+  
+  bool IsChannelOpen() const { return channel_ptr_ != nullptr; }
+
+ private:
+  std::string GetChannelPath(const std::string& channel_type);
+  
+  std::unique_ptr<VirtualChannelNode> channel_ptr_;
+  std::unique_ptr<boost::dll::shared_library> library_channel_;
 };
