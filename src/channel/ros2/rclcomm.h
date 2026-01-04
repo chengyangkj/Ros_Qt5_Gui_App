@@ -58,9 +58,9 @@ class rclcomm : public VirtualChannelNode {
   bool Stop() override;
   void Process() override;
   std::string Name() override { return "ROS2"; };
-  void PubRelocPose(const RobotPose &pose);
-  void PubNavGoal(const RobotPose &pose);
-  void PubRobotSpeed(const RobotSpeed &speed);
+  void PubRelocPose(const basic::RobotPose &pose);
+  void PubNavGoal(const basic::RobotPose &pose);
+  void PubRobotSpeed(const basic::RobotSpeed &speed);
   basic::RobotPose getTransform(std::string from, std::string to);
   TopologyMap ConvertFromRosMsg(const topology_msgs::msg::TopologyMap::SharedPtr msg);
   topology_msgs::msg::TopologyMap ConvertToRosMsg(const TopologyMap& topology_map);

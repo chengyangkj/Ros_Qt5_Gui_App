@@ -246,17 +246,17 @@ void RosbridgeComm::ConnectAsync() {
   
   // ========== 订阅内部消息总线 ==========
   
-  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const RobotPose& pose) {
+  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const basic::RobotPose& pose) {
     LOG_INFO("recv nav goal pose:" << pose);
     PubNavGoal(pose);
   });
   
-  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const RobotPose& pose) {
+  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const basic::RobotPose& pose) {
     LOG_INFO("recv reloc pose:" << pose);
     PubRelocPose(pose);
   });
   
-  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const RobotSpeed& speed) {
+  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const basic::RobotSpeed& speed) {
     LOG_INFO("recv robot speed:" << speed);
     PubRobotSpeed(speed);
   });
@@ -959,7 +959,7 @@ void RosbridgeComm::ImageCallback(const ROSBridgePublishMsg &msg, const std::str
  * @brief 发布重定位位姿
  * @param pose 机器人位姿
  */
-void RosbridgeComm::PubRelocPose(const RobotPose &pose) {
+void RosbridgeComm::PubRelocPose(const basic::RobotPose &pose) {
   rapidjson::Document msg;
   msg.SetObject();
   auto &allocator = msg.GetAllocator();
@@ -1020,7 +1020,7 @@ void RosbridgeComm::PubRelocPose(const RobotPose &pose) {
  * @brief 发布导航目标点
  * @param pose 目标位姿
  */
-void RosbridgeComm::PubNavGoal(const RobotPose &pose) {
+void RosbridgeComm::PubNavGoal(const basic::RobotPose &pose) {
   rapidjson::Document msg;
   msg.SetObject();
   auto &allocator = msg.GetAllocator();
@@ -1071,7 +1071,7 @@ void RosbridgeComm::PubNavGoal(const RobotPose &pose) {
  * @brief 发布机器人速度
  * @param speed 速度信息
  */
-void RosbridgeComm::PubRobotSpeed(const RobotSpeed &speed) {
+void RosbridgeComm::PubRobotSpeed(const basic::RobotSpeed &speed) {
   rapidjson::Document msg;
   msg.SetObject();
   auto &allocator = msg.GetAllocator();

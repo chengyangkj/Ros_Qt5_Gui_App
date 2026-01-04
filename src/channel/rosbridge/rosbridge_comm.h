@@ -33,9 +33,9 @@ class RosbridgeComm : public VirtualChannelNode {
   bool Stop() override;
   void Process() override;
   std::string Name() override { return "ROSBridge"; };
-  void PubRelocPose(const RobotPose &pose);
-  void PubNavGoal(const RobotPose &pose);
-  void PubRobotSpeed(const RobotSpeed &speed);
+  void PubRelocPose(const basic::RobotPose &pose);
+  void PubNavGoal(const basic::RobotPose &pose);
+  void PubRobotSpeed(const basic::RobotSpeed &speed);
   void PubTopologyMapUpdate(const TopologyMap &topology_map);
   
   bool IsConnecting() const override { return connecting_; }

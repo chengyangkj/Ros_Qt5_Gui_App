@@ -174,15 +174,15 @@ bool rclcomm::Start() {
   transform_listener_ =
       std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   
-  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const RobotPose& pose) {
+  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const basic::RobotPose& pose) {
     std::cout << "recv nav goal pose:" << pose << std::endl;
     PubNavGoal(pose);
   });
-  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const RobotPose& pose) {
+  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const basic::RobotPose& pose) {
     std::cout << "recv reloc pose:" << pose << std::endl;
     PubRelocPose(pose);
   });
-  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const RobotSpeed& speed) {
+  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const basic::RobotSpeed& speed) {
     std::cout << "recv robot speed:" << speed << std::endl;
     PubRobotSpeed(speed);
   });
@@ -463,7 +463,7 @@ void rclcomm::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg) {
   PUBLISH(MSG_ID_OCCUPANCY_MAP, new_map);
 }
 
-void rclcomm::PubRelocPose(const RobotPose &pose) {
+void rclcomm::PubRelocPose(const basic::RobotPose &pose) {
   geometry_msgs::msg::PoseWithCovarianceStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = node->get_clock()->now();
@@ -474,7 +474,7 @@ void rclcomm::PubRelocPose(const RobotPose &pose) {
   geo_pose.pose.pose.orientation = tf2::toMsg(q);
   reloc_pose_publisher_->publish(geo_pose);
 }
-void rclcomm::PubNavGoal(const RobotPose &pose) {
+void rclcomm::PubNavGoal(const basic::RobotPose &pose) {
   geometry_msgs::msg::PoseStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = node->get_clock()->now();
@@ -485,7 +485,7 @@ void rclcomm::PubNavGoal(const RobotPose &pose) {
   geo_pose.pose.orientation = tf2::toMsg(q);
   nav_goal_publisher_->publish(geo_pose);
 }
-void rclcomm::PubRobotSpeed(const RobotSpeed &speed) {
+void rclcomm::PubRobotSpeed(const basic::RobotSpeed &speed) {
   geometry_msgs::msg::Twist twist;
   twist.linear.x = speed.vx;
   twist.linear.y = speed.vy;
