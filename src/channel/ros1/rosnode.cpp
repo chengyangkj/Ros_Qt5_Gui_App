@@ -36,7 +36,7 @@ RosNode::RosNode(/* args */) {
   std::cout << "ros node start" << std::endl;
 }
 basic::RobotPose Convert(const geometry_msgs::Pose &pose) {
-  RobotPose robot_pose;
+  basic::RobotPose robot_pose;
 
   // 提取位置信息
   robot_pose.x = pose.position.x;
@@ -69,15 +69,15 @@ bool RosNode::Start() {
   ros::start();
   init();
   
-  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const RobotPose& pose) {
+  SUBSCRIBE(MSG_ID_SET_NAV_GOAL_POSE, [this](const basic::RobotPose& pose) {
     std::cout << "recv nav goal pose:" << pose << std::endl;
     PubNavGoal(pose);
   });
-  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const RobotPose& pose) {
+  SUBSCRIBE(MSG_ID_SET_RELOC_POSE, [this](const basic::RobotPose& pose) {
     std::cout << "recv reloc pose:" << pose << std::endl;
     PubRelocPose(pose);
   });
-  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const RobotSpeed& speed) {
+  SUBSCRIBE(MSG_ID_SET_ROBOT_SPEED, [this](const basic::RobotSpeed& speed) {
     std::cout << "recv robot speed:" << speed << std::endl;
     PubRobotSpeed(speed);
   });
@@ -364,7 +364,7 @@ void RosNode::LocalPathCallback(nav_msgs::Path::ConstPtr msg) {
   } catch (tf2::TransformException &ex) {
   }
 }
-void RosNode::PubRelocPose(const RobotPose &pose) {
+void RosNode::PubRelocPose(const basic::RobotPose &pose) {
   geometry_msgs::PoseWithCovarianceStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = ros::Time(0);
@@ -376,7 +376,7 @@ void RosNode::PubRelocPose(const RobotPose &pose) {
   geo_pose.pose.pose.orientation = q;
   reloc_pose_publisher_.publish(geo_pose);
 }
-void RosNode::PubNavGoal(const RobotPose &pose) {
+void RosNode::PubNavGoal(const basic::RobotPose &pose) {
   geometry_msgs::PoseStamped geo_pose;
   geo_pose.header.frame_id = "map";
   geo_pose.header.stamp = ros::Time(0);
@@ -388,7 +388,7 @@ void RosNode::PubNavGoal(const RobotPose &pose) {
   geo_pose.pose.orientation = q;
   nav_goal_publisher_.publish(geo_pose);
 }
-void RosNode::PubRobotSpeed(const RobotSpeed &speed) {
+void RosNode::PubRobotSpeed(const  basic::RobotSpeed &speed) {
   geometry_msgs::Twist twist;
   twist.linear.x = speed.vx;
   twist.linear.y = speed.vy;

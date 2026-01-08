@@ -38,9 +38,9 @@ class RosNode : public VirtualChannelNode {
   void BatteryCallback(sensor_msgs::BatteryState::ConstPtr path);
   void RobotFootprintCallback(geometry_msgs::PolygonStamped::ConstPtr msg);
   // void MbStatusCallback(actionlib_msgs::GoalStatusArray::ConstPtr msg);
-  void PubRobotSpeed(const RobotSpeed &speed);
-  void PubNavGoal(const RobotPose &pose);
-  void PubRelocPose(const RobotPose &pose);
+  void PubRobotSpeed(const basic::RobotSpeed &speed);
+  void PubNavGoal(const basic::RobotPose &pose);
+  void PubRelocPose(const basic::RobotPose &pose);
   void GetRobotPose();
   basic::RobotPose getTransform(std::string from, std::string to);
 
