@@ -177,10 +177,12 @@ void RosNode::init() {
   //                                             &RosNode::BatteryCallback, this);
   tf_listener_ = new tf::TransformListener();
 }
+
 bool RosNode::Stop() {
   ros::shutdown();
   return true;
 }
+
 void RosNode::BatteryCallback(sensor_msgs::BatteryState::ConstPtr battery) {
   std::map<std::string, std::string> map;
   map["percent"] = std::to_string(battery->percentage);
@@ -198,6 +200,7 @@ void RosNode::OdometryCallback(const nav_msgs::Odometry::ConstPtr &msg) {
   state.w = (double)msg->twist.twist.angular.z;
   PUBLISH(MSG_ID_ODOM_POSE, state);
 }
+
 void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   double origin_x = msg->info.origin.position.x;
   double origin_y = msg->info.origin.position.y;
@@ -215,6 +218,7 @@ void RosNode::MapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   occ_map_.SetFlip();
   PUBLISH(MSG_ID_OCCUPANCY_MAP, occ_map_);
 }
+
 void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   if (occ_map_.cols == 0 || occ_map_.rows == 0)
     return;
@@ -264,6 +268,7 @@ void RosNode::LocalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
     }
   PUBLISH(MSG_ID_LOCAL_COST_MAP, sized_cost_map);
 }
+
 void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   int width = msg->info.width;
   int height = msg->info.height;
@@ -280,6 +285,7 @@ void RosNode::GlobalCostMapCallback(nav_msgs::OccupancyGrid::ConstPtr msg) {
   cost_map.SetFlip();
   PUBLISH(MSG_ID_GLOBAL_COST_MAP, cost_map);
 }
+
 // 激光雷达点云话题回调
 void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
   double angle_min = msg->angle_min;
@@ -318,6 +324,8 @@ void RosNode::LaserScanCallback(sensor_msgs::LaserScanConstPtr msg) {
   } catch (tf2::TransformException &ex) {
   }
 }
+
+
 void RosNode::GlobalPathCallback(nav_msgs::Path::ConstPtr msg) {
   try {
     //        geometry_msgs::msg::TransformStamped laser_transform =
@@ -341,6 +349,8 @@ void RosNode::GlobalPathCallback(nav_msgs::Path::ConstPtr msg) {
   } catch (tf2::TransformException &ex) {
   }
 }
+
+
 void RosNode::LocalPathCallback(nav_msgs::Path::ConstPtr msg) {
   try {
     //        geometry_msgs::msg::TransformStamped laser_transform =
@@ -364,6 +374,8 @@ void RosNode::LocalPathCallback(nav_msgs::Path::ConstPtr msg) {
   } catch (tf2::TransformException &ex) {
   }
 }
+
+
 void RosNode::PubRelocPose(const basic::RobotPose &pose) {
   geometry_msgs::PoseWithCovarianceStamped geo_pose;
   geo_pose.header.frame_id = "map";
@@ -376,6 +388,8 @@ void RosNode::PubRelocPose(const basic::RobotPose &pose) {
   geo_pose.pose.pose.orientation = q;
   reloc_pose_publisher_.publish(geo_pose);
 }
+
+
 void RosNode::PubNavGoal(const basic::RobotPose &pose) {
   geometry_msgs::PoseStamped geo_pose;
   geo_pose.header.frame_id = "map";
@@ -388,6 +402,8 @@ void RosNode::PubNavGoal(const basic::RobotPose &pose) {
   geo_pose.pose.orientation = q;
   nav_goal_publisher_.publish(geo_pose);
 }
+
+
 void RosNode::PubRobotSpeed(const  basic::RobotSpeed &speed) {
   geometry_msgs::Twist twist;
   twist.linear.x = speed.vx;
@@ -401,6 +417,8 @@ void RosNode::PubRobotSpeed(const  basic::RobotSpeed &speed) {
   // Publish it and resolve any remaining callbacks
   speed_publisher_.publish(twist);
 }
+
+
 void RosNode::GetRobotPose() {
   std::string base_frame = Config::ConfigManager::Instance()->GetConfigValue("BaseFrameId", "base_link");
   PUBLISH(MSG_ID_ROBOT_POSE, getTransform(base_frame, "map"));
