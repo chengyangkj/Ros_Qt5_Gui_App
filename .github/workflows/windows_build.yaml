@@ -26,24 +26,21 @@ jobs:
           committish: '2024.12.16'
           cache: true
 
-      - name: Install Qt5 and Dependencies
+      - name: Cache vcpkg installed packages
+        uses: actions/cache@v4
+        id: vcpkg-cache
+        with:
+          path: ${{ env.VCPKG_ROOT }}/installed
+          key: vcpkg-installed-${{ runner.os }}-x64-windows-vcpkg2024.12.16-qt5-boost-opencv-eigen3
+          restore-keys: |
+            vcpkg-installed-${{ runner.os }}-x64-windows-
+
+      - name: Install Dependencies via Manifest
+        if: steps.vcpkg-cache.outputs.cache-hit != 'true'
         env:
           VCPKG_DISABLE_METRICS: 1
         run: |
-          "%VCPKG_ROOT%\vcpkg.exe" install qt5-base[core]:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install qt5-svg:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install boost-filesystem:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install boost-thread:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install boost-system:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install boost-dll:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install opencv:x64-windows
-          
-      - name: Install eigen3
-        env:
-          VCPKG_DISABLE_METRICS: 1
-        continue-on-error: true
-        run: |
-          "%VCPKG_ROOT%\vcpkg.exe" install eigen3:x64-windows || echo "eigen3 installation failed due to pkgconf issue, will try alternative approach..."
+          "%VCPKG_ROOT%\vcpkg.exe" install --triplet x64-windows --x-install-root="%VCPKG_ROOT%\installed"
 
       - name: Configure CMake
         run: |

@@ -13,11 +13,11 @@ ChannelManager::~ChannelManager() {
 }
 
 std::string ChannelManager::GetChannelPath(const std::string &channel_type) {
-  std::string libDir = boost::dll::program_location().parent_path().string() + "/lib/";
+  fs::path libDir = boost::dll::program_location().parent_path() / "lib";
   std::string libPrefix = "libchannel_";
   std::string libSuffix;
 
-#ifdef __WIN32
+#ifdef _WIN32
   libSuffix = ".dll";
 #elif __APPLE__
   libSuffix = ".dylib";
@@ -25,7 +25,8 @@ std::string ChannelManager::GetChannelPath(const std::string &channel_type) {
   libSuffix = ".so";
 #endif
 
-  return libDir + libPrefix + channel_type + libSuffix;
+  fs::path libPath = libDir / (libPrefix + channel_type + libSuffix);
+  return libPath.string();
 }
 
 bool ChannelManager::OpenChannelAuto() {
@@ -79,22 +80,26 @@ bool ChannelManager::OpenChannelAuto() {
 std::vector<std::string> ChannelManager::DiscoveryAllChannel() {
   std::vector<std::string> res;
 
-  std::string libDir = boost::dll::program_location().parent_path().string() + "/lib/";
+  fs::path libDir = boost::dll::program_location().parent_path() / "lib";
+
+  if (!fs::exists(libDir) || !fs::is_directory(libDir)) {
+    return res;
+  }
 
   for (fs::directory_entry &entry : fs::directory_iterator(libDir)) {
     if (fs::is_regular_file(entry.path())) {
       std::string fileName = entry.path().filename().string();
-#ifdef __WIN32
+#ifdef _WIN32
       if (entry.path().extension() == ".dll" &&
           fileName.find("channel_") == 0) {
         std::cout << "find channel:" << entry.path() << std::endl;
-        res.push_back(entry.path());
+        res.push_back(entry.path().string());
       }
 #elif __APPLE__
       if (entry.path().extension() == ".dylib" &&
           fileName.find("libchannel_") == 0) {
         std::cout << "find channel:" << entry.path() << std::endl;
-        res.push_back(entry.path());
+        res.push_back(entry.path().string());
       }
 #elif __linux__
       if (entry.path().extension() == ".so" &&

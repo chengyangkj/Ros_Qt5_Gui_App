@@ -1,0 +1,16 @@
+{
+  "dependencies": [
+    {
+      "name": "qt5-base",
+      "features": ["core"]
+    },
+    "qt5-svg",
+    "boost-filesystem",
+    "boost-thread",
+    "boost-system",
+    "boost-dll",
+    "opencv",
+    "eigen3"
+  ],
+  "builtin-baseline": "2024.12.16"
+}

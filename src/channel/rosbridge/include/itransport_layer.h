@@ -7,7 +7,7 @@
  * Since this library has been developed for different plattforms,
  * we abstract from the actual transport layer, since this varies from plattforms (and frameworks) a lot.
  *
- * Please see client/socket_tcp_connection.h for an example implementation that uses UNIX Sockets
+ * Please see client/socket_websocket_connection.h for an example implementation that uses WebSocket
  * to connect to a ROSBridge server
  */
 namespace rosbridge2cpp {
