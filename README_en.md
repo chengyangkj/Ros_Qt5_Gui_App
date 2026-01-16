@@ -71,7 +71,12 @@ All features are self-implemented through custom drawing, making it easy to run 
 - **CMake**: 3.16+
 - **Compiler**: GCC 7+ / MSVC 2019+
 
-## 📦 Linux Platform Build and Usage
+## 🚀 Build and Usage
+
+> **💡 Tip:** Click the tabs below to switch between different platform build and usage instructions
+
+<details open>
+<summary><b>🐧 Linux Platform</b></summary>
 
 ### Install Dependencies
 
@@ -175,7 +180,10 @@ cd ../install/bin
 ./start.sh
 ```
 
-## 🪟 Windows Platform Build and Usage
+</details>
+
+<details>
+<summary><b>🪟 Windows Platform</b></summary>
 
 ### Install Dependencies
 
@@ -287,6 +295,8 @@ cmake --install . --config Release
 cd ..\install\bin
 .\start.bat
 ```
+
+</details>
 
 ## 📥 Release Binary Distribution
 

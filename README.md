@@ -71,7 +71,12 @@
 - **CMake**: 3.16+
 - **编译器**: GCC 7+ / MSVC 2019+
 
-## 📦 Linux 平台编译与使用
+## 🚀 编译与使用
+
+> **💡 提示：** 点击下方标签切换查看不同平台的编译与使用说明
+
+<details open>
+<summary><b>🐧 Linux 平台</b></summary>
 
 ### 安装依赖
 
@@ -175,7 +180,12 @@ cd ../install/bin
 ./start.sh
 ```
 
-## 🪟 Windows 平台编译与使用
+</details>
+
+<details>
+<summary><b>🪟 Windows 平台</b></summary>
+
+### 安装依赖
 
 ### 安装依赖
 
@@ -287,6 +297,8 @@ cmake --install . --config Release
 cd ..\install\bin
 .\start.bat
 ```
+
+</details>
 
 ## 📥 Release 二进制发行版使用
 
