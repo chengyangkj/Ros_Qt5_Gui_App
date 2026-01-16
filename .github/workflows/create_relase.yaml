@@ -109,7 +109,7 @@ jobs:
             const files = fs.readdirSync('.');
             
             for (const file of files) {
-              if (file.endsWith('.tar.gz') || file.endsWith('.zip') || file.endsWith('.deb') || file.endsWith('.rpm')) {
+              if (file.endsWith('.tar.gz')) {
                 console.log(`Uploading ${file} to release`);
                 try {
                   await github.rest.repos.uploadReleaseAsset({
@@ -123,5 +123,5 @@ jobs:
                 } catch (error) {
                   console.error(`Failed to upload ${file}:`, error.message);
                 }
-              }
+              }                                                                       
             }
