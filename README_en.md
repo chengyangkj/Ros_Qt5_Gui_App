@@ -24,6 +24,7 @@
 ![noetic](https://github.com/chengyangkj/Ros_Qt5_Gui_App/actions/workflows/ros_noetic_build.yaml/badge.svg)
 ![galactic](https://github.com/chengyangkj/Ros_Qt5_Gui_App/actions/workflows/ros_galactic_build.yaml/badge.svg)
 ![melodic](https://github.com/chengyangkj/Ros_Qt5_Gui_App/actions/workflows/ros_melodic_build.yaml/badge.svg)
+![windows](https://github.com/chengyangkj/Ros_Qt5_Gui_App/actions/workflows/windows_build.yaml/badge.svg)
 
 </div>
 
@@ -35,26 +36,24 @@ All features are self-implemented through custom drawing, making it easy to run 
 
 ### ✨ Features
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| ROS1 Communication Support | ✅ | Basic features implemented, continuously optimized |
-| ROS2 Communication Support | ✅ | Stable and long-term support |
-| ROSBridge Communication Support | ✅ | Supports WebSocket connection and automatic reconnection |
-| Global/Local Map Display | ✅ | Supports OccupancyGrid maps |
-| Real-time Robot Position Display | ✅ | Based on TF transforms |
-| Robot Speed Dashboard | ✅ | Real-time linear and angular velocity display |
-| Manual Robot Control | ✅ | Supports velocity control |
-| Robot Relocation | ✅ | Supports 2D Pose Estimate |
-| Single/Multi-point Navigation | ✅ | Supports navigation goal setting |
-| Global/Local Path Display | ✅ | Real-time planned path display |
-| Topological Point Editing | ✅ | Visual editing of topological points |
-| Battery Level Display | ✅ | Subscribes to BatteryState topic |
-| Map Obstacle Editing | ✅ | Supports map editing |
-| Topological Path Editing | ✅ | Visual editing of topological paths |
-| Map Load/Save | ✅ | Supports map file management |
-| Camera Image Display | ✅ | Supports multiple image streams |
-| Robot Footprint Display | ✅ | Subscribes to footprint topic |
-| LiDAR Display | ✅ | Supports LaserScan visualization |
+- ROS1 Communication Support - Basic features implemented, continuously optimized
+- ROS2 Communication Support - Stable and long-term support maintenance
+- ROSBridge Communication Support - Supports WebSocket connection and automatic reconnection
+- Global/Local Map Display - Supports OccupancyGrid maps
+- Real-time Robot Position Display - Based on TF transforms
+- Robot Speed Dashboard - Real-time linear and angular velocity display
+- Manual Robot Control - Supports velocity control
+- Robot Relocation - Supports 2D Pose Estimate
+- Single/Multi-point Navigation - Supports navigation goal setting
+- Global/Local Path Display - Real-time planned path display
+- Topological Point Editing - Visual editing of topological points
+- Battery Level Display - Subscribes to BatteryState topic
+- Map Obstacle Editing - Supports map editing
+- Topological Path Editing - Visual editing of topological paths
+- Map Load/Save - Supports map file management
+- Camera Image Display - Supports multiple image streams
+- Robot Footprint Display - Subscribes to footprint topic
+- LiDAR Display - Supports LaserScan visualization
 
 ### 🖼️ Interface Preview
 
@@ -103,13 +102,17 @@ chmod +x cmake-install.sh
 sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 ```
 
-### Build
+### Build from Source
 
 ```bash
 # Clone repository
 git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
 cd Ros_Qt5_Gui_App
 
+```
+
+#### Method 1: Manual CMake Build
+```bash
 # Create build directory
 mkdir build && cd build
 
@@ -119,6 +122,24 @@ make -j$(nproc)  # Linux
 # or
 cmake --build . --config Release  # Windows
 ```
+
+#### Method 2: Use build.sh Script
+
+```bash
+./build.sh
+```
+
+#### Method 3: Use build_cn.sh Script (China Accelerated Build)
+
+Replaces third-party library sources with Gitee for faster compilation
+
+```bash
+./build_cn.sh
+```
+
+### Release Binary Distribution
+
+Download the binary package for your system version from the [release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) page, and refer to [Method 3: Run After Installation](#method-3-run-after-installation) to run the program
 
 ### Run
 
@@ -145,7 +166,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib  # Linux
 ./ros_qt5_gui_app
 ```
 
-#### Method 3: Run After Installation
+#### Method 3: Run After Installation {#method-3-run-after-installation}
 
 ```bash
 cd build
@@ -164,14 +185,13 @@ start.bat   # Windows
 Before first run, please ensure:
 
 1. **ROS Environment Configured**: Make sure ROS setup.bash/setup.bat has been sourced
-2. **Topic Configuration**: Check if topic names in `config.json` match your ROS system
+2. **Topic Configuration**: Check if topic names in the configuration interface match your ROS system
 3. **Channel Selection**: Select the correct communication channel (ROS1/ROS2/ROSBridge) in the configuration interface
 
-For detailed configuration instructions, please refer to [Configuration Documentation](./doc/configuration_en.md)
+For detailed configuration instructions, please refer to [User Guide](./doc/usage_en.md)
 
 ## 📚 Documentation
 
-- [Configuration Guide](./doc/configuration_en.md) - Detailed configuration options
 - [User Guide](./doc/usage_en.md) - Feature usage tutorials
 - [Development Guide](./doc/development_en.md) - Development environment setup and code structure
 - [FAQ](./doc/faq_en.md) - FAQ and troubleshooting
@@ -221,11 +241,21 @@ If you have any ideas or suggestions, feel free to submit them to [🌟 Wishlist
 
 ## 📱 Related Projects
 
-A cross-platform mobile robot HMI software based on Flutter for ROS1/ROS2 is now officially open source:
+### ROS1/ROS2 Cross-platform Mobile Robot HMI Software Based on Flutter
 
 ![Flutter Version](./doc/images/flutter.png)
 
 For details, visit [ROS_Flutter_Gui_App](https://github.com/chengyangkj/ROS_Flutter_Gui_App)
+
+### ROS1/ROS2 Web GUI Application Based on React
+
+![React Version](https://raw.githubusercontent.com/chengyangkj/ros_web_gui_app/main/doc/images/2d.png)
+
+Supports map editing
+
+![React Version](https://raw.githubusercontent.com/chengyangkj/ros_web_gui_app/main/doc/images/map_edit.png)
+
+For details, visit [ROS_Web_Gui_App](https://github.com/chengyangkj/ros_web_gui_app)
 
 ## 🔗 Related Links
 

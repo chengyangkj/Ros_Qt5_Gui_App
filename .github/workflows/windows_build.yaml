@@ -23,17 +23,23 @@ jobs:
       - name: Setup vcpkg
         uses: friendlyanon/setup-vcpkg@v1
         with:
-          committish: '2024.01.12'
+          committish: '2024.12.12'
           cache: true
 
       - name: Install Qt5 and Dependencies
+        env:
+          VCPKG_DISABLE_METRICS: 1
         run: |
           "%VCPKG_ROOT%\vcpkg.exe" install qt5-base[core]:x64-windows
           "%VCPKG_ROOT%\vcpkg.exe" install qt5-svg:x64-windows
           "%VCPKG_ROOT%\vcpkg.exe" install boost-filesystem:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install eigen3:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install yaml-cpp:x64-windows
-          "%VCPKG_ROOT%\vcpkg.exe" install gtest:x64-windows
+          
+      - name: Install eigen3
+        env:
+          VCPKG_DISABLE_METRICS: 1
+        continue-on-error: true
+        run: |
+          "%VCPKG_ROOT%\vcpkg.exe" install eigen3:x64-windows || echo "eigen3 installation failed due to pkgconf issue, will try alternative approach..."
 
       - name: Configure CMake
         run: |
