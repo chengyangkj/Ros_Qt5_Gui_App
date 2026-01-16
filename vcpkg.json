@@ -1,9 +1,6 @@
 {
   "dependencies": [
-    {
-      "name": "qt5-base",
-      "features": ["core"]
-    },
+    "qt5-base",
     "qt5-svg",
     "boost-filesystem",
     "boost-thread",
