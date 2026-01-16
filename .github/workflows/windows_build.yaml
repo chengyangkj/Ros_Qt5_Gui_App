@@ -33,6 +33,9 @@ jobs:
           "%VCPKG_ROOT%\vcpkg.exe" install qt5-base[core]:x64-windows
           "%VCPKG_ROOT%\vcpkg.exe" install qt5-svg:x64-windows
           "%VCPKG_ROOT%\vcpkg.exe" install boost-filesystem:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install boost-thread:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install boost-system:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install opencv:x64-windows
           
       - name: Install eigen3
         env:
