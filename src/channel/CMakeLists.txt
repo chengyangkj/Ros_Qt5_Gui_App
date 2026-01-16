@@ -23,17 +23,10 @@ add_subdirectory(rosbridge)
 
 find_package(Boost REQUIRED COMPONENTS filesystem)
 
-set(CHANNEL_MANAGER_SOURCES
-  manager/channel_manager.cc
-)
-
-set(CHANNEL_MANAGER_HEADERS
-  manager/channel_manager.h
-)
 
 add_library(channel STATIC
-  ${CHANNEL_MANAGER_SOURCES}
-  ${CHANNEL_MANAGER_HEADERS}
+  channel_manager.cc
+  channel_manager.h
   virtual_channel_node.h
 )
 
