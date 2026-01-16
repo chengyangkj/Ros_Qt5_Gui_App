@@ -71,9 +71,9 @@ All features are self-implemented through custom drawing, making it easy to run 
 - **CMake**: 3.16+
 - **Compiler**: GCC 7+ / MSVC 2019+
 
-### Install Dependencies
+## 📦 Linux Platform Build and Usage
 
-#### Ubuntu/Debian
+### Install Dependencies
 
 ```bash
 sudo apt-get update
@@ -87,10 +87,6 @@ sudo apt-get install -y \
   libsdl-image1.2-dev \
   libsdl1.2-dev
 ```
-
-#### Windows
-
-Windows platform requires manual installation of Qt5 and environment variable configuration, or use package managers like vcpkg.
 
 ### CMake Upgrade
 
@@ -108,19 +104,17 @@ sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 # Clone repository
 git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
 cd Ros_Qt5_Gui_App
-
 ```
 
 #### Method 1: Manual CMake Build
+
 ```bash
 # Create build directory
 mkdir build && cd build
 
 # Configure and build
 cmake ..
-make -j$(nproc)  # Linux
-# or
-cmake --build . --config Release  # Windows
+make -j$(nproc)
 ```
 
 #### Method 2: Use build.sh Script
@@ -129,40 +123,45 @@ cmake --build . --config Release  # Windows
 ./build.sh
 ```
 
-#### Method 3: Use build_cn.sh Script (China Accelerated Build)
+#### Method 3: Use Gitee Mirror for Accelerated Build
 
-Replaces third-party library sources with Gitee for faster compilation
+Replaces third-party library sources with Gitee mirror for faster compilation:
 
 ```bash
 ./build_cn.sh
 ```
 
-### Release Binary Distribution
+Or manually specify mirrors:
 
-Download the binary package for your system version from the [release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) page, and refer to [Method 3: Run After Installation](#method-3-run-after-installation) to run the program
+```bash
+mkdir build && cd build
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -Ddockwidget_GIT_REPOSITORY=https://gitee.com/kqz2007/qt-advanced-docking-system_github.git \
+  -Dnlohmann_json_GIT_REPOSITORY=https://gitee.com/athtan/json.git \
+  -Dyaml-cpp_GIT_REPOSITORY=https://gitee.com/dragonet_220/yaml-cpp.git \
+  -Dwebsocketpp_GIT_REPOSITORY=https://gitee.com/open-source-software_1/websocketpp.git
+make -j$(nproc)
+```
 
 ### Run
 
 #### Method 1: Using Startup Script (Recommended)
 
-After building, the startup script will be automatically copied to the `build` directory. Simply run:
+After building, the startup script will be automatically copied to the `build` directory:
 
 ```bash
 cd build
-./start.sh  # Linux
-# or
-start.bat   # Windows
+./start.sh
 ```
 
-The startup script will automatically:
-- Set library file paths
-- Launch the program
+The startup script will automatically set library file paths and launch the program.
 
 #### Method 2: Manual Run
 
 ```bash
 cd build
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib  # Linux
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 ./ros_qt5_gui_app
 ```
 
@@ -170,15 +169,131 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib  # Linux
 
 ```bash
 cd build
-make install  # Linux
-# or
-cmake --install . --config Release  # Windows
+make install
 
 cd ../install/bin
-./start.sh  # Linux
-# or
-start.bat   # Windows
+./start.sh
 ```
+
+## 🪟 Windows Platform Build and Usage
+
+### Install Dependencies
+
+Windows platform recommends using vcpkg to manage dependencies. The project includes a `vcpkg.json` manifest file that automatically installs all dependencies.
+
+**Install dependencies using vcpkg:**
+
+1. Install vcpkg (if not already installed):
+```powershell
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+```
+
+2. Set environment variable (optional, recommended):
+```powershell
+$env:VCPKG_ROOT = "C:\path\to\vcpkg"
+[Environment]::SetEnvironmentVariable("VCPKG_ROOT", "C:\path\to\vcpkg", "User")
+```
+
+3. Install project dependencies:
+```powershell
+cd Ros_Qt5_Gui_App
+vcpkg install --triplet x64-windows
+```
+
+**Note:** The first installation of large dependencies like Qt5 will take a long time (30-60 minutes) as they need to be compiled from source. Subsequent builds will use cache and be much faster.
+
+### Build from Source
+
+```powershell
+# Clone repository
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
+cd Ros_Qt5_Gui_App
+```
+
+#### Method 1: Manual CMake Build
+
+```powershell
+# Create build directory
+mkdir build
+cd build
+
+# Configure CMake (specify vcpkg toolchain)
+cmake .. `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
+  -DCMAKE_BUILD_TYPE=Release `
+  -DBUILD_WITH_TEST=OFF
+
+# Build
+cmake --build . --config Release --parallel
+
+# Install
+cmake --install . --config Release
+```
+
+#### Method 2: Use Gitee Mirror for Accelerated Build
+
+Replaces third-party library sources with Gitee mirror for faster compilation:
+
+```powershell
+# Create build directory
+mkdir build
+cd build
+
+# Configure CMake with Gitee mirror for acceleration
+cmake .. `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
+  -DCMAKE_BUILD_TYPE=Release `
+  -DBUILD_WITH_TEST=OFF `
+  -Ddockwidget_GIT_REPOSITORY=https://gitee.com/kqz2007/qt-advanced-docking-system_github.git `
+  -Dnlohmann_json_GIT_REPOSITORY=https://gitee.com/athtan/json.git `
+  -Dyaml-cpp_GIT_REPOSITORY=https://gitee.com/dragonet_220/yaml-cpp.git `
+  -Dwebsocketpp_GIT_REPOSITORY=https://gitee.com/open-source-software_1/websocketpp.git
+
+# Build
+cmake --build . --config Release --parallel
+
+# Install
+cmake --install . --config Release
+```
+
+### Run
+
+#### Method 1: Using Startup Script (Recommended)
+
+After building, the startup script will be automatically copied to the `build` directory:
+
+```powershell
+cd build
+.\start.bat
+```
+
+The startup script will automatically set library file paths and launch the program.
+
+#### Method 2: Manual Run
+
+```powershell
+cd build
+.\ros_qt5_gui_app.exe
+```
+
+#### Method 3: Run After Installation {#method-3-run-after-installation-windows}
+
+```powershell
+cd build
+cmake --install . --config Release
+
+cd ..\install\bin
+.\start.bat
+```
+
+## 📥 Release Binary Distribution
+
+Download the binary package for your system version from the [release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) page:
+
+- **Linux**: Download `.tar.gz` package, extract and refer to [Linux Method 3: Run After Installation](#method-3-run-after-installation) to run the program
+- **Windows**: Download `.zip` package, extract and refer to [Windows Method 3: Run After Installation](#method-3-run-after-installation-windows) to run the program
 
 ### Configuration
 

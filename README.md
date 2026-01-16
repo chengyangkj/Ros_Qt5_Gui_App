@@ -9,7 +9,7 @@
 
 # ROS Qt5 GUI App
 
-*一个轻量级的 ROS1/ROS2 移动机器人人机交互软件*
+*一个跨平台轻量级的 ROS1/ROS2 移动机器人人机交互软件*
 
 [简体中文](./README.md) | [English](./README_en.md)
 
@@ -71,9 +71,9 @@
 - **CMake**: 3.16+
 - **编译器**: GCC 7+ / MSVC 2019+
 
-### 安装依赖
+## 📦 Linux 平台编译与使用
 
-#### Ubuntu/Debian
+### 安装依赖
 
 ```bash
 sudo apt-get update
@@ -88,10 +88,6 @@ sudo apt-get install -y \
   libsdl1.2-dev 
 ```
 
-#### Windows
-
-Windows 平台需要手动安装 Qt5 和配置环境变量，或使用 vcpkg 等包管理器。
-
 ### CMake 升级
 
 Ubuntu 20.04及以下的系统自带的CMake版本过低，需要升级到 3.16+ 版本。Ubuntu 22.04 及以上可跳过此步骤。
@@ -102,68 +98,70 @@ chmod +x cmake-install.sh
 sudo ./cmake-install.sh --prefix=/usr/local --skip-license
 ```
 
-### 源码编译构建
+### 编译构建
 
 ```bash
 # 克隆仓库
 git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
 cd Ros_Qt5_Gui_App
-
 ```
 
-#### 方法一、手动cmake编译
+#### 方法一、手动 CMake 编译
+
 ```bash
 # 创建构建目录
 mkdir build && cd build
 
 # 配置和编译
 cmake ..
-make -j$(nproc)  # Linux
-# 或
-cmake --build . --config Release  # Windows
+make -j$(nproc)
 ```
 
-#### 方法二、执行 build.sh 编译
+#### 方法二、使用 build.sh 脚本
 
 ```bash
 ./build.sh
 ```
 
-#### 方法三、执行 build_cn.sh 中国加速编译
+##### 使用 Gitee 镜像加速编译
 
-将拉取的三方库位置替换为gitee，加速编译
+将拉取的三方库位置替换为 Gitee 镜像，加速编译：
 
 ```bash
-./buils_cn.sh
+./build_cn.sh
 ```
 
-### Release 二进制发行版使用
+或者手动指定镜像：
 
-下载[release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases)界面中对应系统版本的二进制压缩包，参考[方法 3: 安装后运行](#方法-3-安装后运行)运行程序
-
+```bash
+mkdir build && cd build
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -Ddockwidget_GIT_REPOSITORY=https://gitee.com/kqz2007/qt-advanced-docking-system_github.git \
+  -Dnlohmann_json_GIT_REPOSITORY=https://gitee.com/athtan/json.git \
+  -Dyaml-cpp_GIT_REPOSITORY=https://gitee.com/dragonet_220/yaml-cpp.git \
+  -Dwebsocketpp_GIT_REPOSITORY=https://gitee.com/open-source-software_1/websocketpp.git
+make -j$(nproc)
+```
 
 ### 运行
 
 #### 方法 1: 使用启动脚本（推荐）
 
-构建完成后，启动脚本会自动复制到 `build` 目录，直接运行即可：
+构建完成后，启动脚本会自动复制到 `build` 目录：
 
 ```bash
 cd build
-./start.sh  # Linux
-# 或
-start.bat   # Windows
+./start.sh
 ```
 
-启动脚本会自动：
-- 设置库文件路径
-- 启动程序
+启动脚本会自动设置库文件路径并启动程序。
 
 #### 方法 2: 手动运行
 
 ```bash
 cd build
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib  # Linux
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 ./ros_qt5_gui_app
 ```
 
@@ -171,15 +169,131 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib  # Linux
 
 ```bash
 cd build
-make install  # Linux
-# 或
-cmake --install . --config Release  # Windows
+make install
 
 cd ../install/bin
-./start.sh  # Linux
-# 或
-start.bat   # Windows
+./start.sh
 ```
+
+## 🪟 Windows 平台编译与使用
+
+### 安装依赖
+
+Windows 平台推荐使用 vcpkg 管理依赖。项目已包含 `vcpkg.json` manifest 文件，可自动安装所有依赖。
+
+**使用 vcpkg 安装依赖：**
+
+1. 安装 vcpkg（如果尚未安装）：
+```powershell
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+```
+
+2. 设置环境变量（可选，推荐）：
+```powershell
+$env:VCPKG_ROOT = "C:\path\to\vcpkg"
+[Environment]::SetEnvironmentVariable("VCPKG_ROOT", "C:\path\to\vcpkg", "User")
+```
+
+3. 安装项目依赖：
+```powershell
+cd Ros_Qt5_Gui_App
+vcpkg install --triplet x64-windows
+```
+
+**注意：** 首次安装 Qt5 等大型依赖包需要较长时间（30-60分钟），因为需要从源码编译。后续构建会使用缓存，速度会快很多。
+
+### 编译构建
+
+```powershell
+# 克隆仓库
+git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
+cd Ros_Qt5_Gui_App
+```
+
+#### 方法一、手动 CMake 编译
+
+```powershell
+# 创建构建目录
+mkdir build
+cd build
+
+# 配置 CMake（指定 vcpkg toolchain）
+cmake .. `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
+  -DCMAKE_BUILD_TYPE=Release `
+  -DBUILD_WITH_TEST=OFF
+
+# 编译
+cmake --build . --config Release --parallel
+
+# 安装
+cmake --install . --config Release
+```
+
+#### 方法二、使用 Gitee 镜像加速编译
+
+将拉取的三方库位置替换为 Gitee 镜像，加速编译：
+
+```powershell
+# 创建构建目录
+mkdir build
+cd build
+
+# 配置 CMake，使用 Gitee 镜像加速
+cmake .. `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
+  -DCMAKE_BUILD_TYPE=Release `
+  -DBUILD_WITH_TEST=OFF `
+  -Ddockwidget_GIT_REPOSITORY=https://gitee.com/kqz2007/qt-advanced-docking-system_github.git `
+  -Dnlohmann_json_GIT_REPOSITORY=https://gitee.com/athtan/json.git `
+  -Dyaml-cpp_GIT_REPOSITORY=https://gitee.com/dragonet_220/yaml-cpp.git `
+  -Dwebsocketpp_GIT_REPOSITORY=https://gitee.com/open-source-software_1/websocketpp.git
+
+# 编译
+cmake --build . --config Release --parallel
+
+# 安装
+cmake --install . --config Release
+```
+
+### 运行
+
+#### 方法 1: 使用启动脚本（推荐）
+
+构建完成后，启动脚本会自动复制到 `build` 目录：
+
+```powershell
+cd build
+.\start.bat
+```
+
+启动脚本会自动设置库文件路径并启动程序。
+
+#### 方法 2: 手动运行
+
+```powershell
+cd build
+.\ros_qt5_gui_app.exe
+```
+
+#### 方法 3: 安装后运行 {#方法-3-安装后运行-windows}
+
+```powershell
+cd build
+cmake --install . --config Release
+
+cd ..\install\bin
+.\start.bat
+```
+
+## 📥 Release 二进制发行版使用
+
+下载[release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases)界面中对应系统版本的二进制压缩包：
+
+- **Linux**: 下载 `.tar.gz` 压缩包，解压后参考 [Linux 方法 3: 安装后运行](#方法-3-安装后运行) 运行程序
+- **Windows**: 下载 `.zip` 压缩包，解压后参考 [Windows 方法 3: 安装后运行](#方法-3-安装后运行-windows) 运行程序
 
 ### 配置说明
 
