@@ -23,7 +23,7 @@ jobs:
       - name: Setup vcpkg
         uses: friendlyanon/setup-vcpkg@v1
         with:
-          committish: '2024.12.12'
+          committish: '2024.12.16'
           cache: true
 
       - name: Install Qt5 and Dependencies
