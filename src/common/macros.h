@@ -4,7 +4,7 @@
 #include <memory>
 
 #define CLASS_TYPE_TRAITS(name,func)                              \
- template<typename T>                                             \ 
+ template<typename T>                                             \
   struct name{                                                    \
        template<typename Class>                                   \
        static constexpr bool Test(decltype(&Class::func)* type){  \
@@ -15,9 +15,7 @@
        static constexpr bool Test(...){                           \
         return false;                                             \
        }                                                          \
-                                                                  \ 
       static inline constexpr bool value = Test<T>(nullptr);     \
-                                                                  \
   };
 
 
@@ -48,10 +46,9 @@ typename std::enable_if<!HasShutdown<T>::value,void>::type CallShutDown(T* insta
         if (create_if_not_exist && instance == nullptr) {                   \
         static std::once_flag once;                                         \
         std::call_once(once,[&](){instance = new class_name();});           \
-        }                                                                   \ 
+        }                                                                   \
         return instance;                                                    \
-    }                                                                       \                                                  
-                                                                            \
+    }                                                                       \
     static void Clear(){                                                    \
       auto instance = Instance(false);                                      \
       if (instance!=nullptr) {                                              \
@@ -60,7 +57,6 @@ typename std::enable_if<!HasShutdown<T>::value,void>::type CallShutDown(T* insta
         instance = nullptr;                                                 \
       }                                                                     \
     }                                                                       \
-                                                                            \
   private:                                                                  \
     class_name();                                                           \
     DISABLE_COPY_AND_ASSIGN(class_name);
