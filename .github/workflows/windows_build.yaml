@@ -21,21 +21,24 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup vcpkg
-        uses: microsoft/setup-vcpkg@v1
+        uses: friendlyanon/setup-vcpkg@v1
+        with:
+          committish: '2024.01.12'
+          cache: true
 
       - name: Install Qt5 and Dependencies
         run: |
-          vcpkg install qt5-base[core]:x64-windows
-          vcpkg install qt5-svg:x64-windows
-          vcpkg install boost-filesystem:x64-windows
-          vcpkg install eigen3:x64-windows
-          vcpkg install yaml-cpp:x64-windows
-          vcpkg install gtest:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install qt5-base[core]:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install qt5-svg:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install boost-filesystem:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install eigen3:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install yaml-cpp:x64-windows
+          "%VCPKG_ROOT%\vcpkg.exe" install gtest:x64-windows
 
       - name: Configure CMake
         run: |
           cmake -B build -S . ^
-            -DCMAKE_TOOLCHAIN_FILE=%VCPKG_ROOT%/scripts/buildsystems/vcpkg.cmake ^
+            -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
             -DCMAKE_BUILD_TYPE=Release ^
             -DBUILD_WITH_TEST=OFF
 
