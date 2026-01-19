@@ -90,7 +90,7 @@ sudo apt-get install -y \
   libeigen3-dev \
   libgtest-dev \
   libsdl-image1.2-dev \
-  libsdl1.2-dev 
+  libsdl1.2-dev
 ```
 
 ### CMake 升级
