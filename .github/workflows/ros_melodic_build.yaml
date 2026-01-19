@@ -41,8 +41,8 @@ jobs:
           qtbase5-private-dev \
           libeigen3-dev \
           libgtest-dev \
-          libsdl-image1.2-dev \
-          libsdl1.2-dev \
+          libsdl2-dev \
+          libsdl2-image-dev \
           wget \
           git
 

@@ -33,7 +33,7 @@
 #include <cmath>
 #include "logger/logger.h"
 #include "yaml-cpp/yaml.h"
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL_image.h>
 #define OCC_GRID_UNKNOWN -1    //未知領域
 #define OCC_GRID_FREE 0        //free
 #define OCC_GRID_OCCUPIED 100  //占有領域

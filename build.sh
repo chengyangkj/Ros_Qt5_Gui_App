@@ -1,5 +1,5 @@
 
-sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl-image1.2-dev libsdl1.2-dev -y
+sudo apt-get install qtbase5-private-dev libqt5svg5-dev libsdl2-dev libsdl2-image-dev -y
 cmake . -B build \
   -DCMAKE_BUILD_TYPE=Release \
   $@

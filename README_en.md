@@ -89,8 +89,8 @@ sudo apt-get install -y \
   qtbase5-dev-tools \
   libeigen3-dev \
   libgtest-dev \
-  libsdl-image1.2-dev \
-  libsdl1.2-dev
+  libsdl2-dev \
+  libsdl2-image-dev
 ```
 
 ### CMake Upgrade

@@ -8,8 +8,8 @@
     "boost-dll",
     "opencv",
     "eigen3",
-    "sdl1",
-    "sdl-image"
+    "sdl2",
+    "sdl2-image"
   ],
   "builtin-baseline": "b322364f06308bdd24823f9d8f03fe0cc86fd46f"
 }
