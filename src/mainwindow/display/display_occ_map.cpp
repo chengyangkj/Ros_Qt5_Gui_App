@@ -84,7 +84,7 @@ void DisplayOccMap::ParseOccupyMap() {
     //以0 0点为中心
     double x, y;
     map_data_.xy2ScenePose(0, 0, x, y);
-    if (not init_flag_) {
+    if (!init_flag_) {
       CenterOnScene(mapToScene(x, y));
       init_flag_ = true;
     }

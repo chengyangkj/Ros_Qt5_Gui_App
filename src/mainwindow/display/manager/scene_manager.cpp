@@ -661,9 +661,10 @@ void SceneManager::blindNavGoalWidget(Display::VirtualDisplay *display, bool is_
   }
   
   // 设置新的点位数据
-  nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
-    .pose = point_info.ToRobotPose(),
-    .name = QString::fromStdString(name)});
+  NavGoalWidget::PointInfo point_info_data;
+  point_info_data.pose = point_info.ToRobotPose();
+  point_info_data.name = QString::fromStdString(name);
+  nav_goal_widget_->SetPose(point_info_data);
   nav_goal_widget_->SetEditMode(is_edit);
   nav_goal_widget_->move(QPoint(view_pos.x()+10, view_pos.y()+10));
   nav_goal_widget_->show();
@@ -1009,9 +1010,10 @@ void SceneManager::updateNavGoalWidgetPose(
   QPointF view_pos = view_ptr_->mapFromScene(display->scenePos());
   nav_goal_widget_->move(QPoint(view_pos.x()+10, view_pos.y()+10));
   nav_goal_widget_->show();
-  nav_goal_widget_->SetPose(NavGoalWidget::PointInfo{
-      .pose = pose,
-      .name = QString::fromStdString(display->GetDisplayName())});
+  NavGoalWidget::PointInfo point_info_data;
+  point_info_data.pose = pose;
+  point_info_data.name = QString::fromStdString(display->GetDisplayName());
+  nav_goal_widget_->SetPose(point_info_data);
   
   //更新移动后的点位坐标
   std::string display_type = display->GetDisplayType();

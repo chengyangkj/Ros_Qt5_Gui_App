@@ -2,6 +2,9 @@
 // 2, 图层坐标系 每个图层的单独坐标系
 // 3, 占栅格地图坐标系 occPose
 // 4,机器人全局地图坐标系 wordPose
+#ifdef constant
+#undef constant
+#endif
 #include "display/manager/display_manager.h"
 #include "display/point_shape.h"
 #include "display/laser_points.h"

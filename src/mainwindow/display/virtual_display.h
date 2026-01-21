@@ -32,12 +32,15 @@
 #include <vector>
 #include <memory>
 using namespace basic;
+#ifdef constant
+#undef constant
+#endif
 #define GetAnyData(type, data, res_data)    \
   {                                         \
     try {                                   \
       res_data = std::any_cast<type>(data); \
-    } catch (const std::bad_any_cast &e) {  \
-      LOG_ERROR("GetAnyData error: " << e.what());        \
+    } catch (const std::bad_any_cast& ex) {  \
+      LOG_ERROR("GetAnyData error: " << ex.what());        \
     }                                       \
   }
 
