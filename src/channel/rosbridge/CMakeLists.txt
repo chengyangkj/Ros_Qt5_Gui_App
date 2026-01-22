@@ -28,6 +28,10 @@ target_include_directories(${TARGET_NAME} PUBLIC
     ${Boost_INCLUDE_DIRS}
 )
 
+if(TARGET Boost::boost)
+    target_link_libraries(${TARGET_NAME} PUBLIC Boost::boost)
+endif()
+
 if(WEBSOCKETPP_INCLUDE_DIRS)
     target_include_directories(${TARGET_NAME} PUBLIC ${WEBSOCKETPP_INCLUDE_DIRS})
 endif()

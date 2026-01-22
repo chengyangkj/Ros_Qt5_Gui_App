@@ -6,6 +6,7 @@
     "boost-thread",
     "boost-system",
     "boost-dll",
+    "boost-asio",
     "opencv",
     "eigen3",
     "sdl2",
