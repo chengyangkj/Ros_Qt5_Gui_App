@@ -33,6 +33,7 @@ class DisplayConfigWidget : public QWidget {
   ~DisplayConfigWidget();
   
   void SetDisplayManager(Display::DisplayManager *manager);
+  void SetChannelList(const std::vector<std::string> &channel_list);
   void LoadConfig();
   void SaveConfig();
 
@@ -60,6 +61,7 @@ class DisplayConfigWidget : public QWidget {
   void RefreshKeyValueTab();
   void UpdateDisplayVisibility(const std::string &display_name, bool visible);
   void AutoSaveConfig();
+  std::string ExtractChannelType(const std::string &channel_path);
   
   Display::DisplayManager *display_manager_{nullptr};
   QVBoxLayout *main_layout_{nullptr};
@@ -93,5 +95,6 @@ class DisplayConfigWidget : public QWidget {
   QLineEdit *rosbridge_port_edit_{nullptr};
   QPushButton *reconnect_channel_btn_{nullptr};
   bool is_loading_config_{false};
+  std::vector<std::string> channel_list_;
 };
 

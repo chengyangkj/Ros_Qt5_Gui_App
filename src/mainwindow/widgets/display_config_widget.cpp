@@ -620,6 +620,47 @@ void DisplayConfigWidget::InitRobotShapeTab() {
   tab_widget_->addTab(robot_shape_tab_, "机器人外形");
 }
 
+void DisplayConfigWidget::SetChannelList(const std::vector<std::string> &channel_list) {
+  channel_list_ = channel_list;
+  
+  channel_type_combo_->blockSignals(true);
+  channel_type_combo_->clear();
+  
+  channel_type_combo_->addItem("auto", "auto");
+  for (const auto &channel : channel_list_) {
+    std::string channel_type = ExtractChannelType(channel);
+    channel_type_combo_->addItem(channel_type.c_str(), channel_type.c_str());
+  }
+  
+  auto &config = Config::ConfigManager::Instance()->GetRootConfig();
+  std::string channel_type = config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
+  int index = channel_type_combo_->findData(QString::fromStdString(channel_type));
+  if (index >= 0) {
+    channel_type_combo_->setCurrentIndex(index);
+  } else {
+    channel_type_combo_->setCurrentIndex(0);
+  }
+  
+  channel_type_combo_->blockSignals(false);
+}
+
+std::string DisplayConfigWidget::ExtractChannelType(const std::string &channel_path) {
+  size_t last_slash = channel_path.find_last_of("/\\");
+  std::string filename = (last_slash == std::string::npos) ? channel_path : channel_path.substr(last_slash + 1);
+  
+  size_t last_dot = filename.find_last_of(".");
+  if (last_dot != std::string::npos) {
+    filename = filename.substr(0, last_dot);
+  }
+  
+  const std::string prefix = "libchannel_";
+  if (filename.find(prefix) == 0) {
+    return filename.substr(prefix.length());
+  }
+  
+  return filename;
+}
+
 void DisplayConfigWidget::InitChannelConfigTab() {
   channel_config_tab_ = new QWidget();
   QVBoxLayout *tab_layout = new QVBoxLayout(channel_config_tab_);
@@ -661,10 +702,6 @@ void DisplayConfigWidget::InitChannelConfigTab() {
   QLabel *type_label = new QLabel("类型:", channel_type_group);
   type_label->setFixedWidth(80);
   channel_type_combo_ = new QComboBox(channel_type_group);
-  channel_type_combo_->addItem("auto", "auto");
-  channel_type_combo_->addItem("ROS2", "ros2");
-  channel_type_combo_->addItem("ROS1", "ros1");
-  channel_type_combo_->addItem("ROSBridge", "rosbridge");
   channel_type_combo_->setStyleSheet(R"(
     QComboBox {
       border: 1px solid #d0d0d0;
@@ -688,6 +725,7 @@ void DisplayConfigWidget::InitChannelConfigTab() {
       margin-right: 5px;
     }
   )");
+
   connect(channel_type_combo_, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
     // 如果正在加载配置，不显示提示
     if (is_loading_config_) {
@@ -715,6 +753,7 @@ void DisplayConfigWidget::InitChannelConfigTab() {
                                 QMessageBox::Ok);
     }
   });
+
   type_layout->addWidget(type_label);
   type_layout->addWidget(channel_type_combo_);
   type_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));

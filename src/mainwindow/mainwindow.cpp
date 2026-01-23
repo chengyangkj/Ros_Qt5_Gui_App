@@ -590,6 +590,7 @@ void MainWindow::setupUi() {
   ////////////////////////////////////////////////////////图层配置管理
   DisplayConfigWidget *display_config_widget_ = new DisplayConfigWidget();
   display_config_widget_->SetDisplayManager(display_manager_);
+  display_config_widget_->SetChannelList(channel_manager_.DiscoveryAllChannel());
   ads::CDockWidget *DisplayConfigDockWidget = new ads::CDockWidget("ConfigManager");
   DisplayConfigDockWidget->setWidget(display_config_widget_);
   DisplayConfigDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
