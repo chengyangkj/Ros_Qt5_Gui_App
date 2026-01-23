@@ -1,18 +1,11 @@
 set(TARGET_NAME runtime)
 
-set(RUNTIME_SOURCES
-    application_manager.cc
-    plugin_manager.cc
-)
-
-set(RUNTIME_HEADERS
-    application_manager.h
-    plugin_manager.h
-)
+file(GLOB_RECURSE SOURCE_FILE CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR} *.cpp *.cc)
+file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR} *.h *.hpp)
 
 add_library(${TARGET_NAME} STATIC
-    ${RUNTIME_SOURCES}
-    ${RUNTIME_HEADERS}
+    ${SOURCE_FILE}
+    ${INCLUDE_FILE}
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC

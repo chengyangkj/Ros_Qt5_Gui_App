@@ -7,50 +7,43 @@
  * /ros_qt5_gui_app/include/channel/base/virtual_communcation_node.h
  */
 #pragma once
+#include <any>
 #include <atomic>
-#include <chrono>
-#include <memory>
-#include <string>
 #include <thread>
-#include "basic/msg/msg_info.h"
-#include "basic/map/occupancy_map.h"
-#include "basic/map/topology_map.h"
-#include "basic/point/point_type.h"
+#include "msg/msg_info.h"
+#include "occupancy_map.h"
+#include "topology_map.h"
+#include "point_type.h"
 #include "core/framework/framework.h"
-
+using namespace basic;
 class VirtualChannelNode {
+ private:
+  std::thread process_thread_;
+
  public:
-  VirtualChannelNode() = default;
-  virtual ~VirtualChannelNode() = default;
-  
-  VirtualChannelNode(const VirtualChannelNode&) = delete;
-  VirtualChannelNode& operator=(const VirtualChannelNode&) = delete;
+  VirtualChannelNode(/* args */) {}
   
   bool Init() {
-    if (!Start()) {
-      return false;
+    if (Start()) {
+      std::cout << "start channel success" << std::endl;
+      run_flag_ = true;
+      process_thread_ = std::thread([this]() {
+        while (run_flag_) {
+          Process();
+          std::this_thread::sleep_for(
+              std::chrono::milliseconds(1000 / loop_rate_));
+        }
+      });
+      return true;
     }
-    
-    run_flag_ = true;
-    process_thread_ = std::thread([this]() {
-      const auto period = std::chrono::milliseconds(1000 / loop_rate_);
-      while (run_flag_) {
-        Process();
-        std::this_thread::sleep_for(period);
-      }
-    });
-    
-    return true;
+    return false;
   }
-  
   void ShutDown() {
     run_flag_ = false;
     Stop();
-    if (process_thread_.joinable()) {
-      process_thread_.join();
-    }
+    process_thread_.join();
   }
-  
+  virtual ~VirtualChannelNode() {}
   virtual void Process() {}
   virtual bool Start() = 0;
   virtual bool Stop() = 0;
@@ -60,9 +53,7 @@ class VirtualChannelNode {
   virtual bool IsConnectionFailed() const { return false; }
   virtual std::string GetConnectionError() const { return ""; }
 
+ public:
   int loop_rate_{30};
   std::atomic<bool> run_flag_{false};
-
- private:
-  std::thread process_thread_;
 };

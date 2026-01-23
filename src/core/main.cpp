@@ -33,12 +33,7 @@ int main(int argc, char *argv[]) {
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
-  ApplicationManager manager;
-  if (!manager.Initialize()) {
-    LOG_ERROR("Failed to initialize application");
-    return -1;
-  }
-  
-  LOG_INFO("ros_qt5_gui_app initialized successfully");
+  ApplicationManager manager_;
+  LOG_INFO("ros_qt5_gui_app init!")
   return a.exec();
 }

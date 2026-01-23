@@ -3,14 +3,9 @@
 #include <iostream>
 #include <algorithm>
 #include "config/config_manager.h"
-
 namespace fs = boost::filesystem;
-
-ChannelManager::ChannelManager() = default;
-
-ChannelManager::~ChannelManager() {
-  CloseChannel();
-}
+ChannelManager::ChannelManager() {}
+ChannelManager::~ChannelManager() {}
 
 std::string ChannelManager::GetChannelPath(const std::string &channel_type) {
   fs::path libDir = boost::dll::program_location().parent_path() / "lib";
@@ -112,63 +107,44 @@ std::vector<std::string> ChannelManager::DiscoveryAllChannel() {
   }
   return res;
 }
-bool ChannelManager::OpenChannel(const std::string& path) {
-  CloseChannel();
-  
+bool ChannelManager::OpenChannel(const std::string &path) {
   try {
-    library_channel_ = std::make_unique<boost::dll::shared_library>(path);
-    
-    using GetChannelInstanceFunc = VirtualChannelNode*(*)();
-    auto func_get = library_channel_->get<GetChannelInstanceFunc>("GetChannelInstance");
-    
-    if (!func_get) {
-      std::cout << "Failed to get GetChannelInstance symbol" << std::endl;
-      library_channel_.reset();
+    library_channel_ = new boost::dll::shared_library(path);
+    // 动态链接库加载成功
+    // 在这里可以使用 QLibrary 提供的函数指针来访问动态链接库中的函数
+    typedef VirtualChannelNode *(*GetChannelInstanceFunc)();
+    GetChannelInstanceFunc func_get =
+        (GetChannelInstanceFunc)library_channel_->get<VirtualChannelNode *()>(
+            "GetChannelInstance");  // 取出该符号
+    channel_ptr_ = func_get();
+    if (channel_ptr_ == nullptr) {
+      std::cout << "get channel instance failed!" << std::endl;
       return false;
     }
-    
-    auto* raw_ptr = func_get();
-    if (raw_ptr == nullptr) {
-      std::cout << "GetChannelInstance returned nullptr" << std::endl;
-      library_channel_.reset();
-      return false;
-    }
-    
-    channel_ptr_.reset(raw_ptr);
-    
     if (!channel_ptr_->Init()) {
-      std::cout << "Channel initialization failed" << std::endl;
-      channel_ptr_.reset();
-      library_channel_.reset();
+      std::cout << "channel init failed!" << std::endl;
       return false;
+    } else {
+      std::cout << "open channel:" << channel_ptr_->Name() << std::endl;
+      return true;
     }
-    
-    std::cout << "Successfully opened channel: " << channel_ptr_->Name() << std::endl;
-    return true;
-    
-  } catch (const boost::system::system_error& e) {
+
+  } catch (const boost::system::system_error &e) {
     std::cout << "Failed to load dynamic library: " << e.what() << std::endl;
-    library_channel_.reset();
-    return false;
-  } catch (...) {
-    std::cout << "Unknown error occurred while opening channel" << std::endl;
-    library_channel_.reset();
     return false;
   }
-}
 
+  return true;
+}
 void ChannelManager::CloseChannel() {
-  if (channel_ptr_) {
-    channel_ptr_->ShutDown();
-    channel_ptr_.reset();
-  }
-  library_channel_.reset();
+  channel_ptr_->ShutDown();
+  delete channel_ptr_;
+  channel_ptr_ = nullptr;
 }
-
-VirtualChannelNode* ChannelManager::GetChannel() {
-  if (channel_ptr_ == nullptr) {
-    std::cerr << "Error: Channel is not initialized!" << std::endl;
-    std::abort();
+VirtualChannelNode *ChannelManager::GetChannel() {
+  [[unlikely]] if (channel_ptr_ == nullptr) {
+    std::cout << "error channel is nullptr exit!" << std::endl;
+    exit(1);
   }
-  return channel_ptr_.get();
+  return channel_ptr_;
 }
