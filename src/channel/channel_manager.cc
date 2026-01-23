@@ -59,18 +59,11 @@ bool ChannelManager::OpenChannelAuto() {
     
     std::cout << "Auto select channel: " << channel_list[0] << std::endl;
     return OpenChannel(channel_list[0]);
-  } else if (channel_type == "ros2" || channel_type == "ros1" || channel_type == "rosbridge") {
+  } else{
     std::string channel_path = GetChannelPath(channel_type);
     std::cout << "Open channel from config: " << channel_path << std::endl;
     return OpenChannel(channel_path);
-  } else {
-    std::cout << "Unknown channel type: " << channel_type << ", fallback to auto" << std::endl;
-    auto channel_list = DiscoveryAllChannel();
-    if (channel_list.size() == 0) {
-      return false;
-    }
-    return OpenChannel(channel_list[0]);
-  }
+  } 
 }
 std::vector<std::string> ChannelManager::DiscoveryAllChannel() {
   std::vector<std::string> res;
@@ -118,7 +111,7 @@ bool ChannelManager::OpenChannel(const std::string &path) {
             "GetChannelInstance");  // 取出该符号
     channel_ptr_ = func_get();
     if (channel_ptr_ == nullptr) {
-      std::cout << "get channel instance failed!" << std::endl;
+      std::cerr << "get channel instance failed!" << std::endl;
       return false;
     }
     if (!channel_ptr_->Init()) {
@@ -130,7 +123,7 @@ bool ChannelManager::OpenChannel(const std::string &path) {
     }
 
   } catch (const boost::system::system_error &e) {
-    std::cout << "Failed to load dynamic library: " << e.what() << std::endl;
+    std::cerr << "Failed to load dynamic library: " << e.what() << std::endl;
     return false;
   }
 
