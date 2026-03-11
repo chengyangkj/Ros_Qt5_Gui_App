@@ -60,7 +60,7 @@
 ![主界面](./doc/images/main.png)
 ![运行效果](./doc/images/main.gif)
 ![建图效果](./doc/images/mapping.gif)
-
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=113214515841165&bvid=BV1TRxMebEM4&cid=26045056904&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
 ## 🚀 快速开始
 
 ### 环境要求
