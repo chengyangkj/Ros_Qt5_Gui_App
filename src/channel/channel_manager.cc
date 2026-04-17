@@ -9,14 +9,17 @@ ChannelManager::~ChannelManager() {}
 
 std::string ChannelManager::GetChannelPath(const std::string &channel_type) {
   fs::path libDir = boost::dll::program_location().parent_path() / "lib";
-  std::string libPrefix = "libchannel_";
+  std::string libPrefix;
   std::string libSuffix;
 
 #ifdef _WIN32
+  libPrefix = "channel_";
   libSuffix = ".dll";
 #elif __APPLE__
+  libPrefix = "libchannel_";
   libSuffix = ".dylib";
 #elif __linux__
+  libPrefix = "libchannel_";
   libSuffix = ".so";
 #endif
 

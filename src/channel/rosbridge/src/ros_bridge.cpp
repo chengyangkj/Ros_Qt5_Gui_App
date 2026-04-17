@@ -158,6 +158,12 @@ namespace rosbridge2cpp {
 		registered_service_request_callbacks_[service_name] = fun;
 	}
 
+	void ROSBridge::RegisterServiceRequestCallback(std::string service_name, FunVrROSCallServiceMsgrROSServiceResponseMsg fun)
+	{
+		registered_service_request_callbacks_[service_name] =
+			[fun](ROSBridgeCallServiceMsg& msg, rapidjson::Document::AllocatorType&) { fun(msg); };
+	}
+
 
 	bool ROSBridge::UnregisterTopicCallback(std::string topic_name, const ROSCallbackHandle<FunVrROSPublishMsg>& callback_handle)
 	{

@@ -30,9 +30,9 @@
 
 ## 📖 简介
 
-本项目基于 Qt5 开发，使用 CMake 构建，可以实现一套代码同时在 ROS1/ROS2 系统中使用。软件在编译时会自动识别环境变量中的 ROS1/ROS2 环境并进行构建，实现 ROS 通信与界面隔离。
+本项目基于 Qt5 与 CMake 构建，采用统一代码基线同时支持 ROS1/ROS2。构建阶段会根据环境变量自动识别目标 ROS 运行时，实现通信层与界面层解耦，降低跨版本适配成本。
 
-所有功能均为自行绘制实现，因此可以轻松运行在性能较低的边缘设备上。项目已接入 CI，保证多 ROS 版本/系统版本的可用性。
+图形渲染基于 Qt Graphics View 体系实现，在保证交互能力的同时兼顾资源占用，适用于算力受限的边缘设备部署场景。项目已接入 CI 流水线，持续验证多 ROS 版本与多系统组合的可用性。当前已支持 Windows（通过 RosBridge 通信），可在项目 [Releases](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) 页面获取可用版本。
 
 ### ✨ 功能特性
 
@@ -71,7 +71,26 @@
 - **CMake**: 3.16+
 - **编译器**: GCC 7+ / MSVC 2019+
 
+## 📥 Release 二进制发行版使用
+
+本仓库通过 CI 预编译了固定版本的二进制软件包。你可以在 [release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) 页面下载对应系统版本的压缩包并直接运行，当前提供以下两个版本：
+
+- **Linux**: 下载 `.tar.gz` 压缩包，解压后参考 [Linux 方法 3: 安装后运行](#方法-3-安装后运行) 运行程序
+- **Windows**: 下载 `.zip` 压缩包，解压后参考 [Windows 方法 3: 安装后运行](#方法-3-安装后运行-windows) 运行程序
+
+### 配置说明
+
+首次运行前，请确保：
+
+1. **ROS 环境已配置**: 确保已 source ROS 的 setup.bash/setup.bat
+2. **话题配置**: 检查配置界面中的话题名称是否与你的 ROS 系统匹配
+3. **通道选择**: 在配置界面中选择正确的通信通道（ROS1/ROS2/ROSBridge）
+
+详细配置说明请参考 [功能使用指南](./doc/usage.md)
+
 ## 🚀 编译与使用
+
+如果想要进行二次开发或编译安装，参考如下教程
 
 > **💡 提示：** 点击下方标签切换查看不同平台的编译与使用说明
 
@@ -185,88 +204,8 @@ cd ../install/bin
 <details>
 <summary><b>🪟 Windows 平台</b></summary>
 
-### 安装依赖
+Windows 平台构建环境请自行准备（Visual Studio C++ 工具链、CMake、vcpkg 等），并根据本机配置执行构建脚本 ./build.bat。详情参考 CI 中的构建过程：[windows build](./.github/workflows/windows_build.yaml)
 
-### 安装依赖
-
-Windows 平台推荐使用 vcpkg 管理依赖。项目已包含 `vcpkg.json` manifest 文件，可自动安装所有依赖。
-
-**使用 vcpkg 安装依赖：**
-
-1. 安装 vcpkg（如果尚未安装）：
-```powershell
-git clone https://github.com/microsoft/vcpkg.git
-cd vcpkg
-.\bootstrap-vcpkg.bat
-```
-
-2. 设置环境变量（可选，推荐）：
-```powershell
-$env:VCPKG_ROOT = "C:\path\to\vcpkg"
-[Environment]::SetEnvironmentVariable("VCPKG_ROOT", "C:\path\to\vcpkg", "User")
-```
-
-3. 安装项目依赖：
-```powershell
-cd Ros_Qt5_Gui_App
-vcpkg install --triplet x64-windows
-```
-
-**注意：** 首次安装 Qt5 等大型依赖包需要较长时间（30-60分钟），因为需要从源码编译。后续构建会使用缓存，速度会快很多。
-
-### 编译构建
-
-```powershell
-# 克隆仓库
-git clone https://github.com/chengyangkj/Ros_Qt5_Gui_App.git
-cd Ros_Qt5_Gui_App
-```
-
-#### 方法一、手动 CMake 编译
-
-```powershell
-# 创建构建目录
-mkdir build
-cd build
-
-# 配置 CMake（指定 vcpkg toolchain）
-cmake .. `
-  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
-  -DCMAKE_BUILD_TYPE=Release `
-  -DBUILD_WITH_TEST=OFF
-
-# 编译
-cmake --build . --config Release --parallel
-
-# 安装
-cmake --install . --config Release
-```
-
-#### 方法二、使用 Gitee 镜像加速编译
-
-将拉取的三方库位置替换为 Gitee 镜像，加速编译：
-
-```powershell
-# 创建构建目录
-mkdir build
-cd build
-
-# 配置 CMake，使用 Gitee 镜像加速
-cmake .. `
-  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake" `
-  -DCMAKE_BUILD_TYPE=Release `
-  -DBUILD_WITH_TEST=OFF `
-  -Ddockwidget_GIT_REPOSITORY=https://gitee.com/kqz2007/qt-advanced-docking-system_github.git `
-  -Dnlohmann_json_GIT_REPOSITORY=https://gitee.com/athtan/json.git `
-  -Dyaml-cpp_GIT_REPOSITORY=https://gitee.com/dragonet_220/yaml-cpp.git `
-  -Dwebsocketpp_GIT_REPOSITORY=https://gitee.com/open-source-software_1/websocketpp.git
-
-# 编译
-cmake --build . --config Release --parallel
-
-# 安装
-cmake --install . --config Release
-```
 
 ### 运行
 
@@ -299,23 +238,6 @@ cd ..\install\bin
 ```
 
 </details>
-
-## 📥 Release 二进制发行版使用
-
-下载[release](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases)界面中对应系统版本的二进制压缩包：
-
-- **Linux**: 下载 `.tar.gz` 压缩包，解压后参考 [Linux 方法 3: 安装后运行](#方法-3-安装后运行) 运行程序
-- **Windows**: 下载 `.zip` 压缩包，解压后参考 [Windows 方法 3: 安装后运行](#方法-3-安装后运行-windows) 运行程序
-
-### 配置说明
-
-首次运行前，请确保：
-
-1. **ROS 环境已配置**: 确保已 source ROS 的 setup.bash/setup.bat
-2. **话题配置**: 检查配置界面中的话题名称是否与你的 ROS 系统匹配
-3. **通道选择**: 在配置界面中选择正确的通信通道（ROS1/ROS2/ROSBridge）
-
-详细配置说明请参考 [功能使用指南](./doc/usage.md)
 
 ## 📚 文档
 

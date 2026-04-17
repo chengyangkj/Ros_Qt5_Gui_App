@@ -20,6 +20,10 @@ if(WIN32)
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
+if(MSVC)
+  add_compile_options(/utf-8)
+endif()
+
 # 依赖
 include(Getnlohmann)
 include(GetDockWidget)

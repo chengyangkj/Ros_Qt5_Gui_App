@@ -51,10 +51,11 @@ RosbridgeComm::RosbridgeComm() {
   
   // 设置默认图像配置
   if (Config::ConfigManager::Instance()->GetRootConfig().images.empty()) {
-    Config::ConfigManager::Instance()->GetRootConfig().images.push_back(
-        Config::ImageDisplayConfig{.location = "front",
-                                   .topic = "/camera/front/image_raw",
-                                   .enable = true});
+    Config::ImageDisplayConfig default_image_config;
+    default_image_config.location = "front";
+    default_image_config.topic = "/camera/front/image_raw";
+    default_image_config.enable = true;
+    Config::ConfigManager::Instance()->GetRootConfig().images.push_back(default_image_config);
   }
   Config::ConfigManager::Instance()->StoreConfig();
 }
@@ -88,10 +89,10 @@ void RosbridgeComm::ConnectAsync() {
   websocket_connection_->RegisterErrorCallback([this](TransportError err) {
     std::lock_guard<std::mutex> lock(error_msg_mutex_);
     if (err == TransportError::R2C_CONNECTION_CLOSED) {
-      connection_error_msg_ = "ROSBridge 连接已关闭";
+      connection_error_msg_ = "ROSBridge connection closed";
       LOG_ERROR("ROSBridge connection closed");
     } else if (err == TransportError::R2C_SOCKET_ERROR) {
-      connection_error_msg_ = "ROSBridge 网络连接错误";
+      connection_error_msg_ = "ROSBridge socket error";
       LOG_ERROR("ROSBridge socket error");
     }
     connection_failed_ = true;
@@ -117,11 +118,12 @@ void RosbridgeComm::ConnectAsync() {
   LOG_INFO("Attempting to connect to ROSBridge server at " << rosbridge_ip_ << ":" << rosbridge_port_);
   if (!ros_bridge_->Init(rosbridge_ip_, rosbridge_port_)) {
     std::lock_guard<std::mutex> lock(error_msg_mutex_);
-    connection_error_msg_ = "无法连接到 ROSBridge 服务器 " + rosbridge_ip_ + ":" + std::to_string(rosbridge_port_) + 
-                            "\n\n请检查：\n"
-                            "1. ROSBridge 服务器是否正在运行\n"
-                            "2. IP 地址和端口是否正确\n"
-                            "3. 网络连接是否正常";
+    connection_error_msg_ =
+        "Failed to connect to ROSBridge server " + rosbridge_ip_ + ":" + std::to_string(rosbridge_port_) +
+        "\n\nPlease check:\n"
+        "1. ROSBridge server is running\n"
+        "2. IP and port are correct\n"
+        "3. Network is reachable";
     LOG_ERROR("Failed to connect to ROSBridge server!");
     connection_failed_ = true;
     connecting_ = false;

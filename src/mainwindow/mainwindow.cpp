@@ -25,6 +25,8 @@
 #include "ui_mainwindow.h"
 #include <QButtonGroup>
 #include <QMessageBox>
+#include <QDialogButtonBox>
+#include <QFormLayout>
 
 #include "widgets/speed_ctrl.h"
 #include "widgets/display_config_widget.h"
@@ -75,17 +77,31 @@ bool MainWindow::openChannel() {
         if (channel->IsConnectionFailed()) {
           std::string error_msg = channel->GetConnectionError();
           std::string channel_name = channel->Name();
-          if (!error_msg.empty()) {
-            QMessageBox::critical(this, QString::fromStdString(channel_name) + " 连接失败", 
-                                  QString::fromStdString(error_msg),
-                                  QMessageBox::Ok);
+          if (channel_name == "ROSBridge") {
+            if (!PromptRosbridgeConfigAndReconnect(error_msg)) {
+              QString display_error = error_msg.empty()
+                                          ? "无法连接到 ROSBridge 服务器。"
+                                          : QString::fromStdString(error_msg);
+              QMessageBox::critical(this,
+                                    "ROSBridge 连接失败",
+                                    display_error,
+                                    QMessageBox::Ok);
+            }
           } else {
-            QMessageBox::critical(this, QString::fromStdString(channel_name) + " 连接失败", 
-                                  "无法连接到 " + QString::fromStdString(channel_name) + " 服务器。\n\n请检查：\n"
-                                  "1. 服务器是否正在运行\n"
-                                  "2. 配置是否正确\n"
-                                  "3. 网络连接是否正常",
-                                  QMessageBox::Ok);
+            if (!error_msg.empty()) {
+              QMessageBox::critical(this,
+                                    QString::fromStdString(channel_name) + " 连接失败",
+                                    QString::fromStdString(error_msg),
+                                    QMessageBox::Ok);
+            } else {
+              QMessageBox::critical(this,
+                                    QString::fromStdString(channel_name) + " 连接失败",
+                                    "无法连接到 " + QString::fromStdString(channel_name) + " 服务器。\n\n请检查：\n"
+                                    "1. 服务器是否正在运行\n"
+                                    "2. 配置是否正确\n"
+                                    "3. 网络连接是否正常",
+                                    QMessageBox::Ok);
+            }
           }
         }
       });
@@ -98,6 +114,69 @@ bool MainWindow::openChannel() {
 bool MainWindow::openChannel(const std::string &channel_name) {
   if (channel_manager_.OpenChannel(channel_name)) {
     registerChannel();
+    return true;
+  }
+  return false;
+}
+
+bool MainWindow::PromptRosbridgeConfigAndReconnect(const std::string& error_msg) {
+  QDialog dialog(this);
+  dialog.setWindowTitle("ROSBridge 连接设置");
+  dialog.setModal(true);
+
+  auto* form_layout = new QFormLayout(&dialog);
+
+  auto& config = Config::ConfigManager::Instance()->GetRootConfig();
+  std::string default_ip = config.channel_config.rosbridge_config.ip.empty()
+                               ? "127.0.0.1"
+                               : config.channel_config.rosbridge_config.ip;
+  std::string default_port = config.channel_config.rosbridge_config.port.empty()
+                                 ? "9090"
+                                 : config.channel_config.rosbridge_config.port;
+
+  auto* ip_edit = new QLineEdit(QString::fromStdString(default_ip), &dialog);
+  auto* port_edit = new QLineEdit(QString::fromStdString(default_port), &dialog);
+  ip_edit->setPlaceholderText("127.0.0.1");
+  port_edit->setPlaceholderText("9090");
+  form_layout->addRow("IP 地址:", ip_edit);
+  form_layout->addRow("端口:", port_edit);
+
+  QString detail_error = error_msg.empty() ? "连接失败，请检查地址和端口。" : QString::fromStdString(error_msg);
+  auto* tip_label = new QLabel(detail_error, &dialog);
+  tip_label->setWordWrap(true);
+  form_layout->addRow(tip_label);
+
+  auto* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+  form_layout->addRow(buttons);
+  connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+  connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+
+  if (dialog.exec() != QDialog::Accepted) {
+    return false;
+  }
+
+  QString new_ip = ip_edit->text().trimmed();
+  QString new_port = port_edit->text().trimmed();
+  if (new_ip.isEmpty() || new_port.isEmpty()) {
+    QMessageBox::warning(this, "参数无效", "IP 和端口不能为空。", QMessageBox::Ok);
+    return false;
+  }
+
+  bool ok = false;
+  new_port.toInt(&ok);
+  if (!ok) {
+    QMessageBox::warning(this, "参数无效", "端口必须是数字。", QMessageBox::Ok);
+    return false;
+  }
+
+  config.channel_config.channel_type = "rosbridge";
+  config.channel_config.rosbridge_config.ip = new_ip.toStdString();
+  config.channel_config.rosbridge_config.port = new_port.toStdString();
+  Config::ConfigManager::Instance()->StoreConfig();
+
+  channel_manager_.CloseChannel();
+  if (openChannel()) {
+    QMessageBox::information(this, "提示", "ROSBridge 配置已更新，正在重连。", QMessageBox::Ok);
     return true;
   }
   return false;

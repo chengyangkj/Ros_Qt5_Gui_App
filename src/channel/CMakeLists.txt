@@ -31,7 +31,11 @@ add_library(channel STATIC
   virtual_channel_node.h
 )
 
-target_link_libraries(channel PUBLIC Boost::filesystem pthread dl common framework)
+if(WIN32)
+  target_link_libraries(channel PUBLIC Boost::filesystem common framework)
+else()
+  target_link_libraries(channel PUBLIC Boost::filesystem pthread dl common framework)
+endif()
 
 target_include_directories(channel PUBLIC 
 ${CMAKE_CURRENT_SOURCE_DIR}
@@ -44,6 +48,10 @@ LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
 #######test
-find_library(DL_LIBRARY dl)
-set(TEST_LINK_LIBRARIES channel ${DL_LIBRARY})
+if(WIN32)
+  set(TEST_LINK_LIBRARIES channel)
+else()
+  find_library(DL_LIBRARY dl)
+  set(TEST_LINK_LIBRARIES channel ${DL_LIBRARY})
+endif()
 AddTest()

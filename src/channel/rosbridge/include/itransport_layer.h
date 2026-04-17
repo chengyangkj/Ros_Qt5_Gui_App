@@ -2,6 +2,10 @@
 
 #include "types.h"
 
+#ifdef SendMessage
+#undef SendMessage
+#endif
+
 /*
  * This class provides an interfaces for generic Transportlayers that can be used by the ROSBridge.
  * Since this library has been developed for different plattforms,

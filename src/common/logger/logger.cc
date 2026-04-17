@@ -28,13 +28,13 @@ Logger::Logger() {
 Logger::~Logger() {}
 void Logger::Log(LogLevel level, const std::stringstream& message, const char* file, int line) {
   switch (level) {
-    case LogLevel::INFO:
+    case LogLevel::kInfo:
       LOG(INFO) << "[" << file << ":" << line << "] " << message.str();
       break;
-    case LogLevel::ERROR:
+    case LogLevel::kError:
       LOG(ERROR) << "[" << file << ":" << line << "] " << message.str();
       break;
-    case LogLevel::WARN:
+    case LogLevel::kWarn:
       LOG(WARNING) << "[" << file << ":" << line << "] " << message.str();
       break;
   }

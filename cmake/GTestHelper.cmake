@@ -12,7 +12,7 @@ if(SRC_FILE)
   add_executable(${TARGET_NAME}_test ${SRC_FILE})
 
   # 链接 GTest 库
-  target_link_libraries(${TARGET_NAME}_test ${GTEST_LIBRARIES} gtest_main pthread ${TEST_LINK_LIBRARIES} )
+  target_link_libraries(${TARGET_NAME}_test ${GTEST_LIBRARIES} gtest_main ${TEST_LINK_LIBRARIES} )
 
   # 添加测试
   add_test(NAME ${TARGET_NAME}_test COMMAND  ${TARGET_NAME}_test)

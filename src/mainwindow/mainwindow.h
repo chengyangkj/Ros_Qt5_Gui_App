@@ -3,6 +3,7 @@
 
 #include <QCalendarWidget>
 #include <QComboBox>
+#include <QDialog>
 #include <QFileDialog>
 #include <QFileSystemModel>
 #include <QGraphicsItem>
@@ -91,5 +92,6 @@ class MainWindow : public QMainWindow {
   void registerChannel();
   void SaveState();
   bool LoadMap(const std::string& file_path);
+  bool PromptRosbridgeConfigAndReconnect(const std::string& error_msg);
 };
 #endif  // MAINWINDOW_H

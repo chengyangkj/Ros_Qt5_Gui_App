@@ -42,25 +42,15 @@ jobs:
         run: |
           "%VCPKG_ROOT%\vcpkg.exe" install --triplet x64-windows --x-install-root="%VCPKG_ROOT%\installed"
 
-      - name: Configure CMake
+      - name: Build via project script
+        env:
+          VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
         run: |
-          cmake -B build -S . ^
-            -DCMAKE_TOOLCHAIN_FILE="%VCPKG_ROOT%\scripts\buildsystems\vcpkg.cmake" ^
-            -DCMAKE_BUILD_TYPE=Release ^
-            -DBUILD_WITH_TEST=OFF
-
-      - name: Build
-        run: |
-          cmake --build build --config Release --parallel
-
-      - name: Install
-        run: |
-          cmake --install build --config Release
+          build.bat
 
       - name: Test
         run: |
-          cd build
-          ctest -C Release --output-on-failure
+          ctest --test-dir build -C Release --output-on-failure
 
       - name: Package Release
         if: startsWith(github.ref, 'refs/tags/v')

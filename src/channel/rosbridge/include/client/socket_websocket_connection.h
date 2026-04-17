@@ -14,6 +14,10 @@
 #include "itransport_layer.h"
 #include "types.h"
 
+#ifdef SendMessage
+#undef SendMessage
+#endif
+
 using json = rapidjson::Document;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
