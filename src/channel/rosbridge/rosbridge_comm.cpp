@@ -14,6 +14,15 @@
 #include <thread>
 #include <chrono>
 
+namespace {
+std::string NormalizeFrameId(const std::string &frame_id) {
+  if (!frame_id.empty() && frame_id[0] == '/') {
+    return frame_id.substr(1);
+  }
+  return frame_id;
+}
+}  // namespace
+
 /**
  * @brief 构造函数，初始化默认配置
  */
@@ -549,6 +558,23 @@ void RosbridgeComm::LocalCostMapCallback(const ROSBridgePublishMsg &msg) {
   int width = info["width"].GetInt();
   int height = info["height"].GetInt();
   double resolution = info["resolution"].GetDouble();
+
+  std::string frame_id = "map";
+  if (msg_json.HasMember("header") && msg_json["header"].HasMember("frame_id") &&
+      msg_json["header"]["frame_id"].IsString()) {
+    frame_id = NormalizeFrameId(msg_json["header"]["frame_id"].GetString());
+  }
+  if (frame_id != "map") {
+    basic::RobotPose tf_map_from_frame = GetTransform("map", frame_id);
+    basic::RobotPose local_origin_pose;
+    local_origin_pose.x = origin_x;
+    local_origin_pose.y = origin_y;
+    local_origin_pose.theta = origin_theta;
+    basic::RobotPose map_origin_pose = basic::absoluteSum(tf_map_from_frame, local_origin_pose);
+    origin_x = map_origin_pose.x;
+    origin_y = map_origin_pose.y;
+    origin_theta = map_origin_pose.theta;
+  }
   
   // 创建代价地图
   basic::OccupancyMap cost_map(height, width, Eigen::Vector3d(origin_x, origin_y, 0), resolution);
@@ -704,6 +730,17 @@ void RosbridgeComm::LocalPathCallback(const ROSBridgePublishMsg &msg) {
   
   const auto &msg_json = msg.msg_json_;
   if (!msg_json.HasMember("poses")) return;
+
+  std::string frame_id = "map";
+  if (msg_json.HasMember("header") && msg_json["header"].HasMember("frame_id") &&
+      msg_json["header"]["frame_id"].IsString()) {
+    frame_id = NormalizeFrameId(msg_json["header"]["frame_id"].GetString());
+  }
+  const bool need_tf = (frame_id != "map");
+  basic::RobotPose tf_map_from_frame;
+  if (need_tf) {
+    tf_map_from_frame = GetTransform("map", frame_id);
+  }
   
   // 提取路径点
   basic::RobotPath path;
@@ -714,6 +751,9 @@ void RosbridgeComm::LocalPathCallback(const ROSBridgePublishMsg &msg) {
       basic::Point point;
       point.x = pose["x"].GetDouble();
       point.y = pose["y"].GetDouble();
+      if (need_tf) {
+        point = basic::absoluteSum(tf_map_from_frame, point);
+      }
       path.push_back(point);
     }
   }
@@ -785,6 +825,17 @@ void RosbridgeComm::RobotFootprintCallback(const ROSBridgePublishMsg &msg) {
   
   const auto &msg_json = msg.msg_json_;
   if (!msg_json.HasMember("polygon") || !msg_json["polygon"].HasMember("points")) return;
+
+  std::string frame_id = "map";
+  if (msg_json.HasMember("header") && msg_json["header"].HasMember("frame_id") &&
+      msg_json["header"]["frame_id"].IsString()) {
+    frame_id = NormalizeFrameId(msg_json["header"]["frame_id"].GetString());
+  }
+  const bool need_tf = (frame_id != "map");
+  basic::RobotPose tf_map_from_frame;
+  if (need_tf) {
+    tf_map_from_frame = GetTransform("map", frame_id);
+  }
   
   // 提取机器人足迹多边形点
   basic::RobotPath footprint;
@@ -794,6 +845,9 @@ void RosbridgeComm::RobotFootprintCallback(const ROSBridgePublishMsg &msg) {
       basic::Point p;
       p.x = points[i]["x"].GetDouble();
       p.y = points[i]["y"].GetDouble();
+      if (need_tf) {
+        p = basic::absoluteSum(tf_map_from_frame, p);
+      }
       footprint.push_back(p);
     }
   }
