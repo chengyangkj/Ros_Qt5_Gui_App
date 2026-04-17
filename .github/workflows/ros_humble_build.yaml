@@ -10,6 +10,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -86,3 +89,13 @@ jobs:
         with:
           name: ros_qt5_gui_app_humble_x86_64
           path: build/install/bin/ros_qt5_gui_app_humble_x86_64.tar.gz
+
+      - name: Upload to GitHub Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: build/install/bin/ros_qt5_gui_app_humble_x86_64.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

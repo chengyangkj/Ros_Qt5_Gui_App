@@ -15,6 +15,17 @@
 
 DisplayConfigWidget::DisplayConfigWidget(QWidget *parent)
     : QWidget(parent), robot_color_(QColor(0, 0, 255)) {
+  setStyleSheet(R"(
+    QWidget {
+      color: #26251e;
+    }
+    QToolTip {
+      background-color: #f7f7f4;
+      color: #26251e;
+      border: 1px solid rgba(38, 37, 30, 0.18);
+      padding: 4px 6px;
+    }
+  )");
   InitUI();
   QTimer::singleShot(3000, this, &DisplayConfigWidget::LoadConfig);
 }
@@ -25,13 +36,19 @@ void DisplayConfigWidget::InitUI() {
   main_layout_ = new QVBoxLayout(this);
   main_layout_->setContentsMargins(10, 10, 10, 10);
   main_layout_->setSpacing(8);
+  setAutoFillBackground(true);
+  setStyleSheet(styleSheet() + R"(
+    DisplayConfigWidget {
+      background-color: #f2f1ed;
+    }
+  )");
   
   QLabel *title_label = new QLabel("配置管理", this);
   title_label->setStyleSheet(R"(
     QLabel {
       font-size: 16px;
-      font-weight: bold;
-      color: #333333;
+      font-weight: 600;
+      color: #26251e;
       padding: 5px;
     }
   )");
@@ -40,25 +57,25 @@ void DisplayConfigWidget::InitUI() {
   tab_widget_ = new QTabWidget(this);
   tab_widget_->setStyleSheet(R"(
     QTabWidget::pane {
-      border: 1px solid #d0d0d0;
-      border-radius: 4px;
-      background-color: #ffffff;
+      border: 1px solid rgba(38, 37, 30, 0.12);
+      border-radius: 8px;
+      background-color: #f7f7f4;
     }
     QTabBar::tab {
-      background-color: #f0f0f0;
-      color: #333333;
-      padding: 8px 16px;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-      margin-right: 2px;
+      background-color: #ebeae5;
+      color: rgba(38, 37, 30, 0.72);
+      padding: 8px 14px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      margin-right: 4px;
     }
     QTabBar::tab:selected {
-      background-color: #ffffff;
-      color: #1976d2;
-      font-weight: bold;
+      background-color: #f7f7f4;
+      color: #26251e;
+      font-weight: 600;
     }
     QTabBar::tab:hover {
-      background-color: #e0e0e0;
+      color: #cf2d56;
     }
   )");
   
@@ -81,8 +98,8 @@ void DisplayConfigWidget::InitDisplayConfigTab() {
   section_label->setStyleSheet(R"(
     QLabel {
       font-size: 14px;
-      font-weight: bold;
-      color: #333333;
+      font-weight: 600;
+      color: #26251e;
       padding: 5px;
     }
   )");
@@ -109,42 +126,99 @@ void DisplayConfigWidget::InitDisplayConfigTab() {
     {DISPLAY_ROBOT_FOOTPRINT, ":/images/classes/RobotLink.png"},
     {DISPLAY_GOAL, ":/images/classes/SetGoal.png"},
   };
-  
   for (const auto &[display_name, icon_path] : display_types) {
-    QGroupBox *group_box = new QGroupBox(QString::fromStdString(display_name), display_scroll_content_);
-    group_box->setStyleSheet(R"(
-      QGroupBox {
-        border: 1px solid #d0d0d0;
-        border-radius: 4px;
-        margin-top: 10px;
-        padding-top: 10px;
-        background-color: #f9f9f9;
-      }
-      QGroupBox::title {
-        subcontrol-origin: margin;
-        left: 10px;
-        padding: 0 5px;
+    (void)icon_path;
+    QWidget *item_widget = new QWidget(display_scroll_content_);
+    item_widget->setStyleSheet(R"(
+      QWidget {
+        background-color: #e6e5e0;
+        border: 1px solid rgba(38, 37, 30, 0.12);
+        border-radius: 8px;
       }
     )");
-    
-    QVBoxLayout *group_layout = new QVBoxLayout(group_box);
-    group_layout->setContentsMargins(10, 15, 10, 10);
-    group_layout->setSpacing(8);
-    
+
+    QVBoxLayout *item_layout = new QVBoxLayout(item_widget);
+    item_layout->setContentsMargins(8, 8, 8, 8);
+    item_layout->setSpacing(6);
+
+    QWidget *header_widget = new QWidget(item_widget);
+    QHBoxLayout *header_layout = new QHBoxLayout(header_widget);
+    header_layout->setContentsMargins(0, 0, 0, 0);
+    header_layout->setSpacing(8);
+
+    QToolButton *expand_btn = new QToolButton(header_widget);
+    expand_btn->setObjectName("display_expand_btn");
+    expand_btn->setText(QString::fromStdString(display_name));
+    expand_btn->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    expand_btn->setArrowType(Qt::RightArrow);
+    expand_btn->setCheckable(true);
+    expand_btn->setChecked(false);
+    expand_btn->setStyleSheet(R"(
+      QToolButton {
+        border: none;
+        color: #26251e;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 2px 4px;
+        text-align: left;
+      }
+      QToolButton:hover {
+        color: #cf2d56;
+      }
+    )");
+
+    QToolButton *toggle_btn = new QToolButton(header_widget);
+    toggle_btn->setCheckable(true);
+    toggle_btn->setChecked(true);
+    toggle_btn->setCursor(Qt::PointingHandCursor);
+    toggle_btn->setStyleSheet(R"(
+      QToolButton {
+        min-width: 34px;
+        max-width: 34px;
+        min-height: 20px;
+        max-height: 20px;
+        border-radius: 10px;
+        background-color: #d8d7d2;
+        border: 1px solid rgba(38, 37, 30, 0.18);
+      }
+      QToolButton:checked {
+        background-color: #26251e;
+        border: 1px solid #26251e;
+      }
+      QToolButton:hover {
+        border: 1px solid rgba(38, 37, 30, 0.35);
+      }
+    )");
+    display_toggle_buttons_[display_name] = toggle_btn;
+    connect(toggle_btn, &QToolButton::toggled, [this, display_name](bool checked) {
+      OnToggleDisplay(display_name, checked);
+    });
+
+    header_layout->addWidget(expand_btn, 1);
+    header_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    header_layout->addWidget(toggle_btn);
+
+    QWidget *content_widget = new QWidget(item_widget);
+    content_widget->setVisible(false);
+    content_widget->setStyleSheet("QWidget { border: none; background: transparent; }");
+    QVBoxLayout *content_layout = new QVBoxLayout(content_widget);
+    content_layout->setContentsMargins(4, 2, 4, 0);
+    content_layout->setSpacing(6);
+
     QHBoxLayout *topic_layout = new QHBoxLayout();
-    QLabel *topic_label = new QLabel("话题:", group_box);
+    QLabel *topic_label = new QLabel("话题:", content_widget);
     topic_label->setFixedWidth(60);
-    QLineEdit *topic_edit = new QLineEdit(group_box);
+    QLineEdit *topic_edit = new QLineEdit(content_widget);
     topic_edit->setPlaceholderText("输入话题名称");
     topic_edit->setStyleSheet(R"(
       QLineEdit {
-        border: 1px solid #d0d0d0;
-        border-radius: 4px;
+        border: 1px solid rgba(38, 37, 30, 0.16);
+        border-radius: 6px;
         padding: 4px;
-        background-color: #ffffff;
+        background-color: #f7f7f4;
       }
       QLineEdit:focus {
-        border-color: #1976d2;
+        border-color: rgba(38, 37, 30, 0.32);
       }
     )");
     display_topic_edits_[display_name] = topic_edit;
@@ -153,45 +227,32 @@ void DisplayConfigWidget::InitDisplayConfigTab() {
     });
     topic_layout->addWidget(topic_label);
     topic_layout->addWidget(topic_edit);
-    group_layout->addLayout(topic_layout);
-    
-    QHBoxLayout *control_layout = new QHBoxLayout();
-    QLabel *visible_label = new QLabel("可见:", group_box);
-    visible_label->setFixedWidth(60);
-    QToolButton *toggle_btn = new QToolButton(group_box);
-    toggle_btn->setCheckable(true);
-    toggle_btn->setChecked(true);
-    toggle_btn->setText("✓");
-    toggle_btn->setFixedSize(30, 24);
-    toggle_btn->setStyleSheet(R"(
-      QToolButton {
-        border: 1px solid #d0d0d0;
-        border-radius: 4px;
-        background-color: #ffffff;
-        color: #333333;
-        font-weight: bold;
+    content_layout->addLayout(topic_layout);
+
+    connect(expand_btn, &QToolButton::toggled, [this, expand_btn, content_widget](bool expanded) {
+      if (expanded) {
+        const auto allExpandButtons = display_scroll_content_->findChildren<QToolButton *>("display_expand_btn");
+        for (auto *otherExpandBtn : allExpandButtons) {
+          if (otherExpandBtn != expand_btn && otherExpandBtn->isChecked()) {
+            otherExpandBtn->blockSignals(true);
+            otherExpandBtn->setChecked(false);
+            otherExpandBtn->setArrowType(Qt::RightArrow);
+            otherExpandBtn->blockSignals(false);
+            QWidget *otherContent = otherExpandBtn->property("content_widget").value<QWidget *>();
+            if (otherContent) {
+              otherContent->setVisible(false);
+            }
+          }
+        }
       }
-      QToolButton:checked {
-        background-color: #4caf50;
-        border-color: #4caf50;
-        color: #ffffff;
-      }
-      QToolButton:hover {
-        border-color: #1976d2;
-      }
-    )");
-    display_toggle_buttons_[display_name] = toggle_btn;
-    connect(toggle_btn, &QToolButton::toggled, [this, display_name, toggle_btn](bool checked) {
-      toggle_btn->setText(checked ? "✓" : "");
-      OnToggleDisplay(display_name, checked);
+      expand_btn->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
+      content_widget->setVisible(expanded);
     });
-    
-    control_layout->addWidget(visible_label);
-    control_layout->addWidget(toggle_btn);
-    control_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    group_layout->addLayout(control_layout);
-    
-    scroll_layout->addWidget(group_box);
+    expand_btn->setProperty("content_widget", QVariant::fromValue(content_widget));
+
+    item_layout->addWidget(header_widget);
+    item_layout->addWidget(content_widget);
+    scroll_layout->addWidget(item_widget);
   }
   
   scroll_layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -211,8 +272,8 @@ void DisplayConfigWidget::InitKeyValueTab() {
   section_label->setStyleSheet(R"(
     QLabel {
       font-size: 14px;
-      font-weight: bold;
-      color: #333333;
+      font-weight: 600;
+      color: #26251e;
       padding: 5px;
     }
   )");
@@ -235,14 +296,14 @@ void DisplayConfigWidget::InitKeyValueTab() {
   add_btn->setFixedWidth(120);
   add_btn->setStyleSheet(R"(
     QPushButton {
-      border: 1px solid #4caf50;
-      border-radius: 4px;
+      border: 1px solid rgba(38, 37, 30, 0.14);
+      border-radius: 8px;
       padding: 6px;
-      background-color: #4caf50;
-      color: #ffffff;
+      background-color: #ebeae5;
+      color: #26251e;
     }
     QPushButton:hover {
-      background-color: #45a049;
+      color: #cf2d56;
     }
   )");
   connect(add_btn, &QPushButton::clicked, this, &DisplayConfigWidget::OnAddKeyValue);
@@ -348,8 +409,8 @@ void DisplayConfigWidget::InitImageConfigTab() {
   section_label->setStyleSheet(R"(
     QLabel {
       font-size: 14px;
-      font-weight: bold;
-      color: #333333;
+      font-weight: 600;
+      color: #26251e;
       padding: 5px;
     }
   )");
@@ -358,22 +419,28 @@ void DisplayConfigWidget::InitImageConfigTab() {
   image_table_ = new QTableWidget(0, 4, image_tab_);
   image_table_->setHorizontalHeaderLabels(QStringList() << "位置" << "话题" << "启用" << "操作");
   image_table_->horizontalHeader()->setStretchLastSection(true);
+  image_table_->verticalHeader()->setVisible(false);
   image_table_->setSelectionBehavior(QAbstractItemView::SelectRows);
+  image_table_->setAlternatingRowColors(true);
   image_table_->setStyleSheet(R"(
     QTableWidget {
-      border: 1px solid #d0d0d0;
-      border-radius: 4px;
-      background-color: #ffffff;
-      gridline-color: #e0e0e0;
+      border: 1px solid rgba(38, 37, 30, 0.12);
+      border-radius: 8px;
+      background-color: #f7f7f4;
+      gridline-color: rgba(38, 37, 30, 0.1);
+      alternate-background-color: #f2f1ed;
+      selection-background-color: #ebeae5;
     }
     QTableWidget::item {
-      padding: 4px;
+      padding: 6px;
     }
     QHeaderView::section {
-      background-color: #f0f0f0;
-      padding: 4px;
+      background-color: #ebeae5;
+      padding: 6px;
       border: none;
-      border-bottom: 1px solid #d0d0d0;
+      border-bottom: 1px solid rgba(38, 37, 30, 0.12);
+      color: #26251e;
+      font-weight: 600;
     }
   )");
   
@@ -383,14 +450,14 @@ void DisplayConfigWidget::InitImageConfigTab() {
   add_btn->setFixedWidth(100);
   add_btn->setStyleSheet(R"(
     QPushButton {
-      border: 1px solid #4caf50;
-      border-radius: 4px;
+      border: 1px solid rgba(38, 37, 30, 0.14);
+      border-radius: 8px;
       padding: 6px;
-      background-color: #4caf50;
-      color: #ffffff;
+      background-color: #ebeae5;
+      color: #26251e;
     }
     QPushButton:hover {
-      background-color: #45a049;
+      color: #cf2d56;
     }
   )");
   connect(add_btn, &QPushButton::clicked, this, &DisplayConfigWidget::OnAddImageConfig);
@@ -968,18 +1035,22 @@ void DisplayConfigWidget::OnAddImageConfig() {
   enable_checkbox->setChecked(true);
   enable_checkbox->setStyleSheet(R"(
     QCheckBox {
-      spacing: 5px;
+      spacing: 0px;
+      padding-left: 2px;
     }
     QCheckBox::indicator {
-      width: 18px;
-      height: 18px;
-      border: 1px solid #d0d0d0;
-      border-radius: 3px;
-      background-color: #ffffff;
+      width: 14px;
+      height: 14px;
+      border: 1px solid rgba(38, 37, 30, 0.22);
+      border-radius: 7px;
+      background-color: #f7f7f4;
     }
     QCheckBox::indicator:checked {
-      background-color: #4caf50;
-      border-color: #4caf50;
+      background-color: #26251e;
+      border-color: #26251e;
+    }
+    QCheckBox::indicator:hover {
+      border-color: rgba(38, 37, 30, 0.38);
     }
   )");
   connect(enable_checkbox, &QCheckBox::toggled, [this, row](bool checked) {
@@ -990,14 +1061,14 @@ void DisplayConfigWidget::OnAddImageConfig() {
   QPushButton *remove_btn = new QPushButton("删除");
   remove_btn->setStyleSheet(R"(
     QPushButton {
-      border: 1px solid #f44336;
-      border-radius: 4px;
-      padding: 2px 8px;
-      background-color: #f44336;
-      color: #ffffff;
+      border: 1px solid rgba(38, 37, 30, 0.14);
+      border-radius: 6px;
+      padding: 3px 8px;
+      background-color: #ebeae5;
+      color: #26251e;
     }
     QPushButton:hover {
-      background-color: #da190b;
+      color: #cf2d56;
     }
   )");
   connect(remove_btn, &QPushButton::clicked, [this, row]() {
@@ -1148,7 +1219,6 @@ void DisplayConfigWidget::LoadConfig() {
     if (toggle_it != display_toggle_buttons_.end()) {
       toggle_it->second->blockSignals(true);
       toggle_it->second->setChecked(display_config.visible);
-      toggle_it->second->setText(display_config.visible ? "✓" : "");
       toggle_it->second->blockSignals(false);
       UpdateDisplayVisibility(display_config.display_name, display_config.visible);
     }
@@ -1179,18 +1249,22 @@ void DisplayConfigWidget::LoadConfig() {
     enable_checkbox->setChecked(image_config.enable);
     enable_checkbox->setStyleSheet(R"(
       QCheckBox {
-        spacing: 5px;
+        spacing: 0px;
+        padding-left: 2px;
       }
       QCheckBox::indicator {
-        width: 18px;
-        height: 18px;
-        border: 1px solid #d0d0d0;
-        border-radius: 3px;
-        background-color: #ffffff;
+        width: 14px;
+        height: 14px;
+        border: 1px solid rgba(38, 37, 30, 0.22);
+        border-radius: 7px;
+        background-color: #f7f7f4;
       }
       QCheckBox::indicator:checked {
-        background-color: #4caf50;
-        border-color: #4caf50;
+        background-color: #26251e;
+        border-color: #26251e;
+      }
+      QCheckBox::indicator:hover {
+        border-color: rgba(38, 37, 30, 0.38);
       }
     )");
     connect(enable_checkbox, &QCheckBox::toggled, [this, row](bool checked) {
@@ -1201,14 +1275,14 @@ void DisplayConfigWidget::LoadConfig() {
     QPushButton *remove_btn = new QPushButton("删除");
     remove_btn->setStyleSheet(R"(
       QPushButton {
-        border: 1px solid #f44336;
-        border-radius: 4px;
-        padding: 2px 8px;
-        background-color: #f44336;
-        color: #ffffff;
+        border: 1px solid rgba(38, 37, 30, 0.14);
+        border-radius: 6px;
+        padding: 3px 8px;
+        background-color: #ebeae5;
+        color: #26251e;
       }
       QPushButton:hover {
-        background-color: #da190b;
+        color: #cf2d56;
       }
     )");
     connect(remove_btn, &QPushButton::clicked, [this, row]() {
