@@ -22,7 +22,8 @@ Logger::Logger() {
   // 设置配置文件
   el::Loggers::reconfigureLogger("default", defaultConf);
 
-  /// 防止Fatal级别日志中断程序
+  el::Loggers::addFlag(el::LoggingFlag::ImmediateFlush);
+  // 防止Fatal级别日志中断程序
   el::Loggers::addFlag(el::LoggingFlag::DisableApplicationAbortOnFatalLog);
 }
 Logger::~Logger() {}

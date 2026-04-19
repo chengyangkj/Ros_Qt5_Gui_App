@@ -9,8 +9,10 @@
  */
 #include "mainwindow.h"
 #include <QDebug>
+#include <QEvent>
 #include <QFont>
 #include <QFontDatabase>
+#include <QMouseEvent>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 #include <QFileInfo>
@@ -51,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
   qRegisterMetaType<TopologyMap>("TopologyMap");
   qRegisterMetaType<TopologyMap::PointInfo>("TopologyMap::PointInfo");
   setupUi();
-  openChannel();
+  QTimer::singleShot(30, this, [this]() { openChannel(); });
   QTimer::singleShot(50, [=]() { 
     RestoreState();
     std::string map_path = Config::ConfigManager::Instance()->GetRootConfig().map_config.path;
@@ -86,7 +88,9 @@ bool MainWindow::openChannel() {
                                  display_error +
                                      "\n\n请在左侧 ConfigManager 面板中重新设置 ROSBridge 的 IP 和端口。",
                                  QMessageBox::Ok);
+            LOG_ERROR("ROSBridge connection failed: " << error_msg);
           } else {
+            LOG_ERROR("Channel " << channel_name << " connection failed: " << error_msg);
             if (!error_msg.empty()) {
               QMessageBox::critical(this,
                                     QString::fromStdString(channel_name) + " 连接失败",
@@ -159,6 +163,8 @@ void MainWindow::closeChannel() { channel_manager_.CloseChannel(); }
 MainWindow::~MainWindow() { delete ui; }
 void MainWindow::setupUi() {
   ui->setupUi(this);
+  setWindowFlags((windowFlags() | Qt::FramelessWindowHint) & ~Qt::WindowTitleHint);
+  setAttribute(Qt::WA_TranslucentBackground, false);
 
   const QStringList preferredFontFamilies = {
       "SF Pro Display",
@@ -245,8 +251,41 @@ void MainWindow::setupUi() {
   QVBoxLayout *center_layout = new QVBoxLayout();    //垂直
   QHBoxLayout *center_h_layout = new QHBoxLayout();  //水平
 
+  const QString window_ctrl_btn_style = R"(
+    QPushButton {
+      min-width: 28px;
+      max-width: 28px;
+      min-height: 24px;
+      max-height: 24px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      background-color: #ffffff;
+      color: #333333;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 0;
+    }
+    QPushButton:hover {
+      background-color: #f5f5f5;
+      border-color: #1976d2;
+    }
+    QPushButton:pressed {
+      background-color: #e3f2fd;
+    }
+  )";
+
+  QWidget *tools_strip = new QWidget();
+  custom_title_bar_ = tools_strip;
+  tools_strip->installEventFilter(this);
+  tools_strip->setStyleSheet(R"(
+    QWidget {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+    }
+  )");
+
   ///////////////////////////////////////////////////////////////地图工具栏
-  QHBoxLayout *horizontalLayout_tools = new QHBoxLayout();
+  QHBoxLayout *horizontalLayout_tools = new QHBoxLayout(tools_strip);
   horizontalLayout_tools->setSpacing(6);
   horizontalLayout_tools->setObjectName(
       QString::fromUtf8(" horizontalLayout_tools"));
@@ -351,7 +390,7 @@ void MainWindow::setupUi() {
   re_save_map_btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
   re_save_map_btn->setStyleSheet(modernToolButtonStyle);
   horizontalLayout_tools->addWidget(re_save_map_btn);
-  center_layout->addLayout(horizontalLayout_tools);
+  center_layout->addWidget(tools_strip);
 
   horizontalLayout_tools->addItem(
       new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -404,6 +443,31 @@ void MainWindow::setupUi() {
     }
   )");
   horizontalLayout_tools->addWidget(label_power_);
+
+  horizontalLayout_tools->addSpacing(12);
+  QPushButton *min_btn = new QPushButton(QStringLiteral("-"), this);
+  QPushButton *max_btn = new QPushButton(QStringLiteral("\u25A1"), this);
+  QPushButton *close_btn = new QPushButton(QStringLiteral("\u00d7"), this);
+  min_btn->setStyleSheet(window_ctrl_btn_style);
+  max_btn->setStyleSheet(window_ctrl_btn_style);
+  close_btn->setStyleSheet(window_ctrl_btn_style +
+                          "\nQPushButton:hover { background-color: #ef5350; color: white; "
+                          "border-color: #ef5350; }");
+  connect(min_btn, &QPushButton::clicked, this, &QWidget::showMinimized);
+  connect(max_btn, &QPushButton::clicked, [this, max_btn]() {
+    if (isMaximized()) {
+      showNormal();
+      max_btn->setText(QStringLiteral("\u25A1"));
+    } else {
+      showMaximized();
+      max_btn->setText(QStringLiteral("\u2750"));
+    }
+  });
+  connect(close_btn, &QPushButton::clicked, this, &QWidget::close);
+  horizontalLayout_tools->addWidget(min_btn);
+  horizontalLayout_tools->addWidget(max_btn);
+  horizontalLayout_tools->addWidget(close_btn);
+
   SlotSetBatteryStatus(0, 0);
   
   //////////////////////////////////////////////////////////////编辑地图工具栏 - 现代化设计
@@ -623,7 +687,7 @@ void MainWindow::setupUi() {
   ////////////////////////////////////////////////////////图层配置管理
   DisplayConfigWidget *display_config_widget_ = new DisplayConfigWidget();
   display_config_widget_->SetDisplayManager(display_manager_);
-  display_config_widget_->SetChannelList(channel_manager_.DiscoveryAllChannel());
+  display_config_widget_->SetChannelList(channel_manager_.DiscoveryChannelTypes());
   ads::CDockWidget *DisplayConfigDockWidget = new ads::CDockWidget("ConfigManager");
   DisplayConfigDockWidget->setWidget(display_config_widget_);
   DisplayConfigDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
@@ -970,6 +1034,39 @@ void MainWindow::setupUi() {
   connect(display_manager_->GetDisplay(DISPLAY_MAP),
           SIGNAL(signalCursorPose(QPointF)), this,
           SLOT(signalCursorPose(QPointF)));
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
+  if (watched == custom_title_bar_) {
+    if (event->type() == QEvent::MouseButtonPress) {
+      QMouseEvent *mouse_event = static_cast<QMouseEvent *>(event);
+      if (mouse_event->button() == Qt::LeftButton) {
+        dragging_window_ = true;
+        drag_position_ = mouse_event->globalPos() - frameGeometry().topLeft();
+        return true;
+      }
+    } else if (event->type() == QEvent::MouseMove) {
+      if (dragging_window_ && !isMaximized()) {
+        QMouseEvent *mouse_event = static_cast<QMouseEvent *>(event);
+        move(mouse_event->globalPos() - drag_position_);
+        return true;
+      }
+    } else if (event->type() == QEvent::MouseButtonRelease) {
+      QMouseEvent *mouse_event = static_cast<QMouseEvent *>(event);
+      if (mouse_event->button() == Qt::LeftButton) {
+        dragging_window_ = false;
+        return true;
+      }
+    } else if (event->type() == QEvent::MouseButtonDblClick) {
+      if (isMaximized()) {
+        showNormal();
+      } else {
+        showMaximized();
+      }
+      return true;
+    }
+  }
+  return QMainWindow::eventFilter(watched, event);
 }
 
 void MainWindow::signalCursorPose(QPointF pos) {

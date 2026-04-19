@@ -21,6 +21,7 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QWidgetAction>
+#include <QPoint>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "DockAreaWidget.h"
 #include "DockManager.h"
@@ -59,6 +60,7 @@ class MainWindow : public QMainWindow {
 
  protected:
   virtual void closeEvent(QCloseEvent *event) override;
+  bool eventFilter(QObject *watched, QEvent *event) override;
 
  private:
   QAction *SavePerspectiveAction = nullptr;
@@ -77,6 +79,9 @@ class MainWindow : public QMainWindow {
   QProgressBar *battery_bar_;
   QLabel *label_power_;
   ads::CDockAreaWidget *center_docker_area_;
+  QWidget *custom_title_bar_{nullptr};
+  bool dragging_window_{false};
+  QPoint drag_position_;
   std::map<std::string, RatioLayoutedFrame *> image_frame_map_;
   std::string map_path_{"./map"};
   

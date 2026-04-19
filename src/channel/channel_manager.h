@@ -22,16 +22,16 @@ class ChannelManager {
  public:
   explicit ChannelManager();
   ~ChannelManager();
-  /// @brief 传入channel so路径，打开对应的通信channel
-  /// @param name
-  /// @return
-  bool OpenChannel(const std::string &name);
+
+  static std::string ChannelTypeFromLibraryPath(const std::string &library_path);
+  static std::string NormalizeStoredChannelType(const std::string &raw);
+
+  /// @brief 传入channel 动态库完整路径，打开对应的通信channel
+  bool OpenChannel(const std::string &library_path);
   /// @brief 根据配置自动选择channel类型并打开，默认auto
-  /// @return
   bool OpenChannelAuto();
-  /// @brief 查找lib路径下所有channel
-  /// @return channel list
-  std::vector<std::string> DiscoveryAllChannel();
+  /// @brief 扫描 lib 目录，返回通道类型名（不含平台前缀与扩展名）
+  std::vector<std::string> DiscoveryChannelTypes();
   VirtualChannelNode *GetChannel();
   void CloseChannel();
 };

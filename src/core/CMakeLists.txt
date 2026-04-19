@@ -2,8 +2,11 @@ add_subdirectory(framework)
 add_subdirectory(runtime)
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-add_executable(
-    ${PROJECT_NAME} main.cpp)
+if(WIN32)
+  add_executable(${PROJECT_NAME} WIN32 main.cpp)
+else()
+  add_executable(${PROJECT_NAME} main.cpp)
+endif()
 
 target_link_libraries(${PROJECT_NAME}  common mainwindow framework runtime Qt5::Core Qt5::Widgets)
 set_target_properties(${PROJECT_NAME} PROPERTIES

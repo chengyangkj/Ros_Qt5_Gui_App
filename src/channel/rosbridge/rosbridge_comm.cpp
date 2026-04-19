@@ -93,8 +93,10 @@ bool RosbridgeComm::Start() {
 }
 
 void RosbridgeComm::ConnectAsync() {
+  LOG_INFO("Starting ROSBridge connection...");
   // 创建WebSocket连接
   websocket_connection_ = std::make_unique<SocketWebSocketConnection>();
+  LOG_INFO("WebSocket connection created");
   websocket_connection_->RegisterErrorCallback([this](TransportError err) {
     std::lock_guard<std::mutex> lock(error_msg_mutex_);
     if (err == TransportError::R2C_CONNECTION_CLOSED) {
@@ -120,6 +122,7 @@ void RosbridgeComm::ConnectAsync() {
     }
   });
   
+  LOG_INFO("Creating ROSBridge instance");
   // 创建ROSBridge实例
   ros_bridge_ = std::make_unique<ROSBridge>(*websocket_connection_);
   

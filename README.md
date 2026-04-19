@@ -32,7 +32,7 @@
 
 本项目基于 Qt5 与 CMake 构建，采用统一代码基线同时支持 ROS1/ROS2。构建阶段会根据环境变量自动识别目标 ROS 运行时，实现通信层与界面层解耦，降低跨版本适配成本。
 
-图形渲染基于 Qt Graphics View 体系实现，在保证交互能力的同时兼顾资源占用，适用于算力受限的边缘设备部署场景。项目已接入 CI 流水线，持续验证多 ROS 版本与多系统组合的可用性。当前已支持 Windows（通过 RosBridge 通信），可在项目 [Releases](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) 页面获取可用版本。
+图形渲染基于 Qt Graphics View 体系实现，在保证交互能力的同时兼顾资源占用，适用于算力受限的边缘设备屏幕部署场景。项目已接入 CI 流水线，持续验证多 ROS 版本与多系统组合的可用性。当前已支持 Windows（通过 RosBridge 通信），可在项目 [Releases](https://github.com/chengyangkj/Ros_Qt5_Gui_App/releases) 页面获取可用版本。
 
 ### ✨ 功能特性
 

@@ -75,5 +75,17 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           files: build/install/bin/ros_qt5_gui_app_windows_x64.zip
+          append_body: true
+          generate_release_notes: true
+          body: |
+            ## Windows x64 构建产物
+
+            **附件**：`ros_qt5_gui_app_windows_x64.zip`（来自 `build/install/bin` 整目录打包）
+
+            **构建**：`windows-latest`，依赖由 vcpkg manifest 安装，`build.bat` 一键配置、编译并安装。
+
+            **使用**：解压 zip 后在目录内运行 `ros_qt5_gui_app.exe`；Qt 等平台 DLL 已与安装目录一并拷贝（与本地 `build.bat` install 产物一致）。
+
+            ---
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

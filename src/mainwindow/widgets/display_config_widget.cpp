@@ -3,7 +3,6 @@
 #include "display/manager/display_manager.h"
 #include "display/virtual_display.h"
 #include "config/config_manager.h"
-#include "config/config_define.h"
 #include "msg/msg_info.h"
 #include "logger/logger.h"
 #include <QDebug>
@@ -172,7 +171,7 @@ void DisplayConfigWidget::InitDisplayConfigTab() {
     toggle_btn->setChecked(true);
     toggle_btn->setCursor(Qt::PointingHandCursor);
     toggle_btn->setStyleSheet(R"(
-      QToolButton {
+      QToolButton { 
         min-width: 34px;
         max-width: 34px;
         min-height: 20px;
@@ -689,43 +688,27 @@ void DisplayConfigWidget::InitRobotShapeTab() {
 
 void DisplayConfigWidget::SetChannelList(const std::vector<std::string> &channel_list) {
   channel_list_ = channel_list;
-  
+
   channel_type_combo_->blockSignals(true);
   channel_type_combo_->clear();
-  
+
   channel_type_combo_->addItem("auto", "auto");
-  for (const auto &channel : channel_list_) {
-    std::string channel_type = ExtractChannelType(channel);
-    channel_type_combo_->addItem(channel_type.c_str(), channel_type.c_str());
+  for (const auto &channel_type : channel_list_) {
+    QString q = QString::fromStdString(channel_type);
+    channel_type_combo_->addItem(q, q);
   }
-  
+
   auto &config = Config::ConfigManager::Instance()->GetRootConfig();
-  std::string channel_type = config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
+  std::string channel_type =
+      config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
   int index = channel_type_combo_->findData(QString::fromStdString(channel_type));
   if (index >= 0) {
     channel_type_combo_->setCurrentIndex(index);
   } else {
     channel_type_combo_->setCurrentIndex(0);
   }
-  
-  channel_type_combo_->blockSignals(false);
-}
 
-std::string DisplayConfigWidget::ExtractChannelType(const std::string &channel_path) {
-  size_t last_slash = channel_path.find_last_of("/\\");
-  std::string filename = (last_slash == std::string::npos) ? channel_path : channel_path.substr(last_slash + 1);
-  
-  size_t last_dot = filename.find_last_of(".");
-  if (last_dot != std::string::npos) {
-    filename = filename.substr(0, last_dot);
-  }
-  
-  const std::string prefix = "libchannel_";
-  if (filename.find(prefix) == 0) {
-    return filename.substr(prefix.length());
-  }
-  
-  return filename;
+  channel_type_combo_->blockSignals(false);
 }
 
 void DisplayConfigWidget::InitChannelConfigTab() {
@@ -800,22 +783,20 @@ void DisplayConfigWidget::InitChannelConfigTab() {
     }
     
     auto &config = Config::ConfigManager::Instance()->GetRootConfig();
-    QString channel_type = channel_type_combo_->itemData(index).toString();
+    std::string channel_type = channel_type_combo_->itemData(index).toString().toStdString();
     QString old_channel_type = QString::fromStdString(config.channel_config.channel_type);
-    
-    // 更新通道配置
-    config.channel_config.channel_type = channel_type.toStdString();
+
+    config.channel_config.channel_type = channel_type;
     AutoSaveConfig();
-    
-    // 根据选择的类型显示/隐藏 ROSBridge 配置
+
     bool show_rosbridge = (channel_type == "rosbridge");
     rosbridge_ip_edit_->setEnabled(show_rosbridge);
     rosbridge_port_edit_->setEnabled(show_rosbridge);
     
     // 如果通道类型发生变化，提示用户需要重启
-    if (channel_type != old_channel_type) {
-      QMessageBox::information(this, "通道配置已更改", 
-                                "通道类型已更改为: " + channel_type + "\n\n"
+    if (QString::fromStdString(channel_type) != old_channel_type) {
+      QMessageBox::information(this, "通道配置已更改",
+                                "通道类型已更改为: " + QString::fromStdString(channel_type) + "\n\n"
                                 "请重启应用程序以使配置生效。",
                                 QMessageBox::Ok);
     }
@@ -1340,8 +1321,8 @@ void DisplayConfigWidget::LoadConfig() {
   // Load channel config
   is_loading_config_ = true;
   
-  // 加载通道类型
-  std::string channel_type = config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
+  std::string channel_type =
+      config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
   channel_type_combo_->blockSignals(true);
   int index = channel_type_combo_->findData(QString::fromStdString(channel_type));
   if (index >= 0) {

@@ -4,6 +4,9 @@ setlocal
 set "SCRIPT_DIR=%~dp0"
 cd /d "%SCRIPT_DIR%"
 
+set "BUILD_MODE=full"
+if /I "%~1"=="make" set "BUILD_MODE=make"
+
 set "BUILD_DIR=build"
 set "INSTALL_DIR=%BUILD_DIR%\install"
 set "TRIPLET=x64-windows"
@@ -46,10 +49,14 @@ set "VCPKG_ROOT=%SELECTED_VCPKG_ROOT%"
 echo [INFO] Re-apply selected vcpkg path after VS env setup: "%VCPKG_ROOT%"
 
 set "INSTALL_ROOT=%VCPKG_ROOT%\installed"
-set "RUNTIME_BIN_DIR=%VCPKG_ROOT%\installed\%TRIPLET%\bin"
-set "QT_PLUGIN_DIR=%VCPKG_ROOT%\installed\%TRIPLET%\plugins"
 
 echo [INFO] Use vcpkg root: "%VCPKG_ROOT%"
+echo [INFO] MSVC config: %CONFIG%
+if /I "%BUILD_MODE%"=="make" (
+  echo [INFO] mode=make: skip vcpkg install and cmake configure
+  goto AfterConfigure
+)
+
 echo [1/4] Install vcpkg dependencies...
 set "VCPKG_DISABLE_METRICS=1"
 "%VCPKG_ROOT%\vcpkg.exe" install --triplet %TRIPLET% --x-install-root="%INSTALL_ROOT%"
@@ -67,8 +74,10 @@ cmake -B "%BUILD_DIR%" -S . ^
   %CMAKE_EXTRA_ARGS%
 if errorlevel 1 exit /b 1
 
+:AfterConfigure
 echo [3/4] Build...
-cmake --build "%BUILD_DIR%" --config %CONFIG% --parallel
+if not defined NUMBER_OF_PROCESSORS set NUMBER_OF_PROCESSORS=8
+cmake --build "%BUILD_DIR%" --config %CONFIG% --parallel %NUMBER_OF_PROCESSORS%
 if errorlevel 1 exit /b 1
 
 echo [4/4] Install...
@@ -135,15 +144,23 @@ exit /b 0
 
 :CopyRuntimeDlls
 set "INSTALL_BIN_DIR=%INSTALL_DIR%\bin"
+if /I "%CONFIG%"=="Debug" (
+  set "RUNTIME_BIN_DIR=%VCPKG_ROOT%\installed\%TRIPLET%\debug\bin"
+  set "QT_PLUGIN_DIR=%VCPKG_ROOT%\installed\%TRIPLET%\debug\plugins"
+) else (
+  set "RUNTIME_BIN_DIR=%VCPKG_ROOT%\installed\%TRIPLET%\bin"
+  set "QT_PLUGIN_DIR=%VCPKG_ROOT%\installed\%TRIPLET%\plugins"
+)
 if not exist "%INSTALL_BIN_DIR%" (
   echo [ERROR] Install bin directory not found: "%INSTALL_BIN_DIR%"
   exit /b 1
 )
 if not exist "%RUNTIME_BIN_DIR%" (
   echo [ERROR] Runtime bin directory not found: "%RUNTIME_BIN_DIR%"
+  echo [ERROR] Debug builds need vcpkg debug DLLs under installed\%TRIPLET%\debug\bin .
   exit /b 1
 )
-echo [INFO] Copy runtime DLLs to "%INSTALL_BIN_DIR%"...
+echo [INFO] Copy runtime DLLs from "%RUNTIME_BIN_DIR%" to "%INSTALL_BIN_DIR%"...
 xcopy "%RUNTIME_BIN_DIR%\*.dll" "%INSTALL_BIN_DIR%\" /Y /I >nul
 if errorlevel 1 (
   echo [ERROR] Failed to copy runtime DLLs from "%RUNTIME_BIN_DIR%".

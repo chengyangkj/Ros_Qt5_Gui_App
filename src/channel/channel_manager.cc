@@ -1,9 +1,46 @@
 #include "channel_manager.h"
 #include <boost/dll.hpp>
-#include <iostream>
 #include <algorithm>
 #include "config/config_manager.h"
+#include "logger/logger.h"
 namespace fs = boost::filesystem;
+
+namespace {
+
+std::string ChannelTypeFromFilename(const std::string &filename) {
+#ifdef _WIN32
+  static const char kPrefix[] = "channel_";
+#else
+  static const char kPrefix[] = "libchannel_";
+#endif
+  fs::path p(filename);
+  std::string stem = p.stem().string();
+  const size_t plen = sizeof(kPrefix) - 1;
+  if (stem.size() >= plen && stem.compare(0, plen, kPrefix) == 0) {
+    return stem.substr(plen);
+  }
+  return stem;
+}
+
+}  // namespace
+
+std::string ChannelManager::ChannelTypeFromLibraryPath(const std::string &library_path) {
+  return ChannelTypeFromFilename(fs::path(library_path).filename().string());
+}
+
+std::string ChannelManager::NormalizeStoredChannelType(const std::string &raw) {
+  std::string s = raw;
+  static const std::string kLib = "libchannel_";
+  static const std::string kCh = "channel_";
+  while (s.size() >= kLib.size() && s.compare(0, kLib.size(), kLib) == 0) {
+    s = s.substr(kLib.size());
+  }
+  while (s.size() > kCh.size() && s.compare(0, kCh.size(), kCh) == 0) {
+    s = s.substr(kCh.size());
+  }
+  return s;
+}
+
 ChannelManager::ChannelManager() {}
 ChannelManager::~ChannelManager() {}
 
@@ -32,43 +69,44 @@ bool ChannelManager::OpenChannelAuto() {
     CloseChannel();
   }
 
-  // 从配置读取通道类型
   auto &config = Config::ConfigManager::Instance()->GetRootConfig();
   std::string channel_type = config.channel_config.channel_type.empty() ? "auto" : config.channel_config.channel_type;
+  if (channel_type != "auto") {
+    channel_type = NormalizeStoredChannelType(channel_type);
+  }
 
   if (channel_type == "auto") {
-    auto channel_list = DiscoveryAllChannel();
+    auto channel_list = DiscoveryChannelTypes();
     if (channel_list.size() == 0) {
-      std::cout << "No channel found in lib directory" << std::endl;
+      LOG_ERROR("No channel found in lib directory");
       return false;
     }
-    
-    // 如果有多个 channel，过滤掉 ROSBridge
+
     std::vector<std::string> filtered_list;
     if (channel_list.size() > 1) {
-      for (const auto& channel_path : channel_list) {
-        // 检查路径中是否包含 "rosbridge"（不区分大小写）
-        std::string lower_path = channel_path;
-        std::transform(lower_path.begin(), lower_path.end(), lower_path.begin(), ::tolower);
-        if (lower_path.find("rosbridge") == std::string::npos) {
-          filtered_list.push_back(channel_path);
+      for (const auto &t : channel_list) {
+        std::string lower_t = t;
+        std::transform(lower_t.begin(), lower_t.end(), lower_t.begin(), ::tolower);
+        if (lower_t.find("rosbridge") == std::string::npos) {
+          filtered_list.push_back(t);
         }
       }
-      // 如果过滤后还有 channel，使用过滤后的列表
       if (filtered_list.size() > 0) {
         channel_list = filtered_list;
       }
     }
-    
-    std::cout << "Auto select channel: " << channel_list[0] << std::endl;
-    return OpenChannel(channel_list[0]);
-  } else{
-    std::string channel_path = GetChannelPath(channel_type);
-    std::cout << "Open channel from config: " << channel_path << std::endl;
+
+    std::string channel_path = GetChannelPath(channel_list[0]);
+    LOG_INFO("Auto select channel: " << channel_path);
     return OpenChannel(channel_path);
-  } 
+  } else {
+    std::string channel_path = GetChannelPath(channel_type);
+    LOG_INFO("Open channel from config: " << channel_path);
+    return OpenChannel(channel_path);
+  }
 }
-std::vector<std::string> ChannelManager::DiscoveryAllChannel() {
+
+std::vector<std::string> ChannelManager::DiscoveryChannelTypes() {
   std::vector<std::string> res;
 
   fs::path libDir = boost::dll::program_location().parent_path() / "lib";
@@ -78,28 +116,29 @@ std::vector<std::string> ChannelManager::DiscoveryAllChannel() {
   }
 
   for (fs::directory_entry &entry : fs::directory_iterator(libDir)) {
-    if (fs::is_regular_file(entry.path())) {
-      std::string fileName = entry.path().filename().string();
-#ifdef _WIN32
-      if (entry.path().extension() == ".dll" &&
-          fileName.find("channel_") == 0) {
-        std::cout << "find channel:" << entry.path() << std::endl;
-        res.push_back(entry.path().string());
-      }
-#elif __APPLE__
-      if (entry.path().extension() == ".dylib" &&
-          fileName.find("libchannel_") == 0) {
-        std::cout << "find channel:" << entry.path() << std::endl;
-        res.push_back(entry.path().string());
-      }
-#elif __linux__
-      if (entry.path().extension() == ".so" &&
-          fileName.find("libchannel_") == 0) {
-        std::cout << "find channel:" << entry.path() << std::endl;
-        res.push_back(entry.path().string());
-      }
-#endif
+    if (!fs::is_regular_file(entry.path())) {
+      continue;
     }
+    std::string fileName = entry.path().filename().string();
+#ifdef _WIN32
+    if (entry.path().extension() == ".dll" && fileName.find("channel_") == 0) {
+      std::string t = ChannelTypeFromLibraryPath(entry.path().string());
+      LOG_INFO("find channel: " << entry.path().string() << " type=" << t);
+      res.push_back(t);
+    }
+#elif __APPLE__
+    if (entry.path().extension() == ".dylib" && fileName.find("libchannel_") == 0) {
+      std::string t = ChannelTypeFromLibraryPath(entry.path().string());
+      LOG_INFO("find channel: " << entry.path().string() << " type=" << t);
+      res.push_back(t);
+    }
+#elif __linux__
+    if (entry.path().extension() == ".so" && fileName.find("libchannel_") == 0) {
+      std::string t = ChannelTypeFromLibraryPath(entry.path().string());
+      LOG_INFO("find channel: " << entry.path().string() << " type=" << t);
+      res.push_back(t);
+    }
+#endif
   }
   return res;
 }
@@ -114,19 +153,19 @@ bool ChannelManager::OpenChannel(const std::string &path) {
             "GetChannelInstance");  // 取出该符号
     channel_ptr_ = func_get();
     if (channel_ptr_ == nullptr) {
-      std::cerr << "get channel instance failed!" << std::endl;
+      LOG_ERROR("get channel instance failed!");
       return false;
     }
     if (!channel_ptr_->Init()) {
-      std::cout << "channel init failed!" << std::endl;
+      LOG_ERROR("channel init failed!");
       return false;
     } else {
-      std::cout << "open channel:" << channel_ptr_->Name() << std::endl;
+      LOG_INFO("open channel: " << channel_ptr_->Name());
       return true;
     }
 
   } catch (const boost::system::system_error &e) {
-    std::cerr << "Failed to load dynamic library: " << e.what() << std::endl;
+    LOG_ERROR("Failed to load dynamic library: " << e.what());
     return false;
   }
 
@@ -139,7 +178,7 @@ void ChannelManager::CloseChannel() {
 }
 VirtualChannelNode *ChannelManager::GetChannel() {
   [[unlikely]] if (channel_ptr_ == nullptr) {
-    std::cout << "error channel is nullptr exit!" << std::endl;
+    LOG_ERROR("error channel is nullptr exit!");
     exit(1);
   }
   return channel_ptr_;

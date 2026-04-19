@@ -61,8 +61,7 @@ class DisplayConfigWidget : public QWidget {
   void RefreshKeyValueTab();
   void UpdateDisplayVisibility(const std::string &display_name, bool visible);
   void AutoSaveConfig();
-  std::string ExtractChannelType(const std::string &channel_path);
-  
+
   Display::DisplayManager *display_manager_{nullptr};
   QVBoxLayout *main_layout_{nullptr};
   QTabWidget *tab_widget_{nullptr};

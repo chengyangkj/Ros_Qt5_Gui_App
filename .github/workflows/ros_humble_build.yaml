@@ -97,5 +97,12 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           files: build/install/bin/ros_qt5_gui_app_humble_x86_64.tar.gz
+          append_body: true
+          body: |
+            ### ROS 2 Humble（x86_64）
+
+            **附件**：`ros_qt5_gui_app_humble_x86_64.tar.gz`
+
+            ---
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
