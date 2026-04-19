@@ -13,6 +13,7 @@
 #include "config/config_manager.h"
 #include "logger/logger.h"
 #include "core/framework/framework.h"
+#include "msg/diagnostic_snapshot.h"
 #include "msg/msg_info.h"
 rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME(DISPLAY_GOAL, "/goal_pose")
@@ -26,6 +27,7 @@ rclcomm::rclcomm() {
   SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT, "/odom")
   SET_DEFAULT_TOPIC_NAME(MSG_ID_SET_ROBOT_SPEED, "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME(MSG_ID_BATTERY_STATE, "/battery")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_DIAGNOSTIC, "/diagnostics")
   SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT, "/local_costmap/published_footprint")
   SET_DEFAULT_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP, "/map/topology")
   SET_DEFAULT_TOPIC_NAME(MSG_ID_TOPOLOGY_MAP_UPDATE, "/map/topology/update")
@@ -89,6 +91,11 @@ bool rclcomm::Start() {
       node->create_subscription<sensor_msgs::msg::BatteryState>(
           GET_TOPIC_NAME(MSG_ID_BATTERY_STATE), 1,
           std::bind(&rclcomm::BatteryCallback, this, std::placeholders::_1),
+          sub1_obt);
+  diagnostic_subscriber_ =
+      node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+          GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC), 10,
+          std::bind(&rclcomm::diagnostic_callback, this, std::placeholders::_1),
           sub1_obt);
   global_path_subscriber_ = node->create_subscription<nav_msgs::msg::Path>(
       GET_TOPIC_NAME(DISPLAY_GLOBAL_PATH), 20,
@@ -207,6 +214,29 @@ void rclcomm::BatteryCallback(
   map["percent"] = std::to_string(msg->percentage);
   map["voltage"] = std::to_string(msg->voltage);
   PUBLISH(MSG_ID_BATTERY_STATE, map);
+}
+
+void rclcomm::diagnostic_callback(
+    const diagnostic_msgs::msg::DiagnosticArray::SharedPtr msg) {
+  basic::DiagnosticSnapshot snapshot;
+  const int64_t stamp_ms =
+      static_cast<int64_t>(msg->header.stamp.sec) * 1000LL +
+      static_cast<int64_t>(msg->header.stamp.nanosec) / 1000000LL;
+  for (const auto &st : msg->status) {
+    std::string hardware_id = st.hardware_id;
+    if (hardware_id.empty()) {
+      hardware_id = "unknown_hardware";
+    }
+    basic::DiagnosticComponentState comp;
+    comp.level = static_cast<int>(st.level);
+    comp.message = st.message;
+    comp.last_update_ms = stamp_ms;
+    for (const auto &kv : st.values) {
+      comp.key_values[kv.key] = kv.value;
+    }
+    snapshot.hardware[hardware_id][st.name] = std::move(comp);
+  }
+  PUBLISH(MSG_ID_DIAGNOSTIC, snapshot);
 }
 
 void rclcomm::getRobotPose() {

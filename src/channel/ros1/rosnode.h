@@ -12,6 +12,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/image_encodings.h>  //图像编码格式
+#include <diagnostic_msgs/DiagnosticArray.h>
 
 #include <tf/transform_listener.h>
 #include "virtual_channel_node.h"
@@ -36,6 +37,7 @@ class RosNode : public VirtualChannelNode {
   void GlobalPathCallback(nav_msgs::Path::ConstPtr path);
   void LocalPathCallback(nav_msgs::Path::ConstPtr path);
   void BatteryCallback(sensor_msgs::BatteryState::ConstPtr path);
+  void DiagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr &msg);
   void RobotFootprintCallback(geometry_msgs::PolygonStamped::ConstPtr msg);
   // void MbStatusCallback(actionlib_msgs::GoalStatusArray::ConstPtr msg);
   void PubRobotSpeed(const basic::RobotSpeed &speed);
@@ -57,6 +59,7 @@ class RosNode : public VirtualChannelNode {
   ros::Subscriber global_path_subscriber_;
   ros::Subscriber local_path_subscriber_;
   ros::Subscriber battery_subscriber_;
+  ros::Subscriber diagnostic_subscriber_;
   ros::Subscriber robot_footprint_subscriber_;
   ros::Subscriber move_base_status_subscriber_;
   std::vector<ros::Subscriber> image_subscriber_list_;

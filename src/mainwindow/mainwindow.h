@@ -44,6 +44,8 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+class DiagnosticDockWidget;
+
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
@@ -84,6 +86,7 @@ class MainWindow : public QMainWindow {
   QPoint drag_position_;
   std::map<std::string, RatioLayoutedFrame *> image_frame_map_;
   std::string map_path_{"./map"};
+  DiagnosticDockWidget *diagnostic_dock_widget_{nullptr};
   
  signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);

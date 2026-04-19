@@ -32,6 +32,8 @@
 
 #include "widgets/speed_ctrl.h"
 #include "widgets/display_config_widget.h"
+#include "widgets/diagnostic_dock_widget.h"
+#include "msg/diagnostic_snapshot.h"
 #include "display/manager/view_manager.h"
 #include <QTimer>
 using namespace ads;
@@ -86,7 +88,7 @@ bool MainWindow::openChannel() {
             QMessageBox::warning(this,
                                  "ROSBridge 连接失败",
                                  display_error +
-                                     "\n\n请在左侧 ConfigManager 面板中重新设置 ROSBridge 的 IP 和端口。",
+                                     "\n\n请在左侧「设置」面板中重新设置 ROSBridge 的 IP 和端口。",
                                  QMessageBox::Ok);
             LOG_ERROR("ROSBridge connection failed: " << error_msg);
           } else {
@@ -143,6 +145,12 @@ void MainWindow::registerChannel() {
 
   SUBSCRIBE(MSG_ID_IMAGE, [this](const std::pair<std::string, std::shared_ptr<cv::Mat>>& location_to_mat) {
       this->SlotRecvImage(location_to_mat.first, location_to_mat.second);
+  });
+
+  SUBSCRIBE(MSG_ID_DIAGNOSTIC, [this](const basic::DiagnosticSnapshot &snap) {
+    if (diagnostic_dock_widget_) {
+      diagnostic_dock_widget_->SetSnapshot(snap);
+    }
   });
 }
 
@@ -688,16 +696,25 @@ void MainWindow::setupUi() {
   DisplayConfigWidget *display_config_widget_ = new DisplayConfigWidget();
   display_config_widget_->SetDisplayManager(display_manager_);
   display_config_widget_->SetChannelList(channel_manager_.DiscoveryChannelTypes());
-  ads::CDockWidget *DisplayConfigDockWidget = new ads::CDockWidget("ConfigManager");
+  ads::CDockWidget *DisplayConfigDockWidget = new ads::CDockWidget(QStringLiteral("Setting"));
   DisplayConfigDockWidget->setWidget(display_config_widget_);
   DisplayConfigDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
-  DisplayConfigDockWidget->setMinimumSize(250, 200);
-  DisplayConfigDockWidget->setMaximumSize(400, 9999);
+  DisplayConfigDockWidget->setMinimumSize(480, 240);
   auto display_config_area =
       dock_manager_->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea,
                                    DisplayConfigDockWidget, center_docker_area_);
   DisplayConfigDockWidget->toggleView(true);
   ui->menuView->addAction(DisplayConfigDockWidget->toggleViewAction());
+
+  diagnostic_dock_widget_ = new DiagnosticDockWidget();
+  ads::CDockWidget *diagnostic_dock = new ads::CDockWidget(QStringLiteral("Diagnostic"));
+  diagnostic_dock->setWidget(diagnostic_dock_widget_);
+  diagnostic_dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+  diagnostic_dock->setMinimumSize(280, 200);
+  dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea, diagnostic_dock,
+                               center_docker_area_);
+  diagnostic_dock->toggleView(false);
+  ui->menuView->addAction(diagnostic_dock->toggleViewAction());
 
   /////////////////////////////////////////////////////////导航任务列表
   QWidget *task_list_widget = new QWidget();

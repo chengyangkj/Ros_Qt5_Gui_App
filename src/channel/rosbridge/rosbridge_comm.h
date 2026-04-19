@@ -56,6 +56,7 @@ class RosbridgeComm : public VirtualChannelNode {
   void OdomCallback(const ROSBridgePublishMsg &msg);
   void RobotFootprintCallback(const ROSBridgePublishMsg &msg);
   void TopologyMapCallback(const ROSBridgePublishMsg &msg);
+  void DiagnosticCallback(const ROSBridgePublishMsg &msg);
   void ImageCallback(const ROSBridgePublishMsg &msg, const std::string &location);
   void TfCallback(const ROSBridgePublishMsg &msg);
 

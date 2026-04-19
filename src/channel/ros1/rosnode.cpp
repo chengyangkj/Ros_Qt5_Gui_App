@@ -9,6 +9,7 @@
 #include "rosnode.h"
 #include <opencv2/opencv.hpp>
 #include "config/config_manager.h"
+#include "msg/diagnostic_snapshot.h"
 #include "msg/msg_info.h"
 RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME(DISPLAY_GOAL, "/move_base_simple/goal")
@@ -22,6 +23,7 @@ RosNode::RosNode(/* args */) {
   SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT, "/odom")
   SET_DEFAULT_TOPIC_NAME(MSG_ID_SET_ROBOT_SPEED, "/cmd_vel")
   SET_DEFAULT_TOPIC_NAME(MSG_ID_BATTERY_STATE, "/battery")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_DIAGNOSTIC, "/diagnostics")
   SET_DEFAULT_TOPIC_NAME("MoveBaseStatus", "/move_base/status")
   SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT, "/move_base/local_costmap/published_footprint")
   SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
@@ -112,6 +114,8 @@ void RosNode::init() {
                                       &RosNode::OdometryCallback, this);
   battery_subscriber_ = nh.subscribe(GET_TOPIC_NAME(MSG_ID_BATTERY_STATE), 1,
                                      &RosNode::BatteryCallback, this);
+  diagnostic_subscriber_ = nh.subscribe(GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC), 1,
+                                      &RosNode::DiagnosticCallback, this);
   robot_footprint_subscriber_ = nh.subscribe(GET_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT), 1,
                                              &RosNode::RobotFootprintCallback, this);
 
@@ -188,6 +192,28 @@ void RosNode::BatteryCallback(sensor_msgs::BatteryState::ConstPtr battery) {
   map["percent"] = std::to_string(battery->percentage);
   map["voltage"] = std::to_string(battery->voltage);
   PUBLISH(MSG_ID_BATTERY_STATE, map);
+}
+
+void RosNode::DiagnosticCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr &msg) {
+  basic::DiagnosticSnapshot snapshot;
+  const int64_t stamp_ms =
+      static_cast<int64_t>(msg->header.stamp.sec) * 1000LL +
+      static_cast<int64_t>(msg->header.stamp.nsec) / 1000000LL;
+  for (const auto &st : msg->status) {
+    std::string hardware_id = st.hardware_id;
+    if (hardware_id.empty()) {
+      hardware_id = "unknown_hardware";
+    }
+    basic::DiagnosticComponentState comp;
+    comp.level = static_cast<int>(st.level);
+    comp.message = st.message;
+    comp.last_update_ms = stamp_ms;
+    for (const auto &kv : st.values) {
+      comp.key_values[kv.key] = kv.value;
+    }
+    snapshot.hardware[hardware_id][st.name] = std::move(comp);
+  }
+  PUBLISH(MSG_ID_DIAGNOSTIC, snapshot);
 }
 // void RosNode::MbStatusCallback(actionlib_msgs::GoalStatusArray::ConstPtr msg) {
 

@@ -6,6 +6,7 @@
 
 #include "rosbridge_comm.h"
 #include "include/ros_time.h"
+#include "msg/diagnostic_snapshot.h"
 #include <cmath>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -42,9 +43,11 @@ RosbridgeComm::RosbridgeComm() {
   SET_DEFAULT_TOPIC_NAME(DISPLAY_ROBOT_FOOTPRINT, "/local_costmap/published_footprint")
   SET_DEFAULT_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP, "/map/topology")
   SET_DEFAULT_TOPIC_NAME(MSG_ID_TOPOLOGY_MAP_UPDATE, "/map/topology/update")
+  SET_DEFAULT_TOPIC_NAME(MSG_ID_DIAGNOSTIC, "/diagnostics")
   
   // 设置默认键值配置
   SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
+  SET_DEFAULT_KEY_VALUE("DiagnosticMsgType", "diagnostic_msgs/DiagnosticArray")
   
   // 设置默认通道配置
   auto &config = Config::ConfigManager::Instance()->GetRootConfig();
@@ -212,6 +215,14 @@ void RosbridgeComm::ConnectAsync() {
   callback_handles_[GET_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP)] = topology_map_topic->Subscribe(
       [this](const ROSBridgePublishMsg &msg) { TopologyMapCallback(msg); });
   subscribers_[GET_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP)] = std::move(topology_map_topic);
+  
+  std::string diagnostic_msg_type =
+      GET_CONFIG_VALUE("DiagnosticMsgType", std::string("diagnostic_msgs/DiagnosticArray"));
+  auto diagnostic_topic =
+      std::make_unique<ROSTopic>(*ros_bridge_, GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC), diagnostic_msg_type, 1);
+  callback_handles_[GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC)] = diagnostic_topic->Subscribe(
+      [this](const ROSBridgePublishMsg &msg) { DiagnosticCallback(msg); });
+  subscribers_[GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC)] = std::move(diagnostic_topic);
   
   // 图像话题订阅（动态配置）
   for (auto one_image_display : Config::ConfigManager::Instance()->GetRootConfig().images) {
@@ -781,6 +792,131 @@ void RosbridgeComm::BatteryCallback(const ROSBridgePublishMsg &msg) {
     map["voltage"] = std::to_string(msg_json["voltage"].GetDouble());
   }
   PUBLISH(MSG_ID_BATTERY_STATE, map);
+}
+
+namespace {
+
+int64_t DiagnosticStampMs(const rapidjson::Value &msg_json) {
+  int64_t stamp_ms = 0;
+  if (msg_json.HasMember("header") && msg_json["header"].IsObject()) {
+    const auto &header = msg_json["header"];
+    if (header.HasMember("stamp") && header["stamp"].IsObject()) {
+      const auto &st = header["stamp"];
+      int64_t sec = 0;
+      if (st.HasMember("sec")) {
+        const auto &sv = st["sec"];
+        if (sv.IsInt64()) {
+          sec = sv.GetInt64();
+        } else if (sv.IsInt()) {
+          sec = sv.GetInt();
+        } else if (sv.IsUint()) {
+          sec = static_cast<int64_t>(sv.GetUint());
+        }
+      }
+      int64_t nsec = 0;
+      if (st.HasMember("nanosec")) {
+        const auto &nv = st["nanosec"];
+        if (nv.IsInt64()) {
+          nsec = nv.GetInt64();
+        } else if (nv.IsInt()) {
+          nsec = nv.GetInt();
+        } else if (nv.IsUint()) {
+          nsec = static_cast<int64_t>(nv.GetUint());
+        }
+      } else if (st.HasMember("nsec")) {
+        const auto &nv = st["nsec"];
+        if (nv.IsInt64()) {
+          nsec = nv.GetInt64();
+        } else if (nv.IsInt()) {
+          nsec = nv.GetInt();
+        } else if (nv.IsUint()) {
+          nsec = static_cast<int64_t>(nv.GetUint());
+        }
+      }
+      stamp_ms = sec * 1000 + nsec / 1000000;
+    }
+  }
+  if (stamp_ms <= 0) {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+               std::chrono::system_clock::now().time_since_epoch())
+        .count();
+  }
+  return stamp_ms;
+}
+
+int DiagnosticLevelFromJson(const rapidjson::Value &v) {
+  if (v.IsInt()) {
+    return v.GetInt();
+  }
+  if (v.IsUint()) {
+    return static_cast<int>(v.GetUint());
+  }
+  if (v.IsInt64()) {
+    return static_cast<int>(v.GetInt64());
+  }
+  return 0;
+}
+
+}  // namespace
+
+void RosbridgeComm::DiagnosticCallback(const ROSBridgePublishMsg &msg) {
+  if (msg.msg_json_.IsNull()) {
+    return;
+  }
+  const auto &msg_json = msg.msg_json_;
+  if (!msg_json.HasMember("status") || !msg_json["status"].IsArray()) {
+    return;
+  }
+  const int64_t stamp_ms = DiagnosticStampMs(msg_json);
+  basic::DiagnosticSnapshot snapshot;
+  const auto &arr = msg_json["status"].GetArray();
+  for (rapidjson::SizeType i = 0; i < arr.Size(); ++i) {
+    const auto &st = arr[i];
+    if (!st.IsObject()) {
+      continue;
+    }
+    int level = 0;
+    if (st.HasMember("level")) {
+      level = DiagnosticLevelFromJson(st["level"]);
+    }
+    std::string name;
+    if (st.HasMember("name") && st["name"].IsString()) {
+      name = st["name"].GetString();
+    }
+    std::string message;
+    if (st.HasMember("message") && st["message"].IsString()) {
+      message = st["message"].GetString();
+    }
+    std::string hardware_id;
+    if (st.HasMember("hardware_id") && st["hardware_id"].IsString()) {
+      hardware_id = st["hardware_id"].GetString();
+    }
+    if (hardware_id.empty()) {
+      hardware_id = "unknown_hardware";
+    }
+    basic::DiagnosticComponentState comp;
+    comp.level = level;
+    comp.message = std::move(message);
+    comp.last_update_ms = stamp_ms;
+    if (st.HasMember("values") && st["values"].IsArray()) {
+      for (const auto &kv : st["values"].GetArray()) {
+        if (!kv.IsObject()) {
+          continue;
+        }
+        std::string k;
+        std::string vval;
+        if (kv.HasMember("key") && kv["key"].IsString()) {
+          k = kv["key"].GetString();
+        }
+        if (kv.HasMember("value") && kv["value"].IsString()) {
+          vval = kv["value"].GetString();
+        }
+        comp.key_values[k] = std::move(vval);
+      }
+    }
+    snapshot.hardware[hardware_id][name] = std::move(comp);
+  }
+  PUBLISH(MSG_ID_DIAGNOSTIC, snapshot);
 }
 
 /**
