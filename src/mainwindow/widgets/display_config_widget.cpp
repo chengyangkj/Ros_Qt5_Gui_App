@@ -8,6 +8,7 @@
 #include <QAbstractItemView>
 #include <QFileDialog>
 #include <QFrame>
+#include <QHeaderView>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QScrollArea>
@@ -16,15 +17,6 @@
 #include <algorithm>
 
 namespace {
-
-QString ToggleStyle() {
-  return QStringLiteral(
-      "QToolButton { min-width:40px; max-width:40px; min-height:22px; max-height:22px; "
-      "border-radius:11px; background:#E8EAED; border:none; }"
-      "QToolButton:checked { background:#1a73e8; }"
-      "QToolButton:hover { background:#DADCE0; }"
-      "QToolButton:checked:hover { background:#1557b0; }");
-}
 
 QString LineEditStyle() {
   return QStringLiteral(
@@ -146,8 +138,8 @@ void DisplayConfigWidget::InitUI() {
 
   nav_list_ = new QListWidget(this);
   nav_list_->setObjectName(QStringLiteral("settingsNav"));
-  nav_list_->setMinimumWidth(160);
-  nav_list_->setMaximumWidth(320);
+  nav_list_->setMinimumWidth(120);
+  nav_list_->setMaximumWidth(200);
   nav_list_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
   nav_list_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   nav_list_->setFocusPolicy(Qt::StrongFocus);
@@ -315,7 +307,9 @@ QWidget *DisplayConfigWidget::CreateLayersPage() {
   QScrollArea *scroll = new QScrollArea(page);
   scroll->setWidgetResizable(true);
   scroll->setFrameShape(QFrame::NoFrame);
+  scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   QWidget *scroll_body = new QWidget;
+  scroll_body->setMinimumWidth(400);
   QVBoxLayout *sl = new QVBoxLayout(scroll_body);
   sl->setContentsMargins(0, 0, 8, 0);
   sl->setSpacing(4);
@@ -355,30 +349,38 @@ QWidget *DisplayConfigWidget::CreateLayersPage() {
       h->setSpacing(12);
 
       QLabel *name = new QLabel(tr(entry.second));
-      name->setMinimumWidth(132);
+      name->setWordWrap(true);
+      name->setMinimumWidth(168);
+      name->setMaximumWidth(240);
+      name->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+      name->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
       name->setStyleSheet(QStringLiteral("font-size:13px;color:#202124;font-weight:500;"));
 
       QLineEdit *topic_edit = new QLineEdit(row);
       topic_edit->setPlaceholderText(QStringLiteral("/topic/name"));
+      topic_edit->setMinimumWidth(180);
+      topic_edit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       topic_edit->setStyleSheet(LineEditStyle());
       display_topic_edits_[display_name] = topic_edit;
       connect(topic_edit, &QLineEdit::editingFinished, [this, display_name, topic_edit]() {
         OnDisplayTopicChanged(display_name, topic_edit->text());
       });
 
-      QToolButton *toggle = new QToolButton(row);
-      toggle->setCheckable(true);
-      toggle->setChecked(true);
-      toggle->setCursor(Qt::PointingHandCursor);
-      toggle->setStyleSheet(ToggleStyle());
-      display_toggle_buttons_[display_name] = toggle;
-      connect(toggle, &QToolButton::toggled, [this, display_name](bool checked) {
+      QCheckBox *vis_cb = new QCheckBox(row);
+      vis_cb->setChecked(true);
+      vis_cb->setCursor(Qt::PointingHandCursor);
+      vis_cb->setText(QString());
+      vis_cb->setStyleSheet(QStringLiteral(
+          "QCheckBox { spacing: 0; padding: 0; }"
+          "QCheckBox::indicator { width: 20px; height: 20px; }"));
+      display_toggle_buttons_[display_name] = vis_cb;
+      connect(vis_cb, &QCheckBox::toggled, [this, display_name](bool checked) {
         OnToggleDisplay(display_name, checked);
       });
 
       h->addWidget(name, 0);
       h->addWidget(topic_edit, 1);
-      h->addWidget(toggle, 0);
+      h->addWidget(vis_cb, 0, Qt::AlignCenter);
       card_layout->addWidget(row);
 
       if (i + 1 < grp.rows.size()) {
@@ -416,15 +418,26 @@ QWidget *DisplayConfigWidget::CreateImagePage() {
   image_table_ = new QTableWidget(0, 4, card);
   image_table_->setHorizontalHeaderLabels(
       QStringList() << tr("Location") << tr("Topic") << tr("Enable") << QString());
-  image_table_->horizontalHeader()->setStretchLastSection(true);
-  image_table_->horizontalHeader()->setDefaultSectionSize(100);
+  image_table_->horizontalHeader()->setMinimumSectionSize(72);
+  image_table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  image_table_->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+  image_table_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Fixed);
+  image_table_->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
+  image_table_->setColumnWidth(2, 80);
+  image_table_->setColumnWidth(3, 80);
   image_table_->verticalHeader()->setVisible(false);
+  image_table_->verticalHeader()->setDefaultSectionSize(36);
   image_table_->setSelectionBehavior(QAbstractItemView::SelectRows);
   image_table_->setShowGrid(false);
   image_table_->setAlternatingRowColors(true);
+  image_table_->setWordWrap(false);
+  image_table_->setTextElideMode(Qt::ElideNone);
   image_table_->setStyleSheet(
       QStringLiteral("QTableWidget { border:none; background:#fafafa; border-radius:8px; font-size:13px; }"
-                     "QTableWidget::item { padding:8px 6px; border-bottom:1px solid rgba(0,0,0,0.05); }"
+                     "QTableWidget::item { padding:8px 8px; border-bottom:1px solid rgba(0,0,0,0.05); color:#202124; }"
+                     "QTableWidget::item:selected { background-color:#e3f2fd; color:#202124; }"
+                     "QTableWidget::item:selected:active { background-color:#e3f2fd; color:#202124; }"
+                     "QTableWidget::item:selected:!active { background-color:#e8f0fe; color:#202124; }"
                      "QHeaderView::section { background:#f1f3f4; padding:8px; border:none; "
                      "border-bottom:1px solid rgba(0,0,0,0.08); font-size:12px; color:#5f6368; font-weight:600; }"));
 
@@ -910,6 +923,10 @@ void DisplayConfigWidget::OnImageConfigChanged(int row) {
     config.images.push_back(image_config);
   }
 
+  location_item->setToolTip(location_item->text());
+  topic_item->setToolTip(topic_item->text());
+  image_table_->resizeColumnToContents(0);
+
   AutoSaveConfig();
 }
 
@@ -1032,8 +1049,12 @@ void DisplayConfigWidget::LoadConfig() {
     image_table_->setItem(row, 2, enable_item);
     image_table_->setCellWidget(row, 2, enable_checkbox);
     image_table_->setCellWidget(row, 3, remove_btn);
+
+    location_item->setToolTip(location_item->text());
+    topic_item->setToolTip(topic_item->text());
   }
   image_table_->blockSignals(false);
+  image_table_->resizeColumnToContents(0);
 
   robot_points_table_->blockSignals(true);
   robot_points_table_->setRowCount(0);

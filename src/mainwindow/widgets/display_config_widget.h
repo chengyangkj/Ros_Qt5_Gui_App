@@ -3,7 +3,6 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QLabel>
-#include <QToolButton>
 #include <QHBoxLayout>
 #include <QStackedWidget>
 #include <QListWidget>
@@ -72,7 +71,7 @@ class DisplayConfigWidget : public QWidget {
   QListWidget *nav_list_{nullptr};
   QStackedWidget *page_stack_{nullptr};
 
-  std::map<std::string, QToolButton *> display_toggle_buttons_;
+  std::map<std::string, QCheckBox *> display_toggle_buttons_;
   std::map<std::string, QLineEdit *> display_topic_edits_;
 
   QWidget *key_value_host_{nullptr};
