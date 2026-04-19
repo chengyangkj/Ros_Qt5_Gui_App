@@ -64,8 +64,8 @@ class DisplayConfigWidget : public QWidget {
   void AutoSaveConfig();
 
   static QFrame *CreateSettingsCard(QWidget *parent);
-  static void AddSectionHeader(QVBoxLayout *layout, const QString &title);
-  static void AddHintLabel(QVBoxLayout *layout, const QString &text);
+  static QLabel *AddSectionHeader(QVBoxLayout *layout, const QString &title);
+  static QLabel *AddHintLabel(QVBoxLayout *layout, const QString &text);
 
   Display::DisplayManager *display_manager_{nullptr};
   QVBoxLayout *main_layout_{nullptr};
@@ -93,6 +93,24 @@ class DisplayConfigWidget : public QWidget {
   QLineEdit *rosbridge_port_edit_{nullptr};
   QPushButton *reconnect_channel_btn_{nullptr};
   QLineEdit *map_path_edit_{nullptr};
+
+  QLabel *title_label_{nullptr};
+  QLabel *connection_section_label_{nullptr};
+  QLabel *channel_type_label_{nullptr};
+  QLabel *rosbridge_section_label_{nullptr};
+  QLabel *rosbridge_ip_label_{nullptr};
+  QLabel *rosbridge_port_label_{nullptr};
+  QLabel *map_path_label_{nullptr};
+  QPushButton *map_browse_btn_{nullptr};
+  QPushButton *image_add_btn_{nullptr};
+  QPushButton *key_value_add_btn_{nullptr};
+  QLabel *robot_points_hint_label_{nullptr};
+  QLabel *robot_polygon_section_label_{nullptr};
+  QLabel *robot_style_section_label_{nullptr};
+  QLabel *robot_color_caption_label_{nullptr};
+  QLabel *robot_opacity_caption_label_{nullptr};
+  QPushButton *robot_add_vertex_btn_{nullptr};
+  QPushButton *robot_remove_vertex_btn_{nullptr};
 
   bool is_loading_config_{false};
   std::vector<std::string> channel_list_;

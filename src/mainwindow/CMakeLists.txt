@@ -8,7 +8,7 @@ file(GLOB_RECURSE SOURCE_FILE  CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR} *.c
 list(FILTER SOURCE_FILE EXCLUDE REGEX "(.*_test\\.cpp$)|(.*_test\\.cc$)")
 file(GLOB_RECURSE UI_FILE CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}  ui/*.ui)
 file(GLOB_RECURSE QRC_FILE  CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}  resource/*.qrc)
-file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS  ${CMAKE_CURRENT_SOURCE_DIR}  *.h *.hpp)
+file(GLOB_RECURSE INCLUDE_FILE CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}  *.h *.hpp)
 
 ####qt moc
 qt5_wrap_ui(QT_UI_HPP ${UI_FILE})
@@ -31,4 +31,3 @@ target_include_directories(
  ${CMAKE_CURRENT_BINARY_DIR}
 )
 target_link_libraries(${TARGET_NAME} Qt5::Widgets Qt5::Core Qt5::Concurrent Qt5::Svg dockwidget::dockwidget nlohmann_json common basic framework channel plugin ${OpenCV_LIBS})
-

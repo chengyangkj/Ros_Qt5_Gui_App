@@ -65,11 +65,9 @@ jobs:
         run: |
           source /opt/ros/humble/setup.bash \
           && rm -rf build \
-          && mkdir build/ \
-          && cd build/ \
-          && cmake .. -DBUILD_WITH_TEST=OFF \
-          && make -j$(nproc) \
-          && make install
+          && chmod +x ./build.sh \
+          && ./build.sh -DBUILD_WITH_TEST=OFF \
+          && cmake --install build
 
       - name: Test
         run: |

@@ -26,14 +26,14 @@ void signalHandler(int signal) {
   if (signal == SIGINT || signal == SIGTERM) {
     if (g_app) {
       g_app->exit(0);
+    }
   }
-}
 }
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   g_app = &a;
-  
+
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 

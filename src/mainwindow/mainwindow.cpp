@@ -26,6 +26,7 @@
 #include "FloatingDockContainer.h"
 #include "algorithm.h"
 #include "logger/logger.h"
+#include "config/config_manager.h"
 #include "ui_mainwindow.h"
 #include <QButtonGroup>
 #include <QMessageBox>
@@ -41,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
   Q_INIT_RESOURCE(images);
   Q_INIT_RESOURCE(media);
+  Config::ConfigManager::Instance();
   LOG_INFO(" MainWindow init thread id" << QThread::currentThreadId());
   qRegisterMetaType<std::string>("std::string");
   qRegisterMetaType<RobotPose>("RobotPose");
@@ -693,28 +695,29 @@ void MainWindow::setupUi() {
   ui->menuView->addAction(SpeedCtrlDockWidget->toggleViewAction());
 
   ////////////////////////////////////////////////////////图层配置管理
-  DisplayConfigWidget *display_config_widget_ = new DisplayConfigWidget();
+  display_config_widget_ = new DisplayConfigWidget();
   display_config_widget_->SetDisplayManager(display_manager_);
   display_config_widget_->SetChannelList(channel_manager_.DiscoveryChannelTypes());
-  ads::CDockWidget *DisplayConfigDockWidget = new ads::CDockWidget(QStringLiteral("Setting"));
-  DisplayConfigDockWidget->setWidget(display_config_widget_);
-  DisplayConfigDockWidget->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
-  DisplayConfigDockWidget->setMinimumSize(480, 240);
+  settings_dock_ = new ads::CDockWidget(tr("Setting"));
+  settings_dock_->setWidget(display_config_widget_);
+  settings_dock_->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+  settings_dock_->setMinimumSize(320, 240);
+  settings_dock_->setMaximumSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   auto display_config_area =
       dock_manager_->addDockWidget(ads::DockWidgetArea::LeftDockWidgetArea,
-                                   DisplayConfigDockWidget, center_docker_area_);
-  DisplayConfigDockWidget->toggleView(true);
-  ui->menuView->addAction(DisplayConfigDockWidget->toggleViewAction());
+                                   settings_dock_, center_docker_area_);
+  settings_dock_->toggleView(true);
+  ui->menuView->addAction(settings_dock_->toggleViewAction());
 
   diagnostic_dock_widget_ = new DiagnosticDockWidget();
-  ads::CDockWidget *diagnostic_dock = new ads::CDockWidget(QStringLiteral("Diagnostic"));
-  diagnostic_dock->setWidget(diagnostic_dock_widget_);
-  diagnostic_dock->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
-  diagnostic_dock->setMinimumSize(280, 200);
-  dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea, diagnostic_dock,
+  diagnostic_dock_ = new ads::CDockWidget(tr("Diagnostic"));
+  diagnostic_dock_->setWidget(diagnostic_dock_widget_);
+  diagnostic_dock_->setMinimumSizeHintMode(ads::CDockWidget::MinimumSizeHintFromDockWidget);
+  diagnostic_dock_->setMinimumSize(280, 200);
+  dock_manager_->addDockWidget(ads::DockWidgetArea::RightDockWidgetArea, diagnostic_dock_,
                                center_docker_area_);
-  diagnostic_dock->toggleView(false);
-  ui->menuView->addAction(diagnostic_dock->toggleViewAction());
+  diagnostic_dock_->toggleView(false);
+  ui->menuView->addAction(diagnostic_dock_->toggleViewAction());
 
   /////////////////////////////////////////////////////////导航任务列表
   QWidget *task_list_widget = new QWidget();
@@ -870,7 +873,6 @@ void MainWindow::setupUi() {
       SLOT(UpdateSelectPoint(const TopologyMap::PointInfo &)));
 
   //////////////////////////////////////////////////////图片
-
   for (auto one_image : Config::ConfigManager::Instance()->GetRootConfig().images) {
     LOG_INFO("init image window location:" << one_image.location << " topic:" << one_image.topic);
     image_frame_map_[one_image.location] = new RatioLayoutedFrame();
@@ -882,7 +884,6 @@ void MainWindow::setupUi() {
   }
 
   //////////////////////////////////////////////////////槽链接
-
   connect(this, SIGNAL(OnRecvChannelData(const MsgId &, const std::any &)),
           this, SLOT(RecvChannelMsg(const MsgId &, const std::any &)), Qt::BlockingQueuedConnection);
   connect(display_manager_, &Display::DisplayManager::signalPub2DPose,

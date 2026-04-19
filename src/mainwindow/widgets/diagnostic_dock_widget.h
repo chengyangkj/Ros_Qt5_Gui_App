@@ -21,7 +21,7 @@ class DiagnosticDockWidget : public QWidget {
   void RebuildUi();
   void UpdateSummary();
   static QString FormatTimeMs(int64_t ms);
-  static QString LevelDisplayName(int level);
+  QString LevelDisplayName(int level) const;
   static QColor LevelColor(int level);
 
   basic::DiagnosticSnapshot snapshot_;
@@ -37,4 +37,7 @@ class DiagnosticDockWidget : public QWidget {
   QLabel *empty_label_{nullptr};
   QLabel *filter_hint_{nullptr};
   QTreeWidget *tree_{nullptr};
+  QPushButton *refresh_btn_{nullptr};
+  QPushButton *clear_filter_btn_{nullptr};
+  QPushButton *filter_chip_buttons_[5]{};
 };

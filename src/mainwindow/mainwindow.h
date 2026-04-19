@@ -22,6 +22,7 @@
 #include <QTreeView>
 #include <QWidgetAction>
 #include <QPoint>
+#include <QEvent>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "DockAreaWidget.h"
 #include "DockManager.h"
@@ -45,6 +46,7 @@ class MainWindow;
 QT_END_NAMESPACE
 
 class DiagnosticDockWidget;
+class DisplayConfigWidget;
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -86,7 +88,10 @@ class MainWindow : public QMainWindow {
   QPoint drag_position_;
   std::map<std::string, RatioLayoutedFrame *> image_frame_map_;
   std::string map_path_{"./map"};
+  DisplayConfigWidget *display_config_widget_{nullptr};
+  ads::CDockWidget *settings_dock_{nullptr};
   DiagnosticDockWidget *diagnostic_dock_widget_{nullptr};
+  ads::CDockWidget *diagnostic_dock_{nullptr};
   
  signals:
   void OnRecvChannelData(const MsgId &id, const std::any &data);

@@ -38,7 +38,7 @@ QString LineEditStyle() {
 DisplayConfigWidget::DisplayConfigWidget(QWidget *parent)
     : QWidget(parent), robot_color_(QColor(0, 0, 255)) {
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  setMinimumWidth(420);
+  setMinimumWidth(280);
   ApplyGlobalStyle();
   InitUI();
 }
@@ -110,21 +110,23 @@ QFrame *DisplayConfigWidget::CreateSettingsCard(QWidget *parent) {
   return card;
 }
 
-void DisplayConfigWidget::AddSectionHeader(QVBoxLayout *layout, const QString &title) {
+QLabel *DisplayConfigWidget::AddSectionHeader(QVBoxLayout *layout, const QString &title) {
   QLabel *lbl = new QLabel(title);
   lbl->setStyleSheet(
       QStringLiteral("QLabel { color: #5f6368; font-size: 12px; font-weight: 600; "
                      "letter-spacing: 0.3px; padding: 16px 4px 6px 4px; }"));
   layout->addWidget(lbl);
+  return lbl;
 }
 
-void DisplayConfigWidget::AddHintLabel(QVBoxLayout *layout, const QString &text) {
+QLabel *DisplayConfigWidget::AddHintLabel(QVBoxLayout *layout, const QString &text) {
   QLabel *lbl = new QLabel(text);
   lbl->setObjectName(QStringLiteral("pageSubtitle"));
   lbl->setWordWrap(true);
   lbl->setStyleSheet(
       QStringLiteral("QLabel { font-size: 12px; color: #80868b; line-height: 1.45; padding: 0 2px 14px 2px; }"));
   layout->addWidget(lbl);
+  return lbl;
 }
 
 void DisplayConfigWidget::InitUI() {
@@ -133,10 +135,10 @@ void DisplayConfigWidget::InitUI() {
   main_layout_->setSpacing(0);
   setAutoFillBackground(true);
 
-  QLabel *title_label = new QLabel(QStringLiteral("Settings"), this);
-  title_label->setStyleSheet(
+  title_label_ = new QLabel(tr("Settings"), this);
+  title_label_->setStyleSheet(
       QStringLiteral("QLabel { font-size: 22px; font-weight: 700; color: #202124; padding: 4px 2px 14px 2px; }"));
-  main_layout_->addWidget(title_label);
+  main_layout_->addWidget(title_label_);
 
   QHBoxLayout *body = new QHBoxLayout();
   body->setSpacing(16);
@@ -144,17 +146,13 @@ void DisplayConfigWidget::InitUI() {
 
   nav_list_ = new QListWidget(this);
   nav_list_->setObjectName(QStringLiteral("settingsNav"));
-  nav_list_->setMinimumWidth(200);
-  nav_list_->setMaximumWidth(260);
+  nav_list_->setMinimumWidth(160);
+  nav_list_->setMaximumWidth(320);
   nav_list_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
   nav_list_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   nav_list_->setFocusPolicy(Qt::StrongFocus);
-  const QStringList navTitles = {QStringLiteral("Channel"),
-                                 QStringLiteral("Display & topics"),
-                                 QStringLiteral("Cameras"),
-                                 QStringLiteral("Robot shape"),
-                                 QStringLiteral("Default map"),
-                                 QStringLiteral("Key-value")};
+  const QStringList navTitles = {tr("Channel"), tr("Display & topics"), tr("Cameras"),
+                                 tr("Robot shape"), tr("Default map"), tr("Key-value")};
   for (const QString &t : navTitles) {
     nav_list_->addItem(t);
   }
@@ -183,14 +181,14 @@ QWidget *DisplayConfigWidget::CreateChannelPage() {
   root->setContentsMargins(8, 4, 8, 8);
   root->setSpacing(0);
 
-  QLabel *page_title = new QLabel(QStringLiteral("Channel"));
+  QLabel *page_title = new QLabel(tr("Channel"));
   page_title->setObjectName(QStringLiteral("pageTitle"));
   root->addWidget(page_title);
-  AddHintLabel(root, QStringLiteral(
-      "Maps to channel_config in config.json: channel_type (e.g. auto, rosbridge, ros1, ros2) "
-      "and rosbridge_config.ip / port when using rosbridge."));
+  AddHintLabel(root,
+               tr("Maps to channel_config in config.json: channel_type (e.g. auto, rosbridge, ros1, ros2) "
+                  "and rosbridge_config.ip / port when using rosbridge."));
 
-  AddSectionHeader(root, QStringLiteral("Connection"));
+  connection_section_label_ = AddSectionHeader(root, tr("Connection"));
 
   QFrame *card = CreateSettingsCard(page);
   QVBoxLayout *card_layout = new QVBoxLayout(card);
@@ -198,9 +196,9 @@ QWidget *DisplayConfigWidget::CreateChannelPage() {
   card_layout->setSpacing(14);
 
   QHBoxLayout *type_layout = new QHBoxLayout();
-  QLabel *type_label = new QLabel(QStringLiteral("Channel type"));
-  type_label->setFixedWidth(88);
-  type_label->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
+  channel_type_label_ = new QLabel(tr("Channel type"));
+  channel_type_label_->setFixedWidth(88);
+  channel_type_label_->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
   channel_type_combo_ = new QComboBox(card);
   channel_type_combo_->setMinimumHeight(36);
   channel_type_combo_->setStyleSheet(
@@ -221,22 +219,22 @@ QWidget *DisplayConfigWidget::CreateChannelPage() {
     rosbridge_ip_edit_->setEnabled(show_rosbridge);
     rosbridge_port_edit_->setEnabled(show_rosbridge);
     if (QString::fromStdString(channel_type) != old_channel_type) {
-      QMessageBox::information(this, QStringLiteral("Channel"),
-                               QStringLiteral("Channel type changed. Restart the application to apply."), QMessageBox::Ok);
+      QMessageBox::information(this, tr("Channel"),
+                               tr("Channel type changed. Restart the application to apply."), QMessageBox::Ok);
     }
   });
-  type_layout->addWidget(type_label);
+  type_layout->addWidget(channel_type_label_);
   type_layout->addWidget(channel_type_combo_, 1);
   card_layout->addLayout(type_layout);
 
-  QLabel *rb_title = new QLabel(QStringLiteral("ROSBridge"));
-  rb_title->setStyleSheet(QStringLiteral("color:#80868b;font-size:11px;font-weight:600;padding-top:4px;"));
-  card_layout->addWidget(rb_title);
+  rosbridge_section_label_ = new QLabel(tr("ROSBridge"));
+  rosbridge_section_label_->setStyleSheet(QStringLiteral("color:#80868b;font-size:11px;font-weight:600;padding-top:4px;"));
+  card_layout->addWidget(rosbridge_section_label_);
 
   QHBoxLayout *ip_layout = new QHBoxLayout();
-  QLabel *ip_label = new QLabel(QStringLiteral("Address"));
-  ip_label->setFixedWidth(88);
-  ip_label->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
+  rosbridge_ip_label_ = new QLabel(tr("Address"));
+  rosbridge_ip_label_->setFixedWidth(88);
+  rosbridge_ip_label_->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
   rosbridge_ip_edit_ = new QLineEdit(card);
   rosbridge_ip_edit_->setPlaceholderText(QStringLiteral("127.0.0.1"));
   rosbridge_ip_edit_->setStyleSheet(LineEditStyle());
@@ -250,18 +248,18 @@ QWidget *DisplayConfigWidget::CreateChannelPage() {
     config.channel_config.rosbridge_config.ip = new_ip.toStdString();
     AutoSaveConfig();
     if (new_ip != old_ip && !new_ip.isEmpty()) {
-      QMessageBox::information(this, QStringLiteral("ROSBridge"),
-                               QStringLiteral("IP changed. Restart the application to apply."), QMessageBox::Ok);
+      QMessageBox::information(this, tr("ROSBridge"),
+                               tr("IP changed. Restart the application to apply."), QMessageBox::Ok);
     }
   });
-  ip_layout->addWidget(ip_label);
+  ip_layout->addWidget(rosbridge_ip_label_);
   ip_layout->addWidget(rosbridge_ip_edit_, 1);
   card_layout->addLayout(ip_layout);
 
   QHBoxLayout *port_layout = new QHBoxLayout();
-  QLabel *port_label = new QLabel(QStringLiteral("Port"));
-  port_label->setFixedWidth(88);
-  port_label->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
+  rosbridge_port_label_ = new QLabel(tr("Port"));
+  rosbridge_port_label_->setFixedWidth(88);
+  rosbridge_port_label_->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
   rosbridge_port_edit_ = new QLineEdit(card);
   rosbridge_port_edit_->setPlaceholderText(QStringLiteral("9090"));
   rosbridge_port_edit_->setStyleSheet(LineEditStyle());
@@ -275,25 +273,25 @@ QWidget *DisplayConfigWidget::CreateChannelPage() {
     config.channel_config.rosbridge_config.port = new_port.toStdString();
     AutoSaveConfig();
     if (new_port != old_port && !new_port.isEmpty()) {
-      QMessageBox::information(this, QStringLiteral("ROSBridge"),
-                               QStringLiteral("Port changed. Restart the application to apply."), QMessageBox::Ok);
+      QMessageBox::information(this, tr("ROSBridge"),
+                               tr("Port changed. Restart the application to apply."), QMessageBox::Ok);
     }
   });
-  port_layout->addWidget(port_label);
+  port_layout->addWidget(rosbridge_port_label_);
   port_layout->addWidget(rosbridge_port_edit_, 1);
   card_layout->addLayout(port_layout);
 
   root->addWidget(card);
 
-  reconnect_channel_btn_ = new QPushButton(QStringLiteral("Help"), page);
+  reconnect_channel_btn_ = new QPushButton(tr("Help"), page);
   reconnect_channel_btn_->setCursor(Qt::PointingHandCursor);
   reconnect_channel_btn_->setStyleSheet(
       QStringLiteral("QPushButton { border:none; color:#1a73e8; font-size:13px; padding:10px 4px; background:transparent; }"
                      "QPushButton:hover { text-decoration:underline; color:#1557b0; }"));
   connect(reconnect_channel_btn_, &QPushButton::clicked, [this]() {
     QMessageBox::information(
-        this, QStringLiteral("Channel"),
-        QStringLiteral("Changes are saved to config.json.\nRestart the application after changing channel type or ROSBridge address."),
+        this, tr("Channel"),
+        tr("Changes are saved to config.json.\nRestart the application after changing channel type or ROSBridge address."),
         QMessageBox::Ok);
   });
   root->addWidget(reconnect_channel_btn_, 0, Qt::AlignLeft);
@@ -307,12 +305,12 @@ QWidget *DisplayConfigWidget::CreateLayersPage() {
   root->setContentsMargins(8, 4, 8, 8);
   root->setSpacing(0);
 
-  QLabel *page_title = new QLabel(QStringLiteral("Display & topics"));
+  QLabel *page_title = new QLabel(tr("Display & topics"));
   page_title->setObjectName(QStringLiteral("pageTitle"));
   root->addWidget(page_title);
-  AddHintLabel(root, QStringLiteral(
-      "Maps to display_config in config.json: display_name, topic, visible. "
-      "Labels on the left match layer names; edit the ROS topic for each layer."));
+  AddHintLabel(root,
+               tr("Maps to display_config in config.json: display_name, topic, visible. "
+                  "Labels on the left match layer names; edit the ROS topic for each layer."));
 
   QScrollArea *scroll = new QScrollArea(page);
   scroll->setWidgetResizable(true);
@@ -322,32 +320,32 @@ QWidget *DisplayConfigWidget::CreateLayersPage() {
   sl->setContentsMargins(0, 0, 8, 0);
   sl->setSpacing(4);
 
-  const std::vector<std::pair<QString, std::vector<std::pair<std::string, QString>>>> groups = {
-      {QStringLiteral("Map & localization"),
-       {{DISPLAY_MAP, QStringLiteral("Occupancy map")},
-        {DISPLAY_ROBOT, QStringLiteral("Odometry / robot")}}},
-      {QStringLiteral("Perception"),
-       {{DISPLAY_LASER, QStringLiteral("Laser scan")}}},
-      {QStringLiteral("Planning"),
-       {{DISPLAY_GLOBAL_PATH, QStringLiteral("Global path")},
-        {DISPLAY_LOCAL_PATH, QStringLiteral("Local path")}}},
-      {QStringLiteral("Costmaps"),
-       {{DISPLAY_GLOBAL_COST_MAP, QStringLiteral("Global costmap")},
-        {DISPLAY_LOCAL_COST_MAP, QStringLiteral("Local costmap")}}},
-      {QStringLiteral("Interaction"),
-       {{DISPLAY_ROBOT_FOOTPRINT, QStringLiteral("Robot footprint")},
-        {DISPLAY_GOAL, QStringLiteral("Navigation goal")}}},
+  const struct {
+    const char *section_en;
+    std::vector<std::pair<std::string, const char *>> rows;
+  } groups[] = {
+      {"Map & localization",
+       {{DISPLAY_MAP, "Occupancy map"},
+        {DISPLAY_ROBOT, "Odometry / robot"}}},
+      {"Perception", {{DISPLAY_LASER, "Laser scan"}}},
+      {"Planning",
+       {{DISPLAY_GLOBAL_PATH, "Global path"}, {DISPLAY_LOCAL_PATH, "Local path"}}},
+      {"Costmaps",
+       {{DISPLAY_GLOBAL_COST_MAP, "Global costmap"},
+        {DISPLAY_LOCAL_COST_MAP, "Local costmap"}}},
+      {"Interaction",
+       {{DISPLAY_ROBOT_FOOTPRINT, "Robot footprint"}, {DISPLAY_GOAL, "Navigation goal"}}},
   };
 
   for (const auto &grp : groups) {
-    AddSectionHeader(sl, grp.first);
+    AddSectionHeader(sl, tr(grp.section_en));
     QFrame *card = CreateSettingsCard(scroll_body);
     QVBoxLayout *card_layout = new QVBoxLayout(card);
     card_layout->setContentsMargins(0, 0, 0, 0);
     card_layout->setSpacing(0);
 
-    for (size_t i = 0; i < grp.second.size(); ++i) {
-      const auto &entry = grp.second[i];
+    for (size_t i = 0; i < grp.rows.size(); ++i) {
+      const auto &entry = grp.rows[i];
       const std::string &display_name = entry.first;
 
       QWidget *row = new QWidget(card);
@@ -356,7 +354,7 @@ QWidget *DisplayConfigWidget::CreateLayersPage() {
       h->setContentsMargins(14, 12, 14, 12);
       h->setSpacing(12);
 
-      QLabel *name = new QLabel(entry.second);
+      QLabel *name = new QLabel(tr(entry.second));
       name->setMinimumWidth(132);
       name->setStyleSheet(QStringLiteral("font-size:13px;color:#202124;font-weight:500;"));
 
@@ -383,7 +381,7 @@ QWidget *DisplayConfigWidget::CreateLayersPage() {
       h->addWidget(toggle, 0);
       card_layout->addWidget(row);
 
-      if (i + 1 < grp.second.size()) {
+      if (i + 1 < grp.rows.size()) {
         QFrame *sep = new QFrame(card);
         sep->setFixedHeight(1);
         sep->setStyleSheet(QStringLiteral("background:rgba(0,0,0,0.06); border:none; max-height:1px;"));
@@ -405,11 +403,10 @@ QWidget *DisplayConfigWidget::CreateImagePage() {
   root->setContentsMargins(8, 4, 8, 8);
   root->setSpacing(0);
 
-  QLabel *page_title = new QLabel(QStringLiteral("Cameras"));
+  QLabel *page_title = new QLabel(tr("Cameras"));
   page_title->setObjectName(QStringLiteral("pageTitle"));
   root->addWidget(page_title);
-  AddHintLabel(root, QStringLiteral(
-      "Maps to images in config.json: location (dock id), topic, enable."));
+  AddHintLabel(root, tr("Maps to images in config.json: location (dock id), topic, enable."));
 
   QFrame *card = CreateSettingsCard(page);
   QVBoxLayout *card_layout = new QVBoxLayout(card);
@@ -418,7 +415,7 @@ QWidget *DisplayConfigWidget::CreateImagePage() {
 
   image_table_ = new QTableWidget(0, 4, card);
   image_table_->setHorizontalHeaderLabels(
-      QStringList() << QStringLiteral("Location") << QStringLiteral("Topic") << QStringLiteral("Enable") << QStringLiteral(""));
+      QStringList() << tr("Location") << tr("Topic") << tr("Enable") << QString());
   image_table_->horizontalHeader()->setStretchLastSection(true);
   image_table_->horizontalHeader()->setDefaultSectionSize(100);
   image_table_->verticalHeader()->setVisible(false);
@@ -435,16 +432,16 @@ QWidget *DisplayConfigWidget::CreateImagePage() {
     OnImageConfigChanged(row);
   });
 
-  QPushButton *add_btn = new QPushButton(QStringLiteral("Add camera"), card);
-  add_btn->setCursor(Qt::PointingHandCursor);
-  add_btn->setStyleSheet(
+  image_add_btn_ = new QPushButton(tr("Add camera"), card);
+  image_add_btn_->setCursor(Qt::PointingHandCursor);
+  image_add_btn_->setStyleSheet(
       QStringLiteral("QPushButton { border:1px solid rgba(26,115,232,0.45); border-radius:8px; padding:8px 16px; "
                      "background:#fff; color:#1a73e8; font-weight:500; font-size:13px; }"
                      "QPushButton:hover { background:#e8f0fe; }"));
-  connect(add_btn, &QPushButton::clicked, this, &DisplayConfigWidget::OnAddImageConfig);
+  connect(image_add_btn_, &QPushButton::clicked, this, &DisplayConfigWidget::OnAddImageConfig);
 
   card_layout->addWidget(image_table_);
-  card_layout->addWidget(add_btn, 0, Qt::AlignLeft);
+  card_layout->addWidget(image_add_btn_, 0, Qt::AlignLeft);
   root->addWidget(card, 1);
   return page;
 }
@@ -455,11 +452,10 @@ QWidget *DisplayConfigWidget::CreateRobotPage() {
   root->setContentsMargins(8, 4, 8, 8);
   root->setSpacing(0);
 
-  QLabel *page_title = new QLabel(QStringLiteral("Robot shape"));
+  QLabel *page_title = new QLabel(tr("Robot shape"));
   page_title->setObjectName(QStringLiteral("pageTitle"));
   root->addWidget(page_title);
-  AddHintLabel(root, QStringLiteral(
-      "Maps to robot_shape_config in config.json: shaped_points, is_ellipse, color, opacity."));
+  AddHintLabel(root, tr("Maps to robot_shape_config in config.json: shaped_points, is_ellipse, color, opacity."));
 
   QScrollArea *scroll = new QScrollArea(page);
   scroll->setWidgetResizable(true);
@@ -469,18 +465,18 @@ QWidget *DisplayConfigWidget::CreateRobotPage() {
   outer->setContentsMargins(0, 0, 8, 0);
   outer->setSpacing(12);
 
-  AddSectionHeader(outer, QStringLiteral("Polygon vertices"));
+  robot_polygon_section_label_ = AddSectionHeader(outer, tr("Polygon vertices"));
   QFrame *points_card = CreateSettingsCard(scroll_content);
   QVBoxLayout *points_layout = new QVBoxLayout(points_card);
   points_layout->setContentsMargins(14, 14, 14, 14);
   points_layout->setSpacing(10);
 
-  QLabel *points_hint = new QLabel(QStringLiteral("Vertices in the plane (meters)"));
-  points_hint->setStyleSheet(QStringLiteral("QLabel { color:#80868b; font-size:12px; }"));
-  points_layout->addWidget(points_hint);
+  robot_points_hint_label_ = new QLabel(tr("Vertices in the plane (meters)"));
+  robot_points_hint_label_->setStyleSheet(QStringLiteral("QLabel { color:#80868b; font-size:12px; }"));
+  points_layout->addWidget(robot_points_hint_label_);
 
   robot_points_table_ = new QTableWidget(0, 2, points_card);
-  robot_points_table_->setHorizontalHeaderLabels(QStringList() << QStringLiteral("X") << QStringLiteral("Y"));
+  robot_points_table_->setHorizontalHeaderLabels(QStringList() << tr("X") << tr("Y"));
   robot_points_table_->horizontalHeader()->setStretchLastSection(true);
   robot_points_table_->setSelectionBehavior(QAbstractItemView::SelectRows);
   robot_points_table_->setShowGrid(false);
@@ -492,13 +488,13 @@ QWidget *DisplayConfigWidget::CreateRobotPage() {
   connect(robot_points_table_, &QTableWidget::cellChanged, this, &DisplayConfigWidget::OnRobotShapePointChanged);
 
   QHBoxLayout *points_btn_layout = new QHBoxLayout();
-  QPushButton *add_point_btn = new QPushButton(QStringLiteral("Add vertex"), points_card);
-  add_point_btn->setCursor(Qt::PointingHandCursor);
-  add_point_btn->setStyleSheet(
+  robot_add_vertex_btn_ = new QPushButton(tr("Add vertex"), points_card);
+  robot_add_vertex_btn_->setCursor(Qt::PointingHandCursor);
+  robot_add_vertex_btn_->setStyleSheet(
       QStringLiteral("QPushButton { border:1px solid rgba(26,115,232,0.45); border-radius:8px; padding:6px 12px; "
                      "background:#fff; color:#1a73e8; font-size:13px; }"
                      "QPushButton:hover { background:#e8f0fe; }"));
-  connect(add_point_btn, &QPushButton::clicked, [this]() {
+  connect(robot_add_vertex_btn_, &QPushButton::clicked, [this]() {
     int row = robot_points_table_->rowCount();
     robot_points_table_->insertRow(row);
     robot_points_table_->setItem(row, 0, new QTableWidgetItem(QStringLiteral("0.0")));
@@ -506,13 +502,13 @@ QWidget *DisplayConfigWidget::CreateRobotPage() {
     OnRobotShapePointChanged();
   });
 
-  QPushButton *remove_point_btn = new QPushButton(QStringLiteral("Remove selected"), points_card);
-  remove_point_btn->setCursor(Qt::PointingHandCursor);
-  remove_point_btn->setStyleSheet(
+  robot_remove_vertex_btn_ = new QPushButton(tr("Remove selected"), points_card);
+  robot_remove_vertex_btn_->setCursor(Qt::PointingHandCursor);
+  robot_remove_vertex_btn_->setStyleSheet(
       QStringLiteral("QPushButton { border:none; border-radius:8px; padding:6px 12px; background:transparent; "
                      "color:#d93025; font-size:13px; }"
                      "QPushButton:hover { background:#fce8e6; }"));
-  connect(remove_point_btn, &QPushButton::clicked, [this]() {
+  connect(robot_remove_vertex_btn_, &QPushButton::clicked, [this]() {
     int row = robot_points_table_->currentRow();
     if (row >= 0) {
       robot_points_table_->removeRow(row);
@@ -520,30 +516,30 @@ QWidget *DisplayConfigWidget::CreateRobotPage() {
     }
   });
 
-  points_btn_layout->addWidget(add_point_btn);
-  points_btn_layout->addWidget(remove_point_btn);
+  points_btn_layout->addWidget(robot_add_vertex_btn_);
+  points_btn_layout->addWidget(robot_remove_vertex_btn_);
   points_btn_layout->addStretch();
 
   points_layout->addWidget(robot_points_table_);
   points_layout->addLayout(points_btn_layout);
   outer->addWidget(points_card);
 
-  AddSectionHeader(outer, QStringLiteral("Style"));
+  robot_style_section_label_ = AddSectionHeader(outer, tr("Style"));
   QFrame *style_card = CreateSettingsCard(scroll_content);
   QVBoxLayout *style_layout = new QVBoxLayout(style_card);
   style_layout->setContentsMargins(14, 14, 14, 14);
   style_layout->setSpacing(14);
 
-  robot_is_ellipse_checkbox_ = new QCheckBox(QStringLiteral("Approximate with ellipse"), style_card);
+  robot_is_ellipse_checkbox_ = new QCheckBox(tr("Approximate with ellipse"), style_card);
   robot_is_ellipse_checkbox_->setStyleSheet(QStringLiteral("QCheckBox { font-size:13px; color:#202124; spacing:8px; }"
                                                            "QCheckBox::indicator { width:18px; height:18px; }"));
   connect(robot_is_ellipse_checkbox_, &QCheckBox::toggled, this, &DisplayConfigWidget::OnRobotShapeIsEllipseChanged);
 
   QHBoxLayout *color_layout = new QHBoxLayout();
-  QLabel *color_label = new QLabel(QStringLiteral("Color"));
-  color_label->setFixedWidth(72);
-  color_label->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
-  robot_color_button_ = new QPushButton(QStringLiteral("Choose color"), style_card);
+  robot_color_caption_label_ = new QLabel(tr("Color"));
+  robot_color_caption_label_->setFixedWidth(72);
+  robot_color_caption_label_->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
+  robot_color_button_ = new QPushButton(tr("Choose color"), style_card);
   robot_color_button_->setMinimumWidth(120);
   robot_color_button_->setCursor(Qt::PointingHandCursor);
   robot_color_button_->setStyleSheet(
@@ -551,14 +547,14 @@ QWidget *DisplayConfigWidget::CreateRobotPage() {
                      "font-size:13px; }"
                      "QPushButton:hover { border-color:#1a73e8; }"));
   connect(robot_color_button_, &QPushButton::clicked, this, &DisplayConfigWidget::OnRobotShapeColorChanged);
-  color_layout->addWidget(color_label);
+  color_layout->addWidget(robot_color_caption_label_);
   color_layout->addWidget(robot_color_button_);
   color_layout->addStretch();
 
   QHBoxLayout *opacity_layout = new QHBoxLayout();
-  QLabel *opacity_label = new QLabel(QStringLiteral("Opacity"));
-  opacity_label->setFixedWidth(72);
-  opacity_label->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
+  robot_opacity_caption_label_ = new QLabel(tr("Opacity"));
+  robot_opacity_caption_label_->setFixedWidth(72);
+  robot_opacity_caption_label_->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
   robot_opacity_slider_ = new QSlider(Qt::Horizontal, style_card);
   robot_opacity_slider_->setRange(0, 100);
   robot_opacity_slider_->setValue(50);
@@ -572,7 +568,7 @@ QWidget *DisplayConfigWidget::CreateRobotPage() {
     robot_opacity_label_->setText(QString::number(value) + QStringLiteral("%"));
     OnRobotShapeOpacityChanged(value);
   });
-  opacity_layout->addWidget(opacity_label);
+  opacity_layout->addWidget(robot_opacity_caption_label_);
   opacity_layout->addWidget(robot_opacity_slider_, 1);
   opacity_layout->addWidget(robot_opacity_label_);
 
@@ -594,11 +590,11 @@ QWidget *DisplayConfigWidget::CreateMapPage() {
   root->setContentsMargins(8, 4, 8, 8);
   root->setSpacing(0);
 
-  QLabel *page_title = new QLabel(QStringLiteral("Default map"));
+  QLabel *page_title = new QLabel(tr("Default map"));
   page_title->setObjectName(QStringLiteral("pageTitle"));
   root->addWidget(page_title);
-  AddHintLabel(root, QStringLiteral(
-      "Maps to map_config.path in config.json: YAML file to load on startup (with or without .yaml)."));
+  AddHintLabel(root,
+               tr("Maps to map_config.path in config.json: YAML file to load on startup (with or without .yaml)."));
 
   QFrame *card = CreateSettingsCard(page);
   QVBoxLayout *card_layout = new QVBoxLayout(card);
@@ -606,11 +602,11 @@ QWidget *DisplayConfigWidget::CreateMapPage() {
   card_layout->setSpacing(12);
 
   QHBoxLayout *path_layout = new QHBoxLayout();
-  QLabel *path_label = new QLabel(QStringLiteral("Map path"));
-  path_label->setFixedWidth(88);
-  path_label->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
+  map_path_label_ = new QLabel(tr("Map path"));
+  map_path_label_->setFixedWidth(88);
+  map_path_label_->setStyleSheet(QStringLiteral("color:#3c4043;font-size:13px;"));
   map_path_edit_ = new QLineEdit(card);
-  map_path_edit_->setPlaceholderText(QStringLiteral("e.g. C:/maps/office.yaml"));
+  map_path_edit_->setPlaceholderText(tr("e.g. C:/maps/office.yaml"));
   map_path_edit_->setStyleSheet(LineEditStyle());
   connect(map_path_edit_, &QLineEdit::editingFinished, [this]() {
     if (is_loading_config_) {
@@ -619,15 +615,15 @@ QWidget *DisplayConfigWidget::CreateMapPage() {
     Config::ConfigManager::Instance()->GetRootConfig().map_config.path = map_path_edit_->text().toStdString();
     AutoSaveConfig();
   });
-  QPushButton *browse_btn = new QPushButton(QStringLiteral("Browse…"), card);
-  browse_btn->setCursor(Qt::PointingHandCursor);
-  browse_btn->setStyleSheet(
+  map_browse_btn_ = new QPushButton(tr("Browse…"), card);
+  map_browse_btn_->setCursor(Qt::PointingHandCursor);
+  map_browse_btn_->setStyleSheet(
       QStringLiteral("QPushButton { border:1px solid #dadce0; border-radius:8px; padding:8px 14px; background:#fff; "
                      "font-size:13px; color:#1a73e8; }"
                      "QPushButton:hover { background:#e8f0fe; border-color:#1a73e8; }"));
-  connect(browse_btn, &QPushButton::clicked, [this]() {
-    QString f = QFileDialog::getOpenFileName(this, QStringLiteral("Select map YAML"), QString(),
-                                               QStringLiteral("YAML (*.yaml *.yml);;All (*.*)"));
+  connect(map_browse_btn_, &QPushButton::clicked, [this]() {
+    QString f = QFileDialog::getOpenFileName(this, tr("Select map YAML"), QString(),
+                                               tr("YAML (*.yaml *.yml);;All (*.*)"));
     if (!f.isEmpty()) {
       map_path_edit_->setText(f);
       if (!is_loading_config_) {
@@ -636,9 +632,9 @@ QWidget *DisplayConfigWidget::CreateMapPage() {
       }
     }
   });
-  path_layout->addWidget(path_label);
+  path_layout->addWidget(map_path_label_);
   path_layout->addWidget(map_path_edit_, 1);
-  path_layout->addWidget(browse_btn);
+  path_layout->addWidget(map_browse_btn_);
   card_layout->addLayout(path_layout);
 
   root->addWidget(card);
@@ -652,12 +648,12 @@ QWidget *DisplayConfigWidget::CreateKeyValuePage() {
   root->setContentsMargins(8, 4, 8, 8);
   root->setSpacing(0);
 
-  QLabel *page_title = new QLabel(QStringLiteral("Key-value"));
+  QLabel *page_title = new QLabel(tr("Key-value"));
   page_title->setObjectName(QStringLiteral("pageTitle"));
   root->addWidget(page_title);
-  AddHintLabel(root, QStringLiteral(
-      "Maps to key_value in config.json: arbitrary string pairs for channel and app options "
-      "(e.g. BaseFrameId, DiagnosticMsgType)."));
+  AddHintLabel(root,
+               tr("Maps to key_value in config.json: arbitrary string pairs for channel and app options "
+                  "(e.g. BaseFrameId)."));
 
   QFrame *card = CreateSettingsCard(page);
   QVBoxLayout *card_layout = new QVBoxLayout(card);
@@ -675,16 +671,16 @@ QWidget *DisplayConfigWidget::CreateKeyValuePage() {
   scroll->setWidget(key_value_host_);
   card_layout->addWidget(scroll);
 
-  QPushButton *add_btn = new QPushButton(QStringLiteral("Add entry"), page);
-  add_btn->setCursor(Qt::PointingHandCursor);
-  add_btn->setStyleSheet(
+  key_value_add_btn_ = new QPushButton(tr("Add entry"), page);
+  key_value_add_btn_->setCursor(Qt::PointingHandCursor);
+  key_value_add_btn_->setStyleSheet(
       QStringLiteral("QPushButton { border:1px solid rgba(26,115,232,0.45); border-radius:8px; padding:8px 16px; "
                      "background:#fff; color:#1a73e8; font-weight:500; margin-top:10px; }"
                      "QPushButton:hover { background:#e8f0fe; }"));
-  connect(add_btn, &QPushButton::clicked, this, &DisplayConfigWidget::OnAddKeyValue);
+  connect(key_value_add_btn_, &QPushButton::clicked, this, &DisplayConfigWidget::OnAddKeyValue);
 
   root->addWidget(card, 1);
-  root->addWidget(add_btn, 0, Qt::AlignLeft);
+  root->addWidget(key_value_add_btn_, 0, Qt::AlignLeft);
   return page;
 }
 
@@ -694,7 +690,7 @@ void DisplayConfigWidget::SetChannelList(const std::vector<std::string> &channel
   channel_type_combo_->blockSignals(true);
   channel_type_combo_->clear();
 
-  channel_type_combo_->addItem(QStringLiteral("Auto"), QStringLiteral("auto"));
+  channel_type_combo_->addItem(tr("Auto"), QStringLiteral("auto"));
   for (const auto &channel_type : channel_list_) {
     QString q = QString::fromStdString(channel_type);
     channel_type_combo_->addItem(q, q);
@@ -756,11 +752,9 @@ void DisplayConfigWidget::OnKeyValueChanged(const std::string &key, const QStrin
 
 void DisplayConfigWidget::OnAddKeyValue() {
   bool ok = false;
-  QString key = QInputDialog::getText(this, QStringLiteral("Add entry"), QStringLiteral("Key:"),
-                                        QLineEdit::Normal, QString(), &ok);
+  QString key = QInputDialog::getText(this, tr("Add entry"), tr("Key:"), QLineEdit::Normal, QString(), &ok);
   if (ok && !key.isEmpty()) {
-    QString value = QInputDialog::getText(this, QStringLiteral("Add entry"), QStringLiteral("Value:"),
-                                            QLineEdit::Normal, QString(), &ok);
+    QString value = QInputDialog::getText(this, tr("Add entry"), tr("Value:"), QLineEdit::Normal, QString(), &ok);
     if (ok) {
       SET_KEY_VALUE(key.toStdString(), value.toStdString())
       RefreshKeyValueTab();
@@ -804,7 +798,7 @@ void DisplayConfigWidget::RefreshKeyValueTab() {
     item_layout->addWidget(key_label);
 
     QLineEdit *value_edit = new QLineEdit(QString::fromStdString(value), item_widget);
-    value_edit->setPlaceholderText(QStringLiteral("Value"));
+    value_edit->setPlaceholderText(tr("Value"));
     value_edit->setStyleSheet(LineEditStyle());
     key_value_edits_[key] = value_edit;
     connect(value_edit, &QLineEdit::editingFinished, [this, key, value_edit]() {
@@ -812,7 +806,7 @@ void DisplayConfigWidget::RefreshKeyValueTab() {
     });
     item_layout->addWidget(value_edit, 1);
 
-    QPushButton *remove_btn = new QPushButton(QStringLiteral("Remove"), item_widget);
+    QPushButton *remove_btn = new QPushButton(tr("Remove"), item_widget);
     remove_btn->setFixedWidth(52);
     remove_btn->setCursor(Qt::PointingHandCursor);
     remove_btn->setStyleSheet(
@@ -848,7 +842,7 @@ void DisplayConfigWidget::OnAddImageConfig() {
     OnImageConfigChanged(row);
   });
 
-  QPushButton *remove_btn = new QPushButton(QStringLiteral("Remove"));
+  QPushButton *remove_btn = new QPushButton(tr("Remove"));
   remove_btn->setCursor(Qt::PointingHandCursor);
   remove_btn->setStyleSheet(
       QStringLiteral("QPushButton { border:none; color:#d93025; font-size:13px; padding:4px 8px; }"
@@ -949,7 +943,7 @@ void DisplayConfigWidget::OnRobotShapeIsEllipseChanged(bool checked) {
 }
 
 void DisplayConfigWidget::OnRobotShapeColorChanged() {
-  QColor color = QColorDialog::getColor(robot_color_, this, QStringLiteral("Choose color"));
+  QColor color = QColorDialog::getColor(robot_color_, this, tr("Choose color"));
   if (color.isValid()) {
     robot_color_ = color;
     QString color_style = QStringLiteral("background-color: %1;").arg(color.name());
@@ -1026,7 +1020,7 @@ void DisplayConfigWidget::LoadConfig() {
       OnImageConfigChanged(row);
     });
 
-    QPushButton *remove_btn = new QPushButton(QStringLiteral("Remove"));
+    QPushButton *remove_btn = new QPushButton(tr("Remove"));
     remove_btn->setCursor(Qt::PointingHandCursor);
     remove_btn->setStyleSheet(
         QStringLiteral("QPushButton { border:none; color:#d93025; font-size:13px; padding:4px 8px; }"

@@ -47,7 +47,6 @@ RosbridgeComm::RosbridgeComm() {
   
   // 设置默认键值配置
   SET_DEFAULT_KEY_VALUE("BaseFrameId", "base_link")
-  SET_DEFAULT_KEY_VALUE("DiagnosticMsgType", "diagnostic_msgs/DiagnosticArray")
   
   // 设置默认通道配置
   auto &config = Config::ConfigManager::Instance()->GetRootConfig();
@@ -216,10 +215,8 @@ void RosbridgeComm::ConnectAsync() {
       [this](const ROSBridgePublishMsg &msg) { TopologyMapCallback(msg); });
   subscribers_[GET_TOPIC_NAME(DISPLAY_TOPOLOGY_MAP)] = std::move(topology_map_topic);
   
-  std::string diagnostic_msg_type =
-      GET_CONFIG_VALUE("DiagnosticMsgType", std::string("diagnostic_msgs/DiagnosticArray"));
-  auto diagnostic_topic =
-      std::make_unique<ROSTopic>(*ros_bridge_, GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC), diagnostic_msg_type, 1);
+  auto diagnostic_topic = std::make_unique<ROSTopic>(
+      *ros_bridge_, GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC), "diagnostic_msgs/DiagnosticArray", 1);
   callback_handles_[GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC)] = diagnostic_topic->Subscribe(
       [this](const ROSBridgePublishMsg &msg) { DiagnosticCallback(msg); });
   subscribers_[GET_TOPIC_NAME(MSG_ID_DIAGNOSTIC)] = std::move(diagnostic_topic);
