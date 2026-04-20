@@ -65,8 +65,7 @@ jobs:
           source /opt/ros/melodic/setup.bash \
           && rm -rf build \
           && chmod +x ./build.sh \
-          && ./build.sh -DBUILD_WITH_TEST=OFF \
-          && cmake --install build
+          && ./build.sh -DBUILD_WITH_TEST=OFF
 
       - name: Test
         run: |
