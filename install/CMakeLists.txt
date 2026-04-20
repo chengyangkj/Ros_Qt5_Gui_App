@@ -2,7 +2,7 @@
 if(UNIX)
   # Linux 系统：安装 linux/bin 目录下的所有文件
   file(GLOB LINUX_BIN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/linux/bin/*")
-  install(FILES ${LINUX_BIN_FILES}
+  install(PROGRAMS ${LINUX_BIN_FILES}
     DESTINATION bin
     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
                 GROUP_READ GROUP_EXECUTE
