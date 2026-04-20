@@ -75,16 +75,25 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
           files: build/install/bin/ros_qt5_gui_app_windows_x64.zip
-          append_body: true
           generate_release_notes: true
           body: |
-            ## Windows x64 构建产物
+            ## Release assets (this workflow + sibling CI)
 
-            **附件**：`ros_qt5_gui_app_windows_x64.zip`（来自 `build/install/bin` 整目录打包）
+            This workflow publishes the **Windows** package. Other workflows upload Linux/ROS tarballs to the **same** release tag (see Assets); only this job updates the release description.
 
-            **构建**：`windows-latest`，依赖由 vcpkg manifest 安装，`build.bat` 一键配置、编译并安装。
+            ### Windows (x64)
+            - **Artifact:** `ros_qt5_gui_app_windows_x64.zip` — full `build/install/bin` folder, including Qt and runtime DLLs.
+            - **Build:** `windows-latest`, dependencies from the vcpkg manifest; `build.bat` configures, builds, and installs.
+            - **Run:** unzip and run `ros_qt5_gui_app.exe` from the extracted folder.
 
-            **使用**：解压 zip 后在目录内运行 `ros_qt5_gui_app.exe`；Qt 等平台 DLL 已与安装目录一并拷贝（与本地 `build.bat` install 产物一致）。
+            ### ROS 2 (Linux x86_64, `.tar.gz` of `build/install/bin`)
+            - **Galactic:** `ros_qt5_gui_app_galactic_x86_64.tar.gz`
+            - **Humble:** `ros_qt5_gui_app_humble_x86_64.tar.gz`
+            - **Foxy:** `ros_qt5_gui_app_foxy_x86_64.tar.gz`
+
+            ### ROS 1 (Linux x86_64, `.tar.gz` of `build/install/bin`)
+            - **Noetic:** `ros_qt5_gui_app_noetic_x86_64.tar.gz`
+            - **Melodic:** `ros_qt5_gui_app_melodic_x86_64.tar.gz`
 
             ---
         env:
