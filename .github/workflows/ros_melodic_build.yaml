@@ -16,64 +16,44 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: osrf/ros:melodic-desktop
-    env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     defaults:
       run:
         shell: bash
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
-
-      - name: Update Cmake
-        run: |
-          apt-get update && apt-get install -y wget
-          wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0-linux-x86_64.sh \
-          && chmod +x cmake-3.20.0-linux-x86_64.sh \
-          && ./cmake-3.20.0-linux-x86_64.sh --prefix=/usr/local --skip-license \
-          && ln -sf /usr/local/bin/cmake /usr/bin/cmake \
-          && cmake --version
-
-      - name: Install Dependencies
-        run: |
-          apt-get update && apt-get install -y \
-          qtbase5-dev \
-          qt5-qmake \
-          libqt5svg5-dev \
-          qtbase5-dev-tools \
-          qtbase5-private-dev \
-          libeigen3-dev \
-          libgtest-dev \
-          libsdl2-dev \
-          libsdl2-image-dev \
-          wget \
-          git
-
-      - name: Update gtest
-        run: |
-          wget https://github.com/google/googletest/archive/refs/tags/release-1.12.1.tar.gz \
-          && tar -zxvf release-1.12.1.tar.gz \
-          && cd googletest-release-1.12.1 \
-          && mkdir build \
-          && cd build \
-          && cmake .. \
-          && make -j$(nproc) \
-          && make install
+        uses: actions/checkout@v4
 
       - name: Build
         run: |
-          source /opt/ros/melodic/setup.bash \
-          && rm -rf build \
-          && chmod +x ./build.sh \
-          && ./build.sh -DBUILD_WITH_TEST=OFF
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            osrf/ros:melodic-desktop \
+            bash -lc '
+              set -e
+              apt-get update && apt-get install -y wget git
+              wget https://github.com/Kitware/CMake/releases/download/v3.20.0/cmake-3.20.0-linux-x86_64.sh
+              chmod +x cmake-3.20.0-linux-x86_64.sh
+              ./cmake-3.20.0-linux-x86_64.sh --prefix=/usr/local --skip-license
+              ln -sf /usr/local/bin/cmake /usr/bin/cmake
+              source /opt/ros/melodic/setup.bash
+              rm -rf build
+              chmod +x ./build.sh
+              ./build.sh -DBUILD_WITH_TEST=OFF
+            '
 
       - name: Test
         run: |
-          source /opt/ros/melodic/setup.bash \
-          && cd build \
-          && make test
+          docker run --rm \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            osrf/ros:melodic-desktop \
+            bash -lc '
+              set -e
+              source /opt/ros/melodic/setup.bash
+              cd build
+              make test
+            '
 
       - name: Package Release
         if: startsWith(github.ref, 'refs/tags/v')
@@ -81,12 +61,29 @@ jobs:
           cd build/install/bin
           tar -czvf ros_qt5_gui_app_melodic_x86_64.tar.gz ./*
 
+      - name: Upload Artifact
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: ros_qt5_gui_app_melodic_x86_64
+          path: build/install/bin/ros_qt5_gui_app_melodic_x86_64.tar.gz
+
+  publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ros_qt5_gui_app_melodic_x86_64
+          path: dist
+
       - name: Upload to GitHub Release
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v0.1.15
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          files: build/install/bin/ros_qt5_gui_app_melodic_x86_64.tar.gz
+          files: dist/ros_qt5_gui_app_melodic_x86_64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
