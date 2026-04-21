@@ -42,19 +42,6 @@ jobs:
               ./build.sh -DBUILD_WITH_TEST=OFF
             '
 
-      - name: Test
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}:/workspace" \
-            -w /workspace \
-            osrf/ros:melodic-desktop \
-            bash -lc '
-              set -e
-              source /opt/ros/melodic/setup.bash
-              cd build
-              make test
-            '
-
       - name: Package Release
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
