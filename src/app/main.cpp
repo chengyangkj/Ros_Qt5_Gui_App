@@ -3,7 +3,7 @@
  * @Date: 2023-09-28 14:56:04
  * @LastEditors: chengyangkj chengyangkj@qq.com
  * @LastEditTime: 2023-10-05 11:39:01
- * @FilePath: /ROS2_Qt5_Gui_App/src/main.cpp
+ * @FilePath: /ROS2_Qt5_Gui_App/src/app/main.cpp
  */
 #ifndef SDL_MAIN_HANDLED
 #define SDL_MAIN_HANDLED
@@ -18,7 +18,8 @@
 #include <csignal>
 #include <iostream>
 #include "logger/logger.h"
-#include "runtime/application_manager.h"
+#include "mainwindow.h"
+
 
 static QApplication* g_app = nullptr;
 
@@ -37,7 +38,8 @@ int main(int argc, char *argv[]) {
   std::signal(SIGINT, signalHandler);
   std::signal(SIGTERM, signalHandler);
 
-  ApplicationManager manager_;
+  MainWindow main_window;
+  main_window.show();
   LOG_INFO("ros_qt5_gui_app init!");
   return a.exec();
 }
