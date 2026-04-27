@@ -1,6 +1,6 @@
 #include "channel_manager.h"
-#include <boost/dll.hpp>
 #include <algorithm>
+#include <boost/dll.hpp>
 #include "config/config_manager.h"
 #include "logger/logger.h"
 namespace fs = boost::filesystem;
