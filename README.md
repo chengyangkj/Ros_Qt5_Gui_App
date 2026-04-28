@@ -195,7 +195,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:./lib
 cd build
 make install
 
-cd ../install/bin
+cd ./install/bin
 ./start.sh
 ```
 
@@ -233,7 +233,7 @@ cd build
 cd build
 cmake --install . --config Release
 
-cd ..\install\bin
+cd .\install\bin
 .\start.bat
 ```
 
